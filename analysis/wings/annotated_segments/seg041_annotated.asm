@@ -35,7 +35,7 @@ arg_6		= byte ptr  0Ch
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_5C]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_104]
 		push	ax
@@ -179,7 +179,7 @@ loc_1EBE2:
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_5C]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_5C]

@@ -150,7 +150,7 @@ loc_7EBB8:
 		push	offset aDataMidgames
 		lea	ax, [bp+var_EC]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_EC]
@@ -167,7 +167,7 @@ loc_7EBB8:
 		push	offset aDataCestalk
 		lea	ax, [bp+var_EC]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_1DC]
 		push	ax
@@ -187,7 +187,7 @@ loc_7EBB8:
 		push	offset aDataFonts
 		lea	ax, [bp+var_EC]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	3
 		lea	ax, [bp+var_EC]

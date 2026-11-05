@@ -179,7 +179,7 @@ loc_6CCC8:
 		push	offset aSOUND
 		lea	ax, [bp+var_5E]
 		push	ax
-		call	sub_1F0C4
+		call	Path_BuildDataPath_1F0C4
 		add	sp, 0Eh
 		lea	ax, [bp+var_D6]
 		push	ax

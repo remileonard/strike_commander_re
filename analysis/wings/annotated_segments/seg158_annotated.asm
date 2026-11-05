@@ -757,7 +757,13 @@ StreamReader_DispatchRead_52671		endp
 
 ; Attributes: bp-based frame
 
-sub_526A2		proc far
+; ==============================================================================================
+; far, ouverture d'un flux : en mode lecture (+4Ch = 1), cherche d'abord le chemin (+0Ah) dans
+; les archives TRE montées (Tre_OpenEntryByName_48C1) ; pas trouvé (ou autre mode) : crée
+; l'objet fichier (méthode +10h) et ouvre le fichier sur le disque, taille par la méthode
+; +18h. Appelée par StreamReader_ReadDispatch_5274A.
+; ==============================================================================================
+StreamReader_OpenFromTreeOrDisk_526A2		proc far
 
 var_3		= byte ptr -3
 var_2		= byte ptr -2
@@ -775,7 +781,7 @@ arg_0		= word ptr  6
 		add	ax, 0Ah
 		push	ax
 		push	si
-		call	sub_48C1
+		call	Tre_OpenEntryByName_48C1
 		add	sp, 4
 		mov	[bp+var_2], al
 
@@ -845,7 +851,7 @@ loc_52744:
 		pop	si
 		leave
 		retf
-sub_526A2		endp
+StreamReader_OpenFromTreeOrDisk_526A2		endp
 
 ; ----------------------------------------------------------------------
 
@@ -881,7 +887,7 @@ arg_4		= byte ptr  0Ah
 		add	sp, 6
 		push	si
 		push	cs
-		call	near ptr sub_526A2
+		call	near ptr StreamReader_OpenFromTreeOrDisk_526A2
 		pop	cx
 		pop	si
 		pop	bp
@@ -932,7 +938,7 @@ arg_8		= dword ptr  0Eh
 loc_527A1:
 		push	si
 		push	cs
-		call	near ptr sub_526A2
+		call	near ptr StreamReader_OpenFromTreeOrDisk_526A2
 		pop	cx
 
 loc_527A7:

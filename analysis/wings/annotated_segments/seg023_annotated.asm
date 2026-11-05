@@ -621,7 +621,7 @@ loc_D6FA:
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_2CC]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_2CC]
@@ -638,7 +638,7 @@ loc_D6FA:
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_2CC]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_2CC]
@@ -751,7 +751,7 @@ loc_D6FA:
 		push	offset aDataFonts
 		lea	ax, [bp+var_2CC]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	2
 		lea	ax, [bp+var_2CC]

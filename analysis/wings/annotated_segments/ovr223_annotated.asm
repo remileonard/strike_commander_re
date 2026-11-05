@@ -382,7 +382,7 @@ arg_0		= dword ptr  6
 		push	offset aCOCKPITS
 		lea	ax, [bp+var_54]
 		push	ax
-		call	sub_1F0C4
+		call	Path_BuildDataPath_1F0C4
 		add	sp, 0Eh
 		lea	ax, [bp+var_FC]
 		push	ax

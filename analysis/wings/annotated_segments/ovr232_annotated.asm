@@ -116,7 +116,7 @@ arg_0		= word ptr  6
 		push	offset aDataMidgames
 		lea	ax, [bp+var_BC]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_BC]
@@ -133,7 +133,7 @@ arg_0		= word ptr  6
 		push	offset aDataCestalk_1
 		lea	ax, [bp+var_BC]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_1AC]
 		push	ax

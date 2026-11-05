@@ -46,7 +46,7 @@ loc_B9B2:
 loc_B9BE:
 		lea	ax, [bp+var_72]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	0
 		lea	ax, [bp+var_9E]
@@ -86,7 +86,7 @@ loc_BA01:
 loc_BA0E:
 		lea	ax, [bp+var_72]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_72]
 		push	ax

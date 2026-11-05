@@ -579,7 +579,7 @@ arg_0		= word ptr  6
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_F0]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_198]
 		push	ax
@@ -752,7 +752,7 @@ loc_24432:
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_F0]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_F0]
@@ -2569,7 +2569,7 @@ arg_0		= word ptr  6
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_5A]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_5A]
 		push	ax

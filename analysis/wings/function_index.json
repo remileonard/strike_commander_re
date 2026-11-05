@@ -1547,8 +1547,8 @@
 "lines": 49,
 "type": "far",
 "calls": [],
-"new_name": "CRT_Stricmp",
-"summary": "Reprise de PACIFIC.EXE : code identique instruction par instruction à `CRT_Stricmp` (sub_2E86 de PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. — Reprise de OPTEST.EXE : code identique instruction par instruction à `CRT_Stricmp` (sub_270F de OPTEST.EXE). Résumé repris de OPTEST.EXE ; appelants et contexte à revérifier ici. — Reprise de STRIKE.EXE : code identique instruction par instruction à `CRT_Stricmp` (sub_2ADC de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far — comparaison de chaînes insensible à la casse (table de plage 617Ah = A-Z/a-z) : stricmp()."
+"new_name": "CRT_StrICmp_2D03",
+"summary": "far, stricmp de Borland : compare deux chaînes du segment de données sans tenir compte de la casse (a..z ramenés à A..Z), rend la différence du premier caractère différent."
 },
 "sub_2D43": {
 "segment": "seg000",
@@ -1643,8 +1643,8 @@
 "lines": 28,
 "type": "far",
 "calls": [],
-"new_name": "CRT_Strupr_2F35",
-"summary": "Reprise de PACIFIC.EXE : code identique instruction par instruction à `CRT_Strupr_30EF` (sub_30EF de PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. — Reprise de STRIKE.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `CRT_Strupr` (sub_2B99 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far — met en majuscule en place (soustrait 0x20 sur plage a-z) : strupr()."
+"new_name": "CRT_StrUpr_2F35",
+"summary": "far, strupr : met la chaîne en majuscules sur place (a..z seulement)."
 },
 "sub_2F55": {
 "segment": "seg000",
@@ -2353,8 +2353,8 @@
 "lines": 23,
 "type": "far",
 "calls": [],
-"new_name": "StreamReader_RegistryAdd_4863",
-"summary": "Reprise de PACIFIC.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `StreamReader_RegistryAdd_6BB2A` (sub_6BB2A de PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. — Reprise de OPTEST.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `StreamReader_RegistryAdd_3B920` (sub_3B920 de OPTEST.EXE). Résumé repris de OPTEST.EXE ; appelants et contexte à revérifier ici. — Reprise de STRIKE.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `StreamReader_RegistryAdd_640B0` (sub_640B0 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far, ajoute un handle à une table globale de 8 flux ouverts (word_7107C = compteur). Référencée par sub_64321."
+"new_name": "Tre_RegisterArchive_4863",
+"summary": "far, ajoute un lecteur d'archive TRE ouvert à la table des archives (8 places, mots à DS:5298h ; nombre dans word_59E58). Rend 0 si la table est pleine."
 },
 "sub_4887": {
 "segment": "seg004",
@@ -2363,8 +2363,8 @@
 "lines": 37,
 "type": "far",
 "calls": [],
-"new_name": "StreamReader_RegistryRemove_4887",
-"summary": "Reprise de PACIFIC.EXE : même suite d'instructions, 3 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `StreamReader_RegistryRemove_6BB4E` (sub_6BB4E de PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. — Reprise de OPTEST.EXE : même suite d'instructions, 3 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `StreamReader_RegistryRemove_3B944` (sub_3B944 de OPTEST.EXE). Résumé repris de OPTEST.EXE ; appelants et contexte à revérifier ici. — Reprise de STRIKE.EXE : même suite d'instructions, 3 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `StreamReader_RegistryRemove_640D4` (sub_640D4 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far, retire un handle de la table globale des flux ouverts (recherche linéaire + compactage). Référencée par sub_642FF."
+"new_name": "Tre_UnregisterArchive_4887",
+"summary": "far, retire un lecteur d'archive de la table (le dernier prend sa place)."
 },
 "sub_48C1": {
 "segment": "seg004",
@@ -2379,8 +2379,8 @@
 "sub_49FD",
 "sub_5252A"
 ],
-"new_name": "sub_48C1",
-"summary": ""
+"new_name": "Tre_OpenEntryByName_48C1",
+"summary": "far (flux, nom). Si le nom se termine par « TRE » (stricmp des 3 derniers caractères avec la chaîne DS:13Ah), rend 0 : une archive n'est jamais cherchée dans une archive. Sinon, pour chaque archive ouverte de la table, Tre_FindEntry_49FD ; trouvé : le flux devient la tranche [position, position + taille) de l'archive (sub_5252A avec les champs +0ABh = position, +0AFh = taille de l'enregistrement trouvé) et rend 1. Appelée par StreamReader_OpenFromTreeOrDisk_526A2."
 },
 "sub_495B": {
 "segment": "seg004",
@@ -2389,8 +2389,8 @@
 "lines": 36,
 "type": "far",
 "calls": [],
-"new_name": "StreamReader_DispatchWrite_495B",
-"summary": "Reprise de PACIFIC.EXE : même suite d'instructions, 2 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `StreamReader_DispatchWrite_6BC22` (sub_6BC22 de PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. — Reprise de OPTEST.EXE : même suite d'instructions, 3 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `StreamReader_DispatchWrite_3B9E5` (sub_3B9E5 de OPTEST.EXE). Résumé repris de OPTEST.EXE ; appelants et contexte à revérifier ici. — Reprise de STRIKE.EXE : même suite d'instructions, 2 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `StreamReader_DispatchWrite_64175` (sub_64175 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far, dispatch vtable [bx+4] (écriture)."
+"new_name": "Tre_CloseAllArchives_495B",
+"summary": "far, détruit tous les lecteurs d'archive de la table (méthode +4 de leur table de méthodes) et vide la table."
 },
 "sub_4998": {
 "segment": "seg004",
@@ -2401,8 +2401,8 @@
 "calls": [
 "sub_49FD"
 ],
-"new_name": "StreamReader_ParseFormattedValueB_4998",
-"summary": "Reprise de PACIFIC.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `StreamReader_ParseFormattedValueB_6BC5F` (sub_6BC5F de PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. — Reprise de OPTEST.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `StreamReader_ParseFormattedValueB_3BA22` (sub_3BA22 de OPTEST.EXE). Résumé repris de OPTEST.EXE ; appelants et contexte à revérifier ici. — Reprise de STRIKE.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `StreamReader_ParseFormattedValueB_641B2` (sub_641B2 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far, appelle sub_64217 (parseur) — variante d'appel."
+"new_name": "Tre_ContainsName_4998",
+"summary": "far (nom) : rend 1 dès qu'une archive montée contient le nom (Tre_FindEntry_49FD), 0 sinon."
 },
 "sub_49D1": {
 "segment": "seg004",
@@ -2414,8 +2414,8 @@
 "sub_5284E",
 "sub_529F9"
 ],
-"new_name": "StreamReader_PrepareParse_49D1",
-"summary": "Reprise de PACIFIC.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `StreamReader_PrepareParse_6BC98` (sub_6BC98 de PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. — Reprise de OPTEST.EXE : code identique instruction par instruction à `StreamReader_PrepareParse_3BA5B` (sub_3BA5B de OPTEST.EXE). Résumé repris de OPTEST.EXE ; appelants et contexte à revérifier ici. — Reprise de STRIKE.EXE : code identique instruction par instruction à `StreamReader_PrepareParse_641EB` (sub_641EB de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far, combine `StreamReader_SeekVariant_63DF6` et `StreamReader_ReadTyped_63FA1` (seg190) — prépare le flux avant analyse formatée. Appelée par sub_64217."
+"new_name": "Tre_ReadHeader_49D1",
+"summary": "far, se place au début de l'archive et lit 8 octets dans l'objet en +61h : u32 nombre d'enregistrements (+61h), puis u32 (+65h, fin de l'index dans BIGTRE.TRE)."
 },
 "sub_49FD": {
 "segment": "seg004",
@@ -2429,8 +2429,8 @@
 "sub_3609",
 "sub_2D03"
 ],
-"new_name": "sub_49FD",
-"summary": ""
+"new_name": "Tre_FindEntry_49FD",
+"summary": "far (archive, nom) : recherche par DICHOTOMIE dans l'index chargé (enregistrements de 74 octets, imul 4Ah). Le nom cherché est d'abord mis en majuscules sur place (CRT_StrUpr_2F35). À chaque pas l'enregistrement du milieu est recopié en +69h (74 octets), puis CRT_StrICmp_2D03(nom, enregistrement+1) : 0 = trouvé (rend 1, l'enregistrement reste en +69h : nom en +6Ah, position u32 en +0ABh, taille u32 en +0AFh) ; < 0 = moitié basse ; > 0 = moitié haute. Pas de hachage : comparaison des noms en clair, l'index doit être trié par nom."
 },
 "sub_4AD8": {
 "segment": "seg004",
@@ -2444,8 +2444,8 @@
 "sub_4887",
 "sub_4B8B"
 ],
-"new_name": "sub_4AD8",
-"summary": ""
+"new_name": "Tre_CloseArchive_4AD8",
+"summary": "far, ferme le fichier de l'archive, la retire de la table (Tre_UnregisterArchive_4887) et libère l'index (Tre_FreeIndex_4B8B)."
 },
 "sub_4B01": {
 "segment": "seg004",
@@ -2459,8 +2459,8 @@
 "sub_529F9",
 "sub_59C00"
 ],
-"new_name": "sub_4B01",
-"summary": ""
+"new_name": "Tre_LoadIndex_4B01",
+"summary": "far, réserve nombre × 74 octets (sub_447E1) et lit l'index juste après l'en-tête de 8 octets ; message « No memory for buffer! » (DS:13Eh) ou « Error in treefile header! » (DS:155h) si la lecture est courte."
 },
 "sub_4B8B": {
 "segment": "seg004",
@@ -2471,8 +2471,8 @@
 "calls": [
 "sub_448A4"
 ],
-"new_name": "Palette_DestructResource_4B8B",
-"summary": "Reprise de PACIFIC.EXE : même suite d'instructions, 3 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `Palette_DestructResource` (sub_2DDF9 de PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. — Reprise de OPTEST.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `Palette_DestructResource` (sub_1ECAB de OPTEST.EXE). Résumé repris de OPTEST.EXE ; appelants et contexte à revérifier ici. — Reprise de STRIKE.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `Palette_DestructResource` (sub_2E8A6 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far,21L — libère une chaîne (+3 via sub_5C7B6) et réinitialise le pointeur : **destructeur de ressource palette.**"
+"new_name": "Tre_FreeIndex_4B8B",
+"summary": "far, libère l'index chargé (+5Dh)."
 },
 "sub_4BB2": {
 "segment": "seg004",
@@ -2487,8 +2487,8 @@
 "sub_49D1",
 "sub_4B01"
 ],
-"new_name": "sub_4BB2",
-"summary": ""
+"new_name": "Tre_OpenArchive_4BB2",
+"summary": "far (lecteur, nom de fichier) : ouvre le fichier en lecture (StreamReader_ReadDispatch_5274A, mode 1) ; ouvert : Tre_RegisterArchive_4863, Tre_ReadHeader_49D1, Tre_LoadIndex_4B01. Appelée par la lecture de la ligne de commande (sub_6A0EB) pour l'option « =NOM » : chaque argument qui commence par « = » monte l'archive nommée."
 },
 "sub_4BF0": {
 "segment": "seg005",
@@ -12551,8 +12551,8 @@
 "sub_3670",
 "sub_3670"
 ],
-"new_name": "Path_BuildComposite",
-"summary": "Reprise de PACIFIC.EXE : code identique instruction par instruction à `Path_BuildComposite` (sub_29505 de PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. — Reprise de STRIKE.EXE : code identique instruction par instruction à `Path_BuildComposite` (sub_2B031 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far,49L — assemble 2-3 segments de chemin (sub_2DF4 + sub_2D48, concaténation) : **construction de chemin de fichier composite (base+dossier+extension).**"
+"new_name": "Path_Concat3_1F089",
+"summary": "far (destination, dossier, nom, extension facultative) : copie le dossier puis ajoute le nom et l'extension (sub_36EC = strcpy, sub_3670 = strcat). Ex. « ..\\..\\data\\gameflow\\ » + « convdata » + « .IFF »."
 },
 "sub_1F0C4": {
 "segment": "seg043",
@@ -12568,8 +12568,8 @@
 "sub_3670",
 "sub_1F089"
 ],
-"new_name": "sub_1F0C4",
-"summary": ""
+"new_name": "Path_BuildDataPath_1F0C4",
+"summary": "far : si le nom contient déjà « \\ », il est copié tel quel ; sinon « ..\\..\\DATA\\ » + dossier + « \\ » + nom + extension (Path_Concat3_1F089)."
 },
 "sub_1F142": {
 "segment": "seg044",
@@ -29754,8 +29754,8 @@
 "lines": 22,
 "type": "far",
 "calls": [],
-"new_name": "sub_51BAE",
-"summary": ""
+"new_name": "Dos_Create_51BAE",
+"summary": "far pascal (chemin far) : mov ah, 3Ch / int 21h (création), même reprise d'erreur."
 },
 "sub_51BDA": {
 "segment": "seg154",
@@ -29764,8 +29764,8 @@
 "lines": 28,
 "type": "far",
 "calls": [],
-"new_name": "File_OpenWithRetry_51BDA",
-"summary": "Reprise de PACIFIC.EXE : code identique instruction par instruction à `File_OpenWithRetry_6B3E6` (sub_6B3E6 de PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. — Reprise de OPTEST.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `File_OpenWithRetry_3ACA4` (sub_3ACA4 de OPTEST.EXE). Résumé repris de OPTEST.EXE ; appelants et contexte à revérifier ici. — Reprise de STRIKE.EXE : code identique instruction par instruction à `File_OpenWithRetry_63434` (sub_63434 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far, ouvre un fichier existant (int 21h, AH=3Dh, DOS OPEN) avec retry via le callback configurable (off_70FCE) en cas d'erreur — même motif que File_CreateWithRetry_630BA (seg184). Référencée par sub_64413 et sub_A1173."
+"new_name": "Dos_Open_51BDA",
+"summary": "far pascal (mode, chemin far) : mov ah, 3Dh / int 21h, avec reprise par le gestionnaire d'erreur critique ; rend le descripteur ou 0FFFFh."
 },
 "sub_51C08": {
 "segment": "seg154",
@@ -30216,8 +30216,8 @@
 "sub_52671",
 "sub_59C05"
 ],
-"new_name": "sub_526A2",
-"summary": ""
+"new_name": "StreamReader_OpenFromTreeOrDisk_526A2",
+"summary": "far, ouverture d'un flux : en mode lecture (+4Ch = 1), cherche d'abord le chemin (+0Ah) dans les archives TRE montées (Tre_OpenEntryByName_48C1) ; pas trouvé (ou autre mode) : crée l'objet fichier (méthode +10h) et ouvre le fichier sur le disque, taille par la méthode +18h. Appelée par StreamReader_ReadDispatch_5274A."
 },
 "sub_5274A": {
 "segment": "seg158",
@@ -30458,8 +30458,8 @@
 "sub_51BAE",
 "sub_51BDA"
 ],
-"new_name": "sub_52BBB",
-"summary": ""
+"new_name": "FileHandle_OpenByPath_52BBB",
+"summary": "far (fichier, chemin, mode) : ouvre le chemin sur le disque, mode 0 = création (Dos_Create_51BAE), 1 = lecture (Dos_Open_51BDA mode 0), autre = lecture et écriture (mode 2) ; range le descripteur en +2."
 },
 "sub_52C29": {
 "segment": "seg159",
@@ -30604,8 +30604,8 @@
 "sub_52D1A",
 "sub_37AD"
 ],
-"new_name": "sub_53245",
-"summary": ""
+"new_name": "EmsFileCache_FindOrAdd_53245",
+"summary": "far (nom far) : cache de fichiers en mémoire EMS (liste circulaire dword_5E6A0, liens +30h/+34h). Cherche le nom par strncmp sur 40 caractères (+38h) ; absent et page EMS réservée (word_5D978 ≥ 0) : réserve 100 octets, recopie le nom, ajoute l'entrée en tête. Comparaison en clair, pas de hachage."
 },
 "sub_533ED": {
 "segment": "seg160",

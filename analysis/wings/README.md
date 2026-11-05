@@ -24,51 +24,85 @@ de mission et le terrain n'ont pas été retrouvés par cette comparaison : leur
 Fichiers : `known_functions.json`, `function_index.json`, `segment_boundaries.json`, `annotated_segments/`,
 `pacific_matches.json`, `strike_matches.json`, `optest_matches.json` (candidats non tranchés compris).
 
-## 3. Accès aux fichiers (lu le 2026-11-05)
+## 3. Accès aux fichiers et archives TRE (lu le 2026-11-05)
 
-Recherche du lecteur d'archive XTRE (noms de fichiers hachés, comparés à l'index de l'archive). **Dans ce
-`WINGS_OF.EXE`, il n'a pas été trouvé** : chaque fichier de données est ouvert par DOS sous son chemin complet.
+**Le lecteur d'archive TRE de `WINGS_OF.EXE` cherche les fichiers par leur NOM EN CLAIR, par dichotomie dans un index
+trié ; aucun hachage n'a été vu dans ce code.** Les fonctions sont dans seg004 (nommées `Tre_*` dans
+`known_functions.json`).
 
-Chaîne constatée, du plus haut au plus bas :
+### 3.1 Monter une archive : ligne de commande
 
-1. Le chemin est construit par deux fonctions pas encore nommées de seg043 :
-   - `sub_1F089` (proposé : `Path_Concat3_1F089`) : copie le dossier, puis ajoute le nom et l'extension ;
-   - `sub_1F0C4` (proposé : `Path_BuildDataPath_1F0C4`) : si le nom contient déjà `\`, il est pris tel quel ; sinon
-     `..\..\DATA\` + dossier + `\` + nom + extension.
+Aucun nom d'archive n'est écrit dans l'exécutable. La lecture de la ligne de commande (`sub_6A0EB`, fonction pas
+encore nommée) teste le premier caractère de chaque argument : `cmp ax, 3Dh` (`=`) mène à `Tre_OpenArchive_4BB2`
+avec le reste de l'argument. `WINGS_OF.EXE =FICHIER.TRE` monte donc l'archive `FICHIER.TRE` ; un argument par archive,
+**8 au plus** (table de 8 mots à `DS:5298h`, `cmp word_59E58, 8` dans `Tre_RegisterArchive_4863`). C'est sans doute
+le lanceur `WG` qui passe ces arguments (non vu : il n'a pas été fourni).
 
-   Les dossiers sont des chaînes du segment de données : `..\..\data\gameflow\`, `..\..\data\cestalk\`,
-   `..\..\data\fonts\`, `..\..\data\midgames\`, `..\..\data\missions\`, `..\..\data\noise\`, ou un nom court
-   (`OBJECTS`, `MISSIONS`, `COCKPITS`, `SOUND`) passé à `sub_1F0C4`.
+`Tre_OpenArchive_4BB2` :
 
-   Exemple : la lecture de `convdata.iff` appelle `sub_1F089("..\..\data\gameflow\", "convdata", ".IFF")`.
-2. Le lecteur de flux (`StreamReader_ConstructVariantA_52440`, table de méthodes à l'offset 2509 du segment de
-   données) ouvre ce chemin par sa méthode d'ouverture (`StreamReader_ReadDispatch_5274A`, 6ᵉ entrée de la table).
-   Celle-ci crée l'objet fichier bas niveau (constructeur `sub_51D61`, objet de 71 octets).
-3. L'objet fichier ouvre le chemin tel quel par `sub_52BBB` (proposé : `FileHandle_OpenByPath_52BBB`). Selon le mode,
-   celui-ci appelle :
-   - `sub_51BDA` (proposé : `Dos_Open_51BDA`) : `mov ah, 3Dh / int 21h` ;
-   - ou `sub_51BAE` (proposé : `Dos_Create_51BAE`) : `mov ah, 3Ch / int 21h`.
-4. Entre les deux se trouve un cache de fichiers en mémoire EMS (`sub_51E78` lit à travers, `sub_53245` cherche une
-   entrée par `strncmp` sur 40 caractères du nom ; actif seulement si la page EMS `word_5D974` est réservée).
-   C'est une comparaison de noms en clair, pas un hachage.
+```
+ouvrir le fichier en lecture        StreamReader_ReadDispatch_5274A (mode 1)
+ajouter l'archive à la table        Tre_RegisterArchive_4863
+lire l'en-tête, 8 octets à 0        Tre_ReadHeader_49D1 : u32 nombre d'enregistrements, u32 (fin de l'index)
+lire l'index juste après            Tre_LoadIndex_4B01 : nombre × 74 octets (imul eax, eax, 4Ah)
+```
 
-Recherches faites sans résultat dans `source/wings.asm` :
+Messages d'erreur : « No memory for buffer! », « Error in treefile header! » (lecture de l'index trop courte).
 
-- la signature `XTRE`, en dword (`45525458h`) comme en deux mots (`5458h`, `4552h`) ;
-- une chaîne `.TRE` ou `tre` ;
-- une table de CRC 32 (octets `96h, 30h, 7, 77h`) ou les polynômes `0EDB88320h` / `4C11DB7h`.
+### 3.2 Format de l'index (constaté dans le code)
 
-Les seuls `int 2Fh` sont la détection XMS (fonctions 4300h et 4310h, `sub_18E8A` et `sub_18EDF`).
+En-tête de 8 octets, puis un enregistrement de **74 octets** par fichier :
 
-Le préfixe `..\..\DATA\` est celui des noms stockés dans les archives TRE d'Origin, comme dans `BIGTRE.TRE` de
-Strike Commander. Ce `WINGS_OF.EXE` construit donc bien les noms qu'une archive indexerait, mais il les ouvre par DOS
-(fichiers isolés sur le disque). Le hachage XTRE est donc à chercher ailleurs, par exemple :
+| Octets | Contenu | Preuve |
+|---|---|---|
+| 0 | 1 octet (non lu par la recherche) | le nom est lu à partir de l'octet 1 (`add ax, 6Ah` pour un enregistrement copié en `+69h`) |
+| 1 à 65 | nom du fichier, chaîne terminée par 0 | `CRT_StrICmp_2D03(nom, enregistrement + 1)` |
+| 66 | u32 position du fichier dans l'archive | `mov eax, [si+0ABh]` (`0ABh − 69h = 66`) |
+| 70 | u32 taille | `add eax, [si+0AFh]` (`0AFh − 69h = 70`) |
 
-- dans une autre version de l'exécutable (version CD-ROM) ;
-- ou dans un programme résident qui intercepte l'ouverture de fichier de DOS (le lanceur `WG` cité par le message
-  « Please type WG to run Wings of Glory. »).
+C'est le même format que `BIGTRE.TRE` de Strike Commander et `PACIFIC.DAT` (`tools/tre_extract.py`).
 
-Rien de cela n'a été vu : c'est à vérifier avec ces fichiers.
+### 3.3 Chercher un fichier : `Tre_FindEntry_49FD`
+
+1. Le chemin demandé est celui que construit le jeu : `..\..\DATA\<dossier>\<nom>.<ext>`, par
+   `Path_BuildDataPath_1F0C4` / `Path_Concat3_1F089` (dossiers `..\..\data\gameflow\`, `..\..\data\cestalk\`,
+   `..\..\data\fonts\`, `..\..\data\midgames\`, `..\..\data\missions\`, `..\..\data\noise\`, ou `OBJECTS`,
+   `MISSIONS`, `COCKPITS`, `SOUND`…). Exemple : `..\..\data\gameflow\convdata.IFF`.
+2. Il est mis en majuscules sur place (`CRT_StrUpr_2F35`, `a`..`z` seulement).
+3. Dichotomie sur les enregistrements (`n` = nombre, `bas` = 0) :
+
+```
+tant que n > 0 :
+    milieu = bas + (n / 2) × 74
+    c = stricmp(nom cherché, nom de l'enregistrement du milieu)
+    si c == 0 : trouvé
+    si c < 0  : n = n / 2                       (moitié basse)
+    si c > 0  : bas = milieu + 74 ; n = n − (n / 2 + 1)   (moitié haute)
+```
+
+   La comparaison (`CRT_StrICmp_2D03`) ignore la casse (`a`..`z` ramenés à `A`..`Z`) et compare les octets sans signe.
+   L'index doit donc être **trié par nom** dans cet ordre.
+4. Trouvé : le flux devient la tranche `[position, position + taille)` de l'archive (`sub_5252A`).
+
+`Tre_OpenEntryByName_48C1` essaie les archives dans l'ordre où elles ont été montées et ne cherche jamais un nom qui
+finit par `TRE` (comparaison des 3 derniers caractères avec la chaîne `TRE`).
+
+### 3.4 Archive d'abord, disque ensuite
+
+`StreamReader_OpenFromTreeOrDisk_526A2` : en lecture (`cmp byte ptr [si+4Ch], 1`), cherche d'abord dans les archives
+(`Tre_OpenEntryByName_48C1`) ; pas trouvé, ou écriture : le chemin est ouvert sur le disque
+(`FileHandle_OpenByPath_52BBB` → `Dos_Open_51BDA`, `mov ah, 3Dh / int 21h`, ou `Dos_Create_51BAE`, `mov ah, 3Ch`).
+Les sauvegardes (`saved\`, `tapes\`) passent par le disque.
+
+Un cache de fichiers en mémoire EMS (`EmsFileCache_FindOrAdd_53245`) compare aussi les noms en clair (`strncmp` sur
+40 caractères).
+
+### 3.5 Écart avec les données de Rémi
+
+Rémi décrit des archives TRE dont l'index contient des **hachages des noms**. Ce `WINGS_OF.EXE` (603 888 octets) ne
+peut pas les lire : sa recherche compare des noms. Pour trouver le hachage, il faut l'exécutable livré avec ces
+archives (autre version du jeu). Recherches faites sans résultat ici : table de CRC 32 (octets `96h, 30h, 7, 77h`),
+polynômes `0EDB88320h` / `4C11DB7h`.
 
 ## 4. Le reste n'est pas lu
 

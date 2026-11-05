@@ -451,7 +451,7 @@ arg_0		= word ptr  6
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_134]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	2
 		lea	ax, [bp+var_134]
@@ -6776,7 +6776,7 @@ loc_12DA9:
 		push	offset aDataMissions
 		lea	ax, [bp+var_13A]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_1E2]
 		push	ax
@@ -6856,7 +6856,7 @@ loc_12E93:
 		push	offset aDataMissions
 		lea	ax, [bp+var_13A]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_1E2]
 		push	ax
@@ -7642,7 +7642,7 @@ loc_13754:
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_50]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_50]

@@ -132,7 +132,12 @@ sub_52B7F		endp
 
 ; Attributes: bp-based frame
 
-sub_52BBB		proc far
+; ==============================================================================================
+; far (fichier, chemin, mode) : ouvre le chemin sur le disque, mode 0 = création
+; (Dos_Create_51BAE), 1 = lecture (Dos_Open_51BDA mode 0), autre = lecture et écriture (mode
+; 2) ; range le descripteur en +2.
+; ==============================================================================================
+FileHandle_OpenByPath_52BBB		proc far
 
 var_2		= byte ptr -2
 arg_0		= word ptr  6
@@ -156,7 +161,7 @@ arg_4		= word ptr  0Ah
 		mov	ax, [si+4]
 		add	ax, 0Ah
 		push	ax
-		call	sub_51BAE
+		call	Dos_Create_51BAE
 		jmp	short loc_52C07
 
 loc_52BE9:
@@ -172,7 +177,7 @@ loc_52BF6:
 		push	ax
 		mov	al, [bp+var_2]
 		push	ax
-		call	File_OpenWithRetry_51BDA
+		call	Dos_Open_51BDA
 
 loc_52C07:
 		mov	[si+2], ax
@@ -196,7 +201,7 @@ loc_52C24:
 		pop	si
 		leave
 		retf
-sub_52BBB		endp
+FileHandle_OpenByPath_52BBB		endp
 
 ; ----------------------------------------------------------------------
 

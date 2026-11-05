@@ -165,14 +165,11 @@ sub_1F05F		endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; Reprise de PACIFIC.EXE : code identique instruction par instruction à Path_BuildComposite
-; (sub_29505 de PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à
-; revérifier ici. — Reprise de STRIKE.EXE : code identique instruction par instruction à
-; Path_BuildComposite (sub_2B031 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et
-; contexte à revérifier ici. — far,49L — assemble 2-3 segments de chemin (sub_2DF4 + sub_2D48,
-; concaténation) : construction de chemin de fichier composite (base+dossier+extension).
+; far (destination, dossier, nom, extension facultative) : copie le dossier puis ajoute le nom
+; et l'extension (sub_36EC = strcpy, sub_3670 = strcat). Ex. « ..\..\data\gameflow\ » + «
+; convdata » + « .IFF ».
 ; ==============================================================================================
-Path_BuildComposite		proc far
+Path_Concat3_1F089		proc far
 
 arg_0		= word ptr  6
 arg_2		= dword ptr  8
@@ -205,13 +202,17 @@ loc_1F0C1:
 		pop	si
 		pop	bp
 		retf
-Path_BuildComposite		endp
+Path_Concat3_1F089		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_1F0C4		proc far
+; ==============================================================================================
+; far : si le nom contient déjà « \ », il est copié tel quel ; sinon « ..\..\DATA\ » + dossier
+; + « \ » + nom + extension (Path_Concat3_1F089).
+; ==============================================================================================
+Path_BuildDataPath_1F0C4		proc far
 
 var_42		= word ptr -42h
 arg_0		= word ptr  6
@@ -269,10 +270,10 @@ loc_1F12A:
 		push	ax
 		push	si
 		push	cs
-		call	near ptr Path_BuildComposite
+		call	near ptr Path_Concat3_1F089
 		add	sp, 0Eh
 
 loc_1F13F:
 		pop	si
-sub_1F0C4		endp
+Path_BuildDataPath_1F0C4		endp
 seg043		ends

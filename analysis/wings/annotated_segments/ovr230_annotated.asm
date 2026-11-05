@@ -139,7 +139,7 @@ loc_80398:
 		push	offset aDataMidgames
 		lea	ax, [bp+var_D0]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_D0]
@@ -156,7 +156,7 @@ loc_80398:
 		push	offset aDataNoise
 		lea	ax, [bp+var_D0]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_1C0]
 		push	ax
@@ -239,7 +239,7 @@ loc_804F5:
 		push	offset aDataFonts
 		lea	ax, [bp+var_D0]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	3
 		lea	ax, [bp+var_D0]
@@ -986,7 +986,7 @@ loc_80CF9:
 		mov	byte ptr [bp+var_30C+3], 0
 		lea	ax, [bp+var_31C]
 		push	ax
-		call	CRT_Strupr_2F35
+		call	CRT_StrUpr_2F35
 		pop	cx
 		push	0
 		push	word_5DD44

@@ -231,7 +231,7 @@ loc_13B44:
 		push	offset aDataMidgames
 		lea	ax, [bp+var_52]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		mov	dl, 1
 		mov	al, [bp+arg_2]

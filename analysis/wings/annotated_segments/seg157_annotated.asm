@@ -103,13 +103,13 @@ loc_51DF5:
 		mov	ax, si
 		add	ax, 1Eh
 		push	ax
-		call	CRT_Strupr_2F35
+		call	CRT_StrUpr_2F35
 		pop	cx
 		mov	al, [bp+arg_4]
 		push	ax
 		push	di
 		push	si
-		call	sub_52BBB
+		call	FileHandle_OpenByPath_52BBB
 		add	sp, 6
 		mov	dword ptr [si+16h], 0
 		mov	al, 1
@@ -225,7 +225,7 @@ arg_A		= dword ptr  10h
 		mov	ax, si
 		add	ax, 1Eh
 		push	ax
-		call	sub_53245
+		call	EmsFileCache_FindOrAdd_53245
 		add	sp, 4
 		mov	word ptr [bp+var_4+2], dx
 		mov	word ptr [bp+var_4], ax

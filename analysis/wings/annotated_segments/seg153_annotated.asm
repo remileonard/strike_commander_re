@@ -10,7 +10,10 @@ loc_51BAA:
 
 ; Attributes: bp-based frame
 
-sub_51BAE		proc far
+; ==============================================================================================
+; far pascal (chemin far) : mov ah, 3Ch / int 21h (création), même reprise d'erreur.
+; ==============================================================================================
+Dos_Create_51BAE		proc far
 
 arg_0		= word ptr  6
 
@@ -31,9 +34,9 @@ loc_51BB3:
 		call	dword ptr dword_5E5FC
 		test	word_5E5FA, 0FFFFh
 		jz	short loc_51BB3
-sub_51BAE		endp
+Dos_Create_51BAE		endp
 
-; START OF FUNCTION CHUNK FOR sub_51BAE
+; START OF FUNCTION CHUNK FOR Dos_Create_51BAE
 		db 0B8h
-; END OF FUNCTION CHUNK FOR sub_51BAE
+; END OF FUNCTION CHUNK FOR Dos_Create_51BAE
 seg153		ends

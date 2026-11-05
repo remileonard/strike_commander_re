@@ -8153,15 +8153,10 @@ CRT_Strdup		endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; Reprise de PACIFIC.EXE : code identique instruction par instruction à CRT_Stricmp (sub_2E86
-; de PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. —
-; Reprise de OPTEST.EXE : code identique instruction par instruction à CRT_Stricmp (sub_270F
-; de OPTEST.EXE). Résumé repris de OPTEST.EXE ; appelants et contexte à revérifier ici. —
-; Reprise de STRIKE.EXE : code identique instruction par instruction à CRT_Stricmp (sub_2ADC
-; de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far
-; — comparaison de chaînes insensible à la casse (table de plage 617Ah = A-Z/a-z) : stricmp().
+; far, stricmp de Borland : compare deux chaînes du segment de données sans tenir compte de la
+; casse (a..z ramenés à A..Z), rend la différence du premier caractère différent.
 ; ==============================================================================================
-CRT_Stricmp		proc far
+CRT_StrICmp_2D03		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -8209,7 +8204,7 @@ loc_2D3D:
 		pop	si
 		pop	bp
 		retf
-CRT_Stricmp		endp
+CRT_StrICmp_2D03		endp
 
 ; ----------------------------------------------------------------------
 
@@ -8626,14 +8621,9 @@ sub_2E60		endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; Reprise de PACIFIC.EXE : code identique instruction par instruction à CRT_Strupr_30EF
-; (sub_30EF de PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier
-; ici. — Reprise de STRIKE.EXE : même suite d'instructions, 1 opérande(s) différent(s)
-; (adresses de données ou constantes) — à vérifier à CRT_Strupr (sub_2B99 de STRIKE.EXE).
-; Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far — met en
-; majuscule en place (soustrait 0x20 sur plage a-z) : strupr().
+; far, strupr : met la chaîne en majuscules sur place (a..z seulement).
 ; ==============================================================================================
-CRT_Strupr_2F35		proc far
+CRT_StrUpr_2F35		proc far
 
 arg_0		= word ptr  6
 
@@ -8660,7 +8650,7 @@ loc_2F4C:
 		pop	si
 		pop	bp
 		retf
-CRT_Strupr_2F35		endp
+CRT_StrUpr_2F35		endp
 
 ; ----------------------------------------------------------------------
 

@@ -757,7 +757,7 @@ loc_6A3DD:
 		mov	di, ax
 		push	[bp+var_3A]
 		push	ax
-		call	sub_4BB2
+		call	Tre_OpenArchive_4BB2
 		add	sp, 4
 		or	al, al
 		jnz	short loc_6A400
@@ -1632,7 +1632,7 @@ loc_6AC3E:
 		push	ax
 		call	sub_58BCE
 		pop	cx
-		call	StreamReader_DispatchWrite_495B
+		call	Tre_CloseAllArchives_495B
 		mov	byte_5B3D8, 0
 
 loc_6AC54:
@@ -1744,7 +1744,7 @@ loc_6ACE6:
 		push	offset aFONTS
 		lea	ax, [bp+var_EE]
 		push	ax
-		call	sub_1F0C4
+		call	Path_BuildDataPath_1F0C4
 		add	sp, 0Eh
 		lea	ax, [bp+var_154]
 		push	ax
@@ -2313,7 +2313,7 @@ arg_2		= word ptr  8
 		jz	short loc_6B22C
 		mov	word ptr [si], 179Fh
 		push	si
-		call	sub_4AD8
+		call	Tre_CloseArchive_4AD8
 		pop	cx
 		push	0
 		push	si

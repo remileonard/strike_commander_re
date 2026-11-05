@@ -114,7 +114,7 @@ var_1		= byte ptr -1
 		push	offset aDataMidgames
 		lea	ax, [bp+var_BE]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_BE]
@@ -131,7 +131,7 @@ var_1		= byte ptr -1
 		push	offset aDataCestalk_2
 		lea	ax, [bp+var_BE]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_1AE]
 		push	ax

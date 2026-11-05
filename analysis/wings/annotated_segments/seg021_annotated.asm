@@ -528,7 +528,7 @@ loc_C7C4:
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_B8]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_B8]
@@ -545,7 +545,7 @@ loc_C7C4:
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_B8]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_B8]
@@ -769,7 +769,7 @@ loc_CA13:
 		push	offset aDataFonts
 		lea	ax, [bp+var_B8]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	2
 		lea	ax, [bp+var_B8]

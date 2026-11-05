@@ -120,7 +120,7 @@ arg_2		= word ptr  8
 		push	offset aDataFonts
 		lea	ax, [bp+var_66]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_66]
 		push	ax
@@ -165,7 +165,7 @@ arg_2		= word ptr  8
 		push	offset aDataFonts
 		lea	ax, [bp+var_66]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	2
 		push	2
@@ -213,7 +213,7 @@ arg_2		= word ptr  8
 		push	offset aDataFonts
 		lea	ax, [bp+var_66]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	2
 		push	2

@@ -603,7 +603,13 @@ sub_530EE		endp
 
 ; Attributes: bp-based frame
 
-sub_53245		proc far
+; ==============================================================================================
+; far (nom far) : cache de fichiers en mémoire EMS (liste circulaire dword_5E6A0, liens
+; +30h/+34h). Cherche le nom par strncmp sur 40 caractères (+38h) ; absent et page EMS
+; réservée (word_5D978 ≥ 0) : réserve 100 octets, recopie le nom, ajoute l'entrée en tête.
+; Comparaison en clair, pas de hachage.
+; ==============================================================================================
+EmsFileCache_FindOrAdd_53245		proc far
 
 var_C		= dword ptr -0Ch
 var_8		= word ptr -8
@@ -784,7 +790,7 @@ loc_533EA:
 		pop	si
 		leave
 		retf
-sub_53245		endp
+EmsFileCache_FindOrAdd_53245		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1054,7 +1060,7 @@ loc_53616:
 		add	sp, 4
 		lea	ax, [bp+var_98]
 		push	ax
-		call	CRT_Strupr_2F35
+		call	CRT_StrUpr_2F35
 		pop	cx
 		push	1
 		push	si
@@ -1068,7 +1074,7 @@ loc_53616:
 		lea	ax, [bp+var_98]
 		push	ax
 		push	cs
-		call	near ptr sub_53245
+		call	near ptr EmsFileCache_FindOrAdd_53245
 		add	sp, 4
 		mov	word ptr [bp+var_E+2], dx
 		mov	word ptr [bp+var_E], ax

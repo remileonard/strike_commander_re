@@ -35,7 +35,7 @@ arg_0		= dword ptr  6
 		add	sp, 8
 		lea	ax, [bp+var_50]
 		push	ax
-		call	StreamReader_ParseFormattedValueB_4998
+		call	Tre_ContainsName_4998
 		pop	cx
 		or	ax, ax
 		jz	short loc_193D6

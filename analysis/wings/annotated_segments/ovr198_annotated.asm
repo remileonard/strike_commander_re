@@ -197,7 +197,7 @@ loc_70D3A:
 		push	offset aPALETTE
 		lea	ax, [bp+var_52]
 		push	ax
-		call	sub_1F0C4
+		call	Path_BuildDataPath_1F0C4
 		add	sp, 0Eh
 		lea	ax, [bp+var_FA]
 		push	ax
@@ -1079,7 +1079,7 @@ arg_2		= word ptr  8
 		push	offset aPALETTE
 		lea	ax, [bp+var_50]
 		push	ax
-		call	sub_1F0C4
+		call	Path_BuildDataPath_1F0C4
 		add	sp, 0Eh
 		lea	ax, [bp+var_F8]
 		push	ax

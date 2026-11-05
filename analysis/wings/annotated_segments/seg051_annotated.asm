@@ -852,7 +852,7 @@ loc_23860:
 		call	CRT_Strcpy
 		add	sp, 4
 		push	di
-		call	CRT_Strupr_2F35
+		call	CRT_StrUpr_2F35
 		pop	cx
 		jmp	short loc_23888
 

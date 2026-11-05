@@ -102,7 +102,7 @@ loc_168BD:
 		push	[bp+arg_2]
 		mov	bx, [bp+var_4]
 		push	word ptr [bx+0Eh]
-		call	CRT_Stricmp
+		call	CRT_StrICmp_2D03
 		add	sp, 4
 		or	ax, ax
 		jnz	short loc_168EA
@@ -211,7 +211,7 @@ loc_1695A:
 		shl	bx, 1
 		push	word ptr [bx+si+8]
 		push	[bp+arg_2]
-		call	CRT_Stricmp
+		call	CRT_StrICmp_2D03
 		add	sp, 4
 		or	ax, ax
 		jnz	short loc_1697C

@@ -855,7 +855,7 @@ loc_490EF:
 		call	CRT_Itoa_Unsigned
 		add	sp, 8
 		push	ax
-		call	CRT_Strupr_2F35
+		call	CRT_StrUpr_2F35
 		pop	cx
 		jmp	loc_491D8
 

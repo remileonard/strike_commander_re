@@ -81,7 +81,7 @@ loc_A7A4:
 		push	offset aDataMidgames
 		lea	ax, [bp+var_52]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		mov	byte_5FD44, 1
 
@@ -776,7 +776,7 @@ loc_AC86:
 		push	offset aSaved_2
 		lea	ax, [bp+var_5C]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_5C]
 		push	ax
@@ -796,7 +796,7 @@ loc_ACB4:
 		push	offset a__2
 		lea	ax, [bp+var_5C]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_5C]
 		push	ax
@@ -1524,7 +1524,7 @@ loc_B245:
 		push	offset a__2
 		lea	ax, [bp+var_5E]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_5E]
 		push	ax
@@ -1579,7 +1579,7 @@ loc_B2B9:
 		push	offset aSaved_2
 		lea	ax, [bp+var_5E]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_5E]
 		push	ax
@@ -1594,7 +1594,7 @@ loc_B2B9:
 		push	offset a__2
 		lea	ax, [bp+var_5E]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_5E]
 		push	ax
@@ -1709,7 +1709,7 @@ loc_B3F0:
 		push	offset a__2
 		lea	ax, [bp+var_5E]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_5E]
 		push	ax
@@ -1832,7 +1832,7 @@ loc_B50C:
 		push	offset a__2
 		lea	ax, [bp+var_5E]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_5E]
 		push	ax

@@ -421,7 +421,7 @@ arg_2		= word ptr  8
 		push	offset aFONTS
 		lea	ax, [bp+var_D6]
 		push	ax
-		call	sub_1F0C4
+		call	Path_BuildDataPath_1F0C4
 		add	sp, 0Eh
 		lea	ax, [bp+var_13C]
 		push	ax
@@ -1134,7 +1134,7 @@ arg_2		= word ptr  8
 		push	offset aFONTS
 		lea	ax, [bp+var_CE]
 		push	ax
-		call	sub_1F0C4
+		call	Path_BuildDataPath_1F0C4
 		add	sp, 0Eh
 		lea	ax, [bp+var_134]
 		push	ax
@@ -1815,7 +1815,7 @@ arg_2		= word ptr  8
 		push	offset aFONTS
 		lea	ax, [bp+var_CE]
 		push	ax
-		call	sub_1F0C4
+		call	Path_BuildDataPath_1F0C4
 		add	sp, 0Eh
 		lea	ax, [bp+var_134]
 		push	ax
@@ -2453,7 +2453,7 @@ loc_6C89E:
 		push	large 0
 		lea	ax, [bp+var_72]
 		push	ax
-		call	sub_1F0C4
+		call	Path_BuildDataPath_1F0C4
 		add	sp, 0Eh
 		lea	ax, [bp+var_D8]
 		push	ax

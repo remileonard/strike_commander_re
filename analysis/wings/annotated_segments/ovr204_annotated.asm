@@ -577,7 +577,7 @@ loc_72B9A:
 		push	offset aTXM_1
 		lea	ax, [bp+var_52]
 		push	ax
-		call	sub_1F0C4
+		call	Path_BuildDataPath_1F0C4
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_52]
@@ -1303,7 +1303,7 @@ loc_73159:
 		push	offset aTXM_1
 		lea	ax, [bp+var_54]
 		push	ax
-		call	sub_1F0C4
+		call	Path_BuildDataPath_1F0C4
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_54]

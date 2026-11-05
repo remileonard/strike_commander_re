@@ -393,7 +393,7 @@ loc_5C49:
 loc_5C55:
 		lea	ax, [bp+var_DE]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	3
 		lea	ax, [bp+var_DE]
@@ -960,7 +960,7 @@ loc_62F2:
 loc_62FE:
 		lea	ax, [bp+var_72]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	0
 		lea	ax, [bp+var_9E]
@@ -1000,7 +1000,7 @@ loc_6341:
 loc_634E:
 		lea	ax, [bp+var_72]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_72]
 		push	ax

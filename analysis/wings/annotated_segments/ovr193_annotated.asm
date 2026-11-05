@@ -46,7 +46,7 @@ arg_4		= word ptr  0Ah
 loc_6E769:
 		push	ds
 		push	word_5D91C
-		call	sub_51BAE
+		call	Dos_Create_51BAE
 		mov	[bp+var_2], ax
 		cmp	[bp+var_2], 0FFFFh
 		jnz	short loc_6E780
@@ -155,7 +155,7 @@ loc_6E81C:
 		push	ds
 		push	word_5D91C
 		push	2
-		call	File_OpenWithRetry_51BDA
+		call	Dos_Open_51BDA
 		mov	[bp+var_2], ax
 		cmp	[bp+var_2], 0FFFFh
 		jnz	short loc_6E835

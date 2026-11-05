@@ -77,7 +77,7 @@ var_2		= word ptr -2
 		push	offset aDataMidgames
 		lea	ax, [bp+var_A8]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_A8]
@@ -556,7 +556,7 @@ var_2		= word ptr -2
 		push	offset aDataMidgames
 		lea	ax, [bp+var_8A]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_8A]

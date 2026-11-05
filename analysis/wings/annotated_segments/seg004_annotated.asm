@@ -8,19 +8,10 @@ seg004		segment	para public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; Reprise de PACIFIC.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de
-; données ou constantes) — à vérifier à StreamReader_RegistryAdd_6BB2A (sub_6BB2A de
-; PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. —
-; Reprise de OPTEST.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de
-; données ou constantes) — à vérifier à StreamReader_RegistryAdd_3B920 (sub_3B920 de
-; OPTEST.EXE). Résumé repris de OPTEST.EXE ; appelants et contexte à revérifier ici. — Reprise
-; de STRIKE.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de données
-; ou constantes) — à vérifier à StreamReader_RegistryAdd_640B0 (sub_640B0 de STRIKE.EXE).
-; Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far, ajoute un
-; handle à une table globale de 8 flux ouverts (word_7107C = compteur). Référencée par
-; sub_64321.
+; far, ajoute un lecteur d'archive TRE ouvert à la table des archives (8 places, mots à
+; DS:5298h ; nombre dans word_59E58). Rend 0 si la table est pleine.
 ; ==============================================================================================
-StreamReader_RegistryAdd_4863		proc far
+Tre_RegisterArchive_4863		proc far
 
 arg_0		= word ptr  6
 
@@ -42,26 +33,16 @@ loc_4883:
 loc_4885:
 		pop	bp
 		retf
-StreamReader_RegistryAdd_4863		endp
+Tre_RegisterArchive_4863		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; Reprise de PACIFIC.EXE : même suite d'instructions, 3 opérande(s) différent(s) (adresses de
-; données ou constantes) — à vérifier à StreamReader_RegistryRemove_6BB4E (sub_6BB4E de
-; PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. —
-; Reprise de OPTEST.EXE : même suite d'instructions, 3 opérande(s) différent(s) (adresses de
-; données ou constantes) — à vérifier à StreamReader_RegistryRemove_3B944 (sub_3B944 de
-; OPTEST.EXE). Résumé repris de OPTEST.EXE ; appelants et contexte à revérifier ici. — Reprise
-; de STRIKE.EXE : même suite d'instructions, 3 opérande(s) différent(s) (adresses de données
-; ou constantes) — à vérifier à StreamReader_RegistryRemove_640D4 (sub_640D4 de STRIKE.EXE).
-; Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far, retire un
-; handle de la table globale des flux ouverts (recherche linéaire + compactage). Référencée
-; par sub_642FF.
+; far, retire un lecteur d'archive de la table (le dernier prend sa place).
 ; ==============================================================================================
-StreamReader_RegistryRemove_4887		proc far
+Tre_UnregisterArchive_4887		proc far
 
 arg_0		= word ptr  6
 
@@ -97,13 +78,21 @@ loc_48B7:
 loc_48BF:
 		pop	bp
 		retf
-StreamReader_RegistryRemove_4887		endp
+Tre_UnregisterArchive_4887		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_48C1		proc far
+; ==============================================================================================
+; far (flux, nom). Si le nom se termine par « TRE » (stricmp des 3 derniers caractères avec la
+; chaîne DS:13Ah), rend 0 : une archive n'est jamais cherchée dans une archive. Sinon, pour
+; chaque archive ouverte de la table, Tre_FindEntry_49FD ; trouvé : le flux devient la tranche
+; [position, position + taille) de l'archive (sub_5252A avec les champs +0ABh = position,
+; +0AFh = taille de l'enregistrement trouvé) et rend 1. Appelée par
+; StreamReader_OpenFromTreeOrDisk_526A2.
+; ==============================================================================================
+Tre_OpenEntryByName_48C1		proc far
 
 var_A		= dword ptr -0Ah
 var_6		= dword ptr -6
@@ -133,7 +122,7 @@ loc_48DB:
 		add	ax, dx
 		add	ax, 0FFFDh
 		push	ax
-		call	CRT_Stricmp
+		call	CRT_StrICmp_2D03
 		add	sp, 4
 		or	ax, ax
 		jz	short loc_4955
@@ -153,7 +142,7 @@ loc_48FE:
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_49FD
+		call	near ptr Tre_FindEntry_49FD
 		add	sp, 4
 		or	ax, ax
 		jz	short loc_4949
@@ -187,25 +176,17 @@ loc_4957:
 		pop	si
 		leave
 		retf
-sub_48C1		endp
+Tre_OpenEntryByName_48C1		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; Reprise de PACIFIC.EXE : même suite d'instructions, 2 opérande(s) différent(s) (adresses de
-; données ou constantes) — à vérifier à StreamReader_DispatchWrite_6BC22 (sub_6BC22 de
-; PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. —
-; Reprise de OPTEST.EXE : même suite d'instructions, 3 opérande(s) différent(s) (adresses de
-; données ou constantes) — à vérifier à StreamReader_DispatchWrite_3B9E5 (sub_3B9E5 de
-; OPTEST.EXE). Résumé repris de OPTEST.EXE ; appelants et contexte à revérifier ici. — Reprise
-; de STRIKE.EXE : même suite d'instructions, 2 opérande(s) différent(s) (adresses de données
-; ou constantes) — à vérifier à StreamReader_DispatchWrite_64175 (sub_64175 de STRIKE.EXE).
-; Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far, dispatch vtable
-; [bx+4] (écriture).
+; far, détruit tous les lecteurs d'archive de la table (méthode +4 de leur table de méthodes)
+; et vide la table.
 ; ==============================================================================================
-StreamReader_DispatchWrite_495B		proc far
+Tre_CloseAllArchives_495B		proc far
 		push	bp
 		mov	bp, sp
 		push	si
@@ -240,25 +221,16 @@ loc_4988:
 		pop	si
 		pop	bp
 		retf
-StreamReader_DispatchWrite_495B		endp
+Tre_CloseAllArchives_495B		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; Reprise de PACIFIC.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de
-; données ou constantes) — à vérifier à StreamReader_ParseFormattedValueB_6BC5F (sub_6BC5F de
-; PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. —
-; Reprise de OPTEST.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de
-; données ou constantes) — à vérifier à StreamReader_ParseFormattedValueB_3BA22 (sub_3BA22 de
-; OPTEST.EXE). Résumé repris de OPTEST.EXE ; appelants et contexte à revérifier ici. — Reprise
-; de STRIKE.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de données
-; ou constantes) — à vérifier à StreamReader_ParseFormattedValueB_641B2 (sub_641B2 de
-; STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far,
-; appelle sub_64217 (parseur) — variante d'appel.
+; far (nom) : rend 1 dès qu'une archive montée contient le nom (Tre_FindEntry_49FD), 0 sinon.
 ; ==============================================================================================
-StreamReader_ParseFormattedValueB_4998		proc far
+Tre_ContainsName_4998		proc far
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -281,7 +253,7 @@ loc_49A6:
 		push	ax
 		nop
 		push	cs
-		call	near ptr sub_49FD
+		call	near ptr Tre_FindEntry_49FD
 		add	sp, 4
 		or	ax, ax
 		jz	short loc_49C4
@@ -301,25 +273,17 @@ loc_49CB:
 		pop	si
 		leave
 		retf
-StreamReader_ParseFormattedValueB_4998		endp
+Tre_ContainsName_4998		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; Reprise de PACIFIC.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de
-; données ou constantes) — à vérifier à StreamReader_PrepareParse_6BC98 (sub_6BC98 de
-; PACIFIC.EXE). Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. —
-; Reprise de OPTEST.EXE : code identique instruction par instruction à
-; StreamReader_PrepareParse_3BA5B (sub_3BA5B de OPTEST.EXE). Résumé repris de OPTEST.EXE ;
-; appelants et contexte à revérifier ici. — Reprise de STRIKE.EXE : code identique instruction
-; par instruction à StreamReader_PrepareParse_641EB (sub_641EB de STRIKE.EXE). Résumé repris
-; de STRIKE.EXE ; appelants et contexte à revérifier ici. — far, combine
-; StreamReader_SeekVariant_63DF6 et StreamReader_ReadTyped_63FA1 (seg190) — prépare le flux
-; avant analyse formatée. Appelée par sub_64217.
+; far, se place au début de l'archive et lit 8 octets dans l'objet en +61h : u32 nombre
+; d'enregistrements (+61h), puis u32 (+65h, fin de l'index dans BIGTRE.TRE).
 ; ==============================================================================================
-StreamReader_PrepareParse_49D1		proc far
+Tre_ReadHeader_49D1		proc far
 
 arg_0		= word ptr  6
 
@@ -343,13 +307,22 @@ arg_0		= word ptr  6
 		pop	si
 		pop	bp
 		retf
-StreamReader_PrepareParse_49D1		endp
+Tre_ReadHeader_49D1		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_49FD		proc far
+; ==============================================================================================
+; far (archive, nom) : recherche par DICHOTOMIE dans l'index chargé (enregistrements de 74
+; octets, imul 4Ah). Le nom cherché est d'abord mis en majuscules sur place (CRT_StrUpr_2F35).
+; À chaque pas l'enregistrement du milieu est recopié en +69h (74 octets), puis
+; CRT_StrICmp_2D03(nom, enregistrement+1) : 0 = trouvé (rend 1, l'enregistrement reste en +69h
+; : nom en +6Ah, position u32 en +0ABh, taille u32 en +0AFh) ; < 0 = moitié basse ; > 0 =
+; moitié haute. Pas de hachage : comparaison des noms en clair, l'index doit être trié par
+; nom.
+; ==============================================================================================
+Tre_FindEntry_49FD		proc far
 
 var_C		= word ptr -0Ch
 var_A		= word ptr -0Ah
@@ -377,7 +350,7 @@ arg_2		= word ptr  8
 
 loc_4A20:
 		push	[bp+arg_2]
-		call	CRT_Strupr_2F35
+		call	CRT_StrUpr_2F35
 		pop	cx
 		mov	di, [si+61h]
 		mov	ax, [bp+var_4]
@@ -417,7 +390,7 @@ loc_4A77:
 		add	ax, 6Ah
 		push	ax
 		push	[bp+var_C]
-		call	CRT_Stricmp
+		call	CRT_StrICmp_2D03
 		add	sp, 4
 		mov	dx, ax
 		or	dx, dx
@@ -462,13 +435,17 @@ loc_4AD1:
 		pop	si
 		leave
 		retf
-sub_49FD		endp
+Tre_FindEntry_49FD		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_4AD8		proc far
+; ==============================================================================================
+; far, ferme le fichier de l'archive, la retire de la table (Tre_UnregisterArchive_4887) et
+; libère l'index (Tre_FreeIndex_4B8B).
+; ==============================================================================================
+Tre_CloseArchive_4AD8		proc far
 
 arg_0		= word ptr  6
 
@@ -486,25 +463,30 @@ arg_0		= word ptr  6
 		pop	cx
 		push	si
 		push	cs
-		call	near ptr StreamReader_RegistryRemove_4887
+		call	near ptr Tre_UnregisterArchive_4887
 		pop	cx
 
 loc_4AF7:
 		push	si
 		nop
 		push	cs
-		call	near ptr Palette_DestructResource_4B8B
+		call	near ptr Tre_FreeIndex_4B8B
 		pop	cx
 		pop	si
 		pop	bp
 		retf
-sub_4AD8		endp
+Tre_CloseArchive_4AD8		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_4B01		proc far
+; ==============================================================================================
+; far, réserve nombre × 74 octets (sub_447E1) et lit l'index juste après l'en-tête de 8 octets
+; ; message « No memory for buffer! » (DS:13Eh) ou « Error in treefile header! » (DS:155h) si
+; la lecture est courte.
+; ==============================================================================================
+Tre_LoadIndex_4B01		proc far
 
 var_4		= dword ptr -4
 arg_0		= word ptr  6
@@ -562,25 +544,16 @@ loc_4B82:
 		pop	si
 		leave
 		retf
-sub_4B01		endp
+Tre_LoadIndex_4B01		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; Reprise de PACIFIC.EXE : même suite d'instructions, 3 opérande(s) différent(s) (adresses de
-; données ou constantes) — à vérifier à Palette_DestructResource (sub_2DDF9 de PACIFIC.EXE).
-; Résumé repris de PACIFIC.EXE ; appelants et contexte à revérifier ici. — Reprise de
-; OPTEST.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de données ou
-; constantes) — à vérifier à Palette_DestructResource (sub_1ECAB de OPTEST.EXE). Résumé repris
-; de OPTEST.EXE ; appelants et contexte à revérifier ici. — Reprise de STRIKE.EXE : même suite
-; d'instructions, 1 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier
-; à Palette_DestructResource (sub_2E8A6 de STRIKE.EXE). Résumé repris de STRIKE.EXE ;
-; appelants et contexte à revérifier ici. — far,21L — libère une chaîne (+3 via sub_5C7B6) et
-; réinitialise le pointeur : destructeur de ressource palette.
+; far, libère l'index chargé (+5Dh).
 ; ==============================================================================================
-Palette_DestructResource_4B8B		proc far
+Tre_FreeIndex_4B8B		proc far
 
 arg_0		= word ptr  6
 
@@ -600,13 +573,20 @@ arg_0		= word ptr  6
 		pop	si
 		pop	bp
 		retf
-Palette_DestructResource_4B8B		endp
+Tre_FreeIndex_4B8B		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_4BB2		proc far
+; ==============================================================================================
+; far (lecteur, nom de fichier) : ouvre le fichier en lecture
+; (StreamReader_ReadDispatch_5274A, mode 1) ; ouvert : Tre_RegisterArchive_4863,
+; Tre_ReadHeader_49D1, Tre_LoadIndex_4B01. Appelée par la lecture de la ligne de commande
+; (sub_6A0EB) pour l'option « =NOM » : chaque argument qui commence par « = » monte l'archive
+; nommée.
+; ==============================================================================================
+Tre_OpenArchive_4BB2		proc far
 
 var_2		= byte ptr -2
 arg_0		= word ptr  6
@@ -630,15 +610,15 @@ arg_2		= word ptr  8
 		jz	short loc_4BEA
 		push	si
 		push	cs
-		call	near ptr StreamReader_RegistryAdd_4863
+		call	near ptr Tre_RegisterArchive_4863
 		pop	cx
 		push	si
 		push	cs
-		call	near ptr StreamReader_PrepareParse_49D1
+		call	near ptr Tre_ReadHeader_49D1
 		pop	cx
 		push	si
 		push	cs
-		call	near ptr sub_4B01
+		call	near ptr Tre_LoadIndex_4B01
 		pop	cx
 
 loc_4BEA:
@@ -646,5 +626,5 @@ loc_4BEA:
 		pop	si
 		leave
 		retf
-sub_4BB2		endp
+Tre_OpenArchive_4BB2		endp
 seg004		ends

@@ -173,7 +173,7 @@ loc_3DB9B:
 		push	[bp+arg_2]
 		mov	bx, word ptr [bp+var_8+2]
 		push	word ptr [bx+2]
-		call	CRT_Stricmp
+		call	CRT_StrICmp_2D03
 		add	sp, 4
 		or	ax, ax
 		jnz	short loc_3DBDF

@@ -241,7 +241,7 @@ loc_78A21:
 		push	offset aDataMidgames
 		lea	ax, [bp+var_F4]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_F4]
@@ -258,7 +258,7 @@ loc_78A21:
 		push	offset aDataNoise
 		lea	ax, [bp+var_F4]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_1E4]
 		push	ax
@@ -346,7 +346,7 @@ loc_78B95:
 		push	offset aDataFonts
 		lea	ax, [bp+var_F4]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	3
 		lea	ax, [bp+var_F4]

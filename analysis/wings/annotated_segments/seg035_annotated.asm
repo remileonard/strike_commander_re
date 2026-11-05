@@ -80,7 +80,7 @@ arg_E		= word ptr  14h
 		push	offset aSOUND
 		lea	ax, [bp+var_104]
 		push	ax
-		call	sub_1F0C4
+		call	Path_BuildDataPath_1F0C4
 		add	sp, 0Eh
 		and	byte ptr [si+79h], 0FDh
 		mov	al, [bp+arg_C]
@@ -337,7 +337,7 @@ loc_1A06E:
 		push	offset aSOUND
 		lea	ax, [bp+var_154]
 		push	ax
-		call	sub_1F0C4
+		call	Path_BuildDataPath_1F0C4
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_154]

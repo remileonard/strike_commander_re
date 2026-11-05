@@ -169,7 +169,7 @@ arg_8		= byte ptr  0Eh
 		mov	ax, si
 		add	ax, 57h
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	0AADh
 		mov	ax, si
@@ -290,7 +290,7 @@ loc_669C3:
 		mov	ax, si
 		add	ax, 57h
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		jmp	short loc_66A47
 
@@ -1784,7 +1784,7 @@ loc_675A9:
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_7A]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_7A]
@@ -1801,7 +1801,7 @@ loc_675A9:
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_7A]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_7A]
@@ -1844,7 +1844,7 @@ loc_675A9:
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_7A]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_7A]
@@ -2544,7 +2544,7 @@ loc_67D0C:
 		push	offset a__2
 		lea	ax, [bp+var_7A]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_7A]
@@ -2594,7 +2594,7 @@ loc_67DD1:
 		push	offset a__2
 		lea	ax, [bp+var_7A]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_7A]
 		push	ax
@@ -2617,7 +2617,7 @@ loc_67DD1:
 		add	sp, 4
 		lea	ax, [bp+var_C]
 		push	ax
-		call	CRT_Strupr_2F35
+		call	CRT_StrUpr_2F35
 		pop	cx
 		mov	eax, [bp+var_AC]
 		mov	[bp+var_BD], eax
@@ -2689,7 +2689,7 @@ loc_67EB6:
 		add	sp, 4
 		lea	ax, [bp+var_28]
 		push	ax
-		call	CRT_Strupr_2F35
+		call	CRT_StrUpr_2F35
 		pop	cx
 		xor	di, di
 		mov	[bp+var_2A], 1
@@ -2887,7 +2887,7 @@ loc_68096:
 		add	sp, 4
 		lea	ax, [bp+var_24]
 		push	ax
-		call	CRT_Strupr_2F35
+		call	CRT_StrUpr_2F35
 		pop	cx
 		lea	ax, [bp+var_24]
 		push	ax
@@ -3000,7 +3000,7 @@ arg_0		= word ptr  6
 		push	offset a__2
 		lea	ax, [bp+var_50]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_50]
 		push	ax
@@ -3194,7 +3194,7 @@ loc_68320:
 		push	offset a__2
 		lea	ax, [bp+var_72]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_11A]
 		push	ax

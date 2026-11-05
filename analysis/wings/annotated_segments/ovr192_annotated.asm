@@ -154,7 +154,7 @@ loc_6DD44:
 		push	offset aDataMidgames
 		lea	ax, [bp+var_96]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		lea	ax, [bp+var_16E]
 		push	ax
@@ -188,7 +188,7 @@ loc_6DD44:
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_96]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_96]
@@ -206,7 +206,7 @@ loc_6DD44:
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_96]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_96]
@@ -232,7 +232,7 @@ loc_6DD44:
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_96]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_96]
@@ -250,7 +250,7 @@ loc_6DD44:
 		push	offset aDataGameflow_3
 		lea	ax, [bp+var_96]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_96]
@@ -315,7 +315,7 @@ loc_6DF19:
 		push	offset aDataFonts
 		lea	ax, [bp+var_96]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	2
 		lea	ax, [bp+var_96]
@@ -362,7 +362,7 @@ loc_6DF99:
 		push	offset aDataFonts
 		lea	ax, [bp+var_96]
 		push	ax
-		call	Path_BuildComposite
+		call	Path_Concat3_1F089
 		add	sp, 0Eh
 		push	2
 		lea	ax, [bp+var_96]
