@@ -363,7 +363,11 @@ sub_E4C5A		endp
 
 ; Attributes: bp-based frame
 
-sub_E4EBB		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Cinématique des
+; funérailles (funeral, sub_E4BD0).
+; ==============================================================================================
+Gameflow_PlayFuneral_E4EBB		proc far
 
 var_132		= word ptr -132h
 var_1A		= word ptr -1Ah
@@ -467,5 +471,5 @@ loc_E4F7F:
 		pop	si
 		leave
 		retf
-sub_E4EBB		endp
+Gameflow_PlayFuneral_E4EBB		endp
 ovr397		ends

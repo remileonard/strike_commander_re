@@ -15,7 +15,7 @@ stru_75DE0	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_75E00	proc far
-		jmp	sub_D47D0
+		jmp	Gameflow_KillBoard_D47D0
 sub_75E00	endp
 		db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 stub380		ends

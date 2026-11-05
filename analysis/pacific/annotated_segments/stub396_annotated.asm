@@ -15,7 +15,7 @@ stru_76370	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_76390	proc far
-		jmp	sub_E3D9D
+		jmp	Gameflow_MeditScreen_E3D9D
 sub_76390	endp
 
 ; ----------------------------------------------------------------------

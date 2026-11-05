@@ -15,7 +15,7 @@ stru_75DB0	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_75DD0	proc far
-		jmp	sub_D3F00
+		jmp	Gameflow_ShowDossier_D3F00
 sub_75DD0	endp
 		db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 stub379		ends

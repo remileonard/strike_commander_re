@@ -70,6 +70,13 @@ def pak_entry(path, k):
         out = lzw(raw[4:])
         assert len(out) == size
         return out
+    if flag == 0b011 and raw[4:6] == b'\x00\x06':
+        # Pacific Strike : uint32 taille, puis flux PKWARE DCL (tools/pkware_dcl.py).
+        from pkware_dcl import explode
+        size = struct.unpack_from('<I', raw, 0)[0]
+        out = explode(raw[4:])
+        assert len(out) == size
+        return out
     return raw
 
 

@@ -15,7 +15,7 @@ stru_758F0	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_75910	proc far
-		jmp	sub_CA536
+		jmp	Strings_Get_CA536
 sub_75910	endp
 
 ; ----------------------------------------------------------------------

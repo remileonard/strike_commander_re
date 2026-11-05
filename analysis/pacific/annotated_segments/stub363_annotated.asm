@@ -15,7 +15,7 @@ stru_758C0	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_758E0	proc far
-		jmp	sub_CA290
+		jmp	Gameflow_ApplyChange_CA290
 sub_758E0	endp
 
 ; ----------------------------------------------------------------------
@@ -23,7 +23,7 @@ sub_758E0	endp
 ; Attributes: thunk
 
 sub_758E5	proc far
-		jmp	sub_CA3D2
+		jmp	Gameflow_EmptyKillMarks_CA3D2
 sub_758E5	endp
 		db 0, 0, 0, 0, 0, 0
 stub363		ends

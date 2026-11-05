@@ -4223,7 +4223,13 @@ sub_D254D		endp
 
 ; Attributes: bp-based frame
 
-sub_D3E8B		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Commande 18 (TRAVEL*) : morceau 8 ; sub_D1EB9 (départ : depart, chaînes
+; PLAC[variable 86] et DATE[variable 82], variables 81 et 83) ; sub_D254D(n) (carte n de
+; mapdata.iff : WRLD/MAPS/INFO, LABL, LINE ; midmap, mapfont) ; sub_D1A1C (arrivée : arrive) ;
+; chaque étape seulement si byte_7D13E = 0.
+; ==============================================================================================
+Gameflow_Travel_D3E8B		proc far
 
 arg_0		= word ptr  6
 arg_2		= byte ptr  8
@@ -4262,7 +4268,7 @@ loc_D3EC7:
 		pop	si
 		pop	bp
 		retf
-sub_D3E8B		endp
+Gameflow_Travel_D3E8B		endp
 
 ; ----------------------------------------------------------------------
 

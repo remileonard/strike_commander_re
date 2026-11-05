@@ -15,7 +15,7 @@ stru_763B0	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_763D0	proc far
-		jmp	sub_E4EBB
+		jmp	Gameflow_PlayFuneral_E4EBB
 sub_763D0	endp
 
 ; ----------------------------------------------------------------------

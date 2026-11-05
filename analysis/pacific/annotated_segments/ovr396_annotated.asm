@@ -449,7 +449,14 @@ off_E3D8B	dw offset loc_E3C35
 
 ; Attributes: bp-based frame
 
-sub_E3D9D		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Commande 23
+; (MEDIT_SCREEN*) : medit, police sm-font, liste MLST, lecture d'un fichier de mission
+; (sub_BD743 : MISN, VERS, NAME, CAMP, TUNE, WRLD, FILE, CAST, AREA, SPOT, NUMS, MSGS, PROG,
+; PART, TEAM, PLAY, LOAD, HOME), carte NAVMAP ; drapeaux 260, 3999, 6634. Rôle de l'écran non
+; établi.
+; ==============================================================================================
+Gameflow_MeditScreen_E3D9D		proc far
 
 var_2A4		= word ptr -2A4h
 var_28E		= word ptr -28Eh
@@ -1921,9 +1928,9 @@ loc_E4B63:
 		pop	si
 		leave
 		retf
-sub_E3D9D		endp
+Gameflow_MeditScreen_E3D9D		endp
 
-; START OF FUNCTION CHUNK FOR sub_E3D9D
+; START OF FUNCTION CHUNK FOR Gameflow_MeditScreen_E3D9D
 off_E4BA3	dw offset loc_E431D
 		dw offset loc_E44FB
 		dw offset loc_E4545
@@ -1944,5 +1951,5 @@ off_E4BA3	dw offset loc_E431D
 		dw offset loc_E4939
 		dw offset loc_E48DF
 		dw offset loc_E4951
-; END OF FUNCTION CHUNK FOR sub_E3D9D
+; END OF FUNCTION CHUNK FOR Gameflow_MeditScreen_E3D9D
 ovr396		ends

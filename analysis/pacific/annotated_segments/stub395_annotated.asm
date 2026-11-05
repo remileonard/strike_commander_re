@@ -15,7 +15,7 @@ stru_76300	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_76320	proc far
-		jmp	sub_E3517
+		jmp	Gameflow_PlayEndText_E3517
 sub_76320	endp
 
 ; ----------------------------------------------------------------------

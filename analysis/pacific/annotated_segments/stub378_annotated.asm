@@ -23,7 +23,7 @@ sub_75D80	endp
 ; Attributes: thunk
 
 sub_75D85	proc far
-		jmp	sub_D3E8B
+		jmp	Gameflow_Travel_D3E8B
 sub_75D85	endp
 
 ; ----------------------------------------------------------------------

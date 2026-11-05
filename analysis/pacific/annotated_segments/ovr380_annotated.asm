@@ -6,7 +6,11 @@ ovr380		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_D47D0		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Commande 19
+; (LOOK_AT_KILLBOARD) : police boardfnt ; sub_9B7FA charge blkbrd et csmlgp.
+; ==============================================================================================
+Gameflow_KillBoard_D47D0		proc far
 
 var_278		= word ptr -278h
 var_25A		= word ptr -25Ah
@@ -818,5 +822,5 @@ loc_D4F66:
 		pop	si
 		leave
 		retf
-sub_D47D0		endp
+Gameflow_KillBoard_D47D0		endp
 ovr380		ends

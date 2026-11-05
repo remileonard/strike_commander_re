@@ -23,7 +23,7 @@ sub_75940	endp
 ; Attributes: thunk
 
 sub_75945	proc far
-		jmp	sub_CAAF2
+		jmp	Gameflow_ChooseAircraft_CAAF2
 sub_75945	endp
 
 ; ----------------------------------------------------------------------
@@ -31,7 +31,7 @@ sub_75945	endp
 ; Attributes: thunk
 
 sub_7594A	proc far
-		jmp	sub_CAD9D
+		jmp	Gameflow_LaunchMission_CAD9D
 sub_7594A	endp
 
 ; ----------------------------------------------------------------------
@@ -87,7 +87,7 @@ sub_75968	endp
 ; Attributes: thunk
 
 sub_7596D	proc far
-		jmp	sub_CAEBB
+		jmp	Gameflow_WriteInstantMission_CAEBB
 sub_7596D	endp
 
 ; ----------------------------------------------------------------------

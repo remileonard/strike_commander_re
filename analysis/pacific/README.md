@@ -1,6 +1,6 @@
 # Pacific Strike (PACIFIC.EXE) — déroulement et conversations
 
-Rédigé le 2026-11-05. Exécutable `PACIFIC.EXE` (1 001 792 octets) et données `PACIFIC.DAT` fournis par Rémi.
+Rédigé le 2026-11-05. Version illustrée : `PACIFIC_GAMEFLOW_CONV.html` (images dans `images/`, `tools/ps_doc_images.py`). Exécutable `PACIFIC.EXE` (1 001 792 octets) et données `PACIFIC.DAT` fournis par Rémi.
 Ni l'un ni l'autre n'est dans le dépôt. Les nombres sont en décimal ; les commandes sont désignées par leur nom
 (noms de Strike Commander, `GAMEFLOW_SYSTEM.md` § 5.2 et `CONV_SYSTEM.md` § 2, quand la commande fait la même
 chose ; sinon nom proposé, marqué \*).
@@ -68,15 +68,15 @@ octets, **3 pour les commandes 0, 6, 7, 9, 10, 35 et 36** (`inc [bp+var_8]` en `
 
 | Valeur | Nom | Octets d'argument | Effet constaté dans le code |
 |---|---|---|---|
-| 0 | `PLAY_CONV` | 2 (mot) | conversation n (`sub_C781E` par le relais `sub_757EF`) ; `[partie+1248]` = 1 |
+| 0 | `PLAY_CONV` | 2 (mot) | conversation n (`Gameflow_PlayConversation_C781E`, puis `Conv_PlayScript_C2ED0`) ; `[partie+1248]` = 1 |
 | 1 | `PLAY_SCENE` | 1 | scène `[partie+1265]` = n ; **arrêt du script** (`[bp+var_3]` = 1) ; `[partie+1248]` = 1 |
-| 2 | (`PLAY_MIDGAME` dans SC) | 1 | `sub_C798D`(partie, n) : n de 1 à 6 seulement (table de 6 cas), écran plein (319 × 199), morceau 5 ; rôle exact non lu |
+| 2 | `PLAY_ENDING`\* | 1 | `Gameflow_PlayEndingOrFuneral_C798D` : n de 1 à 5 → texte de fin `ENDTEXTn.IFF` (`Gameflow_PlayEndText_E3517`) ; autre n → cinématique `FUNERAL.PAK` (`Gameflow_PlayFuneral_E4EBB`) ; données : 0 (après la conversation de la mort du joueur), 1, 2, 4, 5 |
 | 3 | `FLY_MISSION_NOW` | 1 | mission `[partie+1262]` = n, `[partie+1254]` = 1 |
 | 4 | `NOP_4` | 1 | rien |
 | 5 | `CAMPAIGN_RESULT`\* | 1 | selon la mission `[partie+1263]` (tranches 0 à 11, 12 à 17, 18 à 19, 20 à 23, 24 à 27), compte des variables et drapeaux et pose l'un des drapeaux 2 156, 2 220 à 2 226 ; argument non lu |
 | 6 | `SET_FLAG` | 2 (mot) | `GameVar_SetFlag_5646D`(n) |
 | 7 | `CLEAR_FLAG` | 2 (mot) | `GameVar_ClearFlag_56520`(n) |
-| 8 | `PLAY_SHOT` | 1 | `sub_C7A2C`(partie, n) (826 lignes, lit une ressource) ; non lue |
+| 8 | `PLAY_SHOT` | 1 | `Gameflow_PlayShot_C7A2C` : `OPTIONS.IFF`, chunks `ESTB`, `SHOT`, `TUNE`, `SHPS`, `PALS` |
 | 9 | `IF_NOT_FLAG` | 2 (mot) | test : réussit si `GameVar_Get_56414`(n) = 0 |
 | 10 | `IF_FLAG` | 2 (mot) | test : réussit si `GameVar_Get_56414`(n) ≠ 0 |
 | 11 | `RETURN_TO_MENU`\* | 1 | `[partie+1254]` = 0, arrêt du script, `[partie+1248]` = 1 (`NOP_11` dans SC) |
@@ -84,23 +84,23 @@ octets, **3 pour les commandes 0, 6, 7, 9, 10, 35 et 36** (`inc [bp+var_8]` en `
 | 13 | `SET_NEXT_MISSION` | 1 | `[partie+1264]` = n |
 | 14 | `START_FLIGHT` | 1 | `[partie+1254]` = 1 |
 | 15 | `GOTO_NEXT_MISSION` | 1 | `[partie+1254]` = 2 et **arrêt du script** |
-| 16 | `SAVE_GAME` | 1 | choix d'un fichier (`sub_DEF72`), puis sauvegarde (`sub_CD720`) |
+| 16 | `SAVE_GAME` | 1 | choix d'un fichier (`sub_DEF72`), puis sauvegarde (`sub_CD720`, pas encore nommées) |
 | 17 | `LOAD_GAME` | 1 | choix d'un fichier (`sub_DEEAD`) ; s'il est donné, `[partie+1254]` = 3 |
-| 18 | (`SHOW_MAP` dans SC) | 1 | `sub_D3E8B`(partie, n) (40 lignes) ; non lue |
-| 19 | `LOOK_AT_KILLBOARD` | 1 | `sub_D47D0` (813 lignes) ; non lue |
+| 18 | `TRAVEL`\* | 1 | `Gameflow_Travel_D3E8B` : morceau 8 ; départ (`DEPART.PAK`, lieu `PLAC`[variable 86] et date `DATE`[variable 82], jour variable 81, année variable 83, chunks de `STRING.IFF`) ; carte n (`MAPDATA.IFF` : `FORM MAPS` d'`INFO` n, `LABL`, `LINE` ; `MIDMAP.PAK`, police `MAPFONT`) ; arrivée (`ARRIVE.PAK`) |
+| 19 | `LOOK_AT_KILLBOARD` | 1 | `Gameflow_KillBoard_D47D0` : tableau `BLKBRD`, polices `BOARDFNT`, `CSMLGP` |
 | 20 | `IF_MISSION_ACCEPTED` | 1 | test : réussit si `[partie+1630]` ≠ 0 |
 | 21 | `IF_MISSION_REFUSED` | 1 | test : réussit si `[partie+1630]` = 0 |
-| 22 | `WEAPON_LOADOUT` | 1 | `sub_CAD9D`(partie, n) ; non lue |
-| 23 | (`VIEW_CATALOG` dans SC) | 1 | `sub_E3D9D`(partie, n) (1 473 lignes) ; non lue |
+| 22 | `LAUNCH_MISSION`\* | 1 | `Gameflow_LaunchMission_CAD9D` : chunk `FPLN` de `STRING.IFF` (fichiers d'avion) ; avion du joueur choisi par les drapeaux 2 100 à 2 106, 2 200, 2 201 (`Gameflow_ChooseAircraft_CAAF2`) ; mission réécrite dans `instant` ou `test` (`Gameflow_WriteInstantMission_CAEBB` : `MISN`, `CAST`, `CAMP`, `PROG`, `PART`, `TEAM`, `PLAY`, `LOAD`) ; `[partie+1254]` = 1 ; cinématique du pont (`sub_D9A80` : `BACKGRND`, `ELEVATOR`, image de l'avion). Argument non lu |
+| 23 | `MEDIT_SCREEN`\* | 1 | `Gameflow_MeditScreen_E3D9D` : `MEDIT.PAK`, police `SM-FONT`, liste `MLST`, lecture d'un fichier de mission, carte `NAVMAP` ; rôle de l'écran non établi |
 | 24 | `SET_MUSIC_MOOD` | 1 | `[partie+1255]` = n, puis `Music_SetPendingTune_5ED30`(n) |
 | 25 | `SET_SCENE`\* | 1 | scène `[partie+1265]` = n, **sans** arrêt du script (`LOOK_AT_LEDGER` dans SC) |
-| 26 | `SHOW_KILL_MARKS` | 1 | si `[partie+1259]` ≠ 0 et `[partie+1261]` ≠ 2 : `sub_CA3D2` |
+| 26 | `SHOW_KILL_MARKS` | 1 | si `[partie+1259]` ≠ 0 et `[partie+1261]` ≠ 2 : `Gameflow_EmptyKillMarks_CA3D2`, fonction vide (`mov ax, [bp+arg_0] / retf`) |
 | 27, 28 | — | — | erreur (`push 0DA18h` / `sub_1DDFE`) : `REMOVE_PILOT` et `IF_TRUE` n'existent plus |
-| 29 | (`CHECK_GAME_OVER` dans SC) | 1 | `sub_D3F00`(partie, n) (832 lignes) ; non lue ; données : 1 à 8 |
+| 29 | `SHOW_DOSSIER`\* | 1 | `Gameflow_ShowDossier_D3F00` : page n (1 à 8) de `DOSSIER.PAK` (8 entrées), police `FOPTIONS` ; dans les données, chaque sprite pose un drapeau de 2 180 à 2 187 puis ouvre la page 1 à 8 |
 | 30, 31 | `ELSE`, `ENDIF` | 1 | traités avant la table |
 | 32 | `IF_MISSION_SUCCESS` | 1 | test : réussit si l'octet `[partie+1266+n]` = 1 |
 | 33 | — | — | erreur dans la table ; `OR_GROUP` est traité avant |
-| 34 | `APPLY_CHANGE` | 1 | `sub_CA290`(partie, n) (lit une ressource) ; non lue |
+| 34 | `APPLY_CHANGE` | 1 | `Gameflow_ApplyChange_CA290` : chunks `STAT`, `CHNG`, `INFO` du fichier dont le chemin est en `[partie+1008]` ; absente des données |
 | 35 | `SET_VARIABLE`\* | 2 (deux octets) | `GameVar_Set_564BB`(a, b) : variable a = b |
 | 36 | `SET_DATE`\* | 2 (deux octets) | date à partir du mois a et de l'année b (§ 3.4) |
 | 37 | `ADVANCE_MONTHS`\* | 1 | date + n mois (§ 3.4) |
@@ -152,7 +152,7 @@ Fonction pas encore nommée `sub_C2ED0` (ovr351), proposé **`Conv_PlayScript_C2
 | 12 | `ELSE`\* | aucun | — |
 | 13 | `ENDIF`\* | aucun | — |
 | 16 | `NOP_16` | aucun | — |
-| 17 | `GROUP_SHOT_MAP_MARKS`\* | n (mot), n mots, x (mot), y (mot) | `ConvRec_ReadMarks_C5960` |
+| 17 | `GROUP_SHOT_COMMANDER`\* | n (mot), n numéros d'image (mot), x (mot), y (mot) | `ConvRec_ReadMarks_C5960` |
 | autre | — | erreur (`push 9999h` / `sub_1DDFE`) | — |
 
 Différences avec Strike Commander :
@@ -169,9 +169,13 @@ Différences avec Strike Commander :
 - **Blocs conditionnels** : `IF_FLAG`\* n met `[bp+var_15]` = 1 si `GameVar_Get_56414`(n) = 0
   (`ConvRec_FlagNotSet_C5B91`) ; `ELSE`\* inverse `[bp+var_15]` ; `ENDIF`\* le remet à 0. Tant que `[bp+var_15]`
   est posé, `GROUP_SHOT` et `CLOSEUP` sont lus sans être affichés. Pas d'imbrication.
-- **`GROUP_SHOT`** : le décor seul ; les figurants (1), les textes (10) et les repères (17) qui suivent sont lus
-  par la scène de groupe (`cmp ax, 11h`, `cmp ax, 0Ah` dans `loc_C304E`). Les repères accompagnent les décors de
-  carte (`ph2map1`, `cs1map1`…) ; la scène lit des drapeaux pour eux (`GameVar_Get_56414`) : détail non lu.
+- **`GROUP_SHOT`** : le décor seul ; les figurants (1), les textes (10) et le commandant (17) qui suivent sont lus
+  par la scène de groupe (`cmp ax, 11h`, `cmp ax, 0Ah` dans `loc_C304E`).
+- **`GROUP_SHOT_COMMANDER`\* (17)** : le commandant devant une carte de briefing (`ph2map1`, `cs1map1`…). Figure
+  `yucmndr` si le drapeau 2 128 est posé, sinon `commndr` (`push 850h` / `GameVar_Get_56414`, chaînes DS 14 421
+  et 14 429) ; les n mots sont recopiés dans la liste d'images du calque (`mov [bx], ax` sur `[calque+29]`) :
+  l'ordre des images montrées. Les images de ces figures couvrent l'écran (en-tête 0 à 319 × 0 à 199) : le bras et
+  la baguette du commandant sur la carte. Rôle de x et y non lu.
 - Plus de saut relatif (`YESNOCHOICE_BRANCH2`), d'escadre (`SELECT_WING`) ni de choix d'équipier
   (`CHOOSE_WINGMAN`) : 12, 14 et 15 sont des erreurs ou ont un autre sens.
 
@@ -183,5 +187,6 @@ Avec cette grammaire, les 283 conversations se lisent jusqu'au dernier octet.
   Une commande absente de sa table n'est pas ajoutée à la liste (`continue`) et son argument n'est pas sauté :
   c'est le cas de 5, 11, 25, 37, 38, 40 et 41, présentes dans les données.
 - `PSGameFlowParser::parseRequBytes` : 3 octets, comme le code.
+- Commandes de conversation à ajouter : `IF_FLAG`\*, `ELSE`\*, `ENDIF`\*, `GROUP_SHOT_COMMANDER`\*.
 - `PSConvPlayer::SetArchive` découpe les répliques en cherchant le mot 65 535 : le code lit chaque champ à sa place
   (tableau du § 4.2), et le mot 65 535 est le numéro de voix absent, pas une marque de fin.

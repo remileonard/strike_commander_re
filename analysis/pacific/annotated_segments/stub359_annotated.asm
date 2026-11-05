@@ -39,7 +39,7 @@ sub_757EA	endp
 ; Attributes: thunk
 
 sub_757EF	proc far
-		jmp	sub_C781E
+		jmp	Gameflow_PlayConversation_C781E
 sub_757EF	endp
 
 ; ----------------------------------------------------------------------
@@ -47,7 +47,7 @@ sub_757EF	endp
 ; Attributes: thunk
 
 sub_757F4	proc far
-		jmp	sub_C798D
+		jmp	Gameflow_PlayEndingOrFuneral_C798D
 sub_757F4	endp
 
 ; ----------------------------------------------------------------------
@@ -71,7 +71,7 @@ sub_757FE	endp
 ; Attributes: thunk
 
 sub_75803	proc far
-		jmp	sub_C7A2C
+		jmp	Gameflow_PlayShot_C7A2C
 sub_75803	endp
 
 ; ----------------------------------------------------------------------

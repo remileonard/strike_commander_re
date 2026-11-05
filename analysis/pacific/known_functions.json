@@ -5763,5 +5763,80 @@
     "new_name": "Gameflow_LoadScene_C73DD",
     "segment": "ovr359",
     "summary": "far. LUE 2026-11-05. (structure seulement) Lecture d'une scène de GAMEFLOW.IFF : chunks SPRT, REQU (push large 55514552h) et EFCT (push large 54434645h)."
+  },
+  "sub_C781E": {
+    "new_name": "Gameflow_PlayConversation_C781E",
+    "segment": "ovr359",
+    "summary": "far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). PLAY_CONV : prépare la conversation n (sub_755BF → sub_C2045), la joue (Conv_PlayScript_C2ED0), puis libère (sub_C21A4)."
+  },
+  "sub_C798D": {
+    "new_name": "Gameflow_PlayEndingOrFuneral_C798D",
+    "segment": "ovr359",
+    "summary": "far. LUE 2026-11-05. Commande 2 (PLAY_ENDING*) : n de 1 à 6 (table de 6 cas, dec ax) → Gameflow_PlayEndText_E3517(partie, n), écran plein, morceau 5 ; sinon → Gameflow_PlayFuneral_E4EBB."
+  },
+  "sub_E3517": {
+    "new_name": "Gameflow_PlayEndText_E3517",
+    "segment": "ovr395",
+    "summary": "far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Texte de fin n : nom « endtext » + chiffre n (DS 17101), FORM BEGN, jusqu'à 20 chunks TEXT (sub_E16DE), police convfont ; table de 5 cas (n de 1 à 5), morceaux 11, 15…"
+  },
+  "sub_E4EBB": {
+    "new_name": "Gameflow_PlayFuneral_E4EBB",
+    "segment": "ovr397",
+    "summary": "far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Cinématique des funérailles (funeral, sub_E4BD0)."
+  },
+  "sub_D3E8B": {
+    "new_name": "Gameflow_Travel_D3E8B",
+    "segment": "ovr378",
+    "summary": "far. LUE 2026-11-05. Commande 18 (TRAVEL*) : morceau 8 ; sub_D1EB9 (départ : depart, chaînes PLAC[variable 86] et DATE[variable 82], variables 81 et 83) ; sub_D254D(n) (carte n de mapdata.iff : WRLD/MAPS/INFO, LABL, LINE ; midmap, mapfont) ; sub_D1A1C (arrivée : arrive) ; chaque étape seulement si byte_7D13E = 0."
+  },
+  "sub_CAD9D": {
+    "new_name": "Gameflow_LaunchMission_CAD9D",
+    "segment": "ovr365",
+    "summary": "far. LUE 2026-11-05. Commande 22 (LAUNCH_MISSION*) : chaîne FPLN de STRING.IFF (Strings_Get_CA536), avion choisi par Gameflow_ChooseAircraft_CAAF2, mission réécrite par Gameflow_WriteInstantMission_CAEBB (word_7D190 ou word_7D18E), [partie+1254] = 1, [partie+1260] = 1, puis sub_D9A80 (cinématique du pont avec l'avion). Argument non lu."
+  },
+  "sub_CAAF2": {
+    "new_name": "Gameflow_ChooseAircraft_CAAF2",
+    "segment": "ovr365",
+    "summary": "far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Rend le rang de l'avion du joueur d'après les drapeaux 2100 à 2106, 2200, 2201 (le dernier posé l'emporte) et range deux valeurs par avion en [partie+1378] (octet) et [partie+1379] (mot) ; remplit ensuite 4 entrées de 3 octets en [partie+1366] d'après d'autres drapeaux (2111…)."
+  },
+  "sub_CAEBB": {
+    "new_name": "Gameflow_WriteInstantMission_CAEBB",
+    "segment": "ovr365",
+    "summary": "far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Lit un fichier de mission et en écrit une copie modifiée « instant » (ou « test ») : MISN, CAST, CAMP, PROG, PART, FPLN, WEAP, TEAM, PLAY, LOAD ; noms tirés au hasard (CRT_Rand, CRT_Itoa)."
+  },
+  "sub_E3D9D": {
+    "new_name": "Gameflow_MeditScreen_E3D9D",
+    "segment": "ovr396",
+    "summary": "far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Commande 23 (MEDIT_SCREEN*) : medit, police sm-font, liste MLST, lecture d'un fichier de mission (sub_BD743 : MISN, VERS, NAME, CAMP, TUNE, WRLD, FILE, CAST, AREA, SPOT, NUMS, MSGS, PROG, PART, TEAM, PLAY, LOAD, HOME), carte NAVMAP ; drapeaux 260, 3999, 6634. Rôle de l'écran non établi."
+  },
+  "sub_D3F00": {
+    "new_name": "Gameflow_ShowDossier_D3F00",
+    "segment": "ovr379",
+    "summary": "far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Commande 29 (SHOW_DOSSIER*) : page n de dossier.pak, police foptions."
+  },
+  "sub_D47D0": {
+    "new_name": "Gameflow_KillBoard_D47D0",
+    "segment": "ovr380",
+    "summary": "far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Commande 19 (LOOK_AT_KILLBOARD) : police boardfnt ; sub_9B7FA charge blkbrd et csmlgp."
+  },
+  "sub_C7A2C": {
+    "new_name": "Gameflow_PlayShot_C7A2C",
+    "segment": "ovr359",
+    "summary": "far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Commande 8 (PLAY_SHOT) : OPTIONS.IFF, ESTB, INFO, SHOT, TUNE, SHPS, PALS."
+  },
+  "sub_CA290": {
+    "new_name": "Gameflow_ApplyChange_CA290",
+    "segment": "ovr363",
+    "summary": "far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Commande 34 (APPLY_CHANGE) : fichier dont le chemin est en [partie+1008], FORM STAT, FORM CHNG, INFO."
+  },
+  "sub_CA3D2": {
+    "new_name": "Gameflow_EmptyKillMarks_CA3D2",
+    "segment": "ovr363",
+    "summary": "far. LUE 2026-11-05. Fonction vide (mov ax, [bp+arg_0] / retf), appelée par la commande 26 (SHOW_KILL_MARKS)."
+  },
+  "sub_CA536": {
+    "new_name": "Strings_Get_CA536",
+    "segment": "ovr364",
+    "summary": "far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Lit le chunk demandé (4 lettres, arg_0) du FORM STRN du fichier de chaînes (STRING.IFF : PLAN, FPLN, PILT, DATE, PLAC…) dans le tampon donné."
   }
 }

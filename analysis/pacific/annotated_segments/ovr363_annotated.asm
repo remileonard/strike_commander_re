@@ -6,7 +6,11 @@ ovr363		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_CA290		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Commande 34
+; (APPLY_CHANGE) : fichier dont le chemin est en [partie+1008], FORM STAT, FORM CHNG, INFO.
+; ==============================================================================================
+Gameflow_ApplyChange_CA290		proc far
 
 var_AA		= word ptr -0AAh
 var_4D		= dword ptr -4Dh
@@ -141,13 +145,17 @@ loc_CA39C:
 		pop	si
 		leave
 		retf
-sub_CA290		endp
+Gameflow_ApplyChange_CA290		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_CA3D2		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Fonction vide (mov ax, [bp+arg_0] / retf), appelée par la commande 26
+; (SHOW_KILL_MARKS).
+; ==============================================================================================
+Gameflow_EmptyKillMarks_CA3D2		proc far
 
 arg_0		= word ptr  6
 
@@ -156,5 +164,5 @@ arg_0		= word ptr  6
 		mov	ax, [bp+arg_0]
 		pop	bp
 		retf
-sub_CA3D2		endp
+Gameflow_EmptyKillMarks_CA3D2		endp
 ovr363		ends

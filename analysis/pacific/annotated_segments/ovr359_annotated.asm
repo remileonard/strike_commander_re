@@ -746,7 +746,12 @@ Gameflow_LoadScene_C73DD		endp
 
 ; Attributes: bp-based frame
 
-sub_C781E		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). PLAY_CONV : prépare
+; la conversation n (sub_755BF → sub_C2045), la joue (Conv_PlayScript_C2ED0), puis libère
+; (sub_C21A4).
+; ==============================================================================================
+Gameflow_PlayConversation_C781E		proc far
 
 var_78		= word ptr -78h
 var_A		= word ptr -0Ah
@@ -806,7 +811,7 @@ arg_2		= word ptr  8
 		pop	si
 		leave
 		retf
-sub_C781E		endp
+Gameflow_PlayConversation_C781E		endp
 
 ; ----------------------------------------------------------------------
 
@@ -947,7 +952,12 @@ sub_C792C		endp
 
 ; Attributes: bp-based frame
 
-sub_C798D		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Commande 2 (PLAY_ENDING*) : n de 1 à 6 (table de 6 cas, dec ax) →
+; Gameflow_PlayEndText_E3517(partie, n), écran plein, morceau 5 ; sinon →
+; Gameflow_PlayFuneral_E4EBB.
+; ==============================================================================================
+Gameflow_PlayEndingOrFuneral_C798D		proc far
 
 var_E		= word ptr -0Eh
 var_C		= word ptr -0Ch
@@ -1016,22 +1026,26 @@ loc_C7A1D:
 		pop	cx
 		leave
 		retf
-sub_C798D		endp
+Gameflow_PlayEndingOrFuneral_C798D		endp
 
-; START OF FUNCTION CHUNK FOR sub_C798D
+; START OF FUNCTION CHUNK FOR Gameflow_PlayEndingOrFuneral_C798D
 off_C7A20	dw offset loc_C79AC
 		dw offset loc_C79AC
 		dw offset loc_C79AC
 		dw offset loc_C79AC
 		dw offset loc_C79AC
 		dw offset loc_C79AC
-; END OF FUNCTION CHUNK FOR sub_C798D
+; END OF FUNCTION CHUNK FOR Gameflow_PlayEndingOrFuneral_C798D
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_C7A2C		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Commande 8
+; (PLAY_SHOT) : OPTIONS.IFF, ESTB, INFO, SHOT, TUNE, SHPS, PALS.
+; ==============================================================================================
+Gameflow_PlayShot_C7A2C		proc far
 
 var_244		= word ptr -244h
 var_222		= word ptr -222h
@@ -1856,7 +1870,7 @@ loc_C8209:
 		pop	si
 		leave
 		retf
-sub_C7A2C		endp
+Gameflow_PlayShot_C7A2C		endp
 
 ; ----------------------------------------------------------------------
 

@@ -279,7 +279,8 @@ strike_commander_re/
 ├── analysis/
 │   ├── pacific/                     analyse de PACIFIC.EXE (Pacific Strike, --exe pacific) : README.md = déroulement
 │   │                                  (GAMEFLOW.IFF, 42 commandes, variables et drapeaux, date) et conversations
-│   │                                  (CONV.PAK compressé, commandes, voix) comparés à Strike Commander
+│   │                                  (CONV.PAK compressé, commandes, voix) comparés à Strike Commander ;
+│   │                                  PACIFIC_GAMEFLOW_CONV.html = version illustrée (images/, tools/ps_doc_images.py)
 │   ├── topt/                        analyse de TOPTTST1.EXE (Tactical Operations, --exe topt) : README.md,
 │   │                                  known_functions, cinématiques (midgames/, iff/), midgame_engine.json porté
 │   ├── optest/                      analyse d'OPTEST.EXE : mêmes fichiers que ci-dessous
@@ -381,6 +382,8 @@ strike_commander_re/
 └── tools/
     ├── exe_paths.py                 chemins par exécutable ; tous les outils ci-dessous
     │                                  prennent --exe optest (défaut strike)
+    ├── ps_conv_dump.py              conversations de Pacific Strike (CONV.PAK compressé) → texte ; pkware_dcl.py :
+    │                                  décompression PKWARE DCL (entrées de marque 3 des PAK de PACIFIC.DAT, via sc_data)
     ├── conv_dump.py                 lecteur des scripts de conversation (CONV.PAK) → texte ;
     │                                  conv_scene.py : rendu d'une scène de groupe → PNG
     ├── conv_faces.py                visages des conversations : planche des 62 images, composition du gros plan

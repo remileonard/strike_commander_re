@@ -636,7 +636,13 @@ off_CAAEA	dw offset loc_CAA58
 
 ; Attributes: bp-based frame
 
-sub_CAAF2		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Rend le rang de
+; l'avion du joueur d'après les drapeaux 2100 à 2106, 2200, 2201 (le dernier posé l'emporte)
+; et range deux valeurs par avion en [partie+1378] (octet) et [partie+1379] (mot) ; remplit
+; ensuite 4 entrées de 3 octets en [partie+1366] d'après d'autres drapeaux (2111…).
+; ==============================================================================================
+Gameflow_ChooseAircraft_CAAF2		proc far
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -924,13 +930,19 @@ loc_CAD97:
 		pop	si
 		leave
 		retf
-sub_CAAF2		endp
+Gameflow_ChooseAircraft_CAAF2		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_CAD9D		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Commande 22 (LAUNCH_MISSION*) : chaîne FPLN de STRING.IFF
+; (Strings_Get_CA536), avion choisi par Gameflow_ChooseAircraft_CAAF2, mission réécrite par
+; Gameflow_WriteInstantMission_CAEBB (word_7D190 ou word_7D18E), [partie+1254] = 1,
+; [partie+1260] = 1, puis sub_D9A80 (cinématique du pont avec l'avion). Argument non lu.
+; ==============================================================================================
+Gameflow_LaunchMission_CAD9D		proc far
 
 var_50		= word ptr -50h
 arg_0		= word ptr  6
@@ -948,7 +960,7 @@ arg_0		= word ptr  6
 		add	sp, 6
 		push	si
 		push	cs
-		call	near ptr sub_CAAF2
+		call	near ptr Gameflow_ChooseAircraft_CAAF2
 		pop	cx
 		mov	di, ax
 		push	si
@@ -991,7 +1003,7 @@ loc_CADFF:
 loc_CAE12:
 		nop
 		push	cs
-		call	near ptr sub_CAEBB
+		call	near ptr Gameflow_WriteInstantMission_CAEBB
 		add	sp, 8
 		mov	byte ptr [si+4E6h], 1
 		mov	byte ptr [si+4ECh], 1
@@ -1002,7 +1014,7 @@ loc_CAE12:
 		pop	si
 		leave
 		retf
-sub_CAD9D		endp
+Gameflow_LaunchMission_CAD9D		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1124,7 +1136,12 @@ sub_CAE8A		endp
 
 ; Attributes: bp-based frame
 
-sub_CAEBB		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Lit un fichier de
+; mission et en écrit une copie modifiée « instant » (ou « test ») : MISN, CAST, CAMP, PROG,
+; PART, FPLN, WEAP, TEAM, PLAY, LOAD ; noms tirés au hasard (CRT_Rand, CRT_Itoa).
+; ==============================================================================================
+Gameflow_WriteInstantMission_CAEBB		proc far
 
 var_312		= word ptr -312h
 var_2C2		= word ptr -2C2h
@@ -2486,9 +2503,9 @@ loc_CBA36:
 		pop	si
 		leave
 		retf
-sub_CAEBB		endp
+Gameflow_WriteInstantMission_CAEBB		endp
 
-; START OF FUNCTION CHUNK FOR sub_CAEBB
+; START OF FUNCTION CHUNK FOR Gameflow_WriteInstantMission_CAEBB
 off_CBBD2	dw offset loc_CB688
 		dw offset loc_CB68D
 		dw offset loc_CB68D
@@ -2497,7 +2514,7 @@ off_CBBD2	dw offset loc_CB688
 		dw offset loc_CB68D
 		dw offset loc_CB68D
 		dw offset loc_CB692
-; END OF FUNCTION CHUNK FOR sub_CAEBB
+; END OF FUNCTION CHUNK FOR Gameflow_WriteInstantMission_CAEBB
 
 ; ----------------------------------------------------------------------
 

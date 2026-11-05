@@ -145,7 +145,12 @@ sub_CA3E0		endp
 
 ; Attributes: bp-based frame
 
-sub_CA536		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Lit le chunk demandé
+; (4 lettres, arg_0) du FORM STRN du fichier de chaînes (STRING.IFF : PLAN, FPLN, PILT, DATE,
+; PLAC…) dans le tampon donné.
+; ==============================================================================================
+Strings_Get_CA536		proc far
 
 var_F8		= word ptr -0F8h
 var_9B		= dword ptr -9Bh
@@ -238,5 +243,5 @@ loc_CA600:
 		mov	al, 1
 		leave
 		retf
-sub_CA536		endp
+Strings_Get_CA536		endp
 ovr364		ends

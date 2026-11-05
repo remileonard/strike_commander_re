@@ -3436,7 +3436,12 @@ sub_E3243		endp
 
 ; Attributes: bp-based frame
 
-sub_E3517		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Texte de fin n : nom
+; « endtext » + chiffre n (DS 17101), FORM BEGN, jusqu'à 20 chunks TEXT (sub_E16DE), police
+; convfont ; table de 5 cas (n de 1 à 5), morceaux 11, 15…
+; ==============================================================================================
+Gameflow_PlayEndText_E3517		proc far
 
 var_2AE		= word ptr -2AEh
 var_29E		= word ptr -29Eh
@@ -3970,13 +3975,13 @@ loc_E39E6:
 		pop	si
 		leave
 		retf
-sub_E3517		endp
+Gameflow_PlayEndText_E3517		endp
 
-; START OF FUNCTION CHUNK FOR sub_E3517
+; START OF FUNCTION CHUNK FOR Gameflow_PlayEndText_E3517
 off_E3A48	dw offset loc_E3724
 		dw offset loc_E376D
 		dw offset loc_E3793
 		dw offset loc_E37E4
 		dw offset loc_E3849
-; END OF FUNCTION CHUNK FOR sub_E3517
+; END OF FUNCTION CHUNK FOR Gameflow_PlayEndText_E3517
 ovr395		ends

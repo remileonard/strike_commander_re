@@ -6,7 +6,11 @@ ovr379		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_D3F00		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05 (fichiers, chunks et appels ; pas ligne par ligne). Commande 29
+; (SHOW_DOSSIER*) : page n de dossier.pak, police foptions.
+; ==============================================================================================
+Gameflow_ShowDossier_D3F00		proc far
 
 var_2A6		= word ptr -2A6h
 var_2A4		= word ptr -2A4h
@@ -837,5 +841,5 @@ loc_D477B:
 		pop	si
 		leave
 		retf
-sub_D3F00		endp
+Gameflow_ShowDossier_D3F00		endp
 ovr379		ends
