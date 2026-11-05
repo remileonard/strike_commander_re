@@ -847,6 +847,10 @@ de Strike Commander (`tools/object_render.py`, par `tools/ps_object_render.py`) 
 et l'objet n'est juste que si l'octet 4 de `ATTR` est pris comme drapeau « face double » (sans lui, la dérive et le
 stabilisateur disparaissent) ; ce rôle reste à confirmer dans le code. Le modèle mesure 25 m d'envergure.
 
+Ce format est déjà lu par libRealSpace : `RSEntity` a ses lecteurs pour `QUAD`, `MAPS`, `ATTR` et `TXMA`
+(`parseREAL_APPR_POLY_QUAD`, `parseREAL_APPR_POLY_ATTR`, `parseREAL_APPR_POLY_TRIS_TXMS_TXMA`…). Cet essai sert de
+rendu de contrôle, pas de proposition.
+
 ![F4U Corsair : quatre vues et les niveaux de détail 1 et 2](images/ps_corsair.png)
 
 ## 5. Rapport avec libRealSpace
