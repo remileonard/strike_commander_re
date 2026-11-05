@@ -904,7 +904,7 @@ Les constantes sont celles d'une formule en unités anglaises : 550 pied·livre-
 2) pour l'avion désigné par `word_7CADA` ; 0,898, 0,949 ou 1,0 selon `byte_7CB11` pour un objet dont l'octet +51
 vaut 255 ; aucun facteur sinon. Le sens de ces deux réglages n'est pas établi.
 
-Non utilisés par cette fonction : la poussée maximale de `THRS`, son 3e champ (u8) et son 6e (u32). Les champs 23 et 26
+Non utilisés par cette fonction : la poussée maximale de `THRS`, ses deux premiers u8 (152 et 180 pour le Corsair ; le premier est lu dans une variable qui ne sert pas) et son 6e champ (u32, 50). Les champs 23 et 26
 de `JDYN` sont, dans Strike Commander, des réglages de l'IA (vitesse de poursuite maximale, seuil de portée,
 PHYSICS.md) ; dans Pacific Strike, la poussée les lit aussi. Le reste du modèle de vol (forces, moments, `ATMO`,
 `STBL`) n'a pas encore été comparé.
