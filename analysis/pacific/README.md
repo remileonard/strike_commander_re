@@ -1000,6 +1000,48 @@ Leur nom à l'écran n'a pas été trouvé.
 Hors du modèle de vol de l'avion : seg111 (code sans équivalent dans STRIKE.EXE) traite des objets au sol ou des
 navires (`GroundObj_AccelerateToCruise_43156`, file radio).
 
+### 9.2 Implémentation prévue : `PSEntity` et `PSPlane`
+
+Proposition de Rémi : comme `PSArea` (§ 7), la lecture et la physique propres à Pacific Strike vont dans des classes
+dérivées, sans test sur la taille des structures dans les classes de Strike Commander. Relevé dans libRealSpace (version
+80e360a) avant d'écrire quoi que ce soit.
+
+**`PSEntity`, dérivé de `RSEntity`** : lecture des données.
+
+- Aujourd'hui `RSEntity::parseREAL_OBJT_JETP_DYNM_THRS` teste la taille du chunk (`size == 6 || 7 || 8`, puis
+  `size == 19 || 20`) et, pour Pacific Strike, fabrique la poussée par `ReadInt24LEByte3() * 15` à partir du champ
+  puissance. C'est ce test que `PSEntity` supprime : `RSEntity` garde la lecture de Strike Commander (7 octets),
+  `PSEntity::parseREAL_OBJT_JETP_DYNM_THRS` lit les 19 octets de Pacific Strike (§ 9) : poussée maximale, puissance, les
+  3 octets, puis les deux derniers u32 (le dernier = vitesse de décrochage, sa moitié = plancher de la poussée).
+- `JDYN` se lit à l'identique : rien à remplacer. Les champs 23 et 26 sont rangés aujourd'hui dans `ai_speed_max` et
+  `ai_engage_range` ; pour Pacific Strike ce sont aussi Vref et l'altitude de rétablissement du moteur (§ 9).
+- À changer dans `RSEntity.h` : `parseREAL_OBJT_JETP_DYNM_THRS` est `private` et non virtuelle ; la passer `virtual` et
+  `protected` (le `std::bind(&RSEntity::parseREAL_OBJT_JETP_DYNM_THRS, this, …)` de `parseREAL_OBJT_JETP_DYNM` appelle
+  alors celle de `PSEntity`). Strike Commander garde le même code.
+- Création : `SCMission::createEntity()` est déjà virtuelle (`return new RSEntity();`) ; `PSMission` la remplace et
+  rend un `PSEntity`.
+- Les objets 3D (`QUAD`, `MAPS`, `ATTR`, `TXMA`) sont déjà lus par `RSEntity` (§ 8) : rien à faire.
+
+**`PSPlane`, dérivé de `SCJetpPlane`** : la physique. `SCJetpPlane` est le modèle corrigé d'après STRIKE.EXE
+(`IMPL_SCJETPPLANE_CORRECTIONS.md`) ; `PSMission` crée aujourd'hui des `SCJdynPlane`, qui n'utilisent pas les champs de
+`JDYN` lus dans le jeu. `PSMission` créerait des `PSPlane` à la place. Toutes les méthodes visées sont déjà virtuelles
+dans `SCPlane` et remplacées par `SCJetpPlane`. Ce que chaque méthode de `PSPlane` change (§ 9 et § 9.1) :
+
+| Méthode de `SCJetpPlane` | Dans `PSPlane` |
+|---|---|
+| `computeThrust` | poussée de l'hélice : puissance, Vref, altitude de rétablissement, plafond, plancher de vitesse (`Aero_PropellerThrust_4710B`) ; le plafond du cran par le gain moteur et l'arrêt sans carburant restent |
+| `computeLift` | décrochage aussi sous la vitesse de décrochage (7/8 avec le bit 1) ; force latérale × 0,125 au lieu de 0,25 ; pas de décrochage avec l'option de difficulté à 2 |
+| `computeDrag` | part de l'incidence au-delà de (calage + 1) réduite selon l'option de difficulté |
+| `processInput` | consigne d'incidence directe (`α_max × manche`, ÷ 2 en poussant) au lieu de la loi de charge ; roulage au manche sous 25 m/s au lieu de 40 |
+| `updateVelocity` | vitesse plafonnée à 2 × Vref |
+| `checkStatus` | au sol : nez ramené vers 10° (roulette de queue) ; porte-avions (variable 667, niveau du sol propre) |
+
+Ce que la classe aura besoin de connaître : l'option de difficulté du joueur (`word_7CB07`, 0 à 2) et celle des autres
+avions (`byte_7CB11`), dont le nom à l'écran n'est pas encore trouvé ; le niveau du pont du porte-avions
+(`dword_776A2`, origine non lue).
+
+Le code sera écrit après la relecture de cette section (fichiers complets de libRealSpace modifiés, comme pour les
+missions).
 ## 5. Rapport avec libRealSpace
 
 - `PSGameFlowParser::parseOpCode` : les longueurs sont celles du code pour 0, 6, 7, 9, 10, 35 et 36 (2 octets).
