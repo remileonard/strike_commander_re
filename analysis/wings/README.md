@@ -30,13 +30,22 @@ Fichiers : `known_functions.json`, `function_index.json`, `segment_boundaries.js
 trié ; aucun hachage n'a été vu dans ce code.** Les fonctions sont dans seg004 (nommées `Tre_*` dans
 `known_functions.json`).
 
-### 3.1 Monter une archive : ligne de commande
+### 3.1 Monter une archive : fichier `WG.CFG`
 
-Aucun nom d'archive n'est écrit dans l'exécutable. La lecture de la ligne de commande (`sub_6A0EB`, fonction pas
-encore nommée) teste le premier caractère de chaque argument : `cmp ax, 3Dh` (`=`) mène à `Tre_OpenArchive_4BB2`
-avec le reste de l'argument. `WINGS_OF.EXE =FICHIER.TRE` monte donc l'archive `FICHIER.TRE` ; un argument par archive,
-**8 au plus** (table de 8 mots à `DS:5298h`, `cmp word_59E58, 8` dans `Tre_RegisterArchive_4863`). C'est sans doute
-le lanceur `WG` qui passe ces arguments (non vu : il n'a pas été fourni).
+Aucun nom d'archive n'est écrit dans l'exécutable : la liste des archives est lue dans un **fichier de
+configuration**, `wg.cfg` par défaut.
+
+- `sub_69F3D` (fonction pas encore nommée ; proposé : `Config_OpenArgumentFile_69F3D`) ouvre ce fichier avec le
+  lecteur de flux. Le nom vient du segment de données (`mov di, 16E8h` → chaîne `wg.cfg`). Exception : s'il y a plus de
+  2 arguments et que le 1er commence par les 4 octets `Fugi` (`cmp dword ptr [bx], 69677546h`), c'est le 2ᵉ argument
+  qui donne le fichier. Fichier absent : message « Wings of Glory was unable to find %s. Refer to the Install Guide
+  for more details. »
+- La lecture des réglages (`sub_6A0EB`, fonction pas encore nommée) teste le premier caractère de chaque élément lu :
+  `cmp ax, 3Dh` (`=`) mène à `Tre_OpenArchive_4BB2` avec le reste du texte. Une ligne `=FICHIER.TRE` monte donc
+  l'archive `FICHIER.TRE`. Les autres premiers caractères sont `+` et `-` (autres réglages).
+- **8 archives au plus** (table de 8 mots à `DS:5298h`, `cmp word_59E58, 8` dans `Tre_RegisterArchive_4863`).
+
+Les noms des archives de Wings of Glory sont donc dans le `WG.CFG` écrit par l'installation, pas dans l'exécutable.
 
 `Tre_OpenArchive_4BB2` :
 
