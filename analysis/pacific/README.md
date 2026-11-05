@@ -904,7 +904,7 @@ Les constantes sont celles d'une formule en unités anglaises : 550 pied·livre-
 2) pour l'avion désigné par `word_7CADA` ; 0,898, 0,949 ou 1,0 selon `byte_7CB11` pour un objet dont l'octet +51
 vaut 255 ; aucun facteur sinon. Le sens de ces deux réglages n'est pas établi.
 
-Non utilisés par cette fonction : la poussée maximale de `THRS`, ses deux premiers u8 (152 et 180 pour le Corsair ; le premier est lu dans une variable qui ne sert pas) et son 6e champ (u32, 50). 
+Non utilisés par cette fonction : la poussée maximale de `THRS`, ses deux premiers u8 (152 et 180 pour le Corsair ; le premier est lu dans une variable qui ne sert pas) et son 6e champ (u32, 50).
 
 **Les champs 23 et 26 de `JDYN`.** Ce sont deux valeurs à la même place dans le chunk des deux jeux : le champ 23 est un
 mot à l'octet 61, le champ 26 un u32 à l'octet 67. Ce qui change, c'est le code qui les lit :
@@ -917,8 +917,9 @@ mot à l'octet 61, le champ 26 un u32 à l'octet 67. Ce qui change, c'est le cod
   de `THRS`).
 
 Pour libRealSpace : en lisant un `JDYN` de Pacific Strike, ces deux champs servent à la poussée. Non vérifié : si l'IA
-de Pacific Strike les lit encore comme dans Strike Commander. Le reste du modèle de vol (forces, moments, `ATMO`,
-`STBL`) n'a pas encore été comparé.
+de Pacific Strike les lit encore comme dans Strike Commander.
+
+Le reste du modèle de vol (forces, moments, `ATMO`, `STBL`) n'a pas encore été comparé.
 
 ## 5. Rapport avec libRealSpace
 
