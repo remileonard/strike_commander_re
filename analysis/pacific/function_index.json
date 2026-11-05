@@ -30074,8 +30074,8 @@
 "sub_66985",
 "sub_62F7E"
 ],
-"new_name": "sub_62E1B",
-"summary": ""
+"new_name": "PointerLayer_Construct_62E1B",
+"summary": "far. LUE 2026-11-05. Calque du commandant à la carte (commande 17 des conversations) : Layer_Construct, tables de méthodes 3E81h / 3EA1h, cible x → +111, y → +113, groupe de calques → +119 ; PointerLayer_LoadHandPoints_62F7E."
 },
 "sub_62E6A": {
 "segment": "seg144",
@@ -30115,8 +30115,8 @@
 "sub_6A514",
 "sub_66BEC"
 ],
-"new_name": "sub_62EF2",
-"summary": ""
+"new_name": "PointerLayer_Draw_62EF2",
+"summary": "far. LUE 2026-11-05. Méthode de dessin : PointerLayer_DrawStick_630DA (baguette), puis sub_6A514 avec l'image 0 (mot 0 laissé sur la pile par push large 0 / add sp, 0Ah), puis Layer_DrawAtOwnPos_66BEC (image courante [calque+27])."
 },
 "sub_62F57": {
 "segment": "seg144",
@@ -30125,8 +30125,8 @@
 "lines": 27,
 "type": "far",
 "calls": [],
-"new_name": "sub_62F57",
-"summary": ""
+"new_name": "PointerLayer_Advance_62F57",
+"summary": "far. LUE 2026-11-05. Étape suivante ([calque+31] + 1 tant qu'elle est inférieure au nombre − 1), image courante [calque+27] = liste[étape]."
 },
 "sub_62F7E": {
 "segment": "seg144",
@@ -30146,8 +30146,8 @@
 "sub_6D61E",
 "sub_6DFAB"
 ],
-"new_name": "sub_62F7E",
-"summary": ""
+"new_name": "PointerLayer_LoadHandPoints_62F7E",
+"summary": "far. LUE 2026-11-05. Lit GAMEFLOW\\\\PTR.IFF (nom « ptr », chunk DATA) : x, y (mots) du point de la main de chaque image, rangés en [calque+35+4×image]."
 },
 "sub_6308B": {
 "segment": "seg144",
@@ -30156,8 +30156,8 @@
 "lines": 43,
 "type": "far",
 "calls": [],
-"new_name": "sub_6308B",
-"summary": ""
+"new_name": "PointerLayer_StickOffset_6308B",
+"summary": "far. LUE 2026-11-05. Écart |point de la main de la dernière image de la liste − cible| en x → [calque+115] et en y → [calque+117]."
 },
 "sub_630DA": {
 "segment": "seg144",
@@ -30168,8 +30168,8 @@
 "calls": [
 "sub_69F22"
 ],
-"new_name": "sub_630DA",
-"summary": ""
+"new_name": "PointerLayer_DrawStick_630DA",
+"summary": "far. LUE 2026-11-05. Baguette : trait de couleur 15 (sub_69F22) depuis le point de la main de l'image courante ; à la dernière étape ([calque+31] = [calque+33] − 1) jusqu'à (x, y − [groupe+6]), sinon jusqu'au point de la main moins ([calque+115], [calque+117])."
 },
 "sub_63137": {
 "segment": "seg144",
@@ -30180,8 +30180,8 @@
 "calls": [
 "sub_76A"
 ],
-"new_name": "sub_63137",
-"summary": ""
+"new_name": "PointerLayer_AllocImageList_63137",
+"summary": "far. LUE 2026-11-05. Alloue la liste de n images ([calque+29]) et range n en [calque+33]."
 },
 "sub_63157": {
 "segment": "seg144",

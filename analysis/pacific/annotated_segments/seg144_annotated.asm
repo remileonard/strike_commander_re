@@ -3032,7 +3032,7 @@ loc_62DFA:
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_62F7E
+		call	near ptr PointerLayer_LoadHandPoints_62F7E
 		pop	cx
 
 loc_62E16:
@@ -3046,7 +3046,12 @@ sub_62DE1		endp
 
 ; Attributes: bp-based frame
 
-sub_62E1B		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Calque du commandant à la carte (commande 17 des conversations) :
+; Layer_Construct, tables de méthodes 3E81h / 3EA1h, cible x → +111, y → +113, groupe de
+; calques → +119 ; PointerLayer_LoadHandPoints_62F7E.
+; ==============================================================================================
+PointerLayer_Construct_62E1B		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -3084,7 +3089,7 @@ loc_62E34:
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_62F7E
+		call	near ptr PointerLayer_LoadHandPoints_62F7E
 		pop	cx
 
 loc_62E65:
@@ -3092,7 +3097,7 @@ loc_62E65:
 		pop	si
 		pop	bp
 		retf
-sub_62E1B		endp
+PointerLayer_Construct_62E1B		endp
 
 ; ----------------------------------------------------------------------
 
@@ -3177,7 +3182,12 @@ sub_62EAE		endp
 
 ; Attributes: bp-based frame
 
-sub_62EF2		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Méthode de dessin : PointerLayer_DrawStick_630DA (baguette), puis
+; sub_6A514 avec l'image 0 (mot 0 laissé sur la pile par push large 0 / add sp, 0Ah), puis
+; Layer_DrawAtOwnPos_66BEC (image courante [calque+27]).
+; ==============================================================================================
+PointerLayer_Draw_62EF2		proc far
 
 var_8		= word ptr -8
 var_6		= word ptr -6
@@ -3203,7 +3213,7 @@ arg_0		= word ptr  6
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_630DA
+		call	near ptr PointerLayer_DrawStick_630DA
 		pop	cx
 		mov	ax, [bp+var_2]
 		mov	[bp+var_6], ax
@@ -3229,13 +3239,17 @@ arg_0		= word ptr  6
 		pop	si
 		leave
 		retf
-sub_62EF2		endp
+PointerLayer_Draw_62EF2		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_62F57		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Étape suivante ([calque+31] + 1 tant qu'elle est inférieure au nombre −
+; 1), image courante [calque+27] = liste[étape].
+; ==============================================================================================
+PointerLayer_Advance_62F57		proc far
 
 arg_0		= word ptr  6
 
@@ -3261,13 +3275,17 @@ loc_62F6B:
 		pop	si
 		pop	bp
 		retf
-sub_62F57		endp
+PointerLayer_Advance_62F57		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_62F7E		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Lit GAMEFLOW\\PTR.IFF (nom « ptr », chunk DATA) : x, y (mots) du point
+; de la main de chaque image, rangés en [calque+35+4×image].
+; ==============================================================================================
+PointerLayer_LoadHandPoints_62F7E		proc far
 
 var_F8		= word ptr -0F8h
 var_A8		= word ptr -0A8h
@@ -3373,13 +3391,17 @@ loc_63053:
 		pop	si
 		leave
 		retf
-sub_62F7E		endp
+PointerLayer_LoadHandPoints_62F7E		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_6308B		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Écart |point de la main de la dernière image de la liste − cible| en x
+; → [calque+115] et en y → [calque+117].
+; ==============================================================================================
+PointerLayer_StickOffset_6308B		proc far
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -3421,13 +3443,18 @@ arg_0		= word ptr  6
 		pop	si
 		leave
 		retf
-sub_6308B		endp
+PointerLayer_StickOffset_6308B		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_630DA		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Baguette : trait de couleur 15 (sub_69F22) depuis le point de la main
+; de l'image courante ; à la dernière étape ([calque+31] = [calque+33] − 1) jusqu'à (x, y −
+; [groupe+6]), sinon jusqu'au point de la main moins ([calque+115], [calque+117]).
+; ==============================================================================================
+PointerLayer_DrawStick_630DA		proc far
 
 arg_0		= word ptr  6
 
@@ -3477,13 +3504,16 @@ loc_6311F:
 		pop	si
 		pop	bp
 		retf
-sub_630DA		endp
+PointerLayer_DrawStick_630DA		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_63137		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Alloue la liste de n images ([calque+29]) et range n en [calque+33].
+; ==============================================================================================
+PointerLayer_AllocImageList_63137		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -3505,7 +3535,7 @@ arg_2		= word ptr  8
 		pop	si
 		pop	bp
 		retf
-sub_63137		endp
+PointerLayer_AllocImageList_63137		endp
 
 ; ----------------------------------------------------------------------
 
@@ -3674,7 +3704,7 @@ sub_6324D		proc far
 		add	word ptr ss:[bx+4], 0FFF6h
 		nop
 		nop
-		jmp	sub_62EF2
+		jmp	PointerLayer_Draw_62EF2
 sub_6324D		endp
 
 ; ----------------------------------------------------------------------

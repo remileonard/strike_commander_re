@@ -2491,12 +2491,12 @@ loc_C33F0:
 		add	ax, dx
 		push	ax
 		push	0
-		call	sub_62E1B
+		call	PointerLayer_Construct_62E1B
 		add	sp, 0Ah
 		mov	[bp+var_40], ax
 		push	word ptr [bp+var_394+1]
 		push	ax
-		call	sub_63137
+		call	PointerLayer_AllocImageList_63137
 		add	sp, 4
 		xor	dx, dx
 		jmp	short loc_C3463
@@ -2522,7 +2522,7 @@ loc_C3463:
 		cmp	dx, word ptr [bp+var_394+1]
 		jl	short loc_C343E
 		push	[bp+var_40]
-		call	sub_6308B
+		call	PointerLayer_StickOffset_6308B
 		pop	cx
 		push	[bp+var_40]
 		lea	ax, [bp+var_E2]

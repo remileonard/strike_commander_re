@@ -171,11 +171,21 @@ Différences avec Strike Commander :
   est posé, `GROUP_SHOT` et `CLOSEUP` sont lus sans être affichés. Pas d'imbrication.
 - **`GROUP_SHOT`** : le décor seul ; les figurants (1), les textes (10) et le commandant (17) qui suivent sont lus
   par la scène de groupe (`cmp ax, 11h`, `cmp ax, 0Ah` dans `loc_C304E`).
-- **`GROUP_SHOT_COMMANDER`\* (17)** : le commandant devant une carte de briefing (`ph2map1`, `cs1map1`…). Figure
-  `yucmndr` si le drapeau 2 128 est posé, sinon `commndr` (`push 850h` / `GameVar_Get_56414`, chaînes DS 14 421
-  et 14 429) ; les n mots sont recopiés dans la liste d'images du calque (`mov [bx], ax` sur `[calque+29]`) :
-  l'ordre des images montrées. Les images de ces figures couvrent l'écran (en-tête 0 à 319 × 0 à 199) : le bras et
-  la baguette du commandant sur la carte. Rôle de x et y non lu.
+- **`GROUP_SHOT_COMMANDER`\* (17)** : le commandant devant une carte de briefing (`ph2map1`, `cs1map1`…), qui
+  pointe la cible (x, y) avec sa baguette. Calque créé par `PointerLayer_Construct_62E1B` :
+  - figure `yucmndr` si le drapeau 2 128 est posé, sinon `commndr` (`push 850h` / `GameVar_Get_56414`) ; ses images
+    couvrent l'écran (en-tête 0 à 319 × 0 à 199) : image 0 = le commandant, 1 à 15 = le bras ;
+  - les n mots = liste d'images, montrées dans l'ordre (`PointerLayer_Advance_62F57` avance d'une étape et reste sur
+    la dernière) ;
+  - `GAMEFLOW\PTR.IFF` (`FORM CPTR`, chunk `DATA`) : x, y (2 octets chacun) du point de la main pour chaque image,
+    en coordonnées d'écran (`PointerLayer_LoadHandPoints_62F7E`, rangés en `[calque+35+4×image]`) ;
+  - dessin (`PointerLayer_Draw_62EF2`), dans cet ordre : la baguette, trait de couleur 15
+    (`PointerLayer_DrawStick_630DA`) depuis le point de la main de l'image courante, jusqu'à la cible à la dernière
+    étape, sinon jusqu'au point de la main décalé de |point de la dernière image − cible|
+    (`PointerLayer_StickOffset_6308B`) ; puis **l'image 0** (`sub_6A514` avec l'image 0 : le mot 0 laissé sur la
+    pile par `push large 0` / `add sp, 0Ah`) ; puis l'image courante (`Layer_DrawAtOwnPos_66BEC`). À la dernière
+    étape, y de la cible moins `[groupe+6]` (valeur non lue ; avec 0, la baguette de la conversation 4 tombe sur
+    Kwajalein, cible (115, 70)).
 - Plus de saut relatif (`YESNOCHOICE_BRANCH2`), d'escadre (`SELECT_WING`) ni de choix d'équipier
   (`CHOOSE_WINGMAN`) : 12, 14 et 15 sont des erreurs ou ont un autre sens.
 

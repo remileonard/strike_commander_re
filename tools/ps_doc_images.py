@@ -10,6 +10,7 @@ Le texte est écrit avec la police de PIL, pas avec celle du jeu.
 Usage : python3 tools/ps_doc_images.py --donnees <DATA de Pacific Strike> <dossier de sortie>
 """
 import os
+import struct
 import sys
 
 if '--donnees' in sys.argv:
@@ -48,17 +49,64 @@ def image(screen, pal, text=None, colour=15):
     return im
 
 
-def group(back, text=None, commander=None, frame=0):
-    """Scène de groupe : décor (palettes du décor seules), puis une image de la figure du commandant
-    (commande 17). Les images de cette figure couvrent l'écran entier (en-tête 0 à 319 × 0 à 199) : elles sont
-    dessinées à l'écran en (0, 0), après la recopie du décor ; le rôle du x, y de la commande n'est pas lu."""
+def pointer_points():
+    """GAMEFLOW\\PTR.IFF (FORM CPTR, chunk DATA) : pour chaque image de la figure, x et y (2 octets chacun) du
+    point de la main, en coordonnées d'écran ; lu par sub_62F7E dans [calque+35+4×image]."""
+    data = d.read(os.path.join(d.GAME, 'GAMEFLOW', 'PTR.IFF'))
+    size = struct.unpack_from('>I', data, 16)[0]
+    return [struct.unpack_from('<hh', data, 20 + 4 * k) for k in range(size // 4)]
+
+
+def line(screen, x0, y0, x1, y1, colour):
+    """Trait d'un pixel (sub_69F22 n'est pas lu en détail : tracé de Bresenham)."""
+    dx = abs(x1 - x0)
+    dy = -abs(y1 - y0)
+    sx = 1 if x0 < x1 else -1
+    sy = 1 if y0 < y1 else -1
+    err = dx + dy
+    while True:
+        if 0 <= x0 < 320 and 0 <= y0 < 200:
+            screen[y0 * 320 + x0] = colour
+        if x0 == x1 and y0 == y1:
+            return
+        e2 = 2 * err
+        if e2 >= dy:
+            err += dy
+            x0 += sx
+        if e2 <= dx:
+            err += dx
+            y0 += sy
+
+
+def group(back, text=None, commander=None, step=0):
+    """Scène de groupe : décor (palettes du décor seules), puis le commandant de la commande 17.
+
+    commander = (figure, images, x, y). Pour l'étape `step` de la liste `images`, comme la méthode de dessin du
+    calque (sub_62EF2) : 1) la baguette, trait de couleur 15 (sub_630DA) depuis le point de la main de l'image
+    courante (PTR.IFF) ; à la dernière étape jusqu'à la cible (x, y), avant elle jusqu'au point de la main décalé
+    de l'écart entre le point de la dernière image et la cible (valeurs absolues, sub_6308B) ; 2) l'image 0 ;
+    3) l'image courante. Les images de ces figures couvrent l'écran (en-tête 0 à 319 × 0 à 199) : dessinées en
+    (0, 0). Le décalage vertical du groupe de calques retiré de y à la dernière étape est pris égal à 0."""
     pal = [0] * 768
     offscreen = bytearray(320 * 200)
     di.background(back, pal, offscreen)
     screen = to_screen(offscreen)
     if commander:
-        shape = d.pak_entry(cs.pak('CONVSHPS'), cs.TABLES['FIGR'][commander])
-        d.draw_image(screen, 320, 200, shape, frame, 0, 0, di.WHOLE)
+        name, images, x, y = commander
+        shape = d.pak_entry(cs.pak('CONVSHPS'), cs.TABLES['FIGR'][name])
+        points = pointer_points()
+        current = images[step]
+        hand_x, hand_y = points[current]
+        last_x, last_y = points[images[-1]]
+        if step == len(images) - 1:
+            end_x = x
+            end_y = y
+        else:
+            end_x = hand_x - abs(last_x - x)
+            end_y = hand_y - abs(last_y - y)
+        line(screen, hand_x, hand_y, end_x, end_y, 15)
+        d.draw_image(screen, 320, 200, shape, 0, 0, 0, di.WHOLE)
+        d.draw_image(screen, 320, 200, shape, current, 0, 0, di.WHOLE)
     return image(screen, pal, text)
 
 
@@ -93,17 +141,20 @@ def write_all(out):
             back = recs[k - 1][2]['décor']
             text = recs[k + 1][2]['texte']
             for name in ('commndr', 'yucmndr'):
-                frames = [di.x2(group(back, text, name, f)) for f in rec['images']]
+                frames = [di.x2(group(back, text, (name, rec['images'], rec['x'], rec['y']), k))
+                          for k in range(len(rec['images']))]
                 gif = f'ps_{back}_{name}_{at}.gif'
                 frames[0].save(os.path.join(out, gif), save_all=True, append_images=frames[1:], duration=180,
                                loop=0)
                 saved.append(gif)
-    # Les deux figures du commandant, toutes leurs images, sur la carte ph2map1.
+    # Les deux figures du commandant, toutes leurs images (par-dessus l'image 0), sur la carte ph2map1 ; cible de la
+    # baguette : celle du premier passage de la conversation 4.
     for name in ('commndr', 'yucmndr'):
         shape = d.pak_entry(cs.pak('CONVSHPS'), cs.TABLES['FIGR'][name])
         cells = []
         for f in range(len(d.shape_images(shape))):
-            cells.append((f'image {f}', group('ph2map1', None, name, f).crop((100, 50, 320, 160))))
+            one = (name, [f], 115, 70)
+            cells.append((f'image {f}', group('ph2map1', None, one, 0).crop((100, 50, 320, 160))))
         di.labelled_strip(cells, scale=1, columns=4).save(os.path.join(out, f'ps_figure_{name}.png'))
         saved.append(f'ps_figure_{name}.png')
     print('\n'.join(saved))
