@@ -24,6 +24,52 @@ de mission et le terrain n'ont pas été retrouvés par cette comparaison : leur
 Fichiers : `known_functions.json`, `function_index.json`, `segment_boundaries.json`, `annotated_segments/`,
 `pacific_matches.json`, `strike_matches.json`, `optest_matches.json` (candidats non tranchés compris).
 
-## 3. Rien n'est encore lu
+## 3. Accès aux fichiers (lu le 2026-11-05)
 
-Aucune fonction propre à Wings of Glory n'a été lue. Les données du jeu n'ont pas été fournies.
+Recherche du lecteur d'archive XTRE (noms de fichiers hachés, comparés à l'index de l'archive). **Dans ce
+`WINGS_OF.EXE`, il n'a pas été trouvé** : chaque fichier de données est ouvert par DOS sous son chemin complet.
+
+Chaîne constatée, du plus haut au plus bas :
+
+1. Le chemin est construit par deux fonctions pas encore nommées de seg043 :
+   - `sub_1F089` (proposé : `Path_Concat3_1F089`) : copie le dossier, puis ajoute le nom et l'extension ;
+   - `sub_1F0C4` (proposé : `Path_BuildDataPath_1F0C4`) : si le nom contient déjà `\`, il est pris tel quel ; sinon
+     `..\..\DATA\` + dossier + `\` + nom + extension.
+
+   Les dossiers sont des chaînes du segment de données : `..\..\data\gameflow\`, `..\..\data\cestalk\`,
+   `..\..\data\fonts\`, `..\..\data\midgames\`, `..\..\data\missions\`, `..\..\data\noise\`, ou un nom court
+   (`OBJECTS`, `MISSIONS`, `COCKPITS`, `SOUND`) passé à `sub_1F0C4`.
+
+   Exemple : la lecture de `convdata.iff` appelle `sub_1F089("..\..\data\gameflow\", "convdata", ".IFF")`.
+2. Le lecteur de flux (`StreamReader_ConstructVariantA_52440`, table de méthodes à l'offset 2509 du segment de
+   données) ouvre ce chemin par sa méthode d'ouverture (`StreamReader_ReadDispatch_5274A`, 6ᵉ entrée de la table).
+   Celle-ci crée l'objet fichier bas niveau (constructeur `sub_51D61`, objet de 71 octets).
+3. L'objet fichier ouvre le chemin tel quel par `sub_52BBB` (proposé : `FileHandle_OpenByPath_52BBB`). Selon le mode,
+   celui-ci appelle :
+   - `sub_51BDA` (proposé : `Dos_Open_51BDA`) : `mov ah, 3Dh / int 21h` ;
+   - ou `sub_51BAE` (proposé : `Dos_Create_51BAE`) : `mov ah, 3Ch / int 21h`.
+4. Entre les deux se trouve un cache de fichiers en mémoire EMS (`sub_51E78` lit à travers, `sub_53245` cherche une
+   entrée par `strncmp` sur 40 caractères du nom ; actif seulement si la page EMS `word_5D974` est réservée).
+   C'est une comparaison de noms en clair, pas un hachage.
+
+Recherches faites sans résultat dans `source/wings.asm` :
+
+- la signature `XTRE`, en dword (`45525458h`) comme en deux mots (`5458h`, `4552h`) ;
+- une chaîne `.TRE` ou `tre` ;
+- une table de CRC 32 (octets `96h, 30h, 7, 77h`) ou les polynômes `0EDB88320h` / `4C11DB7h`.
+
+Les seuls `int 2Fh` sont la détection XMS (fonctions 4300h et 4310h, `sub_18E8A` et `sub_18EDF`).
+
+Le préfixe `..\..\DATA\` est celui des noms stockés dans les archives TRE d'Origin, comme dans `BIGTRE.TRE` de
+Strike Commander. Ce `WINGS_OF.EXE` construit donc bien les noms qu'une archive indexerait, mais il les ouvre par DOS
+(fichiers isolés sur le disque). Le hachage XTRE est donc à chercher ailleurs, par exemple :
+
+- dans une autre version de l'exécutable (version CD-ROM) ;
+- ou dans un programme résident qui intercepte l'ouverture de fichier de DOS (le lanceur `WG` cité par le message
+  « Please type WG to run Wings of Glory. »).
+
+Rien de cela n'a été vu : c'est à vérifier avec ces fichiers.
+
+## 4. Le reste n'est pas lu
+
+Aucune autre fonction propre à Wings of Glory n'a été lue. Les données du jeu n'ont pas été fournies.
