@@ -239,6 +239,116 @@ Différences avec Strike Commander :
 
 Avec cette grammaire, les 283 conversations se lisent jusqu'au dernier octet.
 
+## 6. Scripts de mission : chargement et exécution par les objets
+
+Lu le 2026-11-05, en comparant avec STRIKE.EXE (`MISSION_SCRIPT_OPCODES.md`). La mécanique est celle de Strike
+Commander ; les écarts sont listés au § 6.5.
+
+### 6.1 Chargement (`MissionScenario_LoadFromIFF_BD743`)
+
+Lit les chunks du fichier de mission (`MISN` : `VERS`, `NAME`, `CAMP`, `TUNE`, `WRLD`, `FILE`, `CAST`, `AREA`, `SPOT`,
+`NUMS`, `MSGS`, `PROG`, `PART`, `TEAM`, `PLAY`, `LOAD`, `HOME`). Appelée au départ en vol (par `sub_877A0`, pas encore
+nommée) et par l'écran `MEDIT` (`Gameflow_MeditScreen_E3D9D`).
+
+- **`PROG`** (`ProgBuffer_LoadRawAndCountMarkers_BF8E9`) : comme Strike Commander. Le bloc est copié tel quel ; le
+  chargeur compte les octets nuls aux positions paires (`cmp byte ptr es:[bx], 0` / `add dx, 2`) : ce sont les
+  séparateurs entre les programmes. Un programme est désigné par son rang (`ProgBuffer_FindSubProgramByIndex_51C42`).
+- **`PART`** (`PartEntry_AllocateArray_BF7F9`) : nombre d'objets = taille du chunk ÷ 62 (`mov bx, 3Eh` / `div bx`,
+  erreur si le reste n'est pas nul) ; **89 octets par objet en mémoire** (`imul ax, ax, 59h` ; Strike Commander : 85).
+  Chaque objet est lu par `PartEntry_LoadAndResolveNames_BF3D5`.
+
+**Le chunk `PART` n'a pas changé** : 62 octets par objet, lus dans le même ordre aux mêmes places (mêmes variables de
+pile que `PartEntry_LoadAndResolveNames_A9E3C` de STRIKE.EXE). Seule la structure en mémoire change :
+
+| Champ en mémoire | Strike Commander | Pacific Strike |
+|---|---|---|
+| noms, camp, zone, position, cap, champs +45 à +56 | +0 à +56 | identiques |
+| bits d'état (actif, détruit…) | +57 | +57 |
+| +62, +64 (mis à 0) | oui | oui |
+| mot mis à 0 au chargement | — | **+66** (rôle non établi) |
+| référence vers un autre objet | — | **+68** (`sub_39519` ; posée par les ordres 174 et 175, § 6.5) |
+| script 1 : `on_is_activated` | +66 | **+70** |
+| script 2 : `on_mission_update` | +70 | **+74** |
+| script 3 : `on_is_destroyed` | +74 | **+78** |
+| script 4 : `on_missions_init` | +78 | **+82** |
+| objet du monde (contrôleur) | +82 | **+86** |
+| état de l'ordre en cours (255 = posé) | +84 | **+88** |
+
+Les 4 scripts sont résolus une fois, au chargement, en pointeurs vers leur programme
+(`Expr_LookupNamedValue_530A7` sur la liste des programmes) ; noms des scripts : ceux de libRealSpace.
+`PartEntry_ResetState_BF382` remet l'objet au repos (comme `PartEntry_ResetState_A9DFD`, plus la référence +68).
+
+### 6.2 Exécution, à chaque image (`MAIN_GAME_TICK_54FD2`)
+
+Même ordre que `MAIN_GAME_TICK` de STRIKE.EXE :
+
+```
+MAIN_GAME_TICK_54FD2
+  Scene_RunUpdateScript_54AD7              scène globale
+  Scene_DetectAndActivateChange_54BCF      scène courante d'après la position du joueur
+  Scene_RunUpdateScript_54AD7              scène courante
+  PartEntry_DispatchMissionUpdateTick_5471E   chaque objet de PART (pas de 89 octets) dont le bit 0 de +57 est posé
+    Expr_Node_UpdateAndPropagate_54338
+      Expr_VM_ExecuteSingleInstruction_530DB  prépare l'état d'exécution (programme, objet)
+        Expr_VM_Interpreter_51F24             joue le programme
+```
+
+`Expr_Node_UpdateAndPropagate_54338`, pour un objet actif :
+
+- bit 1 de +57 posé → `Expr_Node_RecomputeIfDirty_53780` ;
+- sinon, bit 3 posé → script 4 (+82), puis si l'objet est plus loin que la distance limite (`dword_7CC84`) :
+  `PartEntry_Deactivate_536C9` ;
+- sinon → script 2 (+74) ; ensuite, si l'objet du monde est celui de `[mission+101]` (l'objet dont la position sert
+  de référence aux distances), l'octet +88 prend `[mission+128]` quand `[mission+127]` vaut 165, 166 ou 162, sinon 255.
+
+### 6.3 Les autres événements d'un objet
+
+| Événement | Fonction | Ce qu'elle fait |
+|---|---|---|
+| activation | `Shared_TriggerExprInstruction_53749` | pose le bit 0 de +57, efface les bits 2 et 3, met +58 à 0, joue le script 1 (+70) |
+| destruction | `Expr_Node_RecomputeIfDirty_53780` | si le bit 0 est posé : l'efface, pose le bit 1, joue le script 3 (+78) |
+| apparition dans le monde | `PartEntry_ResolveSpawnPositionAndActivate_5313D` | calcule la position et crée l'objet du monde (+86) ; **seulement si le drapeau 260 n'est pas posé** (`push 104h` / `GameVar_Get_56414` / `jnz`) |
+
+Les scènes (`SCNE`) gardent leurs trois scripts : `Scene_TriggerActivation_54AB2` (+8), `Scene_RunUpdateScript_54AD7`
+(+12), `Scene_RunLeavingScript_54AF6` (+16), chacun par `Expr_VM_ExecuteSingleInstruction_530DB`.
+
+### 6.4 Encodage des instructions
+
+Comme Strike Commander (`Expr_VM_ReadNextToken_51D33`, même lecture qu'`Expr_VM_ReadNextToken_50F85`) : un octet
+d'instruction, un octet d'argument ; tant que l'octet suivant vaut 9, il est sauté et l'octet d'après est un argument
+de plus (3 au plus). **Exception : les 22 instructions de drapeau** lisent un octet de plus (le numéro sur 2 octets),
+puis exigent l'octet 5 (§ 2.1).
+
+### 6.5 Instructions : ce qui change
+
+La table de l'interpréteur a toujours 209 cas (`cmp bx, 0D0h`). Toutes les instructions de Strike Commander sont
+traitées, et 12 de plus :
+
+- **Instruction inconnue = erreur.** Dans Strike Commander, le cas par défaut passe à l'instruction suivante. Dans
+  Pacific Strike, il appelle la fonction d'erreur (`push 911Bh` / `sub_1DDFE`). Les instructions 5 et `OP_SET_LABEL`
+  (8), qui ne font rien, ont donc maintenant leur propre cas.
+- **Ordres** (`MissionScript_CallNativeHandler_53B0B`) : au lieu d'un `switch` sur 161 à 191, une liste de 22 valeurs
+  cherchée une à une (`word_542E0`). On y trouve tous les ordres de Strike Commander, plus 112, 173, 174, 175 et 193.
+
+| Valeur | Nom | Données | Constaté dans le code |
+|---|---|---|---|
+| 5 | `OP_NOOP_5`\* | 0 | rien |
+| 112 | `OP_ORDER_FRIENDLY_OF_TYPE`\* | 0 | ordre : pour un objet du monde de la classe 16 (`test byte ptr [bx+2], 10h`), choisit au hasard un objet du même camp et du type donné (`sub_545A4`) et prend sa position ; sinon l'ordre échoue |
+| 153 | `OP_153`\* | 12 | objet, `SPOT` : crée un élément ajouté à une liste (`sub_537DF`) ; rôle non établi |
+| 154 | `OP_154`\* | 69 | objet, deux `SPOT` : même famille que 153 (`sub_539B4`) ; rôle non établi |
+| 155 | `OP_SPAWN_AT_SPOT`\* | 4 | crée un objet (`Debris_LoadAndInstantiateAlt`) à la position d'un `SPOT` |
+| 156 | `OP_RELEASE_ATTACHED`\* | 4 | libère l'élément attaché à l'objet du monde (`[objet+120]`, `sub_74144`) et le remet à 0 |
+| 157 | `OP_157`\* | 16 | deux objets et un `SPOT` : fait apparaître le premier (`PartEntry_ResolveSpawnPositionAndActivate_5313D`), lit la position du `SPOT`, puis une méthode de l'objet du monde du second ; rôle non établi |
+| 173 | `OP_SET_OBJ_DESTROY_TARGET_B`\* | 1 | même traitement que `OP_SET_OBJ_DESTROY_TARGET` (167) |
+| 174 | `OP_ORDER_RANDOM_ENEMY_OF_TYPE`\* | 1 279 | si +68 est vide : choisit au hasard un objet du camp adverse et du type n (`sub_545A4`) et le garde en +68 ; puis vise sa position. Rien de trouvé : l'ordre échoue |
+| 175 | `OP_ORDER_RANDOM_ENEMY_OF_TYPE_B`\* | 4 | même traitement que 174 |
+| 193 | `OP_ORDER_OBJ_AND_SPOT`\* | 48 | ordre avec un objet (2ᵉ argument) et un `SPOT` (3ᵉ argument ; 65 535 = erreur) |
+
+« Données » = nombre d'emplois dans les 64 fichiers de `MISSIONS`. `sub_545A4` (pas encore nommée) parcourt les
+objets du monde (`sub_1E6E1`) et retient ceux dont l'octet +53 de la description vaut n et, pour les objets de la
+classe 16, dont le camp (`[objet+81]`) est celui demandé ; elle en garde 6 au plus et en tire un au hasard
+(`CRT_Rand`). Pour 174 et 175, le camp demandé est l'inverse de celui de l'objet (−1 ↔ 1).
+
 ## 5. Rapport avec libRealSpace
 
 - `PSGameFlowParser::parseOpCode` : les longueurs sont celles du code pour 0, 6, 7, 9, 10, 35 et 36 (2 octets).

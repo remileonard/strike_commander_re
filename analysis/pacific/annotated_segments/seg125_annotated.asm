@@ -236,7 +236,11 @@ sub_51C99		endp
 
 ; Attributes: bp-based frame
 
-sub_51D33		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Même lecture qu'Expr_VM_ReadNextToken_50F85 : instruction, argument,
+; puis jusqu'à 3 arguments de plus précédés de l'octet 9.
+; ==============================================================================================
+Expr_VM_ReadNextToken_51D33		proc far
 
 arg_0		= word ptr  6
 
@@ -308,7 +312,7 @@ loc_51DCC:
 		pop	si
 		pop	bp
 		retf
-sub_51D33		endp
+Expr_VM_ReadNextToken_51D33		endp
 
 ; ----------------------------------------------------------------------
 
@@ -571,7 +575,7 @@ arg_0		= word ptr  6
 loc_51F38:
 		push	di
 		push	cs
-		call	near ptr sub_51D33
+		call	near ptr Expr_VM_ReadNextToken_51D33
 		pop	cx
 		mov	bx, [di+6]
 		cmp	bx, 0D0h
@@ -1674,7 +1678,7 @@ loc_52829:
 		push	ax
 		nop
 		push	cs
-		call	near ptr sub_5313D
+		call	near ptr PartEntry_ResolveSpawnPositionAndActivate_5313D
 		jmp	loc_52D83
 
 loc_52833:
@@ -1694,7 +1698,7 @@ loc_5284E:
 		push	ax
 		nop
 		push	cs
-		call	near ptr sub_536C9
+		call	near ptr PartEntry_Deactivate_536C9
 		jmp	loc_52D83
 
 loc_52858:
@@ -1876,7 +1880,7 @@ loc_529DF:
 		push	large [bp+var_8]
 		nop
 		push	cs
-		call	near ptr sub_5313D
+		call	near ptr PartEntry_ResolveSpawnPositionAndActivate_5313D
 		add	sp, 4
 		push	word ptr [di+0Ch]
 		mov	ax, [bp+var_2]
@@ -2381,7 +2385,7 @@ loc_52E5B:
 loc_52E68:
 		nop
 		push	cs
-		call	near ptr sub_53B0B
+		call	near ptr MissionScript_CallNativeHandler_53B0B
 		add	sp, 0Ah
 		mov	[di+12h], ax
 		jmp	short loc_52EF1
@@ -2710,7 +2714,12 @@ Expr_LookupNamedValue_530A7		endp
 
 ; Attributes: bp-based frame
 
-sub_530DB		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Équivalent d'Expr_VM_ExecuteSingleInstruction_51E7E : si le programme
+; n'est pas nul, prépare l'état d'exécution (programme, objet) sur la pile et appelle
+; Expr_VM_Interpreter_51F24.
+; ==============================================================================================
+Expr_VM_ExecuteSingleInstruction_530DB		proc far
 
 var_82		= word ptr -82h
 var_80		= dword ptr -80h
@@ -2756,13 +2765,18 @@ arg_6		= dword ptr  0Ch
 loc_5313B:
 		leave
 		retf
-sub_530DB		endp
+Expr_VM_ExecuteSingleInstruction_530DB		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_5313D		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. (structure) Équivalent de
+; PartEntry_ResolveSpawnPositionAndActivate_51EDC : crée l'objet du monde (+86) seulement si
+; le drapeau 260 n'est pas posé (push 104h / GameVar_Get_56414 / jnz).
+; ==============================================================================================
+PartEntry_ResolveSpawnPositionAndActivate_5313D		proc far
 
 var_10C		= dword ptr -10Ch
 var_108		= dword ptr -108h
@@ -3298,20 +3312,24 @@ loc_536BA:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_53749
+		call	near ptr Shared_TriggerExprInstruction_53749
 		add	sp, 4
 
 loc_536C6:
 		pop	si
 		leave
 		retf
-sub_5313D		endp
+PartEntry_ResolveSpawnPositionAndActivate_5313D		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_536C9		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. (structure) Équivalent de PartEntry_Deactivate_5242A (objet du monde
+; +86).
+; ==============================================================================================
+PartEntry_Deactivate_536C9		proc far
 
 arg_0		= word ptr  6
 
@@ -3372,13 +3390,18 @@ loc_5373F:
 		and	byte ptr es:[bx+39h], 0FEh
 		pop	bp
 		retf
-sub_536C9		endp
+PartEntry_Deactivate_536C9		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_53749		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Activation d'un objet (même code que
+; Shared_TriggerExprInstruction_5247D) : bit 0 de +57 posé, bits 2 et 3 effacés, +58 = 0,
+; script +70 (on_is_activated).
+; ==============================================================================================
+Shared_TriggerExprInstruction_53749		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -3397,17 +3420,21 @@ arg_2		= word ptr  8
 		add	ax, 40h
 		push	ax
 		push	cs
-		call	near ptr sub_530DB
+		call	near ptr Expr_VM_ExecuteSingleInstruction_530DB
 		add	sp, 0Ah
 		pop	bp
 		retf
-sub_53749		endp
+Shared_TriggerExprInstruction_53749		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_53780		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Destruction : si le bit 0 de +57 est posé, l'efface, pose le bit 1,
+; joue le script +78 (on_is_destroyed).
+; ==============================================================================================
+Expr_Node_RecomputeIfDirty_53780		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -3429,13 +3456,13 @@ arg_2		= word ptr  8
 		add	ax, 40h
 		push	ax
 		push	cs
-		call	near ptr sub_530DB
+		call	near ptr Expr_VM_ExecuteSingleInstruction_530DB
 		add	sp, 0Ah
 
 loc_537B5:
 		pop	bp
 		retf
-sub_53780		endp
+Expr_Node_RecomputeIfDirty_53780		endp
 
 ; ----------------------------------------------------------------------
 
@@ -3463,7 +3490,7 @@ arg_0		= dword ptr  6
 		add	sp, 4
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_53780
+		call	near ptr Expr_Node_RecomputeIfDirty_53780
 		add	sp, 4
 
 loc_537DD:
@@ -3827,7 +3854,13 @@ sub_539B4		endp
 
 ; Attributes: bp-based frame
 
-sub_53B0B		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Ordres de mission : liste de 22 valeurs cherchée une à une (word_542E0
+; : 112, 161 à 165, 167 à 175, 177 à 181, 191, 193 ; cibles à +44) au lieu du switch 161 à 191
+; de MissionScript_CallNativeHandler_52513. 173 = même cas que 167 ; 174 et 175 : cible tirée
+; au hasard dans le camp adverse (sub_545A4), gardée en +68.
+; ==============================================================================================
+MissionScript_CallNativeHandler_53B0B		proc far
 
 var_F4		= dword ptr -0F4h
 var_F0		= dword ptr -0F0h
@@ -4690,9 +4723,9 @@ loc_542DC:
 		pop	si
 		leave
 		retf
-sub_53B0B		endp
+MissionScript_CallNativeHandler_53B0B		endp
 
-; START OF FUNCTION CHUNK FOR sub_53B0B
+; START OF FUNCTION CHUNK FOR MissionScript_CallNativeHandler_53B0B
 word_542E0	dw 70h
 		dw 0A1h
 		dw 0A2h
@@ -4737,13 +4770,19 @@ off_5430C	dw offset loc_54037
 		dw offset loc_541BF
 		dw offset loc_53B7D
 		dw offset loc_53C7C
-; END OF FUNCTION CHUNK FOR sub_53B0B
+; END OF FUNCTION CHUNK FOR MissionScript_CallNativeHandler_53B0B
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_54338		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Équivalent d'Expr_Node_UpdateAndPropagate_52AC6 : bit 1 de +57 →
+; Expr_Node_RecomputeIfDirty_53780 ; sinon bit 3 → script +82 puis, au-delà de dword_7CC84,
+; PartEntry_Deactivate_536C9 ; sinon script +74, puis, si l'objet du monde est celui de
+; [mission+101], +88 = [mission+128] quand [mission+127] vaut 165, 166 ou 162, sinon 255.
+; ==============================================================================================
+Expr_Node_UpdateAndPropagate_54338		proc far
 
 var_30		= dword ptr -30h
 var_2C		= dword ptr -2Ch
@@ -4790,7 +4829,7 @@ loc_5436B:
 		add	ax, 40h
 		push	ax
 		push	cs
-		call	near ptr sub_530DB
+		call	near ptr Expr_VM_ExecuteSingleInstruction_530DB
 		add	sp, 0Ah
 		les	bx, word ptr [bp+arg_0]
 		mov	di, es:[bx+56h]
@@ -4861,7 +4900,7 @@ loc_54439:
 		jz	short loc_544B4
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_536C9
+		call	near ptr PartEntry_Deactivate_536C9
 		add	sp, 4
 		jmp	short loc_544B4
 
@@ -4873,7 +4912,7 @@ loc_5444A:
 		add	ax, 40h
 		push	ax
 		push	cs
-		call	near ptr sub_530DB
+		call	near ptr Expr_VM_ExecuteSingleInstruction_530DB
 		add	sp, 0Ah
 		les	bx, word ptr [bp+arg_0]
 		mov	ax, es:[bx+56h]
@@ -4909,7 +4948,7 @@ loc_5449E:
 loc_544A9:
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_53780
+		call	near ptr Expr_Node_RecomputeIfDirty_53780
 		add	sp, 4
 
 loc_544B4:
@@ -4917,7 +4956,7 @@ loc_544B4:
 		pop	si
 		leave
 		retf
-sub_54338		endp
+Expr_Node_UpdateAndPropagate_54338		endp
 
 ; ----------------------------------------------------------------------
 
@@ -5442,7 +5481,7 @@ loc_54735:
 		push	word ptr [bp+var_4+2]
 		push	bx
 		push	cs
-		call	near ptr sub_54338
+		call	near ptr Expr_Node_UpdateAndPropagate_54338
 		add	sp, 4
 
 loc_54751:
@@ -5925,7 +5964,7 @@ loc_54A2E:
 loc_54A4A:
 		push	large [bp+var_4]
 		push	cs
-		call	near ptr sub_5313D
+		call	near ptr PartEntry_ResolveSpawnPositionAndActivate_5313D
 		add	sp, 4
 
 loc_54A55:
@@ -6035,7 +6074,7 @@ arg_0		= word ptr  6
 		add	ax, 40h
 		push	ax
 		push	cs
-		call	near ptr sub_530DB
+		call	near ptr Expr_VM_ExecuteSingleInstruction_530DB
 		add	sp, 0Ah
 		pop	si
 		pop	bp
@@ -6071,7 +6110,7 @@ arg_0		= word ptr  6
 		add	ax, 40h
 		push	ax
 		push	cs
-		call	near ptr sub_530DB
+		call	near ptr Expr_VM_ExecuteSingleInstruction_530DB
 		add	sp, 0Ah
 		pop	si
 		pop	bp
@@ -6115,7 +6154,7 @@ arg_0		= word ptr  6
 		add	ax, 40h
 		push	ax
 		push	cs
-		call	near ptr sub_530DB
+		call	near ptr Expr_VM_ExecuteSingleInstruction_530DB
 		add	sp, 0Ah
 		pop	si
 		pop	bp
@@ -6760,7 +6799,7 @@ loc_54EC8:
 		add	ax, 40h
 		push	ax
 		push	cs
-		call	near ptr sub_530DB
+		call	near ptr Expr_VM_ExecuteSingleInstruction_530DB
 		add	sp, 0Ah
 		jmp	short loc_54F16
 
@@ -6853,7 +6892,13 @@ sub_54E76		endp
 
 ; Attributes: bp-based frame
 
-sub_54FD2		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. (scripts) Même ordre que MAIN_GAME_TICK de STRIKE.EXE :
+; Scene_RunUpdateScript_54AD7 (scène globale [+95]), Scene_DetectAndActivateChange_54BCF,
+; Scene_RunUpdateScript_54AD7 (scène courante [+97]),
+; PartEntry_DispatchMissionUpdateTick_5471E, puis sub_5093D / sub_54E76.
+; ==============================================================================================
+MAIN_GAME_TICK_54FD2		proc far
 
 var_12		= dword ptr -12h
 var_C		= dword ptr -0Ch
@@ -7008,7 +7053,7 @@ loc_550FD:
 		pop	si
 		leave
 		retf
-sub_54FD2		endp
+MAIN_GAME_TICK_54FD2		endp
 
 ; ----------------------------------------------------------------------
 
@@ -7126,7 +7171,7 @@ loc_551DF:
 loc_551EE:
 		push	si
 		push	cs
-		call	near ptr sub_54FD2
+		call	near ptr MAIN_GAME_TICK_54FD2
 		pop	cx
 		or	al, al
 		jz	short loc_55202
@@ -7155,7 +7200,7 @@ loc_5521B:
 		add	ax, 40h
 		push	ax
 		push	cs
-		call	near ptr sub_530DB
+		call	near ptr Expr_VM_ExecuteSingleInstruction_530DB
 		add	sp, 0Ah
 		jmp	short loc_5523B
 
@@ -7184,7 +7229,7 @@ loc_55268:
 		add	ax, 40h
 		push	ax
 		push	cs
-		call	near ptr sub_530DB
+		call	near ptr Expr_VM_ExecuteSingleInstruction_530DB
 		add	sp, 0Ah
 		jmp	short loc_55288
 
@@ -7202,7 +7247,7 @@ loc_55288:
 		add	ax, 40h
 		push	ax
 		push	cs
-		call	near ptr sub_530DB
+		call	near ptr Expr_VM_ExecuteSingleInstruction_530DB
 		add	sp, 0Ah
 		jmp	short loc_552B5
 

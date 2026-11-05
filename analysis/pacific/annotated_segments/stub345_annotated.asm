@@ -47,7 +47,7 @@ sub_7530F	endp
 ; Attributes: thunk
 
 sub_75314	proc far
-		jmp	sub_BF8E9
+		jmp	ProgBuffer_LoadRawAndCountMarkers_BF8E9
 sub_75314	endp
 
 ; ----------------------------------------------------------------------
@@ -207,7 +207,7 @@ sub_75373	endp
 ; Attributes: thunk
 
 sub_75378	proc far
-		jmp	sub_BF382
+		jmp	PartEntry_ResetState_BF382
 sub_75378	endp
 
 ; ----------------------------------------------------------------------
@@ -215,7 +215,7 @@ sub_75378	endp
 ; Attributes: thunk
 
 sub_7537D	proc far
-		jmp	sub_BF3D5
+		jmp	PartEntry_LoadAndResolveNames_BF3D5
 sub_7537D	endp
 
 ; ----------------------------------------------------------------------
@@ -247,7 +247,7 @@ sub_7538C	endp
 ; Attributes: thunk
 
 sub_75391	proc far
-		jmp	sub_BF7E3
+		jmp	PartEntry_ResetArray_BF7E3
 sub_75391	endp
 
 ; ----------------------------------------------------------------------
@@ -255,7 +255,7 @@ sub_75391	endp
 ; Attributes: thunk
 
 sub_75396	proc far
-		jmp	sub_BF7F9
+		jmp	PartEntry_AllocateArray_BF7F9
 sub_75396	endp
 
 ; ----------------------------------------------------------------------

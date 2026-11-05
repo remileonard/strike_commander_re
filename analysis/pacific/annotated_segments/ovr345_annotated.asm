@@ -1290,7 +1290,11 @@ ExprSlot_WriteFieldGroup_BF2EB		endp
 
 ; Attributes: bp-based frame
 
-sub_BF382		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Comme PartEntry_ResetState_A9DFD : +50 = 255, +58 = 0, bits 0 à 5 de
+; +57 effacés, contrôleur +86 = 0, +88 = 255 ; en plus, référence +68 remise à 0 (sub_39519).
+; ==============================================================================================
+PartEntry_ResetState_BF382		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1317,13 +1321,19 @@ arg_2		= word ptr  8
 		mov	byte ptr es:[bx+58h], 0FFh
 		pop	bp
 		retf
-sub_BF382		endp
+PartEntry_ResetState_BF382		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_BF3D5		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Lit les 62 octets d'un objet PART, comme
+; PartEntry_LoadAndResolveNames_A9E3C de STRIKE.EXE (mêmes champs, mêmes places jusqu'à +56) ;
+; les 4 scripts résolus par Expr_LookupNamedValue_530A7 vont en +70, +74, +78, +82 (STRIKE.EXE
+; : +66 à +78) ; +62, +64, +66 mis à 0.
+; ==============================================================================================
+PartEntry_LoadAndResolveNames_BF3D5		proc far
 
 var_4A		= word ptr -4Ah
 var_48		= word ptr -48h
@@ -1358,7 +1368,7 @@ arg_4		= word ptr  0Ah
 		mov	si, word_79B8C
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_BF382
+		call	near ptr PartEntry_ResetState_BF382
 		add	sp, 4
 		push	large 3Eh
 		push	ss
@@ -1484,7 +1494,7 @@ arg_4		= word ptr  0Ah
 		pop	si
 		leave
 		retf
-sub_BF3D5		endp
+PartEntry_LoadAndResolveNames_BF3D5		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1906,7 +1916,10 @@ Member_ClearAndFree_BF7C1		endp
 
 ; Attributes: bp-based frame
 
-sub_BF7E3		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Tableau des objets PART : nombre et pointeur à 0.
+; ==============================================================================================
+PartEntry_ResetArray_BF7E3		proc far
 
 arg_0		= word ptr  6
 
@@ -1919,13 +1932,18 @@ arg_0		= word ptr  6
 		pop	si
 		pop	bp
 		retf
-sub_BF7E3		endp
+PartEntry_ResetArray_BF7E3		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_BF7F9		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Nombre d'objets = taille du chunk PART ÷ 62 (erreur 9036h si reste), 89
+; octets par objet en mémoire (imul ax, ax, 59h ; STRIKE.EXE : 85),
+; PartEntry_LoadAndResolveNames_BF3D5 pour chacun.
+; ==============================================================================================
+PartEntry_AllocateArray_BF7F9		proc far
 
 var_6		= word ptr -6
 var_4		= dword ptr -4
@@ -1941,7 +1959,7 @@ arg_2		= word ptr  8
 		mov	di, [bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr sub_BF7E3
+		call	near ptr PartEntry_ResetArray_BF7E3
 		pop	cx
 		mov	ax, [di+72h]
 		mov	bx, 3Eh
@@ -1986,7 +2004,7 @@ loc_BF872:
 		push	di
 		push	large [bp+var_4]
 		push	cs
-		call	near ptr sub_BF3D5
+		call	near ptr PartEntry_LoadAndResolveNames_BF3D5
 		add	sp, 6
 		inc	[bp+var_6]
 		add	word ptr [bp+var_4], 59h
@@ -1999,7 +2017,7 @@ loc_BF885:
 		pop	si
 		leave
 		retf
-sub_BF7F9		endp
+PartEntry_AllocateArray_BF7F9		endp
 
 ; ----------------------------------------------------------------------
 
@@ -2094,7 +2112,12 @@ ProgBuffer_ResetAndSetSize_BF8D3		endp
 
 ; Attributes: bp-based frame
 
-sub_BF8E9		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Comme ProgBuffer_LoadRawAndCountMarkers_AA31D de STRIKE.EXE : copie
+; brute du chunk PROG, compte des octets nuls aux positions paires (séparateurs de
+; programmes).
+; ==============================================================================================
+ProgBuffer_LoadRawAndCountMarkers_BF8E9		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -2152,7 +2175,7 @@ loc_BF94B:
 		pop	si
 		pop	bp
 		retf
-sub_BF8E9		endp
+ProgBuffer_LoadRawAndCountMarkers_BF8E9		endp
 
 ; ----------------------------------------------------------------------
 

@@ -24325,8 +24325,8 @@
 "lines": 73,
 "type": "far",
 "calls": [],
-"new_name": "sub_51D33",
-"summary": ""
+"new_name": "Expr_VM_ReadNextToken_51D33",
+"summary": "far. LUE 2026-11-05. Même lecture qu'Expr_VM_ReadNextToken_50F85 : instruction, argument, puis jusqu'à 3 arguments de plus précédés de l'octet 9."
 },
 "sub_51DD3": {
 "segment": "seg125",
@@ -24490,8 +24490,8 @@
 "calls": [
 "sub_51F24"
 ],
-"new_name": "sub_530DB",
-"summary": ""
+"new_name": "Expr_VM_ExecuteSingleInstruction_530DB",
+"summary": "far. LUE 2026-11-05. Équivalent d'Expr_VM_ExecuteSingleInstruction_51E7E : si le programme n'est pas nul, prépare l'état d'exécution (programme, objet) sur la pile et appelle Expr_VM_Interpreter_51F24."
 },
 "sub_5313D": {
 "segment": "seg125",
@@ -24521,8 +24521,8 @@
 "sub_546A8",
 "sub_53749"
 ],
-"new_name": "sub_5313D",
-"summary": ""
+"new_name": "PartEntry_ResolveSpawnPositionAndActivate_5313D",
+"summary": "far. LUE 2026-11-05. (structure) Équivalent de PartEntry_ResolveSpawnPositionAndActivate_51EDC : crée l'objet du monde (+86) seulement si le drapeau 260 n'est pas posé (push 104h / GameVar_Get_56414 / jnz)."
 },
 "sub_536C9": {
 "segment": "seg125",
@@ -24533,8 +24533,8 @@
 "calls": [
 "sub_54C1C"
 ],
-"new_name": "sub_536C9",
-"summary": ""
+"new_name": "PartEntry_Deactivate_536C9",
+"summary": "far. LUE 2026-11-05. (structure) Équivalent de PartEntry_Deactivate_5242A (objet du monde +86)."
 },
 "sub_53749": {
 "segment": "seg125",
@@ -24545,8 +24545,8 @@
 "calls": [
 "sub_530DB"
 ],
-"new_name": "sub_53749",
-"summary": ""
+"new_name": "Shared_TriggerExprInstruction_53749",
+"summary": "far. LUE 2026-11-05. Activation d'un objet (même code que Shared_TriggerExprInstruction_5247D) : bit 0 de +57 posé, bits 2 et 3 effacés, +58 = 0, script +70 (on_is_activated)."
 },
 "sub_53780": {
 "segment": "seg125",
@@ -24557,8 +24557,8 @@
 "calls": [
 "sub_530DB"
 ],
-"new_name": "sub_53780",
-"summary": ""
+"new_name": "Expr_Node_RecomputeIfDirty_53780",
+"summary": "far. LUE 2026-11-05. Destruction : si le bit 0 de +57 est posé, l'efface, pose le bit 1, joue le script +78 (on_is_destroyed)."
 },
 "sub_537B7": {
 "segment": "seg125",
@@ -24651,8 +24651,8 @@
 "sub_544F5",
 "sub_5493F"
 ],
-"new_name": "sub_53B0B",
-"summary": ""
+"new_name": "MissionScript_CallNativeHandler_53B0B",
+"summary": "far. LUE 2026-11-05. Ordres de mission : liste de 22 valeurs cherchée une à une (word_542E0 : 112, 161 à 165, 167 à 175, 177 à 181, 191, 193 ; cibles à +44) au lieu du switch 161 à 191 de MissionScript_CallNativeHandler_52513. 173 = même cas que 167 ; 174 et 175 : cible tirée au hasard dans le camp adverse (sub_545A4), gardée en +68."
 },
 "sub_54338": {
 "segment": "seg125",
@@ -24668,8 +24668,8 @@
 "sub_530DB",
 "sub_53780"
 ],
-"new_name": "sub_54338",
-"summary": ""
+"new_name": "Expr_Node_UpdateAndPropagate_54338",
+"summary": "far. LUE 2026-11-05. Équivalent d'Expr_Node_UpdateAndPropagate_52AC6 : bit 1 de +57 → Expr_Node_RecomputeIfDirty_53780 ; sinon bit 3 → script +82 puis, au-delà de dword_7CC84, PartEntry_Deactivate_536C9 ; sinon script +74, puis, si l'objet du monde est celui de [mission+101], +88 = [mission+128] quand [mission+127] vaut 165, 166 ou 162, sinon 255."
 },
 "sub_544B8": {
 "segment": "seg125",
@@ -25058,8 +25058,8 @@
 "sub_5093D",
 "sub_54E76"
 ],
-"new_name": "sub_54FD2",
-"summary": ""
+"new_name": "MAIN_GAME_TICK_54FD2",
+"summary": "far. LUE 2026-11-05. (scripts) Même ordre que MAIN_GAME_TICK de STRIKE.EXE : Scene_RunUpdateScript_54AD7 (scène globale [+95]), Scene_DetectAndActivateChange_54BCF, Scene_RunUpdateScript_54AD7 (scène courante [+97]), PartEntry_DispatchMissionUpdateTick_5471E, puis sub_5093D / sub_54E76."
 },
 "sub_55100": {
 "segment": "seg125",
@@ -69638,8 +69638,8 @@
 "sub_6D61E",
 "sub_6DFAB"
 ],
-"new_name": "sub_BD743",
-"summary": ""
+"new_name": "MissionScenario_LoadFromIFF_BD743",
+"summary": "far. LUE 2026-11-05. (structure) Lit un fichier de mission : MISN, VERS, NAME, CAMP, TUNE, WRLD, FILE, CAST, AREA, SPOT, NUMS, MSGS, PROG (ProgBuffer_LoadRawAndCountMarkers_BF8E9), PART (PartEntry_AllocateArray_BF7F9), TEAM, PLAY, LOAD, HOME. Appelée par sub_877A0 (départ en vol) et Gameflow_MeditScreen_E3D9D."
 },
 "sub_BE01E": {
 "segment": "ovr344",
@@ -70050,8 +70050,8 @@
 "calls": [
 "sub_39519"
 ],
-"new_name": "sub_BF382",
-"summary": ""
+"new_name": "PartEntry_ResetState_BF382",
+"summary": "far. LUE 2026-11-05. Comme PartEntry_ResetState_A9DFD : +50 = 255, +58 = 0, bits 0 à 5 de +57 effacés, contrôleur +86 = 0, +88 = 255 ; en plus, référence +68 remise à 0 (sub_39519)."
 },
 "sub_BF3D5": {
 "segment": "ovr345",
@@ -70071,8 +70071,8 @@
 "sub_530A7",
 "sub_530A7"
 ],
-"new_name": "sub_BF3D5",
-"summary": ""
+"new_name": "PartEntry_LoadAndResolveNames_BF3D5",
+"summary": "far. LUE 2026-11-05. Lit les 62 octets d'un objet PART, comme PartEntry_LoadAndResolveNames_A9E3C de STRIKE.EXE (mêmes champs, mêmes places jusqu'à +56) ; les 4 scripts résolus par Expr_LookupNamedValue_530A7 vont en +70, +74, +78, +82 (STRIKE.EXE : +66 à +78) ; +62, +64, +66 mis à 0."
 },
 "sub_BF56D": {
 "segment": "ovr345",
@@ -70193,8 +70193,8 @@
 "lines": 14,
 "type": "far",
 "calls": [],
-"new_name": "sub_BF7E3",
-"summary": ""
+"new_name": "PartEntry_ResetArray_BF7E3",
+"summary": "far. LUE 2026-11-05. Tableau des objets PART : nombre et pointeur à 0."
 },
 "sub_BF7F9": {
 "segment": "ovr345",
@@ -70209,8 +70209,8 @@
 "sub_1DDFE",
 "sub_BF3D5"
 ],
-"new_name": "sub_BF7F9",
-"summary": ""
+"new_name": "PartEntry_AllocateArray_BF7F9",
+"summary": "far. LUE 2026-11-05. Nombre d'objets = taille du chunk PART ÷ 62 (erreur 9036h si reste), 89 octets par objet en mémoire (imul ax, ax, 59h ; STRIKE.EXE : 85), PartEntry_LoadAndResolveNames_BF3D5 pour chacun."
 },
 "sub_BF890": {
 "segment": "ovr345",
@@ -70258,8 +70258,8 @@
 "sub_1DDFE",
 "sub_6DB78"
 ],
-"new_name": "sub_BF8E9",
-"summary": ""
+"new_name": "ProgBuffer_LoadRawAndCountMarkers_BF8E9",
+"summary": "far. LUE 2026-11-05. Comme ProgBuffer_LoadRawAndCountMarkers_AA31D de STRIKE.EXE : copie brute du chunk PROG, compte des octets nuls aux positions paires (séparateurs de programmes)."
 },
 "sub_BF959": {
 "segment": "ovr345",

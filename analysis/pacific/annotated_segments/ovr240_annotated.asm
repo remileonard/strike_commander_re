@@ -558,7 +558,7 @@ loc_89EFA:
 		or	al, al
 		jz	short loc_89F62
 		push	large [bp+var_5A]
-		call	sub_536C9
+		call	PartEntry_Deactivate_536C9
 		add	sp, 4
 		mov	ax, word ptr [bp+var_54+2]
 		mov	word ptr [bp+var_54], ax

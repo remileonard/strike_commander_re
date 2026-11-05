@@ -79,7 +79,7 @@ sub_752A3	endp
 ; Attributes: thunk
 
 sub_752A8	proc far
-		jmp	sub_BD743
+		jmp	MissionScenario_LoadFromIFF_BD743
 sub_752A8	endp
 
 ; ----------------------------------------------------------------------

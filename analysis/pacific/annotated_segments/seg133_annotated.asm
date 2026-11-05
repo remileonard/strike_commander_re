@@ -382,7 +382,7 @@ arg_2		= word ptr  8
 		mov	ax, [bx+2]
 		add	ax, 40h
 		push	ax
-		call	sub_530DB
+		call	Expr_VM_ExecuteSingleInstruction_530DB
 		add	sp, 0Ah
 		jmp	short loc_5B99A
 
@@ -630,7 +630,7 @@ loc_5BB79:
 		mov	ax, [bx+2]
 		add	ax, 40h
 		push	ax
-		call	sub_530DB
+		call	Expr_VM_ExecuteSingleInstruction_530DB
 		add	sp, 0Ah
 		jmp	short loc_5BBA4
 

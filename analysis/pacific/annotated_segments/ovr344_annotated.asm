@@ -290,7 +290,7 @@ loc_BD576:
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_BD743
+		call	near ptr MissionScenario_LoadFromIFF_BD743
 		add	sp, 4
 
 loc_BD580:
@@ -496,7 +496,13 @@ sub_BD68B		endp
 
 ; Attributes: bp-based frame
 
-sub_BD743		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. (structure) Lit un fichier de mission : MISN, VERS, NAME, CAMP, TUNE,
+; WRLD, FILE, CAST, AREA, SPOT, NUMS, MSGS, PROG (ProgBuffer_LoadRawAndCountMarkers_BF8E9),
+; PART (PartEntry_AllocateArray_BF7F9), TEAM, PLAY, LOAD, HOME. Appelée par sub_877A0 (départ
+; en vol) et Gameflow_MeditScreen_E3D9D.
+; ==============================================================================================
+MissionScenario_LoadFromIFF_BD743		proc far
 
 var_182		= word ptr -182h
 var_14E		= dword ptr -14Eh
@@ -1395,7 +1401,7 @@ loc_BDFFA:
 		pop	si
 		leave
 		retf
-sub_BD743		endp
+MissionScenario_LoadFromIFF_BD743		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1973,7 +1979,7 @@ loc_BE438:
 		push	si
 		push	si
 		push	cs
-		call	near ptr sub_BD743
+		call	near ptr MissionScenario_LoadFromIFF_BD743
 		add	sp, 4
 		lea	ax, [bp+var_128]
 		push	ax

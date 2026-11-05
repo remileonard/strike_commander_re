@@ -89,6 +89,7 @@ ol.steps li::before { content: counter(s); font-family: var(--font-mono); font-w
   .grid2 { grid-template-columns: minmax(0, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+p code, li code { overflow-wrap: anywhere; }
 </style>
 </head>
 <body>
@@ -111,6 +112,7 @@ ol.steps li::before { content: counter(s); font-family: var(--font-mono); font-w
     <li><a href="#briefing"><span>11</span><span>Un briefing, image par image</span></a></li>
     <li><a href="#commandant"><span>12</span><span>Le commandant à la carte</span></a></li>
     <li><a href="#conditions"><span>13</span><span>Répliques conditionnelles</span></a></li>
+    <li><a href="#scripts"><span>13b</span><span>Scripts de mission</span></a></li>
     <li><a href="#librs"><span>14</span><span>libRealSpace</span></a></li>
     <li><a href="#outils"><span>15</span><span>Outils et sources</span></a></li>
   </ol>
@@ -585,6 +587,40 @@ CLOSEUP pan 25 ms_fpov3 160 128 "But Noodles, he says we ought to kill every pil
 ENDIF
 CLOSEUP air 25 ms_rpov 130 128 "I can't give you an answer, Wally. There's no regulation." 244</pre>
   <p>La réplique sur Noodles n'est dite que si le drapeau 76 n'est pas posé.</p>
+</article>
+
+<!-- 13b -->
+<article class="card" id="scripts">
+  <header><span class="id">13b</span><h2>Scripts de mission : chargement et exécution par les objets</h2></header>
+<p>Lu le 2026-11-05, en comparant avec STRIKE.EXE (<code>MISSION_SCRIPT_OPCODES.md</code>). La mécanique est celle de Strike Commander ; les écarts sont listés au § 6.5.</p>
+<h3>6.1 Chargement (<code>MissionScenario_LoadFromIFF_BD743</code>)</h3>
+<p>Lit les chunks du fichier de mission (<code>MISN</code> : <code>VERS</code>, <code>NAME</code>, <code>CAMP</code>, <code>TUNE</code>, <code>WRLD</code>, <code>FILE</code>, <code>CAST</code>, <code>AREA</code>, <code>SPOT</code>, <code>NUMS</code>, <code>MSGS</code>, <code>PROG</code>, <code>PART</code>, <code>TEAM</code>, <code>PLAY</code>, <code>LOAD</code>, <code>HOME</code>). Appelée au départ en vol (par <code>sub_877A0</code>, pas encore nommée) et par l'écran <code>MEDIT</code> (<code>Gameflow_MeditScreen_E3D9D</code>).</p>
+<ul><li><b><code>PROG</code></b> (<code>ProgBuffer_LoadRawAndCountMarkers_BF8E9</code>) : comme Strike Commander. Le bloc est copié tel quel ; le chargeur compte les octets nuls aux positions paires (<code>cmp byte ptr es:[bx], 0</code> / <code>add dx, 2</code>) : ce sont les séparateurs entre les programmes. Un programme est désigné par son rang (<code>ProgBuffer_FindSubProgramByIndex_51C42</code>).</li><li><b><code>PART</code></b> (<code>PartEntry_AllocateArray_BF7F9</code>) : nombre d'objets = taille du chunk ÷ 62 (<code>mov bx, 3Eh</code> / <code>div bx</code>, erreur si le reste n'est pas nul) ; <b>89 octets par objet en mémoire</b> (<code>imul ax, ax, 59h</code> ; Strike Commander : 85). Chaque objet est lu par <code>PartEntry_LoadAndResolveNames_BF3D5</code>.</li></ul>
+<p><b>Le chunk <code>PART</code> n'a pas changé</b> : 62 octets par objet, lus dans le même ordre aux mêmes places (mêmes variables de pile que <code>PartEntry_LoadAndResolveNames_A9E3C</code> de STRIKE.EXE). Seule la structure en mémoire change :</p>
+<div class="tablewrap"><table><thead><tr><th>Champ en mémoire</th><th>Strike Commander</th><th>Pacific Strike</th></tr></thead><tbody><tr><td>noms, camp, zone, position, cap, champs +45 à +56</td><td>+0 à +56</td><td>identiques</td></tr><tr><td>bits d'état (actif, détruit…)</td><td>+57</td><td>+57</td></tr><tr><td>+62, +64 (mis à 0)</td><td>oui</td><td>oui</td></tr><tr><td>mot mis à 0 au chargement</td><td>—</td><td><b>+66</b> (rôle non établi)</td></tr><tr><td>référence vers un autre objet</td><td>—</td><td><b>+68</b> (<code>sub_39519</code> ; posée par les ordres 174 et 175, § 6.5)</td></tr><tr><td>script 1 : <code>on_is_activated</code></td><td>+66</td><td><b>+70</b></td></tr><tr><td>script 2 : <code>on_mission_update</code></td><td>+70</td><td><b>+74</b></td></tr><tr><td>script 3 : <code>on_is_destroyed</code></td><td>+74</td><td><b>+78</b></td></tr><tr><td>script 4 : <code>on_missions_init</code></td><td>+78</td><td><b>+82</b></td></tr><tr><td>objet du monde (contrôleur)</td><td>+82</td><td><b>+86</b></td></tr><tr><td>état de l'ordre en cours (255 = posé)</td><td>+84</td><td><b>+88</b></td></tr></tbody></table></div>
+<p>Les 4 scripts sont résolus une fois, au chargement, en pointeurs vers leur programme (<code>Expr_LookupNamedValue_530A7</code> sur la liste des programmes) ; noms des scripts : ceux de libRealSpace. <code>PartEntry_ResetState_BF382</code> remet l'objet au repos (comme <code>PartEntry_ResetState_A9DFD</code>, plus la référence +68).</p>
+<h3>6.2 Exécution, à chaque image (<code>MAIN_GAME_TICK_54FD2</code>)</h3>
+<p>Même ordre que <code>MAIN_GAME_TICK</code> de STRIKE.EXE :</p>
+<pre class="tpl">MAIN_GAME_TICK_54FD2
+  Scene_RunUpdateScript_54AD7              scène globale
+  Scene_DetectAndActivateChange_54BCF      scène courante d&#x27;après la position du joueur
+  Scene_RunUpdateScript_54AD7              scène courante
+  PartEntry_DispatchMissionUpdateTick_5471E   chaque objet de PART (pas de 89 octets) dont le bit 0 de +57 est posé
+    Expr_Node_UpdateAndPropagate_54338
+      Expr_VM_ExecuteSingleInstruction_530DB  prépare l&#x27;état d&#x27;exécution (programme, objet)
+        Expr_VM_Interpreter_51F24             joue le programme</pre>
+<p><code>Expr_Node_UpdateAndPropagate_54338</code>, pour un objet actif :</p>
+<ul><li>bit 1 de +57 posé → <code>Expr_Node_RecomputeIfDirty_53780</code> ;</li><li>sinon, bit 3 posé → script 4 (+82), puis si l'objet est plus loin que la distance limite (<code>dword_7CC84</code>) : <code>PartEntry_Deactivate_536C9</code> ;</li><li>sinon → script 2 (+74) ; ensuite, si l'objet du monde est celui de <code>[mission+101]</code> (l'objet dont la position sert de référence aux distances), l'octet +88 prend <code>[mission+128]</code> quand <code>[mission+127]</code> vaut 165, 166 ou 162, sinon 255.</li></ul>
+<h3>6.3 Les autres événements d'un objet</h3>
+<div class="tablewrap"><table><thead><tr><th>Événement</th><th>Fonction</th><th>Ce qu'elle fait</th></tr></thead><tbody><tr><td>activation</td><td><code>Shared_TriggerExprInstruction_53749</code></td><td>pose le bit 0 de +57, efface les bits 2 et 3, met +58 à 0, joue le script 1 (+70)</td></tr><tr><td>destruction</td><td><code>Expr_Node_RecomputeIfDirty_53780</code></td><td>si le bit 0 est posé : l'efface, pose le bit 1, joue le script 3 (+78)</td></tr><tr><td>apparition dans le monde</td><td><code>PartEntry_ResolveSpawnPositionAndActivate_5313D</code></td><td>calcule la position et crée l'objet du monde (+86) ; <b>seulement si le drapeau 260 n'est pas posé</b> (<code>push 104h</code> / <code>GameVar_Get_56414</code> / <code>jnz</code>)</td></tr></tbody></table></div>
+<p>Les scènes (<code>SCNE</code>) gardent leurs trois scripts : <code>Scene_TriggerActivation_54AB2</code> (+8), <code>Scene_RunUpdateScript_54AD7</code> (+12), <code>Scene_RunLeavingScript_54AF6</code> (+16), chacun par <code>Expr_VM_ExecuteSingleInstruction_530DB</code>.</p>
+<h3>6.4 Encodage des instructions</h3>
+<p>Comme Strike Commander (<code>Expr_VM_ReadNextToken_51D33</code>, même lecture qu'<code>Expr_VM_ReadNextToken_50F85</code>) : un octet d'instruction, un octet d'argument ; tant que l'octet suivant vaut 9, il est sauté et l'octet d'après est un argument de plus (3 au plus). <b>Exception : les 22 instructions de drapeau</b> lisent un octet de plus (le numéro sur 2 octets), puis exigent l'octet 5 (§ 2.1).</p>
+<h3>6.5 Instructions : ce qui change</h3>
+<p>La table de l'interpréteur a toujours 209 cas (<code>cmp bx, 0D0h</code>). Toutes les instructions de Strike Commander sont traitées, et 12 de plus :</p>
+<ul><li><b>Instruction inconnue = erreur.</b> Dans Strike Commander, le cas par défaut passe à l'instruction suivante. Dans Pacific Strike, il appelle la fonction d'erreur (<code>push 911Bh</code> / <code>sub_1DDFE</code>). Les instructions 5 et <code>OP_SET_LABEL</code> (8), qui ne font rien, ont donc maintenant leur propre cas.</li><li><b>Ordres</b> (<code>MissionScript_CallNativeHandler_53B0B</code>) : au lieu d'un <code>switch</code> sur 161 à 191, une liste de 22 valeurs cherchée une à une (<code>word_542E0</code>). On y trouve tous les ordres de Strike Commander, plus 112, 173, 174, 175 et 193.</li></ul>
+<div class="tablewrap"><table><thead><tr><th>Valeur</th><th>Nom</th><th>Données</th><th>Constaté dans le code</th></tr></thead><tbody><tr><td>5</td><td><code>OP_NOOP_5</code>*</td><td>0</td><td>rien</td></tr><tr><td>112</td><td><code>OP_ORDER_FRIENDLY_OF_TYPE</code>*</td><td>0</td><td>ordre : pour un objet du monde de la classe 16 (<code>test byte ptr [bx+2], 10h</code>), choisit au hasard un objet du même camp et du type donné (<code>sub_545A4</code>) et prend sa position ; sinon l'ordre échoue</td></tr><tr><td>153</td><td><code>OP_153</code>*</td><td>12</td><td>objet, <code>SPOT</code> : crée un élément ajouté à une liste (<code>sub_537DF</code>) ; rôle non établi</td></tr><tr><td>154</td><td><code>OP_154</code>*</td><td>69</td><td>objet, deux <code>SPOT</code> : même famille que 153 (<code>sub_539B4</code>) ; rôle non établi</td></tr><tr><td>155</td><td><code>OP_SPAWN_AT_SPOT</code>*</td><td>4</td><td>crée un objet (<code>Debris_LoadAndInstantiateAlt</code>) à la position d'un <code>SPOT</code></td></tr><tr><td>156</td><td><code>OP_RELEASE_ATTACHED</code>*</td><td>4</td><td>libère l'élément attaché à l'objet du monde (<code>[objet+120]</code>, <code>sub_74144</code>) et le remet à 0</td></tr><tr><td>157</td><td><code>OP_157</code>*</td><td>16</td><td>deux objets et un <code>SPOT</code> : fait apparaître le premier (<code>PartEntry_ResolveSpawnPositionAndActivate_5313D</code>), lit la position du <code>SPOT</code>, puis une méthode de l'objet du monde du second ; rôle non établi</td></tr><tr><td>173</td><td><code>OP_SET_OBJ_DESTROY_TARGET_B</code>*</td><td>1</td><td>même traitement que <code>OP_SET_OBJ_DESTROY_TARGET</code> (167)</td></tr><tr><td>174</td><td><code>OP_ORDER_RANDOM_ENEMY_OF_TYPE</code>*</td><td>1 279</td><td>si +68 est vide : choisit au hasard un objet du camp adverse et du type n (<code>sub_545A4</code>) et le garde en +68 ; puis vise sa position. Rien de trouvé : l'ordre échoue</td></tr><tr><td>175</td><td><code>OP_ORDER_RANDOM_ENEMY_OF_TYPE_B</code>*</td><td>4</td><td>même traitement que 174</td></tr><tr><td>193</td><td><code>OP_ORDER_OBJ_AND_SPOT</code>*</td><td>48</td><td>ordre avec un objet (2ᵉ argument) et un <code>SPOT</code> (3ᵉ argument ; 65 535 = erreur)</td></tr></tbody></table></div>
+<p>« Données » = nombre d'emplois dans les 64 fichiers de <code>MISSIONS</code>. <code>sub_545A4</code> (pas encore nommée) parcourt les objets du monde (<code>sub_1E6E1</code>) et retient ceux dont l'octet +53 de la description vaut n et, pour les objets de la classe 16, dont le camp (<code>[objet+81]</code>) est celui demandé ; elle en garde 6 au plus et en tire un au hasard (<code>CRT_Rand</code>). Pour 174 et 175, le camp demandé est l'inverse de celui de l'objet (−1 ↔ 1).</p>
 </article>
 
 <!-- 14 -->
