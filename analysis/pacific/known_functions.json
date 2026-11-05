@@ -5873,5 +5873,10 @@
     "new_name": "PointerLayer_AllocImageList_63137",
     "segment": "seg144",
     "summary": "far. LUE 2026-11-05. Alloue la liste de n images ([calque+29]) et range n en [calque+33]."
+  },
+  "sub_51F24": {
+    "new_name": "Expr_VM_Interpreter_51F24",
+    "segment": "seg125",
+    "summary": "far. LUE 2026-11-05 (instructions de drapeau). Interpréteur des scripts PROG des missions de Pacific Strike (place et instructions de Expr_VM_Interpreter_51106 de STRIKE.EXE ; table off_52F05, cmp bx, 0D0h). Les 22 instructions de drapeau (11h, 12h, 21h à 31h, 42h, 43h, 45h, 50h à 56h) lisent un numéro de 2 octets (octet d'argument + octet suivant × 256), vérifient que l'octet d'après vaut 5, et passent par GameVar_Get_56414 / GameVar_Set_564BB : même table que le déroulement et les conversations (analysis/pacific/README.md § 2.1)."
   }
 }

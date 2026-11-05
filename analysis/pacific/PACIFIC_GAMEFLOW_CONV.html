@@ -99,6 +99,7 @@ ol.steps li::before { content: counter(s); font-family: var(--font-mono); font-w
   <ol>
     <li><a href="#programme"><span>1</span><span>Programme et données</span></a></li>
     <li><a href="#variables"><span>2</span><span>Variables et drapeaux</span></a></li>
+    <li><a href="#partage"><span>2b</span><span>Table partagée avec les missions</span></a></li>
     <li><a href="#fichier"><span>3</span><span>GAMEFLOW.IFF</span></a></li>
     <li><a href="#efct"><span>4</span><span>Scripts EFCT</span></a></li>
     <li><a href="#commandes"><span>5</span><span>Les 42 commandes</span></a></li>
@@ -191,6 +192,62 @@ shr ax, 3 / and ax, 7     octet et bit dans word_7D00E → 1 si posé, 0 sinon</
       <tr><td class="num">170 à 182, 185 à 194</td><td>comptes lus par <code>SET_DATE</code>* (§ 7) ; rôle non établi</td></tr>
     </tbody>
   </table></div>
+</article>
+
+<!-- 2b -->
+<article class="card" id="partage">
+  <header><span class="id">2b</span><h2>Une seule table pour le déroulement, les conversations et les missions</h2></header>
+  <p>Les scripts de mission (<code>PROG</code>) lisent et écrivent <b>la même table</b> que le déroulement et les
+  conversations. L'interpréteur des scripts de mission, <code>Expr_VM_Interpreter_51F24</code> (mêmes instructions que
+  <code>Expr_VM_Interpreter_51106</code> de STRIKE.EXE), passe par <code>GameVar_Get_56414</code> et
+  <code>GameVar_Set_564BB</code> pour ses 22 instructions de drapeau (<code>OP_MOVE_FLAG_TO_WORK_REGISTER</code>,
+  <code>OP_SET_FLAG_TO_TRUE</code>, <code>OP_ADD_1_TO_FLAG</code>, <code>OP_TEST_FLAG</code>…).</p>
+  <div class="grid2">
+  <div>
+  <h3>Strike Commander</h3>
+  <pre class="tpl">mission   FLAG[n] : chunk FLAG de la mission
+             │  8 valeurs STAT
+             ▼  misn2op.iff
+déroulement  drapeaux de la partie
+             │
+conversation (pas de condition)</pre>
+  </div>
+  <div>
+  <h3>Pacific Strike</h3>
+  <pre class="tpl">mission ─────┐
+déroulement ─┼── variables 0 à 255
+conversation ┘   drapeaux 256 et plus
+             (GameVar_Get_56414 / GameVar_Set_564BB)</pre>
+  </div>
+  </div>
+  <ul>
+    <li><b>Encodage</b> : une instruction de drapeau occupe 4 octets : instruction, numéro sur 2 octets, puis l'octet 5
+    (vérifié par le code). Les autres instructions gardent l'encodage de Strike Commander.</li>
+    <li><b>Le chunk <code>FLAG</code> des 51 fichiers de mission est vide</b> (0 octet).</li>
+  </ul>
+  <h3>Ce que les données montrent</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Numéros</th><th>Écrits par</th><th>Lus par</th></tr></thead>
+    <tbody>
+      <tr><td class="num">401 à 431</td><td>une mission chacun : 401 = <code>PRLH-M1</code>, 402 = <code>PRLH-M2</code> … 431 = <code>IJOK-M4</code></td><td>les conversations (<code>IF_FLAG</code>*) ; <code>SET_DATE</code>* ; le déroulement (406)</td></tr>
+      <tr><td class="num">433, 434</td><td>les missions de défaite <code>LOSE-M1A</code> à <code>LOSE-M2C</code></td><td>les conversations ; le déroulement (433)</td></tr>
+      <tr><td class="num">435, 436</td><td><code>ENDG-M1</code>, <code>ENDG-M2</code></td><td>le déroulement (435)</td></tr>
+      <tr><td class="num">440 à 458</td><td>quelques missions</td><td>les conversations</td></tr>
+      <tr><td class="num">variables 170 à 182</td><td>toutes les missions</td><td>les conversations (170, 173 à 176) ; <code>SET_DATE</code>*</td></tr>
+      <tr><td class="num">variables 185 à 194</td><td>toutes les missions</td><td>le déroulement (185) ; <code>SET_DATE</code>*</td></tr>
+      <tr><td class="num">variable 31</td><td>toutes les missions</td><td>le déroulement</td></tr>
+    </tbody>
+  </table></div>
+  <p>Exemple, <code>PRLH-M1</code> (Pearl Harbor) : le drapeau 401 est effacé au début, puis posé si la variable 1 vaut
+  1 et la variable 195 ne vaut pas 1 :</p>
+  <pre class="tpl">OP_TEST_FLAG 1
+OP_BRANCH_IF_NOT_EQUAL 90
+OP_TEST_FLAG 195
+OP_BRANCH_IF_EQUAL 90
+OP_SET_FLAG_TO_TRUE 401
+OP_SET_LABEL 90</pre>
+  <p>Les conversations qui suivent la mission testent ce drapeau pour choisir leurs répliques. Le rôle exact des
+  variables 170 à 194 n'est pas établi.</p>
 </article>
 
 <!-- 3 -->

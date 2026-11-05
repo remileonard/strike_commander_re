@@ -535,7 +535,15 @@ Expr_VM_ReadVarOrOverride_51EEA		endp
 
 ; Attributes: bp-based frame
 
-sub_51F24		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05 (instructions de drapeau). Interpréteur des scripts PROG des missions de
+; Pacific Strike (place et instructions de Expr_VM_Interpreter_51106 de STRIKE.EXE ; table
+; off_52F05, cmp bx, 0D0h). Les 22 instructions de drapeau (11h, 12h, 21h à 31h, 42h, 43h,
+; 45h, 50h à 56h) lisent un numéro de 2 octets (octet d'argument + octet suivant × 256),
+; vérifient que l'octet d'après vaut 5, et passent par GameVar_Get_56414 / GameVar_Set_564BB :
+; même table que le déroulement et les conversations (analysis/pacific/README.md § 2.1).
+; ==============================================================================================
+Expr_VM_Interpreter_51F24		proc far
 
 var_28		= dword ptr -28h
 var_24		= dword ptr -24h
@@ -2439,9 +2447,9 @@ loc_52F01:
 		pop	si
 		leave
 		retf
-sub_51F24		endp
+Expr_VM_Interpreter_51F24		endp
 
-; START OF FUNCTION CHUNK FOR sub_51F24
+; START OF FUNCTION CHUNK FOR Expr_VM_Interpreter_51F24
 off_52F05	dw offset loc_51F61
 		dw offset loc_51F61
 		dw offset loc_51F51
@@ -2651,7 +2659,7 @@ off_52F05	dw offset loc_51F61
 		dw offset loc_52EE8
 		dw offset loc_52EE8
 		dw offset loc_52D6F
-; END OF FUNCTION CHUNK FOR sub_51F24
+; END OF FUNCTION CHUNK FOR Expr_VM_Interpreter_51F24
 
 ; ----------------------------------------------------------------------
 
@@ -2742,7 +2750,7 @@ arg_6		= dword ptr  0Ch
 		lea	ax, [bp+var_82]
 		push	ax
 		push	cs
-		call	near ptr sub_51F24
+		call	near ptr Expr_VM_Interpreter_51F24
 		pop	cx
 
 loc_5313B:

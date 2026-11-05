@@ -36,6 +36,54 @@ Preuve (`GameVar_Get_56414`) : `cmp si, 0FFh / jbe` → `shl ax, 1` et lecture d
 Dans les données, les drapeaux vont de 74 à 6 969. Variables vues dans le code : 81 et 86 (posées par
 `SET_VARIABLE`\*), 82 et 83 (mois et année, § 3.3), 130 (mission mise de côté, § 3.3).
 
+### 2.1 Une seule table pour le déroulement, les conversations et les missions
+
+Les scripts de mission (`PROG`) lisent et écrivent **la même table** que le déroulement et les conversations.
+L'interpréteur des scripts de mission (`Expr_VM_Interpreter_51F24`, seg125, à la place qu'occupe
+`Expr_VM_Interpreter_51106` dans STRIKE.EXE, juste après `Expr_VM_PopValue_51EB4`, mêmes instructions) appelle
+`GameVar_Get_56414` et `GameVar_Set_564BB` pour toutes les instructions de drapeau (`OP_MOVE_FLAG_TO_WORK_REGISTER`,
+`OP_SET_FLAG_TO_TRUE`, `OP_SET_FLAG_TO_FALSE`, `OP_ADD_1_TO_FLAG`, `OP_TEST_FLAG`… : 22 instructions). Dans Strike
+Commander, ces instructions travaillent sur le chunk `FLAG` de la mission (`MISSION_SCRIPT_OPCODES.md`), et la
+mission ne transmet au déroulement que les 8 valeurs `STAT` de `misn2op.iff`.
+
+- **Encodage** : une instruction de drapeau occupe 4 octets : instruction, numéro (2 octets, bas puis haut), puis
+  l'octet 5 (vérifié : `cmp byte ptr es:[bx], 5`, sinon erreur). Les autres instructions gardent l'encodage de
+  Strike Commander (instruction, argument, puis 9 et un argument de plus). Les 64 fichiers de `MISSIONS` se lisent
+  ainsi sans erreur de séparateur.
+- **Le chunk `FLAG` des 51 fichiers de mission (`*-M*.IFF`) est vide (0 octet).**
+
+Ce que les données montrent (numéros écrits par les `PROG` des missions, lus ailleurs) :
+
+| Numéros | Écrits par | Lus par |
+|---|---|---|
+| 401 à 431 | une mission chacun : 401 = `PRLH-M1`, 402 = `PRLH-M2` … 431 = `IJOK-M4` | les conversations (`IF_FLAG`\*) ; `SET_DATE`\* (drapeaux 401 à 400 + mission courante) ; le déroulement pour 406 |
+| 432 | les missions de fin de campagne (`*-ML`) | ces mêmes missions |
+| 433, 434 | `LOSE-M1A` à `LOSE-M1C`, `LOSE-M2A` à `LOSE-M2C` | les conversations ; 433 par le déroulement |
+| 435, 436 | `ENDG-M1`, `ENDG-M2` | 435 par le déroulement |
+| 440 à 458 | quelques missions | les conversations |
+| variables 170 à 182 | toutes les missions | les conversations (170, 173 à 176) ; `SET_DATE`\* (soustraites) |
+| variables 185 à 194 | toutes les missions | le déroulement (185) ; `SET_DATE`\* (ajoutées deux fois) |
+| variable 31 | toutes les missions | le déroulement (`IF_NOT_FLAG`) |
+| variable 195, 201, drapeau 500 | les missions | les conversations |
+
+Dans le sens inverse, le déroulement pose des numéros que les missions lisent (variable 187) et que les conversations
+lisent (74 à 79, 440, 2 158 à 2 160, 2 210).
+
+Exemple, `PRLH-M1` : au début, `OP_SET_FLAG_TO_FALSE 401` ; plus loin :
+
+```
+OP_TEST_FLAG 1
+OP_BRANCH_IF_NOT_EQUAL 90
+OP_TEST_FLAG 195
+OP_BRANCH_IF_EQUAL 90
+OP_SET_FLAG_TO_TRUE 401
+OP_SET_LABEL 90
+```
+
+Le drapeau 401 est posé si la variable 1 vaut 1 et la variable 195 ne vaut pas 1 ; les conversations qui suivent la
+mission testent ce drapeau. Dans `CRLS-M1`, les programmes 46 à 49 mettent une des variables 173 à 176 à 2, retirent
+1 à la variable 31 et ajoutent 1 à la variable 200 ; le rôle de ces variables n'est pas établi.
+
 ## 3. Déroulement (`GAMEFLOW.IFF`)
 
 ### 3.1 Structure du fichier
