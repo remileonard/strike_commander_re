@@ -314,8 +314,10 @@ Les scènes (`SCNE`) gardent leurs trois scripts : `Scene_TriggerActivation_54AB
 
 ### 6.4 Lecture d'une instruction
 
-Le format est celui de Strike Commander : `Expr_VM_ReadNextToken_51D33` lit comme `Expr_VM_ReadNextToken_50F85` de
-STRIKE.EXE. Il y a **trois formes d'instruction**, et la longueur d'une instruction est toujours paire.
+**Les instructions sont de longueur variable** : de 2 à 8 octets selon le nombre d'arguments, 4 octets pour une
+instruction de drapeau. C'est le principal changement par rapport à Strike Commander (tableau en fin de section).
+Il y a **trois formes d'instruction**, lues par `Expr_VM_ReadNextToken_51D33` et, pour la forme 3, par le code de
+l'instruction elle-même.
 
 **Forme 1 : instruction simple, 2 octets.** Un octet pour le numéro de l'instruction, un octet pour son argument.
 
@@ -378,6 +380,24 @@ octet   octets lus      instruction
 ```
 
 ![Début du chunk PROG de CRLS-M1 : les instructions et la séparation des programmes](images/ps_prog_split.png)
+
+**Ce qui change par rapport à Strike Commander.** Le lecteur de STRIKE.EXE (`Expr_VM_ReadNextToken_50F85`) ne
+cherche la marque 9 **qu'une fois** (un seul `cmp byte ptr es:[bx], 9`, un seul champ `[di+0Ah]`), et son
+interpréteur ne teste jamais la marque 5 : dans Strike Commander, une instruction de drapeau a 2 octets et un numéro
+de 0 à 255.
+
+| | Strike Commander | Pacific Strike |
+|---|---|---|
+| arguments supplémentaires | 1 au plus | 3 au plus |
+| longueurs possibles | 2 ou 4 octets | 2, 4, 6 ou 8 octets |
+| instruction de drapeau | 2 octets, numéro sur 1 octet | 4 octets, numéro sur 2 octets, puis la marque 5 |
+| exemple | `OP_SET_OBJ_FLY_TO_WP` avec 1 argument de plus | `OP_FIRE_AT_SPOT`\* avec 3 arguments de plus |
+
+Conséquence pour libRealSpace : aujourd'hui, `RSMission::paseMissionScript` lit l'argument supplémentaire de Strike
+Commander comme une instruction à part (`OP_SPOT_DATA`, 9), et `SCProg::execute` va le chercher dans l'instruction
+suivante (`has_second`, `this->prog[i + 1].arg`). Ce contournement tient pour un argument ; avec 3 arguments
+supplémentaires et des numéros sur 2 octets, il faut que la structure `PROG` porte elle-même tous les arguments d'une
+instruction, et que `SCProg` les y lise. Ce changement sera décrit avec l'implémentation.
 
 Deux détails pour un lecteur exact (aucun des deux ne se produit dans les données) : le lecteur cherche la marque 9
 **avant** de lire l'octet haut d'une instruction de drapeau, donc un octet haut égal à 9 serait pris pour une marque ;
@@ -551,8 +571,8 @@ OP_ADD_1_TO_FLAG
 OP_REMOVE_1_TO_FLAG
 ```
 
-Toutes les instructions ont une longueur paire : un lecteur qui avance instruction par instruction reste aligné sur
-les mots de la règle 2.
+Chaque forme occupe un nombre entier de mots de 2 octets (1 à 4) : un lecteur qui avance instruction par instruction
+retombe toujours sur le début d'un mot, et donc sur les mots nuls de la règle 2.
 
 **6. Les sauts cherchent l'étiquette vers l'avant, dans le programme courant.** Les instructions de saut
 (`OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS`, `OP_BRANCH_IF_EQUAL` et les autres `OP_BRANCH_IF_*`) passent leur argument à
