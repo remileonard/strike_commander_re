@@ -819,10 +819,9 @@ raccordent d'une case à l'autre et Pearl Harbor apparaît avec Ford Island, les
 
 ![Pearl Harbor : textures de côte, de ville et de port, 48 points par case](images/ps_ground_pearl.png)
 
-**Écarts avec libRealSpace** (`RSArea`, le dessin du terrain de Strike Commander, utilisé tel quel pour Pacific Strike) :
-les triangles de couleur 0 y sont dessinés ; la texture s'ajoute au triangle ombré ; l'eau texturée n'existe pas.
-Le chargement des images (`TXMPACK.PAK` de Pacific Strike : largeur et hauteur sur 2 octets, puis les points) n'a pas
-été comparé à `RSMapTextureSet`.
+**Pour libRealSpace** : il n'y a pas de classe propre au terrain de Pacific Strike, `RSArea` et le dessin du terrain de
+Strike Commander servent tels quels. Leur dessin n'a pas encore été comparé à ces règles (couleur 0, remplacement du
+triangle ombré par la texture, u, v fixes, plans d'eau et de ciel, format des images de `TXMPACK.PAK`).
 
 ## 5. Rapport avec libRealSpace
 
