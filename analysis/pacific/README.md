@@ -312,12 +312,77 @@ MAIN_GAME_TICK_54FD2
 Les scènes (`SCNE`) gardent leurs trois scripts : `Scene_TriggerActivation_54AB2` (+8), `Scene_RunUpdateScript_54AD7`
 (+12), `Scene_RunLeavingScript_54AF6` (+16), chacun par `Expr_VM_ExecuteSingleInstruction_530DB`.
 
-### 6.4 Encodage des instructions
+### 6.4 Lecture d'une instruction
 
-Comme Strike Commander (`Expr_VM_ReadNextToken_51D33`, même lecture qu'`Expr_VM_ReadNextToken_50F85`) : un octet
-d'instruction, un octet d'argument ; tant que l'octet suivant vaut 9, il est sauté et l'octet d'après est un argument
-de plus (3 au plus). **Exception : les 22 instructions de drapeau** lisent un octet de plus (le numéro sur 2 octets),
-puis exigent l'octet 5 (§ 2.1).
+Le format est celui de Strike Commander : `Expr_VM_ReadNextToken_51D33` lit comme `Expr_VM_ReadNextToken_50F85` de
+STRIKE.EXE. Il y a **trois formes d'instruction**, et la longueur d'une instruction est toujours paire.
+
+**Forme 1 : instruction simple, 2 octets.** Un octet pour le numéro de l'instruction, un octet pour son argument.
+
+```
++-------------+----------+
+| instruction | argument |
++-------------+----------+
+     165           2          OP_SET_OBJ_FLY_TO_WP, argument 2
+```
+
+**Forme 2 : instruction avec des arguments supplémentaires.** Après les 2 premiers octets, le lecteur regarde
+l'octet suivant. S'il vaut 9, c'est une **marque** : elle est sautée, et l'octet qui la suit est un argument de plus.
+Le lecteur recommence 3 fois au plus. Chaque argument supplémentaire prend donc 2 octets (la marque 9 et sa
+valeur). Un argument absent vaut 65 535.
+
+```
++-------------+------------+---+------------+---+------------+---+------------+
+| instruction | argument 1 | 9 | argument 2 | 9 | argument 3 | 9 | argument 4 |
++-------------+------------+---+------------+---+------------+---+------------+
+     154            15       9       9        9       0        9       13
+                                  OP_FIRE_AT_SPOT*, arguments 15, 9, 0 et 13
+```
+
+L'octet qui suit une marque est toujours une valeur, même s'il vaut 9 : dans cet exemple, l'argument 2 vaut 9.
+
+**Forme 3 : instruction de drapeau, 4 octets.** Les 22 instructions qui lisent ou écrivent une variable ou un drapeau
+(liste au § 6.7, règle 5) ont besoin d'un numéro qui peut dépasser 255 (table commune du § 2.1). Le 2ᵉ octet est
+l'octet bas du numéro, le 3ᵉ son octet haut, et le 4ᵉ vaut toujours 5. Le lecteur commun ne lit que les 2 premiers
+octets ; c'est le code de chaque instruction de drapeau qui lit le 3ᵉ, vérifie que le 4ᵉ vaut 5 (erreur sinon) et
+le saute.
+
+```
++-------------+-----------+------------+---+
+| instruction | octet bas | octet haut | 5 |
++-------------+-----------+------------+---+
+      83          148           1        5     OP_SET_FLAG_TO_FALSE, numéro 148 + 256 × 1 = 404
+```
+
+**Fin d'un programme : le mot nul.** `OP_NOOP` avec l'argument 0 (2 octets nuls) termine le programme (ou revient
+à l'appelant, `Expr_VM_PopValue_51EB4`). Le programme suivant commence à l'octet qui le suit.
+
+![Les trois formes d'instruction et la fin de programme, avec les octets des fichiers de mission](images/ps_prog_encoding.png)
+
+Le chunk `PROG` se lit donc d'un bout à l'autre, instruction après instruction ; chaque mot nul ferme un programme :
+
+```
+octet   octets lus      instruction
+  0     161 1           OP_SET_OBJ_TAKE_OFF
+  2     165 3           OP_SET_OBJ_FLY_TO_WP
+  4     171 0           OP_SET_MESSAGE
+  6     165 2           OP_SET_OBJ_FLY_TO_WP
+  8     171 1           OP_SET_MESSAGE
+ 10     193 0 9 0       OP_ORDER_OBJ_AND_SPOT*      (forme 2)
+ 14     171 4           OP_SET_MESSAGE
+ 16     0 0             OP_NOOP                     fin du programme 0
+ 18     16 148          OP_MOVE_VALUE_TO_WORK_REGISTER
+ 20     80 255 0 5      OP_MOVE_WORK_REGISTER_TO_FLAG (forme 3)
+ 24     83 148 1 5      OP_SET_FLAG_TO_FALSE        (forme 3)
+...
+```
+
+![Début du chunk PROG de CRLS-M1 : les instructions et la séparation des programmes](images/ps_prog_split.png)
+
+Deux détails pour un lecteur exact (aucun des deux ne se produit dans les données) : le lecteur cherche la marque 9
+**avant** de lire l'octet haut d'une instruction de drapeau, donc un octet haut égal à 9 serait pris pour une marque ;
+et la recherche d'étiquette (§ 6.7, règle 6) avance par paires d'octets, donc un octet haut égal à 8 serait pris pour
+une étiquette.
 
 ### 6.5 Instructions : ce qui change
 
@@ -433,7 +498,7 @@ compte est plus grand que le nombre de programmes. Pour le portage, découper su
 comme « pas de script » tout numéro qui ne désigne pas un programme existant donne le même résultat sur les données :
 le plus grand numéro employé est 80 et aucun ne dépasse le nombre de programmes.
 
-**4. Une instruction = 2 octets, plus 2 octets par argument supplémentaire** (`Expr_VM_ReadNextToken_51D33`) :
+**4. Une instruction = 2 octets, plus 2 octets par argument supplémentaire** (`Expr_VM_ReadNextToken_51D33`, schéma au § 6.4) :
 
 ```
 octet 0 : numéro de l'instruction
@@ -446,7 +511,7 @@ tant que l'octet suivant vaut 9 (3 fois au plus) :
 Les arguments absents valent 65 535 (`mov word ptr [di+0Ah], 0FFFFh`, idem +0Ch et +0Eh). Les données contiennent 433
 de ces extensions.
 
-**5. Les 22 instructions de drapeau ont 2 octets de plus.** Après la lecture de la règle 4, le cas de l'instruction
+**5. Les 22 instructions de drapeau ont 2 octets de plus** (schéma au § 6.4). Après la lecture de la règle 4, le cas de l'instruction
 lit un octet de plus, l'octet haut du numéro de variable, puis exige l'octet 5 et le saute
 (`shl dx, 8` / `add dx, [arg]`, puis `cmp byte ptr es:[bx], 5` ; sinon erreur ; puis `inc word ptr [di]` en
 `loc_5275A`). Le numéro est donc **octet bas d'abord** :

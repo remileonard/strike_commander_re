@@ -7,6 +7,9 @@ du décor (FORM BACK de CONVDATA.IFF) dans l'ordre, visage par-dessus, image hor
 dans PACIFIC.EXE.
 Le texte est écrit avec la police de PIL, pas avec celle du jeu.
 
+Le schéma de lecture des instructions des scripts de mission (ps_prog_encoding.png, README § 6.4) prend ses octets
+dans les fichiers de mission (chunk PROG).
+
 Usage : python3 tools/ps_doc_images.py --donnees <DATA de Pacific Strike> <dossier de sortie>
 """
 import os
@@ -110,6 +113,134 @@ def group(back, text=None, commander=None, step=0):
     return image(screen, pal, text)
 
 
+# --- Schéma de lecture des instructions (README § 6.4) -----------------------------------------------------------
+
+# Rôle d'un octet → (couleur de fond, étiquette sous la case)
+ROLES = {
+    'op': ((120, 160, 230), 'instruction'),
+    'arg': ((140, 200, 140), 'argument'),
+    'mark': ((200, 200, 200), 'marque 9'),
+    'lo': ((140, 200, 140), 'octet bas'),
+    'hi': ((240, 180, 110), 'octet haut'),
+    'five': ((200, 200, 200), 'marque 5'),
+    'end': ((235, 130, 130), 'fin'),
+}
+
+# (fichier de mission, position dans PROG, rôles des octets, titre, lecture)
+EXAMPLES = [
+    ('CRLS-M1.IFF', 6, ['op', 'arg'],
+     'Instruction simple : 2 octets',
+     'OP_SET_OBJ_FLY_TO_WP, argument 1 = 2'),
+    ('CRLS-M1.IFF', 452, ['op', 'arg', 'mark', 'arg'],
+     'Un argument de plus : la marque 9, puis l\'argument',
+     'OP_SET_OBJ_FLY_TO_WP, arguments 6 et 8'),
+    ('LYTG-M4.IFF', 496, ['op', 'arg', 'mark', 'arg', 'mark', 'arg', 'mark', 'arg'],
+     'Trois arguments de plus (le maximum) ; le 2e argument vaut 9',
+     'OP_FIRE_AT_SPOT*, arguments 15, 9, 0 et 13'),
+    ('CRLS-M1.IFF', 24, ['op', 'lo', 'hi', 'five'],
+     'Instruction de drapeau : numéro sur 2 octets, puis la marque 5',
+     'OP_SET_FLAG_TO_FALSE, numéro 148 + 256 × 1 = 404'),
+    ('CRLS-M1.IFF', 16, ['end', 'end'],
+     'Mot nul : fin du programme',
+     'OP_NOOP, argument 0 : le programme suivant commence après'),
+]
+
+CELL = 64
+GAP = 6
+LEFT = 24
+
+
+def prog_chunk(name):
+    data = d.read(os.path.join(d.GAME, 'MISSIONS', name))
+    at = 12
+    while at + 8 <= len(data):
+        tag = data[at:at + 4]
+        size = struct.unpack_from('>I', data, at + 4)[0]
+        if tag == b'PROG':
+            return data[at + 8:at + 8 + size]
+        at += 8 + size + (size & 1)
+    raise ValueError(name + ' : pas de chunk PROG')
+
+
+def cells(draw, x, y, values, roles):
+    small = di.font(11)
+    big = di.font(18)
+    for k, (value, role) in enumerate(zip(values, roles)):
+        colour, label = ROLES[role]
+        left = x + k * (CELL + GAP)
+        draw.rectangle((left, y, left + CELL, y + 40), fill=colour, outline=(40, 40, 40))
+        text = str(value)
+        width = draw.textlength(text, font=big)
+        draw.text((left + (CELL - width) / 2, y + 9), text, fill=(0, 0, 0), font=big)
+        width = draw.textlength(label, font=small)
+        draw.text((left + (CELL - width) / 2, y + 46), label, fill=(60, 60, 60), font=small)
+
+
+def encoding_diagram():
+    """Une ligne par exemple : les octets lus dans le fichier, colorés selon leur rôle."""
+    row = 110
+    width = LEFT + 8 * (CELL + GAP) + 420
+    im = Image.new('RGB', (width, 20 + row * len(EXAMPLES)), (255, 255, 255))
+    draw = ImageDraw.Draw(im)
+    for n, (name, at, roles, title, reading) in enumerate(EXAMPLES):
+        values = list(prog_chunk(name)[at:at + len(roles)])
+        y = 14 + n * row
+        draw.text((LEFT, y), title, fill=(0, 0, 0), font=di.font(14))
+        cells(draw, LEFT, y + 26, values, roles)
+        right = LEFT + 8 * (CELL + GAP) + 10
+        draw.text((right, y + 30), reading, fill=(0, 0, 0), font=di.font(12))
+        draw.text((right, y + 50), f'{name}, octet {at} de PROG', fill=(110, 110, 110), font=di.font(11))
+    return im
+
+
+def program_split_diagram():
+    """Début du chunk PROG de CRLS-M1 : les instructions lues l'une après l'autre, et les programmes séparés par les
+    mots nuls."""
+    data = prog_chunk('CRLS-M1.IFF')
+    groups = [
+        (0, ['op', 'arg'], 'OP_SET_OBJ_TAKE_OFF'),
+        (2, ['op', 'arg'], 'OP_SET_OBJ_FLY_TO_WP'),
+        (4, ['op', 'arg'], 'OP_SET_MESSAGE'),
+        (6, ['op', 'arg'], 'OP_SET_OBJ_FLY_TO_WP'),
+        (8, ['op', 'arg'], 'OP_SET_MESSAGE'),
+        (10, ['op', 'arg', 'mark', 'arg'], 'OP_ORDER_OBJ_AND_SPOT*'),
+        (14, ['op', 'arg'], 'OP_SET_MESSAGE'),
+        (16, ['end', 'end'], 'OP_NOOP'),
+        (18, ['op', 'arg'], 'OP_MOVE_VALUE_TO_WORK_REGISTER'),
+        (20, ['op', 'lo', 'hi', 'five'], 'OP_MOVE_WORK_REGISTER_TO_FLAG'),
+        (24, ['op', 'lo', 'hi', 'five'], 'OP_SET_FLAG_TO_FALSE'),
+    ]
+    row = 34
+    im = Image.new('RGB', (760, 70 + row * len(groups) + 40), (255, 255, 255))
+    draw = ImageDraw.Draw(im)
+    draw.text((LEFT, 12), 'CRLS-M1.IFF, début du chunk PROG, lu instruction par instruction', fill=(0, 0, 0),
+              font=di.font(14))
+    small = di.font(13)
+    y = 44
+    program = 0
+    draw.text((LEFT, y), 'programme 0 (commence à l\'octet 0)', fill=(30, 30, 160), font=small)
+    y += 26
+    for at, roles, name in groups:
+        draw.text((LEFT, y + 6), f'{at:3d}', fill=(110, 110, 110), font=small)
+        for k, role in enumerate(roles):
+            colour = ROLES[role][0]
+            left = LEFT + 40 + k * 46
+            draw.rectangle((left, y, left + 42, y + 26), fill=colour, outline=(40, 40, 40))
+            text = str(data[at + k])
+            width = draw.textlength(text, font=small)
+            draw.text((left + (42 - width) / 2, y + 5), text, fill=(0, 0, 0), font=small)
+        draw.text((LEFT + 40 + 4 * 46 + 12, y + 6), name, fill=(0, 0, 0), font=small)
+        y += row
+        if roles[0] == 'end':
+            program += 1
+            draw.line((LEFT, y - 3, 740, y - 3), fill=(200, 60, 60), width=2)
+            draw.text((LEFT, y + 2), f'programme {program} (commence à l\'octet {at + 2})', fill=(30, 30, 160),
+                      font=small)
+            y += 26
+    draw.text((LEFT, y + 4), '…', fill=(0, 0, 0), font=small)
+    return im
+
+
 def records(k):
     return pc.parse(pc.entry(k))
 
@@ -121,6 +252,11 @@ def write_all(out):
 
     def save(im, name):
         di.x2(im).save(os.path.join(out, name))
+        saved.append(name)
+
+    # Schémas des scripts de mission : déjà dessinés en grand, pas d'agrandissement.
+    for im, name in ((encoding_diagram(), 'ps_prog_encoding.png'), (program_split_diagram(), 'ps_prog_split.png')):
+        im.save(os.path.join(out, name))
         saved.append(name)
 
     # Salle de briefing et premier texte.
