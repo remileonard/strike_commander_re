@@ -669,7 +669,12 @@ pistes passent par `RSArea::ParseTriFile`, qui lit le format de Strike Commander
 - les faces sont lues sur 16 octets au lieu de 28 ;
 - la lecture attend 3 048 octets alors que l'entrée en fait 798 : elle déborde de l'entrée.
 
-La correction tient dans `RSArea::ParseTriFile` (lecture selon le jeu) ; elle sera écrite avec l'implémentation.
+**Implémentation prévue** (décision de Rémi) : `RSArea` n'est pas modifié dans sa lecture, pour ne pas casser
+Strike Commander. La lecture de Pacific Strike ira dans une classe `PSArea`, dérivée de `RSArea`, qui remplace
+`ParseTriFile` ; `PSMission` créera un `PSArea` au lieu d'un `RSArea` (`this->area = new RSArea();` aujourd'hui).
+Seul point à toucher dans `RSArea.h` : `ParseTriFile` y est `private` et non virtuelle (appelée par
+`RSArea::ParseTrigo`) ; il faudra la déclarer `virtual` et la passer en `protected`, ainsi que les membres qu'elle
+remplit, sans rien changer à ce que fait Strike Commander.
 
 ![Oahu : relief (pistes en rouge) et champ « éclairage » des sommets](images/ps_terrain_oahu.png)
 
