@@ -898,7 +898,7 @@ arg_4		= word ptr  0Ah
 		push	ss
 		lea	ax, word ptr [bp+var_14]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_14]
 		mov	[bp+var_4], eax

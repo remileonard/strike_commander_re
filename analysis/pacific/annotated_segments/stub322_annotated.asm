@@ -15,7 +15,7 @@ stru_74870	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_74890	proc far
-		jmp	sub_B1790
+		jmp	Landing_CheckTouchdown_B1790
 sub_74890	endp
 		db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 stub322		ends

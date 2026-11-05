@@ -464,7 +464,15 @@ sub_9EAAF		endp
 
 ; Attributes: bp-based frame
 
-sub_9EADA		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-05. Écran des options du vol (appelé par sub_739C4 avec le bloc
+; de réglages, 63B4h = dword_7CAE4, base du segment de données 76730h). Chaque option est un
+; widget lié à un champ du bloc (sub_A09BD : liste de valeurs ; sub_A08AE : oui/non). Relevé :
+; « Sky Texture » +1Ah (byte_7CAFE), « Water Texture » +1Bh (byte_7CAFF), « Flight Model: »
+; +23h (word_7CB07, valeurs Ace / Veteran / Rookie), « Easy Landings » +25h (byte_7CB09), «
+; Enemy AI: » +2Dh (byte_7CB11, Ace / Veteran / Rookie). Libellés dans seg008 (base 54F0h).
+; ==============================================================================================
+Options_FlightOptionsScreen_9EADA		proc far
 
 var_B5E		= word ptr -0B5Eh
 var_B50		= word ptr -0B50h
@@ -3142,7 +3150,7 @@ loc_A07DF:
 		pop	si
 		leave
 		retf
-sub_9EADA		endp
+Options_FlightOptionsScreen_9EADA		endp
 
 ; ----------------------------------------------------------------------
 

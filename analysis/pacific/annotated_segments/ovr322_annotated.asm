@@ -6,7 +6,12 @@ ovr322		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_B1790		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-05. Contrôle d'un posé (vitesse, roulis…). Si byte_7CB09 (« Easy
+; Landings ») est posé : au sol directement ([objet+20h] = 1), contrôles sautés. Suite non
+; lue.
+; ==============================================================================================
+Landing_CheckTouchdown_B1790		proc far
 
 var_80		= dword ptr -80h
 var_78		= dword ptr -78h
@@ -370,5 +375,5 @@ loc_B1B07:
 		pop	si
 		leave
 		retf
-sub_B1790		endp
+Landing_CheckTouchdown_B1790		endp
 ovr322		ends

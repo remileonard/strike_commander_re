@@ -882,7 +882,7 @@ loc_45519:
 		push	ss
 		lea	ax, word ptr [bp+var_3C]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_3C]
 		mov	[si+1Ah], eax
@@ -933,7 +933,7 @@ loc_45626:
 		push	ss
 		lea	ax, word ptr [bp+var_18]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_18]
 		mov	[si+1Ah], eax

@@ -749,7 +749,13 @@ sub_11CC8		endp
 
 ; Attributes: bp-based frame
 
-sub_11E79		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Compétences d'un profil de pilote ([+0A3h], [+0A4h], [+0A5h]) décalées
+; de byte_7CB11 (« Enemy AI: » : 0 Ace, 1 Veteran, 2 Rookie) vers la droite -> [+99h], [+9Eh],
+; [+9Fh] ; niveau [+98h] = 2 si [+99h] > 12, 1 si > 6, sinon 0 (suite non lue). Équivalent de
+; PilotProfile_RescaleSkillByDifficulty_12FC9 de STRIKE.
+; ==============================================================================================
+PilotProfile_RescaleSkillByEnemyAI_11E79		proc far
 
 arg_0		= word ptr  6
 
@@ -783,5 +789,5 @@ loc_11EBA:
 
 loc_11ECD:
 		les	bx, [bp+arg_0]
-sub_11E79		endp
+PilotProfile_RescaleSkillByEnemyAI_11E79		endp
 seg027		ends

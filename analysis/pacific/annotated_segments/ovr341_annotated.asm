@@ -183,7 +183,7 @@ loc_BA20C:
 		push	ss
 		lea	ax, word ptr [bp+var_14]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		les	bx, word ptr [bp+var_4]
 		mov	eax, es:[bx+66h]

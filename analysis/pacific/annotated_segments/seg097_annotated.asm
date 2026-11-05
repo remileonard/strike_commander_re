@@ -184,7 +184,7 @@ loc_3CB68:
 		push	ss
 		lea	ax, word ptr [bp+var_28]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_C]
 		add	eax, [bp+var_28]
@@ -324,7 +324,7 @@ loc_3CCB8:
 		push	ss
 		lea	ax, word ptr [bp+var_24]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		push	di
 		push	ss
@@ -375,7 +375,7 @@ loc_3CD35:
 		push	ss
 		lea	ax, word ptr [bp+var_42]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_2C]
 		add	eax, [bp+var_42]
@@ -434,7 +434,7 @@ loc_3CE05:
 		push	ss
 		lea	ax, word ptr [bp+var_2C]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [si+20h]
 		sar	eax, 1

@@ -421,7 +421,16 @@ sub_365C6		endp
 
 ; Attributes: bp-based frame
 
-sub_3664D		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Hauteur du sol sous un point, ponts compris : (sortie, monde, position,
+; objet, drapeau). Altitude du terrain (Terrain_HeightSample, [monde+0BFh]) ; puis pour
+; chacune des [monde+0B3h] surfaces d'atterrissage (liste de mots en [monde+0B5h], boîte en
+; +0Ah de chaque objet, Camera_FrustumBoundsTest) contenant le point : si le terrain n'est pas
+; plus haut que le point, ou drapeau ≠ 0, ou variable 668 posée -> [monde+207h] = 1 et hauteur
+; de la surface (sub_32021) ; sinon [monde+207h] = 0 et hauteur du terrain. Origine de la
+; liste des surfaces non lue.
+; ==============================================================================================
+Ground_HeightUnderPoint_3664D		proc far
 
 var_2A		= dword ptr -2Ah
 var_26		= dword ptr -26h
@@ -572,7 +581,7 @@ loc_3677A:
 		pop	si
 		leave
 		retf
-sub_3664D		endp
+Ground_HeightUnderPoint_3664D		endp
 
 ; ----------------------------------------------------------------------
 
@@ -599,7 +608,7 @@ arg_6		= byte ptr  0Ch
 		lea	ax, word ptr [bp+var_4]
 		push	ax
 		push	cs
-		call	near ptr sub_3664D
+		call	near ptr Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		cmp	[bp+var_4], 200h
 		jg	short loc_367AD

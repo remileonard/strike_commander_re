@@ -1594,7 +1594,7 @@ loc_D064:
 		push	ss
 		lea	ax, word ptr [bp+var_30]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_30]
 		add	[bp+var_48], eax
@@ -1825,7 +1825,7 @@ loc_D3AF:
 		push	ss
 		lea	ax, word ptr [bp+var_18]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_18]
 
@@ -2406,7 +2406,7 @@ arg_4		= word ptr  0Ah
 		push	ss
 		lea	ax, word ptr [bp+var_18]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_18]
 		sub	[bp+var_4], eax

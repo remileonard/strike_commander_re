@@ -2268,7 +2268,7 @@ loc_86BA9:
 		push	ss
 		lea	ax, word ptr [bp+var_14]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_14]
 		les	bx, [bp+arg_0]
@@ -3186,7 +3186,7 @@ arg_2		= word ptr  8
 		push	ss
 		lea	ax, word ptr [bp+var_10]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+0Ah]

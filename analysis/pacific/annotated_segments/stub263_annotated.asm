@@ -47,7 +47,7 @@ sub_739BF	endp
 ; Attributes: thunk
 
 sub_739C4	proc far
-		jmp	sub_9EADA
+		jmp	Options_FlightOptionsScreen_9EADA
 sub_739C4	endp
 
 ; ----------------------------------------------------------------------

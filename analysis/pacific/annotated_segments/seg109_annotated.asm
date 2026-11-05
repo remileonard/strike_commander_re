@@ -221,7 +221,7 @@ loc_43E98:
 		push	ss
 		lea	ax, word ptr [bp+var_4A]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_4A]
 		mov	[bp+var_A2], eax
@@ -384,7 +384,7 @@ loc_43FAF:
 		push	ss
 		lea	ax, word ptr [bp+var_60]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_60]
 		mov	[si+1Ah], eax

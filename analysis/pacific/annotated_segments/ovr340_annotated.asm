@@ -289,7 +289,7 @@ loc_B9E72:
 		push	ss
 		lea	ax, word ptr [bp+var_18]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	ax, si
 		add	ax, 1Ah

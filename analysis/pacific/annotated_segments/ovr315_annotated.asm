@@ -386,7 +386,7 @@ loc_B061E:
 		push	ss
 		lea	ax, word ptr [bp+var_1A]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [si+1Ah]
 		cmp	eax, [bp+var_1A]

@@ -595,7 +595,7 @@ loc_3FE16:
 		push	ss
 		lea	ax, word ptr [bp+var_18]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_18]
 		mov	[di+1Ah], eax

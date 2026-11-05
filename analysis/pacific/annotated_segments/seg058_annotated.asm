@@ -46,10 +46,10 @@ sub_23584		proc far
 		add	sp, 4
 		nop
 		push	cs
-		call	near ptr sub_2362F
+		call	near ptr Player_UpdateFrameState_2362F
 		nop
 		push	cs
-		call	near ptr sub_2362F
+		call	near ptr Player_UpdateFrameState_2362F
 		pop	bp
 		retf
 sub_23584		endp
@@ -58,7 +58,13 @@ sub_23584		endp
 
 ; Attributes: bp-based frame
 
-sub_2362F		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-05. Copie des drapeaux d'événements byte_776A6..776B3 vers
+; byte_776B4..776C3 puis remise à 0 ; dword_776A2 = Ground_HeightUnderPoint_3664D(word_79788,
+; position du joueur (word_7CADA+12h), drapeau 1) = hauteur du sol ou du pont sous le joueur
+; (0 sans joueur) ; références des cibles word_7CADC / word_7CADE (SetReference16).
+; ==============================================================================================
+Player_UpdateFrameState_2362F		proc far
 
 var_14		= word ptr -14h
 var_8		= dword ptr -8
@@ -123,7 +129,7 @@ var_2		= word ptr -2
 		push	ss
 		lea	ax, word ptr [bp+var_8]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_8]
 		mov	dword_776A2, eax
@@ -175,7 +181,7 @@ loc_23731:
 loc_23750:
 		leave
 		retf
-sub_2362F		endp
+Player_UpdateFrameState_2362F		endp
 
 ; ----------------------------------------------------------------------
 

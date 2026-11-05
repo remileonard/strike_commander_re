@@ -195,7 +195,7 @@ loc_B1AD:
 		push	ss
 		lea	ax, word ptr [bp+var_2A]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_2A]
 		cmp	eax, [bp+var_3A]
@@ -526,7 +526,7 @@ loc_B55C:
 		push	ss
 		lea	ax, word ptr [bp+var_22]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_22]
 		add	[bp+var_46], eax

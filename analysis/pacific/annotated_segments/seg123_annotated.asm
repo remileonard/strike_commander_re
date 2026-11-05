@@ -657,7 +657,7 @@ loc_50E4F:
 		mov	[bp+var_1], 1
 
 loc_50E79:
-		call	sub_2362F
+		call	Player_UpdateFrameState_2362F
 
 loc_50E7E:
 		mov	al, [bp+var_1]

@@ -42,6 +42,11 @@ DRAG_FACTOR_POSITIVE = [
     0xA8 / 256.0,
     0x54 / 256.0,
 ]
+FLIGHT_MODEL = [
+    "Ace",
+    "Veteran",
+    "Rookie",
+]
 COLOURS = [
     "#1f5f8b",
     "#c8701e",
@@ -149,7 +154,7 @@ def figure_thrust(plane, out):
         ax.text(x, ax.get_ylim()[1] * 0.97, text, rotation=90, va="top", ha="right", fontsize=8, color="#555555")
     ax.set_xlabel("vitesse (m/s)")
     ax.set_ylabel("poussée (kN), plein gaz (cran 10)")
-    ax.set_title(f"{plane.name} : poussée de l'hélice (joueur, option de difficulté à 1)")
+    ax.set_title(f"{plane.name} : poussée de l'hélice (joueur, Flight Model: Veteran)")
     ax.legend(fontsize=8)
     ax.grid(alpha=0.3)
     fig.tight_layout()
@@ -188,13 +193,13 @@ def figure_drag(plane, out):
                 values.append(-limit + (a + limit) * DRAG_FACTOR_NEGATIVE[option])
             else:
                 values.append(a)
-        ax.plot(alphas, values, color=COLOURS[option], label=f"option de difficulté {option}")
+        ax.plot(alphas, values, color=COLOURS[option], label=f"Flight Model: {FLIGHT_MODEL[option]}")
     ax.axvline(limit, color="#999999", linestyle=":", linewidth=1)
     ax.axvline(-limit, color="#999999", linestyle=":", linewidth=1)
     ax.text(limit, -25, " calage + 1", fontsize=8, color="#555555")
     ax.set_xlabel("incidence (°)")
     ax.set_ylabel("incidence comptée dans la traînée (°)")
-    ax.set_title(f"{plane.name} : traînée à forte incidence selon l'option")
+    ax.set_title(f"{plane.name} : traînée à forte incidence selon Flight Model:")
     ax.legend(fontsize=8)
     ax.grid(alpha=0.3)
     fig.tight_layout()
@@ -210,7 +215,7 @@ def figure_speeds(plane, out):
         (25.0, "au sol : roulage au manche en dessous"),
         (plane.stall_speed * 7 / 8, "décrochage, bit 1 posé (7/8)"),
         (plane.stall_speed, "décrochage (dernier champ de THRS)"),
-        (LOW_SPEED_RATIO * plane.v_ref, "puissance × option en dessous"),
+        (LOW_SPEED_RATIO * plane.v_ref, "puissance × facteur de Flight Model: en dessous"),
         (plane.v_ref, "Vref (JDYN champ 23) : puissance ÷ 2 au-dessus"),
         (2 * plane.v_ref, "vitesse maximale (2 × Vref)"),
     ]

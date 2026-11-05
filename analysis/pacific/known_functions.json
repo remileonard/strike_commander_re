@@ -6243,5 +6243,30 @@
     "new_name": "PhysicsTicks_4A8F4",
     "segment": "seg114",
     "summary": "far, 950 instructions. LUE 2026-11-05. Tick physique de l'avion (équivalent de PhysicsTicks). Ordre : gains de dégâts ([bx+34h]) ; AU SOL : joueur + variable 667 posée + vitesse < 20 m/s → au sol forcé, sol = dword_776A2 (120 m s'il est sous 10 m) ; autres : sub_3664D ; décollage (au sol effacé) si l'altitude dépasse sol + garde (Aircraft_GroundClearance_3DF89) + dword_7CDE6 (si 667 à 0) + 10 m ; sub_4B53B ; MOTEUR : carburant ≤ 0 → poussée 0 ; cran ≤ arrondi(10·g) ; poussée = Aero_PropellerThrust_4710B × g (dword_7CE36) ; carburant −= (10 − 9·dword_7CE1E)·sfc·(cran·0,199 si ≤ 5, sinon cran·0,297 ; facteur sauté au cran 0)·dt, comme STRIKE ; COMMANDES → drapeaux [si+92h] (bit 0 aérofreins, bit 1 avec son 18, bit 2 train, bits 4, 5 (méthode +44h), bits 7-8 compteur 0..2), chaque organe bloqué si détruit (octets +42h..+44h de l'objet de dégâts contre leurs maxima +7..+9) ; 1re image : bit 2 si vitesse nulle, cran 4 sinon ; PILOTE AUTOMATIQUE si jdyn[85h] ≠ 255 et bit 5 à 0 ; FORCES : Aero_SumLinearForces_486B5 ; VITESSE BORNÉE à 2 × Vref (jdyn[9Dh]) ; Aero_ControlOrchestrator_49011 ; Physics_IntegrateSecondaryPosition ; au sol sous 25 m/s : lacet = −([ctrl+21h]/16 · V)/4 (STRIKE : 40 m/s) ; Physics_IntegratePosition_462A6 ; AU SOL : vitesse projetée sur le sol, annulée sous 5/256 ; jdyn[79h] = 10, [7Dh] = 20, [81h] = 0,5 ; tangage du nez (sub_59A03) : à l'arrêt hors de 10 ± 0,5° → remis à 10° (méthode +2Ch) ; sous 20 m/s : vitesse de tangage menée vers 10°, bornée à 0,5·dt (roulette de queue)."
+  },
+  "sub_9EADA": {
+    "new_name": "Options_FlightOptionsScreen_9EADA",
+    "segment": "ovr263",
+    "summary": "far. LUE EN PARTIE 2026-11-05. Écran des options du vol (appelé par sub_739C4 avec le bloc de réglages, 63B4h = dword_7CAE4, base du segment de données 76730h). Chaque option est un widget lié à un champ du bloc (sub_A09BD : liste de valeurs ; sub_A08AE : oui/non). Relevé : « Sky Texture » +1Ah (byte_7CAFE), « Water Texture » +1Bh (byte_7CAFF), « Flight Model: » +23h (word_7CB07, valeurs Ace / Veteran / Rookie), « Easy Landings » +25h (byte_7CB09), « Enemy AI: » +2Dh (byte_7CB11, Ace / Veteran / Rookie). Libellés dans seg008 (base 54F0h)."
+  },
+  "sub_11E79": {
+    "new_name": "PilotProfile_RescaleSkillByEnemyAI_11E79",
+    "segment": "seg027",
+    "summary": "far. LUE 2026-11-05. Compétences d'un profil de pilote ([+0A3h], [+0A4h], [+0A5h]) décalées de byte_7CB11 (« Enemy AI: » : 0 Ace, 1 Veteran, 2 Rookie) vers la droite -> [+99h], [+9Eh], [+9Fh] ; niveau [+98h] = 2 si [+99h] > 12, 1 si > 6, sinon 0 (suite non lue). Équivalent de PilotProfile_RescaleSkillByDifficulty_12FC9 de STRIKE."
+  },
+  "sub_3664D": {
+    "new_name": "Ground_HeightUnderPoint_3664D",
+    "segment": "seg086",
+    "summary": "far. LUE 2026-11-05. Hauteur du sol sous un point, ponts compris : (sortie, monde, position, objet, drapeau). Altitude du terrain (Terrain_HeightSample, [monde+0BFh]) ; puis pour chacune des [monde+0B3h] surfaces d'atterrissage (liste de mots en [monde+0B5h], boîte en +0Ah de chaque objet, Camera_FrustumBoundsTest) contenant le point : si le terrain n'est pas plus haut que le point, ou drapeau ≠ 0, ou variable 668 posée -> [monde+207h] = 1 et hauteur de la surface (sub_32021) ; sinon [monde+207h] = 0 et hauteur du terrain. Origine de la liste des surfaces non lue."
+  },
+  "sub_2362F": {
+    "new_name": "Player_UpdateFrameState_2362F",
+    "segment": "seg058",
+    "summary": "far. LUE EN PARTIE 2026-11-05. Copie des drapeaux d'événements byte_776A6..776B3 vers byte_776B4..776C3 puis remise à 0 ; dword_776A2 = Ground_HeightUnderPoint_3664D(word_79788, position du joueur (word_7CADA+12h), drapeau 1) = hauteur du sol ou du pont sous le joueur (0 sans joueur) ; références des cibles word_7CADC / word_7CADE (SetReference16)."
+  },
+  "sub_B1790": {
+    "new_name": "Landing_CheckTouchdown_B1790",
+    "segment": "ovr322",
+    "summary": "far. LUE EN PARTIE 2026-11-05. Contrôle d'un posé (vitesse, roulis…). Si byte_7CB09 (« Easy Landings ») est posé : au sol directement ([objet+20h] = 1), contrôles sautés. Suite non lue."
   }
 }

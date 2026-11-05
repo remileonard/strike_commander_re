@@ -198,7 +198,7 @@ loc_96C9:
 		push	ss
 		lea	ax, word ptr [bp+var_24]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_24]
 		sar	eax, 8
@@ -1104,7 +1104,7 @@ loc_9D50:
 		push	ss
 		lea	ax, word ptr [bp+var_12]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	eax, [bp+var_12]
 		sar	eax, 8

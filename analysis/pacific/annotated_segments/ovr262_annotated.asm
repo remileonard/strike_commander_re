@@ -201,7 +201,7 @@ loc_9E169:
 		add	ax, 1Ah
 		push	word ptr [bx+5Ch]
 		push	ax
-		call	sub_11E79
+		call	PilotProfile_RescaleSkillByEnemyAI_11E79
 		add	sp, 4
 
 loc_9E18B:

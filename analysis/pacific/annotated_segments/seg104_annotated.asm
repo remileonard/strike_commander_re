@@ -1917,7 +1917,7 @@ loc_425D5:
 		push	ss
 		lea	ax, word ptr [bp+var_A]
 		push	ax
-		call	sub_3664D
+		call	Ground_HeightUnderPoint_3664D
 		add	sp, 0Ch
 		mov	bx, word_79788
 		mov	al, [bx+207h]

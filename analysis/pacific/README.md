@@ -904,9 +904,10 @@ poussée (N) = 0,8477 × 550 × P ÷ (v × 3,2773) × 4,4453 × cran ÷ 10, born
 
 Les constantes sont celles d'une formule en unités anglaises : 550 pied·livre-force par seconde et par cheval,
 3,2773 pieds par mètre, 4,4453 newtons par livre-force, rendement de l'hélice 0,8477 (`mov [bp+var_8], 22600h`,
-`472h`, `347h`, `0D9h`). Le facteur k ne s'applique qu'à basse vitesse : 1,047, 1,074 ou 1,098 selon `word_7CB07` (0, 1,
-2) pour l'avion désigné par `word_7CADA` ; 0,898, 0,949 ou 1,0 selon `byte_7CB11` pour un objet dont l'octet +51
-vaut 255 ; aucun facteur sinon. Le sens de ces deux réglages n'est pas établi.
+`472h`, `347h`, `0D9h`). Le facteur k ne s'applique qu'à basse vitesse : 1,047, 1,074 ou 1,098 selon l'option `Flight Model:`
+(`word_7CB07` : `Ace`, `Veteran`, `Rookie`) pour l'avion du joueur (`word_7CADA`) ; 0,898, 0,949 ou 1,0 selon l'option
+`Enemy AI:` (`byte_7CB11`) pour un objet dont l'octet +81 vaut 255 (objets non identifiés) ; aucun facteur sinon
+(§ 9.2).
 
 Non utilisés par cette fonction : la poussée maximale de `THRS`, ses deux premiers u8 (152 et 180 pour le Corsair ; le premier est lu dans une variable qui ne sert pas) et son 6e champ (u32, 50).
 
@@ -962,13 +963,13 @@ Un cas particulier du joueur (`byte_7CEF8` = 4 et `dword_7977E` = 1,0) ajoute le
 **2. Portance : décrochage aussi par la vitesse** (`Aero_ComputeLiftAndSideForce_47E1E`). Le décrochage (portance
 nulle, alerte) a lieu si |α| dépasse l'incidence de décrochage, comme Strike Commander, **ou si la vitesse passe sous
 la vitesse de décrochage** : partie entière du dernier champ de `THRS` (Corsair : 45 m/s), un huitième de moins quand
-le bit 1 des drapeaux est posé. Il ne touche que le joueur, et pas avec l'option `word_7CB07` = 2. Force latérale :
+le bit 1 des drapeaux est posé. Il ne touche que le joueur, et pas en `Flight Model: Rookie` (`word_7CB07` = 2). Force latérale :
 coefficient ÷ 8 au lieu de ÷ 4.
 
-**3. Traînée** (`Aero_ComputeDragWithFeedback_481AB`) : même formule, sauf l'option `word_7CB07` : la part de
+**3. Traînée** (`Aero_ComputeDragWithFeedback_481AB`) : même formule, sauf selon l'option `Flight Model:` (`word_7CB07`) : la part de
 l'incidence au-delà de (calage + 1) compte × 0,797 (incidence négative) ou × 0,656 (positive) à 1, × 0,5 ou × 0,328 à 2.
 
-![Corsair : incidence comptée dans la traînée selon l'option de difficulté](images/ps_drag_alpha.png)
+![Corsair : incidence comptée dans la traînée selon Flight Model: (Ace, Veteran, Rookie)](images/ps_drag_alpha.png)
 
 **4. Somme des forces** (`Aero_SumLinearForces_486B5`) : identique, sauf quand le bit 5 des drapeaux est posé.
 Strike Commander met alors poussée et portance à zéro ; Pacific Strike divise la poussée par 512, garde la portance et
@@ -992,10 +993,9 @@ que quand le flux vient de l'arrière.
 
 ![Corsair : tous les seuils de vitesse du modèle de vol](images/ps_speed_marks.png)
 
-**Les deux options de difficulté.** `word_7CB07` (0, 1 ou 2, 1 par défaut) donne au joueur plus de puissance à basse
-vitesse, moins de traînée à forte incidence, et à 2 supprime son décrochage. `byte_7CB11` (0 par défaut) règle la
-puissance d'autres avions (× 0,898 / 0,949 / 1,0). Chacune enlève 0,098 (à 1) ou 0,199 (à 2) au multiplicateur de score.
-Leur nom à l'écran n'a pas été trouvé.
+**Les deux options de difficulté** sont `Flight Model:` (`word_7CB07`) et `Enemy AI:` (`byte_7CB11`) de l'écran des
+options, avec les valeurs `Ace`, `Veteran`, `Rookie` (détail au § 9.2). `Flight Model:` donne au joueur plus de
+puissance à basse vitesse, moins de traînée à forte incidence, et en `Rookie` supprime son décrochage.
 
 Hors du modèle de vol de l'avion : seg111 (code sans équivalent dans STRIKE.EXE) traite des objets au sol ou des
 navires (`GroundObj_AccelerateToCruise_43156`, file radio).
@@ -1036,9 +1036,28 @@ dans `SCPlane` et remplacées par `SCJetpPlane`. Ce que chaque méthode de `PSPl
 | `updateVelocity` | vitesse plafonnée à 2 × Vref |
 | `checkStatus` | au sol : nez ramené vers 10° (roulette de queue) ; porte-avions (variable 667, niveau du sol propre) |
 
-Ce que la classe aura besoin de connaître : l'option de difficulté du joueur (`word_7CB07`, 0 à 2) et celle des autres
-avions (`byte_7CB11`), dont le nom à l'écran n'est pas encore trouvé ; le niveau du pont du porte-avions
-(`dword_776A2`, origine non lue).
+Ce que la classe aura besoin de connaître (trouvé le 2026-11-05) :
+
+- **les options du vol**, réglées dans l'écran des options (`Options_FlightOptionsScreen_9EADA`, libellés de
+  PACIFIC.EXE) ; chaque option est un champ du bloc de réglages qui commence à `dword_7CAE4` :
+
+| Libellé | Variable | Valeurs | Effet lu |
+|---|---|---|---|
+| `Flight Model:` | `word_7CB07` | 0 `Ace`, 1 `Veteran` (défaut), 2 `Rookie` | puissance du joueur à basse vitesse, traînée à forte incidence, pas de décrochage en `Rookie` (§ 9, § 9.1) |
+| `Enemy AI:` | `byte_7CB11` | 0 `Ace` (défaut), 1 `Veteran`, 2 `Rookie` | compétences des pilotes de l'IA divisées par 1, 2 ou 4 (`PilotProfile_RescaleSkillByEnemyAI_11E79`) ; puissance de certains avions × 0,898 / 0,949 / 1,0 |
+| `Easy Landings` | `byte_7CB09` | oui / non | contrôles du posé sautés : l'avion est posé directement (`Landing_CheckTouchdown_B1790`) |
+| `Sky Texture` | `byte_7CAFE` | oui / non | plan de ciel texturé (§ 7.2) |
+| `Water Texture` | `byte_7CAFF` | oui / non | plan d'eau texturé (§ 7.2) |
+
+  `Flight Model:` et `Enemy AI:` retirent chacune 0,098 (`Veteran`) ou 0,199 (`Rookie`) au multiplicateur de score.
+
+- **la hauteur sous le joueur** (`dword_776A2`) : recalculée à chaque image (`Player_UpdateFrameState_2362F`) par
+  `Ground_HeightUnderPoint_3664D`, la même fonction qui donne le sol des autres avions dans le tick. Elle part de
+  l'altitude du terrain, puis parcourt une liste de **surfaces d'atterrissage** rangée dans le monde : si l'avion est
+  dans la boîte d'une de ces surfaces, elle rend la hauteur de la surface (le pont) au lieu du terrain, et marque
+  « sur une surface ». C'est donc la hauteur du pont quand le joueur est au-dessus d'un porte-avions. Non lu : qui
+  remplit la liste des surfaces, le calcul de la hauteur de surface (`sub_32021`), et le rôle des variables 667
+  et 668 de la table commune qui interviennent dans ces tests.
 
 Le code sera écrit après la relecture de cette section (fichiers complets de libRealSpace modifiés, comme pour les
 missions).
