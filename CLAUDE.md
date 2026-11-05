@@ -281,6 +281,8 @@ strike_commander_re/
 │   │                                  (GAMEFLOW.IFF, 42 commandes, variables et drapeaux, date) et conversations
 │   │                                  (CONV.PAK compressé, commandes, voix) comparés à Strike Commander ;
 │   │                                  PACIFIC_GAMEFLOW_CONV.html = version illustrée (images/, tools/ps_doc_images.py)
+│   │                                  ; PACIFIC_TERRAIN.html (terrain, pistes, sol, eau) et PACIFIC_PHYSIQUE.html (objets 3D,
+│   │                                  FORM DYNM, modèle de vol, PSEntity / PSPlane prévus ; tools/ps_physics_figures.py)
 │   ├── topt/                        analyse de TOPTTST1.EXE (Tactical Operations, --exe topt) : README.md,
 │   │                                  known_functions, cinématiques (midgames/, iff/), midgame_engine.json porté
 │   ├── optest/                      analyse d'OPTEST.EXE : mêmes fichiers que ci-dessous
