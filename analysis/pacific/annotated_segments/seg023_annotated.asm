@@ -7,7 +7,13 @@ seg023		segment	para public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_C2A8		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Même rôle que Goal_SetObjective_A307 : refuse tout ordre si
+; [entité+355] ≠ 0 ; liste de 21 ordres (word_C6E8, cibles à +42). 167, 173, 174, 175 : cible
+; → [entité+291] (sub_39519), ordre → [entité+265]. 168 et 112 partagent un cas, 169 et 191 un
+; autre ; 193 a le sien. Fin : Goal_IsComplete_C73C.
+; ==============================================================================================
+Goal_SetObjective_C2A8		proc far
 
 var_82		= word ptr -82h
 var_5E		= dword ptr -5Eh
@@ -386,7 +392,7 @@ loc_C6C2:
 		push	bx
 		nop
 		push	cs
-		call	near ptr sub_C73C
+		call	near ptr Goal_IsComplete_C73C
 		add	sp, 4
 		or	al, al
 		jz	short loc_C6E2
@@ -403,9 +409,9 @@ loc_C6E4:
 		pop	si
 		leave
 		retf
-sub_C2A8		endp
+Goal_SetObjective_C2A8		endp
 
-; START OF FUNCTION CHUNK FOR sub_C2A8
+; START OF FUNCTION CHUNK FOR Goal_SetObjective_C2A8
 word_C6E8	dw 70h
 		dw 0A1h
 		dw 0A2h
@@ -448,13 +454,17 @@ off_C712	dw offset loc_C2E8
 		dw offset loc_C685
 		dw offset loc_C325
 		dw offset loc_C425
-; END OF FUNCTION CHUNK FOR sub_C2A8
+; END OF FUNCTION CHUNK FOR Goal_SetObjective_C2A8
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_C73C		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Selon [entité+265] (liste de 15 valeurs, word_C8E0) : 167, 173, 174 et
+; 175 partagent un cas, 112 et 168 un autre.
+; ==============================================================================================
+Goal_IsComplete_C73C		proc far
 
 var_28		= dword ptr -28h
 var_24		= dword ptr -24h
@@ -650,9 +660,9 @@ loc_C8DA:
 		pop	si
 		leave
 		retf
-sub_C73C		endp
+Goal_IsComplete_C73C		endp
 
-; START OF FUNCTION CHUNK FOR sub_C73C
+; START OF FUNCTION CHUNK FOR Goal_IsComplete_C73C
 word_C8E0	dw 0FFFFh
 		dw 70h
 		dw 0A1h
@@ -683,7 +693,7 @@ off_C8FE	dw offset loc_C76C
 		dw offset loc_C8BC
 		dw offset loc_C8BC
 		dw offset loc_C78C
-; END OF FUNCTION CHUNK FOR sub_C73C
+; END OF FUNCTION CHUNK FOR Goal_IsComplete_C73C
 
 ; ----------------------------------------------------------------------
 
@@ -795,7 +805,13 @@ sub_C93E		endp
 
 ; Attributes: bp-based frame
 
-sub_C9E4		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Traitement de l'ordre en cours [entité+265] (liste de 14 valeurs,
+; word_CFC9) : 174 = cas de 167, 175 = cas de 173. Cible au sol (octet +23 = 2) : demande au
+; nœud d'attaque au sol [entité+196] (méthodes +4 puis +8) avec le mode 0 (167, 174) ou 1
+; (173, 175) ; autre cible : sub_B968 pour 167/174, échec pour 173/175.
+; ==============================================================================================
+Goal_ExecuteObjective_C9E4		proc far
 
 var_46		= dword ptr -46h
 var_42		= dword ptr -42h
@@ -829,7 +845,7 @@ arg_0		= dword ptr  6
 		push	si
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_C73C
+		call	near ptr Goal_IsComplete_C73C
 		add	sp, 4
 		mov	[bp+var_1], al
 		les	bx, word ptr [bp+arg_0]
@@ -1394,9 +1410,9 @@ loc_CFC3:
 		pop	si
 		leave
 		retf
-sub_C9E4		endp
+Goal_ExecuteObjective_C9E4		endp
 
-; START OF FUNCTION CHUNK FOR sub_C9E4
+; START OF FUNCTION CHUNK FOR Goal_ExecuteObjective_C9E4
 word_CFC9	dw 0FFFFh
 		dw 0A1h
 		dw 0A2h
@@ -1425,7 +1441,7 @@ off_CFE5	dw offset loc_CC00
 		dw offset loc_CC62
 		dw offset loc_CD1F
 		dw offset loc_CC00
-; END OF FUNCTION CHUNK FOR sub_C9E4
+; END OF FUNCTION CHUNK FOR Goal_ExecuteObjective_C9E4
 
 ; ----------------------------------------------------------------------
 

@@ -72,7 +72,7 @@ loc_84360:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_843EA
+		call	near ptr PilotProfile_LoadFromPROF_843EA
 		add	sp, 4
 
 loc_843E8:
@@ -84,7 +84,12 @@ sub_84340		endp
 
 ; Attributes: bp-based frame
 
-sub_843EA		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. (structure) Lit INTEL\\<nom>.IFF : PROF, _AI_, MVRS, GOAL ; crée les
+; nœuds d'IA, dont le nœud n° 19 (attaque au sol, 72 octets, table 4C8h) rangé en
+; [entité+196].
+; ==============================================================================================
+PilotProfile_LoadFromPROF_843EA		proc far
 
 var_148		= word ptr -148h
 var_EB		= dword ptr -0EBh
@@ -651,7 +656,7 @@ loc_849CE:
 		pop	si
 		leave
 		retf
-sub_843EA		endp
+PilotProfile_LoadFromPROF_843EA		endp
 
 ; ----------------------------------------------------------------------
 

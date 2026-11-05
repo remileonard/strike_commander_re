@@ -119,7 +119,7 @@ sub_72F8C	endp
 ; Attributes: thunk
 
 sub_72F91	proc far
-		jmp	sub_843EA
+		jmp	PilotProfile_LoadFromPROF_843EA
 sub_72F91	endp
 
 ; ----------------------------------------------------------------------

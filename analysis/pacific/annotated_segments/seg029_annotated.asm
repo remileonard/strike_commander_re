@@ -34,7 +34,13 @@ sub_1379C		endp
 
 ; Attributes: bp-based frame
 
-sub_137A1		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Nœud 19, méthode +4 : cible = demande, ou [entité+291], ou [entité+497]
+; ; doit être au sol (octet +23 = 2). Sans arme ([emport+36] < 1), ou navire (classe 23 ou 24)
+; sans arme des masques 31 / 64 : 10 si l'octet +101 de la description de l'avion vaut 4 ou si
+; l'octet +10 de la demande ≠ 0, sinon 0 ; avec arme : 9, 7 ou 1.
+; ==============================================================================================
+GroundAttack_CanEngage_137A1		proc far
 
 var_14		= word ptr -14h
 var_12		= byte ptr -12h
@@ -231,13 +237,18 @@ loc_13952:
 		pop	si
 		leave
 		retf
-sub_137A1		endp
+GroundAttack_CanEngage_137A1		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_13956		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Nœud 19, méthode +8 : si l'octet +101 de la description de l'avion vaut
+; 4 ou si l'octet +10 de la demande ≠ 0 : phase 6 ([nœud+50] = 6), [nœud+45] = 4,0 ; sinon
+; déroulement normal.
+; ==============================================================================================
+GroundAttack_Start_13956		proc far
 
 var_5C		= dword ptr -5Ch
 var_58		= dword ptr -58h
@@ -569,9 +580,9 @@ loc_13C84:
 		pop	si
 		leave
 		retf
-sub_13956		endp
+GroundAttack_Start_13956		endp
 
-; START OF FUNCTION CHUNK FOR sub_13956
+; START OF FUNCTION CHUNK FOR GroundAttack_Start_13956
 word_13C8B	dw 8
 		dw 9
 		dw 0Dh
@@ -580,13 +591,17 @@ off_13C93	dw offset loc_13C34
 		dw offset loc_13AD4
 		dw offset loc_13BFF
 		dw offset loc_13B98
-; END OF FUNCTION CHUNK FOR sub_13956
+; END OF FUNCTION CHUNK FOR GroundAttack_Start_13956
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_13C9B		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Nœud 19, méthode +12 : joue la phase [nœud+50] (12 phases, table
+; off_13F27).
+; ==============================================================================================
+GroundAttack_PhaseDispatch_13C9B		proc far
 
 var_60		= dword ptr -60h
 var_5C		= dword ptr -5Ch
@@ -847,14 +862,14 @@ loc_13EFD:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_14FBE
+		call	near ptr GroundAttack_Phase6_14FBE
 		jmp	loc_13E10
 
 loc_13F09:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_1542B
+		call	near ptr GroundAttack_Phase7_1542B
 		jmp	loc_13E10
 
 loc_13F15:
@@ -871,9 +886,9 @@ loc_13F24:
 		pop	si
 		leave
 		retf
-sub_13C9B		endp
+GroundAttack_PhaseDispatch_13C9B		endp
 
-; START OF FUNCTION CHUNK FOR sub_13C9B
+; START OF FUNCTION CHUNK FOR GroundAttack_PhaseDispatch_13C9B
 off_13F27	dw offset loc_13E9D
 		dw offset loc_13EA9
 		dw offset loc_13EB5
@@ -886,7 +901,7 @@ off_13F27	dw offset loc_13E9D
 		dw offset loc_13F21
 		dw offset loc_13ED9
 		dw offset loc_13EE5
-; END OF FUNCTION CHUNK FOR sub_13C9B
+; END OF FUNCTION CHUNK FOR GroundAttack_PhaseDispatch_13C9B
 
 ; ----------------------------------------------------------------------
 
@@ -2463,7 +2478,11 @@ sub_14EDF		endp
 
 ; Attributes: bp-based frame
 
-sub_14FBE		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Phase 6 : dirige l'avion vers la cible (sub_A41D) ; aligné et assez
+; près, phase 7 ([nœud+45] = 25,0). Aucun largage d'arme.
+; ==============================================================================================
+GroundAttack_Phase6_14FBE		proc far
 
 var_106		= dword ptr -106h
 var_102		= dword ptr -102h
@@ -2863,13 +2882,18 @@ loc_15427:
 		pop	si
 		leave
 		retf
-sub_14FBE		endp
+GroundAttack_Phase6_14FBE		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_1542B		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Phase 7 : [nœud+71] = 1, [entité+361] = 1, garde la direction ; si
+; dword_7C837 < 250 : +20 par tour sur [[avion+99]+62] jusqu'à [[avion+99]+3]. Aucun largage
+; d'arme.
+; ==============================================================================================
+GroundAttack_Phase7_1542B		proc far
 
 arg_0		= word ptr  6
 
@@ -2913,7 +2937,7 @@ arg_0		= word ptr  6
 loc_154AE:
 		pop	bp
 		retf
-sub_1542B		endp
+GroundAttack_Phase7_1542B		endp
 
 ; ----------------------------------------------------------------------
 

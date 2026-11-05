@@ -5973,5 +5973,50 @@
     "new_name": "WorldObjects_FindNextOfType_1E6E1",
     "segment": "seg050",
     "summary": "far. LUE 2026-11-05. (liste, type, camp, précédent) : objet suivant dont l'octet +53 de la description vaut type et, pour un objet de la classe 16 ([objet+2] & 16), dont le camp [objet+81] vaut camp."
+  },
+  "sub_C2A8": {
+    "new_name": "Goal_SetObjective_C2A8",
+    "segment": "seg023",
+    "summary": "far. LUE 2026-11-05. Même rôle que Goal_SetObjective_A307 : refuse tout ordre si [entité+355] ≠ 0 ; liste de 21 ordres (word_C6E8, cibles à +42). 167, 173, 174, 175 : cible → [entité+291] (sub_39519), ordre → [entité+265]. 168 et 112 partagent un cas, 169 et 191 un autre ; 193 a le sien. Fin : Goal_IsComplete_C73C."
+  },
+  "sub_C73C": {
+    "new_name": "Goal_IsComplete_C73C",
+    "segment": "seg023",
+    "summary": "far. LUE 2026-11-05. Selon [entité+265] (liste de 15 valeurs, word_C8E0) : 167, 173, 174 et 175 partagent un cas, 112 et 168 un autre."
+  },
+  "sub_C9E4": {
+    "new_name": "Goal_ExecuteObjective_C9E4",
+    "segment": "seg023",
+    "summary": "far. LUE 2026-11-05. Traitement de l'ordre en cours [entité+265] (liste de 14 valeurs, word_CFC9) : 174 = cas de 167, 175 = cas de 173. Cible au sol (octet +23 = 2) : demande au nœud d'attaque au sol [entité+196] (méthodes +4 puis +8) avec le mode 0 (167, 174) ou 1 (173, 175) ; autre cible : sub_B968 pour 167/174, échec pour 173/175."
+  },
+  "sub_843EA": {
+    "new_name": "PilotProfile_LoadFromPROF_843EA",
+    "segment": "ovr236",
+    "summary": "far. LUE 2026-11-05. (structure) Lit INTEL\\\\<nom>.IFF : PROF, _AI_, MVRS, GOAL ; crée les nœuds d'IA, dont le nœud n° 19 (attaque au sol, 72 octets, table 4C8h) rangé en [entité+196]."
+  },
+  "sub_137A1": {
+    "new_name": "GroundAttack_CanEngage_137A1",
+    "segment": "seg029",
+    "summary": "far. LUE 2026-11-05. Nœud 19, méthode +4 : cible = demande, ou [entité+291], ou [entité+497] ; doit être au sol (octet +23 = 2). Sans arme ([emport+36] < 1), ou navire (classe 23 ou 24) sans arme des masques 31 / 64 : 10 si l'octet +101 de la description de l'avion vaut 4 ou si l'octet +10 de la demande ≠ 0, sinon 0 ; avec arme : 9, 7 ou 1."
+  },
+  "sub_13956": {
+    "new_name": "GroundAttack_Start_13956",
+    "segment": "seg029",
+    "summary": "far. LUE 2026-11-05. Nœud 19, méthode +8 : si l'octet +101 de la description de l'avion vaut 4 ou si l'octet +10 de la demande ≠ 0 : phase 6 ([nœud+50] = 6), [nœud+45] = 4,0 ; sinon déroulement normal."
+  },
+  "sub_13C9B": {
+    "new_name": "GroundAttack_PhaseDispatch_13C9B",
+    "segment": "seg029",
+    "summary": "far. LUE 2026-11-05. Nœud 19, méthode +12 : joue la phase [nœud+50] (12 phases, table off_13F27)."
+  },
+  "sub_14FBE": {
+    "new_name": "GroundAttack_Phase6_14FBE",
+    "segment": "seg029",
+    "summary": "far. LUE 2026-11-05. Phase 6 : dirige l'avion vers la cible (sub_A41D) ; aligné et assez près, phase 7 ([nœud+45] = 25,0). Aucun largage d'arme."
+  },
+  "sub_1542B": {
+    "new_name": "GroundAttack_Phase7_1542B",
+    "segment": "seg029",
+    "summary": "far. LUE 2026-11-05. Phase 7 : [nœud+71] = 1, [entité+361] = 1, garde la direction ; si dword_7C837 < 250 : +20 par tour sur [[avion+99]+62] jusqu'à [[avion+99]+3]. Aucun largage d'arme."
   }
 }

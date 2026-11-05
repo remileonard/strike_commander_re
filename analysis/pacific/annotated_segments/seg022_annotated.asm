@@ -375,7 +375,7 @@ loc_B46E:
 		cmp	word_7977C, 5
 		jbe	short loc_B4AF
 		push	large [bp+arg_0]
-		call	sub_C9E4
+		call	Goal_ExecuteObjective_C9E4
 
 loc_B48F:
 		add	sp, 4

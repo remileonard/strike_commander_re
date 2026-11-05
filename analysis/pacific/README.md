@@ -340,8 +340,8 @@ traitées, et 12 de plus :
 | 156 | `OP_DETACH_CARRIED`\* | 4 | libère l'objet porté par l'objet du monde (`[objet+120]`, `sub_74144`) et le remet à 0. Exemple `IJOK-M3` : avant que le `BETTY` lâche son `BAKA` |
 | 157 | `OP_LAUNCH_FROM_OBJ`\* | 16 | **objet A, objet B, `SPOT`** : fait apparaître A (`PartEntry_ResolveSpawnPositionAndActivate_5313D`), le place au point `SPOT` pris dans le repère de B, et lui donne l'orientation de B (méthodes +60 et +64). Exemples : `IJOK-M3` lâche l'avion-suicide `BAKA` sous le bombardier `BETTY` ; `IJOK-M4` fait partir un siège éjectable (`EJECSEAJ`) d'un `BETTY` |
 | 173 | `OP_SET_OBJ_DESTROY_TARGET_B`\* | 1 | même traitement que `OP_SET_OBJ_DESTROY_TARGET` (167) |
-| 174 | `OP_ORDER_RANDOM_ENEMY_OF_TYPE`\* | 1 279 | si +68 est vide : choisit au hasard un objet du camp adverse et du type n (`MissionScript_PickRandomObjectOfType_545A4`) et le garde en +68 ; puis vise sa position. Rien de trouvé : l'ordre échoue |
-| 175 | `OP_ORDER_RANDOM_ENEMY_OF_TYPE_B`\* | 4 | même traitement que 174 |
+| 174 | `OP_ATTACK_RANDOM_ENEMY_OF_TYPE`\* | 1 279 | si +68 est vide : choisit au hasard un objet du camp adverse et du type n (`MissionScript_PickRandomObjectOfType_545A4`) et le garde en +68 ; puis vise sa position. Rien de trouvé : l'ordre échoue. Côté IA : même traitement que `OP_SET_OBJ_DESTROY_TARGET` (§ 6.6) |
+| 175 | `OP_DIVE_ON_RANDOM_ENEMY_OF_TYPE`\* | 4 | même choix de cible que 174 ; côté IA, contre une cible au sol, l'attaque passe directement aux phases 6 et 7 sans exiger d'arme (§ 6.6). Données : `175 8`, dans `IJOK-M1`, `IJOK-M3`, `LYTG-M2` |
 | 193 | `OP_ORDER_OBJ_AND_SPOT`\* | 48 | ordre avec un objet (2ᵉ argument) et un `SPOT` (3ᵉ argument ; 65 535 = erreur) |
 
 **Numéros d'objet.** Dans les scripts, un objet est désigné par le numéro écrit dans les 2 premiers octets de son
@@ -354,6 +354,62 @@ est une position du monde.
 objets du monde (`WorldObjects_FindNextOfType_1E6E1`) et retient ceux dont l'octet +53 de la description vaut n et, pour les objets de la
 classe 16, dont le camp (`[objet+81]`) est celui demandé ; elle en garde 6 au plus et en tire un au hasard
 (`CRT_Rand`). Pour 174 et 175, le camp demandé est l'inverse de celui de l'objet (−1 ↔ 1).
+
+### 6.6 Fin du gestionnaire d'ordres, et ce que l'IA fait de 174 et 175
+
+**Fin de `MissionScript_CallNativeHandler_53B0B`** (même code que la fin de `MissionScript_CallNativeHandler_52513`) :
+chaque ordre calcule une position (et parfois un objet cible, et un pointeur de données), puis :
+
+- résultat −2 (cible introuvable) : l'ordre rend 0 ;
+- résultat −1 : l'ordre rend 1 sans rien transmettre ;
+- sinon : appel de la méthode +140 de l'objet du monde (`call dword ptr [bx+8Ch]` ; +136 dans STRIKE.EXE) avec le
+  numéro de l'ordre, l'objet du monde de la cible, la position et le pointeur de données ; sa valeur est rendue.
+  Un ordre absent de la liste des 22 arrive aussi ici, sans position calculée (comme le cas par défaut de STRIKE.EXE).
+
+Pour un avion, cette méthode transmet l'ordre à son entité IA. **`Goal_SetObjective_C2A8`** (pas de nom avant ; même
+rôle que `Goal_SetObjective_A307`) cherche le numéro dans une liste de 21 ordres :
+
+| Ordres | Traitement commun |
+|---|---|
+| `OP_SET_OBJ_DESTROY_TARGET` (167), 173, 174, 175 | cible → `[entité+291]` ; numéro de l'ordre → `[entité+265]` (ordre en cours) |
+| `OP_SET_OBJ_DEFEND_TARGET` (168), 112 | même cas |
+| `OP_SET_OBJ_DEFEND_AREA` (169), `OP_SET_OBJ_PATROL_POSITION` (191) | même cas |
+| 193 | son propre cas |
+
+Si l'octet `[entité+355]` n'est pas nul, aucun ordre n'est pris (comme le bit 5 de `[entité+651]` dans STRIKE.EXE).
+`Goal_IsComplete_C73C` traite aussi 167, 173, 174 et 175 de la même façon.
+
+**La différence est dans le traitement de l'ordre en cours, `Goal_ExecuteObjective_C9E4`** : 174 y partage le cas de
+167, 175 celui de 173. Les deux cas lisent la cible (`[entité+291]`) et, si c'est une cible au sol (octet +23 de sa
+description = 2), préparent une demande pour le nœud d'IA **n° 19, l'attaque au sol** (objet `[entité+196]`, créé par
+`PilotProfile_LoadFromPROF_843EA` avec l'identifiant 19 ; dans STRIKE.EXE `GroundAttack_CanEngage_77000`) :
+
+| | 167 et 174 | 173 et 175 |
+|---|---|---|
+| octet +10 de la demande (mode) | 0 | **1** |
+| cible qui n'est pas au sol | `sub_B968` (pas encore nommée) | la fonction rend 0 |
+| `dword_776AF` | mis à 1 si le registre `dl` n'est pas nul en entrant dans le cas (origine non lue) | non touché |
+
+Ce que le nœud fait du mode :
+
+- `GroundAttack_CanEngage_137A1` (méthode +4) : si l'avion n'a pas d'arme utilisable (`[emport+36]` < 1), ou si la
+  cible est un navire (classe 23 ou 24) sans arme des masques 31 ou 64, l'attaque est acceptée (valeur 10) **si le mode
+  vaut 1, ou si l'octet +101 de la description de l'avion vaut 4** ; sinon refusée (0). Avec une arme adaptée, les
+  valeurs 9, 7 ou 1 viennent des armes.
+- `GroundAttack_Start_13956` (méthode +8) : même condition (mode 1 ou octet +101 = 4) → l'attaque commence
+  **directement à la phase 6**, avec la valeur 4,0 en `[nœud+45]` ; sinon, déroulement normal.
+- `GroundAttack_PhaseDispatch_13C9B` (méthode +12) joue la phase en cours (12 phases) :
+  - phase 6 (`GroundAttack_Phase6_14FBE`) : l'avion se dirige vers la cible (`sub_A41D`) ; aligné et assez près,
+    passe à la phase 7 ;
+  - phase 7 (`GroundAttack_Phase7_1542B`) : garde le cap vers la cible et augmente de 20 par tour un réglage de l'avion
+    (`[avion+99]` → +62) jusqu'à son maximum (+3), quand `dword_7C837` < 250.
+  - **Aucun largage d'arme n'est appelé dans ces deux phases.**
+
+En résumé : 174 = attaquer une cible ennemie tirée au hasard, comme un ordre de destruction ordinaire ; 175 = même
+cible, mais contre une cible au sol l'avion fonce dessus (phases 6 et 7) sans avoir besoin d'arme. Les 3 missions qui
+emploient 175 (`IJOK-M1`, `IJOK-M3`, `LYTG-M2`) sont celles d'Iwo Jima, d'Okinawa et de Leyte, et l'octet +101 = 4 donne
+le même comportement à certains avions : **cela ressemble à une attaque kamikaze, mais ce n'est pas établi** (ni
+l'impact ni le sens de la valeur 4 n'ont été lus).
 
 ## 5. Rapport avec libRealSpace
 
