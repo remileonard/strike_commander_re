@@ -904,9 +904,20 @@ Les constantes sont celles d'une formule en unités anglaises : 550 pied·livre-
 2) pour l'avion désigné par `word_7CADA` ; 0,898, 0,949 ou 1,0 selon `byte_7CB11` pour un objet dont l'octet +51
 vaut 255 ; aucun facteur sinon. Le sens de ces deux réglages n'est pas établi.
 
-Non utilisés par cette fonction : la poussée maximale de `THRS`, ses deux premiers u8 (152 et 180 pour le Corsair ; le premier est lu dans une variable qui ne sert pas) et son 6e champ (u32, 50). Les champs 23 et 26
-de `JDYN` sont, dans Strike Commander, des réglages de l'IA (vitesse de poursuite maximale, seuil de portée,
-PHYSICS.md) ; dans Pacific Strike, la poussée les lit aussi. Le reste du modèle de vol (forces, moments, `ATMO`,
+Non utilisés par cette fonction : la poussée maximale de `THRS`, ses deux premiers u8 (152 et 180 pour le Corsair ; le premier est lu dans une variable qui ne sert pas) et son 6e champ (u32, 50). 
+
+**Les champs 23 et 26 de `JDYN`.** Ce sont deux valeurs à la même place dans le chunk des deux jeux : le champ 23 est un
+mot à l'octet 61, le champ 26 un u32 à l'octet 67. Ce qui change, c'est le code qui les lit :
+
+- dans Strike Commander, seule l'IA les lit, jamais la physique du joueur (PHYSICS.md) : champ 23 = vitesse maximale de
+  poursuite (500 par défaut), champ 26 = seuil de portée (11 005 par défaut) ;
+- dans Pacific Strike, la poussée les lit : champ 23 = vitesse de référence (197 m/s pour le Corsair ; sous 65 % de cette
+  vitesse la puissance reçoit le facteur k, au-dessus elle est divisée par 2), champ 26 = altitude à partir de laquelle
+  le moteur perd de la puissance (6 098 m, soit 20 000 pieds, pour le Corsair ; baisse en ligne droite jusqu'au plafond
+  de `THRS`).
+
+Pour libRealSpace : en lisant un `JDYN` de Pacific Strike, ces deux champs servent à la poussée. Non vérifié : si l'IA
+de Pacific Strike les lit encore comme dans Strike Commander. Le reste du modèle de vol (forces, moments, `ATMO`,
 `STBL`) n'a pas encore été comparé.
 
 ## 5. Rapport avec libRealSpace
