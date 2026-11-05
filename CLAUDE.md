@@ -245,7 +245,8 @@ visionneuse d'objets 3D (`objview.pak`), générique et score final.
 - Tous les outils de consultation et de génération prennent **`--exe optest`** (défaut `strike`),
   chemins dans `tools/exe_paths.py`. Troisième exécutable : **`--exe topt`** = `TOPTTST1.EXE` de
   Tactical Operations, sans base IDA (listing reconstruit, `analysis/topt/README.md`). Quatrième : **`--exe pacific`** = `PACIFIC.EXE` de Pacific Strike
-  (vol et hors-vol dans un seul exécutable ; `analysis/pacific/README.md`).
+  (vol et hors-vol dans un seul exécutable ; `analysis/pacific/README.md`). Cinquième : **`--exe wings`** =
+  `WINGS_OF.EXE` de Wings of Glory (vol et hors-vol ; `analysis/wings/README.md`).
 - **Noms repris de STRIKE.EXE** par `tools/match_functions.py --write` : 567 fonctions dont le
   code est identique (412) ou de même suite d'instructions avec des adresses de données
   différentes (155, « à vérifier »), appels sortants contrôlés. Leur résumé commence par
@@ -274,8 +275,10 @@ strike_commander_re/
 │   ├── optest.map                   fichier map d'OPTEST.EXE
 │   ├── topttst1.asm                 TOPTTST1.EXE (Tactical Operations), listing reconstruit au format IDA
 │   │                                  par tools/vroomm_listing.py — analysis/topt/README.md
-│   └── pacific.asm                  PACIFIC.EXE (Pacific Strike, vol et hors-vol), listing reconstruit
-│                                      (--exe pacific) — analysis/pacific/README.md
+│   ├── pacific.asm                  PACIFIC.EXE (Pacific Strike, vol et hors-vol), listing reconstruit
+│   │                                  (--exe pacific) — analysis/pacific/README.md
+│   └── wings.asm                    WINGS_OF.EXE (Wings of Glory, vol et hors-vol), listing reconstruit
+│                                      (--exe wings) — analysis/wings/README.md
 ├── analysis/
 │   ├── pacific/                     analyse de PACIFIC.EXE (Pacific Strike, --exe pacific) : README.md = déroulement
 │   │                                  (GAMEFLOW.IFF, 42 commandes, variables et drapeaux, date) et conversations
@@ -283,6 +286,8 @@ strike_commander_re/
 │   │                                  PACIFIC_GAMEFLOW_CONV.html = version illustrée (images/, tools/ps_doc_images.py)
 │   │                                  ; PACIFIC_TERRAIN.html (terrain, pistes, sol, eau) et PACIFIC_PHYSIQUE.html (objets 3D,
 │   │                                  FORM DYNM, modèle de vol, PSEntity / PSPlane prévus ; tools/ps_physics_figures.py)
+│   ├── wings/                       analyse de WINGS_OF.EXE (Wings of Glory, --exe wings) : README.md, noms repris de
+│   │                                  PACIFIC, STRIKE et OPTEST (match_functions.py), annotated_segments/
 │   ├── topt/                        analyse de TOPTTST1.EXE (Tactical Operations, --exe topt) : README.md,
 │   │                                  known_functions, cinématiques (midgames/, iff/), midgame_engine.json porté
 │   ├── optest/                      analyse d'OPTEST.EXE : mêmes fichiers que ci-dessous

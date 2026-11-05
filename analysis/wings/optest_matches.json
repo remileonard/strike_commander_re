@@ -1,0 +1,5250 @@
+{
+ "sub_145B0": {
+  "segment": "seg027",
+  "kind": "approchée",
+  "instructions": 12,
+  "candidates": {
+   "sub_3E9EE": "TextScroll_RegisterHandler_3E9EE"
+  },
+  "chosen": null
+ },
+ "sub_161": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_163": "Ovl_CopyStubTable"
+  },
+  "chosen": "sub_163",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_167BE": {
+  "segment": "seg027",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_3B8F8": "StreamReader_ComputeHeaderOffset_3B8F8"
+  },
+  "chosen": null
+ },
+ "sub_167CB": {
+  "segment": "seg027",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_3B8F8": "StreamReader_ComputeHeaderOffset_3B8F8"
+  },
+  "chosen": null
+ },
+ "sub_16F21": {
+  "segment": "seg029",
+  "kind": "approchée",
+  "instructions": 12,
+  "candidates": {
+   "sub_9D32": "TalkingHead_SetBaseFrame_9D32"
+  },
+  "chosen": "sub_9D32",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_17AD7": {
+  "segment": "seg029",
+  "kind": "approchée",
+  "instructions": 11,
+  "candidates": {
+   "sub_7A3D": "VoicePlayer_SetDriver_7A3D",
+   "sub_94F4": "ScaledImageLayer_SetScale_94F4",
+   "sub_ADB7": "TextLayer_SetText_ADB7",
+   "sub_BA1C": "MovingMaskLayer_SetTable_BA1C"
+  },
+  "chosen": null
+ },
+ "sub_17D4A": {
+  "segment": "seg029",
+  "kind": "approchée",
+  "instructions": 11,
+  "candidates": {
+   "sub_7A3D": "VoicePlayer_SetDriver_7A3D",
+   "sub_94F4": "ScaledImageLayer_SetScale_94F4",
+   "sub_ADB7": "TextLayer_SetText_ADB7",
+   "sub_BA1C": "MovingMaskLayer_SetTable_BA1C"
+  },
+  "chosen": null
+ },
+ "sub_19108": {
+  "segment": "seg032",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_2E2C3": "Layer_Advance_2E2C3",
+   "sub_3C5C8": "ResourceRecord_ResetIfSet_3C5C8"
+  },
+  "chosen": null
+ },
+ "sub_19244": {
+  "segment": "seg032",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_311CF": "GlyphObject_ConstructWithBuffer_311CF"
+  },
+  "chosen": "sub_311CF",
+  "calls_confirmed": 1,
+  "operand_diffs": 7
+ },
+ "sub_19784": {
+  "segment": "seg034",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_3D231": "StreamReader_DestructWrapper_3D231"
+  },
+  "chosen": "sub_3D231",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_19CF": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 46,
+  "candidates": {
+   "sub_149E": "PIT_DelayLoop"
+  },
+  "chosen": "sub_149E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1A6AA": {
+  "segment": "seg036",
+  "kind": "approchée",
+  "instructions": 42,
+  "candidates": {
+   "sub_783A": "Music_ChannelStopSequence_783A"
+  },
+  "chosen": "sub_783A",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_1B36": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_14FF": "CRT_InstallProtectedHandler"
+  },
+  "chosen": "sub_14FF",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1C067": {
+  "segment": "seg040",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_2E202": "Layer_DrawAtOwnPos_2E202"
+  },
+  "chosen": "sub_2E202",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1C0BF": {
+  "segment": "seg040",
+  "kind": "approchée",
+  "instructions": 11,
+  "candidates": {
+   "sub_7A3D": "VoicePlayer_SetDriver_7A3D",
+   "sub_94F4": "ScaledImageLayer_SetScale_94F4",
+   "sub_ADB7": "TextLayer_SetText_ADB7",
+   "sub_BA1C": "MovingMaskLayer_SetTable_BA1C"
+  },
+  "chosen": null
+ },
+ "sub_1C0CF": {
+  "segment": "seg040",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_94F4": "ScaledImageLayer_SetScale_94F4"
+  },
+  "chosen": "sub_94F4",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1C0DF": {
+  "segment": "seg040",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_BA1C": "MovingMaskLayer_SetTable_BA1C"
+  },
+  "chosen": "sub_BA1C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1C1F6": {
+  "segment": "seg040",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_2E202": "Layer_DrawAtOwnPos_2E202"
+  },
+  "chosen": "sub_2E202",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1C24E": {
+  "segment": "seg040",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_BA1C": "MovingMaskLayer_SetTable_BA1C"
+  },
+  "chosen": "sub_BA1C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1C25E": {
+  "segment": "seg040",
+  "kind": "approchée",
+  "instructions": 11,
+  "candidates": {
+   "sub_7A3D": "VoicePlayer_SetDriver_7A3D",
+   "sub_94F4": "ScaledImageLayer_SetScale_94F4",
+   "sub_ADB7": "TextLayer_SetText_ADB7",
+   "sub_BA1C": "MovingMaskLayer_SetTable_BA1C"
+  },
+  "chosen": null
+ },
+ "sub_1C310": {
+  "segment": "seg040",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_2E202": "Layer_DrawAtOwnPos_2E202"
+  },
+  "chosen": "sub_2E202",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1C368": {
+  "segment": "seg040",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_BA1C": "MovingMaskLayer_SetTable_BA1C"
+  },
+  "chosen": "sub_BA1C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1C378": {
+  "segment": "seg040",
+  "kind": "approchée",
+  "instructions": 11,
+  "candidates": {
+   "sub_7A3D": "VoicePlayer_SetDriver_7A3D",
+   "sub_94F4": "ScaledImageLayer_SetScale_94F4",
+   "sub_ADB7": "TextLayer_SetText_ADB7",
+   "sub_BA1C": "MovingMaskLayer_SetTable_BA1C"
+  },
+  "chosen": null
+ },
+ "sub_1C84D": {
+  "segment": "seg040",
+  "kind": "approchée",
+  "instructions": 12,
+  "candidates": {
+   "sub_9D32": "TalkingHead_SetBaseFrame_9D32"
+  },
+  "chosen": "sub_9D32",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_1CC24": {
+  "segment": "seg040",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_2E5CF": "AnimLayer_Construct_2E5CF"
+  },
+  "chosen": "sub_2E5CF",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_1CD96": {
+  "segment": "seg040",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_2E202": "Layer_DrawAtOwnPos_2E202"
+  },
+  "chosen": "sub_2E202",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1D7A5": {
+  "segment": "seg040",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_ADB7": "TextLayer_SetText_ADB7"
+  },
+  "chosen": "sub_ADB7",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1D85C": {
+  "segment": "seg040",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_2E202": "Layer_DrawAtOwnPos_2E202"
+  },
+  "chosen": "sub_2E202",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1D8B4": {
+  "segment": "seg040",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_3D231": "StreamReader_DestructWrapper_3D231"
+  },
+  "chosen": "sub_3D231",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1DBBE": {
+  "segment": "seg040",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_2E5CF": "AnimLayer_Construct_2E5CF"
+  },
+  "chosen": "sub_2E5CF",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_1E016": {
+  "segment": "seg040",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_2E202": "Layer_DrawAtOwnPos_2E202"
+  },
+  "chosen": "sub_2E202",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1E326": {
+  "segment": "seg040",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_BA1C": "MovingMaskLayer_SetTable_BA1C"
+  },
+  "chosen": "sub_BA1C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1EC5D": {
+  "segment": "seg041",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_C38E": "ConvData_LoadByName_C38E"
+  },
+  "chosen": "sub_C38E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1EC9B": {
+  "segment": "seg041",
+  "kind": "approchée",
+  "instructions": 15,
+  "candidates": {
+   "sub_C38E": "ConvData_LoadByName_C38E"
+  },
+  "chosen": "sub_C38E",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_1F038": {
+  "segment": "seg043",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_C7D3": "String_ConstructFromPtrLen"
+  },
+  "chosen": "sub_C7D3",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_1F5": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_1F7": "CRT_RestoreIntVectors"
+  },
+  "chosen": "sub_1F7",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_207CC": {
+  "segment": "seg047",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_E0B7": "GaugeWidget_AllocateRenderBufferWrapper_E0B7"
+  },
+  "chosen": "sub_E0B7",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2094E": {
+  "segment": "seg047",
+  "kind": "approchée",
+  "instructions": 40,
+  "candidates": {
+   "sub_E256": "GaugeWidget_QueryAndFormat_E256"
+  },
+  "chosen": "sub_E256",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_219B6": {
+  "segment": "seg049",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_F898": "Widget_SetFlagBit0_F898"
+  },
+  "chosen": "sub_F898",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_219C4": {
+  "segment": "seg049",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_F8A6": "Widget_ClearFlagBit0_F8A6"
+  },
+  "chosen": "sub_F8A6",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_219D2": {
+  "segment": "seg049",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_F8B4": "Widget_TranslateBounds_F8B4"
+  },
+  "chosen": "sub_F8B4",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_21A1A": {
+  "segment": "seg049",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_21A24": {
+  "segment": "seg049",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_21AB0": {
+  "segment": "seg049",
+  "kind": "stricte",
+  "instructions": 65,
+  "candidates": {
+   "sub_F9A4": "PaletteScreen_DrawCurveShape_F9A4"
+  },
+  "chosen": "sub_F9A4",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_21BFD": {
+  "segment": "seg049",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_FB0A": "Palette_ReadAllDACRegisters_FB0A"
+  },
+  "chosen": "sub_FB0A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_21C1A": {
+  "segment": "seg049",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_FB27": "Palette_WriteAllDACRegisters_FB27"
+  },
+  "chosen": "sub_FB27",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_22049": {
+  "segment": "seg049",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_F898": "Widget_SetFlagBit0_F898"
+  },
+  "chosen": "sub_F898",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_22057": {
+  "segment": "seg049",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_FF96": "Widget_SetFlagBit4AndOffsets_FF96"
+  },
+  "chosen": "sub_FF96",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_221F": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_1C57": "PC_SoundOn"
+  },
+  "chosen": "sub_1C57",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_22719": {
+  "segment": "seg049",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_2E2C3": "Layer_Advance_2E2C3",
+   "sub_3C5C8": "ResourceRecord_ResetIfSet_3C5C8"
+  },
+  "chosen": null
+ },
+ "sub_227E": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_1C8A": "CRT_Write_TextMode"
+  },
+  "chosen": "sub_1C8A",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_23279": {
+  "segment": "seg050",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_11303": "PaletteScreen_LookupByteTable_11303"
+  },
+  "chosen": "sub_11303",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_232D7": {
+  "segment": "seg050",
+  "kind": "stricte",
+  "instructions": 43,
+  "candidates": {
+   "sub_11363": "PaletteScreen_DispatchWidgetLayoutB_11363"
+  },
+  "chosen": "sub_11363",
+  "calls_confirmed": 4,
+  "operand_diffs": 0
+ },
+ "sub_232E": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_1D3A": "CRT_SetFileAttr"
+  },
+  "chosen": "sub_1D3A",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2349": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 60,
+  "candidates": {
+   "sub_1D55": "Stdio_Fflush"
+  },
+  "chosen": "sub_1D55",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2464": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 34,
+  "candidates": {
+   "sub_1E70": "CRT_Strrchr_Like"
+  },
+  "chosen": "sub_1E70",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_24FA": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 53,
+  "candidates": {
+   "sub_1F06": "Stdio_WriteTextMode"
+  },
+  "chosen": "sub_1F06",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_2688": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_2094": "CRT_Itoa_Signed10"
+  },
+  "chosen": "sub_2094",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_26B0": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_20BC": "CRT_Itoa_Unsigned"
+  },
+  "chosen": "sub_20BC",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_26CA": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_20D6": "CRT_Itoa_BaseVariant"
+  },
+  "chosen": "sub_20D6",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_26EF": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_20FB": "CRT_Memmove"
+  },
+  "chosen": "sub_20FB",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_26F8B": {
+  "segment": "seg055",
+  "kind": "stricte",
+  "instructions": 40,
+  "candidates": {
+   "sub_157C1": "Effect_BBoxClipTest"
+  },
+  "chosen": "sub_157C1",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_270E": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_211A": "CRT_Memset"
+  },
+  "chosen": "sub_211A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2734": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_2140": "CRT_Memset_Public"
+  },
+  "chosen": "sub_2140",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_27B2": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 14,
+  "candidates": {
+   "sub_21BE": "CRT_Msg_NullPtrAssign"
+  },
+  "chosen": "sub_21BE",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_27C9": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_21D5": "Stdio_Ungetc"
+  },
+  "chosen": "sub_21D5",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_27E2": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 134,
+  "candidates": {
+   "sub_21EE": "Stdio_Putc"
+  },
+  "chosen": "sub_21EE",
+  "calls_confirmed": 6,
+  "operand_diffs": 3
+ },
+ "sub_2AD2": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 83,
+  "candidates": {
+   "sub_24DE": "Stdio_SetupFileStruct"
+  },
+  "chosen": "sub_24DE",
+  "calls_confirmed": 1,
+  "operand_diffs": 4
+ },
+ "sub_2BD2": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_25DE": "CRT_Msg_Sprintf1"
+  },
+  "chosen": "sub_25DE",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2BEF": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 16,
+  "candidates": {
+   "sub_25FB": "CRT_Msg_Sprintf2"
+  },
+  "chosen": "sub_25FB",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2C0B": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_2617": "CRT_Strcat"
+  },
+  "chosen": "sub_2617",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_2C44": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 31,
+  "candidates": {
+   "sub_2650": "CRT_Strchr_WordAligned"
+  },
+  "chosen": "sub_2650",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2C7A": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_2686": "CRT_Strncmp_Like"
+  },
+  "chosen": "sub_2686",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2CA9": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_26B5": "CRT_Strcpy"
+  },
+  "chosen": "sub_26B5",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2CCB": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 34,
+  "candidates": {
+   "sub_26D7": "CRT_Strdup"
+  },
+  "chosen": "sub_26D7",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2D03": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 37,
+  "candidates": {
+   "sub_270F": "CRT_Stricmp"
+  },
+  "chosen": "sub_270F",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2D43": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_274F": "CRT_Strlen"
+  },
+  "chosen": "sub_274F",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2D5D": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 20,
+  "candidates": {
+   "sub_2769": "CRT_Strlwr_2769",
+   "sub_2879": "CRT_Strupr"
+  },
+  "chosen": null
+ },
+ "sub_2DC7": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 27,
+  "candidates": {
+   "sub_280A": "CRT_Strncpy_Pad"
+  },
+  "chosen": "sub_280A",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2F35": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 20,
+  "candidates": {
+   "sub_2769": "CRT_Strlwr_2769",
+   "sub_2879": "CRT_Strupr"
+  },
+  "chosen": null
+ },
+ "sub_300": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_2CD": "CRT_Abs16_2CD"
+  },
+  "chosen": "sub_2CD",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_33DF6": {
+  "segment": "seg072",
+  "kind": "approchée",
+  "instructions": 13,
+  "candidates": {
+   "sub_73F": "CRT_SetjmpSave",
+   "sub_5FC6C": "AudioQueue_Helper_5FC6C"
+  },
+  "chosen": null
+ },
+ "sub_34058": {
+  "segment": "seg073",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_1D72E": "LightSet_Init_1D72E"
+  },
+  "chosen": "sub_1D72E",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_340EF": {
+  "segment": "seg073",
+  "kind": "approchée",
+  "instructions": 20,
+  "candidates": {
+   "sub_1D7CD": "LightSet_SetIntensityPercent_1D7CD"
+  },
+  "chosen": "sub_1D7CD",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_34411": {
+  "segment": "seg073",
+  "kind": "stricte",
+  "instructions": 60,
+  "candidates": {
+   "sub_1DB23": "LightSet_FaceIntensity_1DB23"
+  },
+  "chosen": "sub_1DB23",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_344C0": {
+  "segment": "seg074",
+  "kind": "approchée",
+  "instructions": 14,
+  "candidates": {
+   "sub_1DBE0": "Render_EdgeSetup"
+  },
+  "chosen": "sub_1DBE0",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_349C9": {
+  "segment": "seg075",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_349E": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 126,
+  "candidates": {
+   "sub_2DE2": "Stdio_WriteLowLevel"
+  },
+  "chosen": "sub_2DE2",
+  "calls_confirmed": 4,
+  "operand_diffs": 3
+ },
+ "sub_34B1F": {
+  "segment": "seg075",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_3D231": "StreamReader_DestructWrapper_3D231"
+  },
+  "chosen": "sub_3D231",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_34F0F": {
+  "segment": "seg075",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_1EA87": "Camera_UpdateViewportClip"
+  },
+  "chosen": "sub_1EA87",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_34FD5": {
+  "segment": "seg076",
+  "kind": "approchée",
+  "instructions": 39,
+  "candidates": {
+   "sub_1EBFF": "VGA_LoadPalette"
+  },
+  "chosen": "sub_1EBFF",
+  "calls_confirmed": 0,
+  "operand_diffs": 5
+ },
+ "sub_35081": {
+  "segment": "seg076",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_1ECAB": "Palette_DestructResource"
+  },
+  "chosen": "sub_1ECAB",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_35863": {
+  "segment": "seg076",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_1F54F": "Cockpit_PanAzimuthUpdate"
+  },
+  "chosen": "sub_1F54F",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3588C": {
+  "segment": "seg076",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_1F54F": "Cockpit_PanAzimuthUpdate"
+  },
+  "chosen": "sub_1F54F",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_35AC": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 28,
+  "candidates": {
+   "sub_2EF0": "Stdio_ErrorHandler"
+  },
+  "chosen": "sub_2EF0",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_35C7C": {
+  "segment": "seg077",
+  "kind": "stricte",
+  "instructions": 158,
+  "candidates": {
+   "sub_1F752": "Palette_ShadeIndexWithFog_1F752"
+  },
+  "chosen": "sub_1F752",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_35E32": {
+  "segment": "seg077",
+  "kind": "stricte",
+  "instructions": 119,
+  "candidates": {
+   "sub_1F908": "Palette_FogTableIndex_1F908"
+  },
+  "chosen": "sub_1F908",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_362E6": {
+  "segment": "seg078",
+  "kind": "approchée",
+  "instructions": 19,
+  "candidates": {
+   "sub_1FDBC": "Container_Construct"
+  },
+  "chosen": "sub_1FDBC",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_36308": {
+  "segment": "seg078",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_1FDDE": "Container_ConstructTyped"
+  },
+  "chosen": "sub_1FDDE",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3641D": {
+  "segment": "seg078",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_1FF3C": "Container_UnlinkNode"
+  },
+  "chosen": "sub_1FF3C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3644C": {
+  "segment": "seg078",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_1FF6B": "Container_FindAndRemove"
+  },
+  "chosen": "sub_1FF6B",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_36516": {
+  "segment": "seg078",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_20050": "Container_Append"
+  },
+  "chosen": "sub_20050",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3670": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 39,
+  "candidates": {
+   "sub_2F71": "CRT_MemFamily_Extra2"
+  },
+  "chosen": "sub_2F71",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_36AF": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 36,
+  "candidates": {
+   "sub_2FB0": "CRT_MemFamily_Extra3"
+  },
+  "chosen": "sub_2FB0",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_37186": {
+  "segment": "seg078",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_20D7C": "Container_RemoveNode"
+  },
+  "chosen": "sub_20D7C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_372DB": {
+  "segment": "seg078",
+  "kind": "approchée",
+  "instructions": 30,
+  "candidates": {
+   "sub_20EEC": "Container_Op_20EEC"
+  },
+  "chosen": "sub_20EEC",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_37440": {
+  "segment": "seg079",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_21083": "Debris_BodyReset"
+  },
+  "chosen": "sub_21083",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3775": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_3035": "CRT_MemFamily_Extra7"
+  },
+  "chosen": "sub_3035",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_37852": {
+  "segment": "seg079",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_37879": {
+  "segment": "seg079",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_37884": {
+  "segment": "seg079",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_379CF": {
+  "segment": "seg079",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_381FB": {
+  "segment": "seg081",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_38205": {
+  "segment": "seg081",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_3D231": "StreamReader_DestructWrapper_3D231"
+  },
+  "chosen": "sub_3D231",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3825E": {
+  "segment": "seg081",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_3B8F8": "StreamReader_ComputeHeaderOffset_3B8F8"
+  },
+  "chosen": null
+ },
+ "sub_382E8": {
+  "segment": "seg081",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_3D231": "StreamReader_DestructWrapper_3D231"
+  },
+  "chosen": "sub_3D231",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_38543": {
+  "segment": "seg082",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_2237A": "WeakRef_InvalidateIfSet"
+  },
+  "chosen": "sub_2237A",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_397FD": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 38,
+  "candidates": {
+   "sub_2375C": "Math_DotProduct3D_2375C"
+  },
+  "chosen": "sub_2375C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3A0C2": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_2410A": "Math_VectorLengthUnscaled_2410A"
+  },
+  "chosen": "sub_2410A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3A15D": {
+  "segment": "seg086",
+  "kind": "approchée",
+  "instructions": 47,
+  "candidates": {
+   "sub_241B4": "Vector_Normalize3D_241B4"
+  },
+  "chosen": "sub_241B4",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_3A1D9": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_24233": "Utility_Helper_24233"
+  },
+  "chosen": "sub_24233",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3A644": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_246F0": "Utility_Helper_246F0"
+  },
+  "chosen": "sub_246F0",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3A9F4": {
+  "segment": "seg086",
+  "kind": "approchée",
+  "instructions": 53,
+  "candidates": {
+   "sub_24AFE": "UI_ComputeScaledVectorHelper_24AFE"
+  },
+  "chosen": "sub_24AFE",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_3AC59": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_24DD7": "Damage_ComputeHelperA_24DD7"
+  },
+  "chosen": "sub_24DD7",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3B551": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_2574E": "Matrix_BuildFromAngle_2574E"
+  },
+  "chosen": "sub_2574E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3B669": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 35,
+  "candidates": {
+   "sub_2589B": "WorldObject_BuildOrientationMatrix_2589B"
+  },
+  "chosen": "sub_2589B",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3BD91": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_26047": "Matrix_BuildFullOrientation_26047"
+  },
+  "chosen": "sub_26047",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3C13": {
+  "segment": "seg001",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_3FBA8": "VROOMM_InstallIntHandler_3FBA8"
+  },
+  "chosen": "sub_3FBA8",
+  "calls_confirmed": 0,
+  "operand_diffs": 6
+ },
+ "sub_3C5": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_392": "CRT_Exit"
+  },
+  "chosen": "sub_392",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3C82C": {
+  "segment": "seg087",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_26BB4": "Math_FixedMulDiv_26BB4"
+  },
+  "chosen": "sub_26BB4",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3C889": {
+  "segment": "seg087",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_26C11": "Math_CosRaw_26C11"
+  },
+  "chosen": "sub_26C11",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3C8CF": {
+  "segment": "seg087",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_26C57": "Math_Tan_Raw_26C57"
+  },
+  "chosen": "sub_26C57",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3C982": {
+  "segment": "seg087",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_26D0A": "Math_AsinRaw_26D0A"
+  },
+  "chosen": "sub_26D0A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3C9C5": {
+  "segment": "seg087",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_26D4D": "Math_AcosRaw_26D4D"
+  },
+  "chosen": "sub_26D4D",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3CA71": {
+  "segment": "seg087",
+  "kind": "approchée",
+  "instructions": 36,
+  "candidates": {
+   "sub_26DF9": "Math_VectorLength3D_Raw_26DF9"
+  },
+  "chosen": "sub_26DF9",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_3CAD1": {
+  "segment": "seg087",
+  "kind": "stricte",
+  "instructions": 36,
+  "candidates": {
+   "sub_26E59": "Math_Sqrt_Raw_26E59"
+  },
+  "chosen": "sub_26E59",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3CB86": {
+  "segment": "seg087",
+  "kind": "stricte",
+  "instructions": 68,
+  "candidates": {
+   "sub_26F0E": "Math_Helper_26F0E"
+  },
+  "chosen": "sub_26F0E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3CC59": {
+  "segment": "seg087",
+  "kind": "stricte",
+  "instructions": 204,
+  "candidates": {
+   "sub_26FE1": "Math_VectorTransformByMatrix3x3_26FE1"
+  },
+  "chosen": "sub_26FE1",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3CF4B": {
+  "segment": "seg087",
+  "kind": "stricte",
+  "instructions": 63,
+  "candidates": {
+   "sub_272D3": "Matrix_WorldToLocal_272D3"
+  },
+  "chosen": "sub_272D3",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3D0EF": {
+  "segment": "seg088",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_3D1D6": {
+  "segment": "seg089",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_28CDB": "Music_Stop_28CDB"
+  },
+  "chosen": "sub_28CDB",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3D1F7": {
+  "segment": "seg089",
+  "kind": "approchée",
+  "instructions": 16,
+  "candidates": {
+   "sub_28CFC": "Music_PlayGameflowTune_28CFC"
+  },
+  "chosen": "sub_28CFC",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_3D21F": {
+  "segment": "seg089",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_28D24": "Speech_LoadBank_28D24"
+  },
+  "chosen": "sub_28D24",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3D4": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_3A1": "CRT_Abort"
+  },
+  "chosen": "sub_3A1",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_400": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_3CD": "CRT_Fmemcpy"
+  },
+  "chosen": "sub_3CD",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_40E79": {
+  "segment": "seg095",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_3C848": "ResourceRecord_WriteFieldWrapper_3C848"
+  },
+  "chosen": "sub_3C848",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_42BF9": {
+  "segment": "seg098",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_2A8DF": "PagedMemory_DetectDriverSignatureA_2A8DF"
+  },
+  "chosen": "sub_2A8DF",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_42C0A": {
+  "segment": "seg098",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_2A8F0": "PagedMemory_DetectDriverSignatureB_2A8F0"
+  },
+  "chosen": "sub_2A8F0",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_42C1B": {
+  "segment": "seg098",
+  "kind": "approchée",
+  "instructions": 56,
+  "candidates": {
+   "sub_2A901": "PagedMemory_LoadPage_2A901"
+  },
+  "chosen": "sub_2A901",
+  "calls_confirmed": 0,
+  "operand_diffs": 4
+ },
+ "sub_42D00": {
+  "segment": "seg098",
+  "kind": "stricte",
+  "instructions": 61,
+  "candidates": {
+   "sub_2A98B": "PagedMemory_InitDriver_2A98B"
+  },
+  "chosen": "sub_2A98B",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_42DA7": {
+  "segment": "seg098",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_2AA32": "PagedMemory_CheckDriverPresent_2AA32"
+  },
+  "chosen": "sub_2AA32",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_433DE": {
+  "segment": "seg098",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_2AE02": "PagedMemory_WriteByte_2AE02"
+  },
+  "chosen": "sub_2AE02",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_44382": {
+  "segment": "seg100",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_44395": {
+  "segment": "seg100",
+  "kind": "approchée",
+  "instructions": 41,
+  "candidates": {
+   "sub_2B23C": "PagedMemory_ReadTextResource_2B23C"
+  },
+  "chosen": null
+ },
+ "sub_44733": {
+  "segment": "seg102",
+  "kind": "approchée",
+  "instructions": 42,
+  "candidates": {
+   "sub_2B731": "Memory_TypedFreeVariant_2B731"
+  },
+  "chosen": "sub_2B731",
+  "calls_confirmed": 0,
+  "operand_diffs": 5
+ },
+ "sub_447E1": {
+  "segment": "seg102",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_2B7E1": "Memory_TypedFreeWrapper_2B7E1"
+  },
+  "chosen": "sub_2B7E1",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_44820": {
+  "segment": "seg102",
+  "kind": "approchée",
+  "instructions": 36,
+  "candidates": {
+   "sub_2B862": "Memory_TypedFreeWrapperB_2B862"
+  },
+  "chosen": "sub_2B862",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_44862": {
+  "segment": "seg102",
+  "kind": "approchée",
+  "instructions": 36,
+  "candidates": {
+   "sub_2B862": "Memory_TypedFreeWrapperB_2B862"
+  },
+  "chosen": "sub_2B862",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_448A4": {
+  "segment": "seg102",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_2B8A4": "Memory_TypedFree_2B8A4"
+  },
+  "chosen": "sub_2B8A4",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_448DE": {
+  "segment": "seg102",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_2B8DE": "Memory_TypedAllocDispatch_2B8DE"
+  },
+  "chosen": "sub_2B8DE",
+  "calls_confirmed": 1,
+  "operand_diffs": 5
+ },
+ "sub_44921": {
+  "segment": "seg102",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_2B920": "Memory_TypedAllocDispatchB_2B920"
+  },
+  "chosen": "sub_2B920",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_4495C": {
+  "segment": "seg102",
+  "kind": "approchée",
+  "instructions": 27,
+  "candidates": {
+   "sub_2B95B": "Memory_TypedAllocDispatchC_2B95B"
+  },
+  "chosen": "sub_2B95B",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_449D0": {
+  "segment": "seg102",
+  "kind": "approchée",
+  "instructions": 27,
+  "candidates": {
+   "sub_2B95B": "Memory_TypedAllocDispatchC_2B95B"
+  },
+  "chosen": "sub_2B95B",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_44A05": {
+  "segment": "seg102",
+  "kind": "approchée",
+  "instructions": 23,
+  "candidates": {
+   "sub_2BA04": "Memory_TypedAllocDispatchE_2BA04"
+  },
+  "chosen": "sub_2BA04",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_44A95": {
+  "segment": "seg102",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_2BA94": "Memory_ValidateAllocatorIndex_2BA94"
+  },
+  "chosen": "sub_2BA94",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_44AC2": {
+  "segment": "seg102",
+  "kind": "approchée",
+  "instructions": 52,
+  "candidates": {
+   "sub_2BAC1": "Memory_AllocatorTableConstructor_2BAC1"
+  },
+  "chosen": "sub_2BAC1",
+  "calls_confirmed": 5,
+  "operand_diffs": 2
+ },
+ "sub_44B3E": {
+  "segment": "seg102",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_2BB3D": "Memory_AllocatorTable_ConstructSubobject_2BB3D"
+  },
+  "chosen": "sub_2BB3D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_44C0A": {
+  "segment": "seg103",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_44C15": {
+  "segment": "seg103",
+  "kind": "approchée",
+  "instructions": 39,
+  "candidates": {
+   "sub_2BE28": "PagedResourceC_Construct_2BE28"
+  },
+  "chosen": "sub_2BE28",
+  "calls_confirmed": 2,
+  "operand_diffs": 8
+ },
+ "sub_44CDA": {
+  "segment": "seg103",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_451CF": {
+  "segment": "seg105",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_2C52D": "DisplayCache_ComputeChecksum_2C52D"
+  },
+  "chosen": "sub_2C52D",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_4573C": {
+  "segment": "seg106",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_2C859": "DisplayCache_Helper_2C859"
+  },
+  "chosen": "sub_2C859",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_45B40": {
+  "segment": "seg107",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_2DB84": "LayerGroup_Add_2DB84"
+  },
+  "chosen": "sub_2DB84",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_45B7D": {
+  "segment": "seg107",
+  "kind": "stricte",
+  "instructions": 42,
+  "candidates": {
+   "sub_2DBC1": "LayerGroup_Remove_2DBC1"
+  },
+  "chosen": null
+ },
+ "sub_45BE9": {
+  "segment": "seg107",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_2DC2D": "LayerGroup_AdvanceAll_2DC2D"
+  },
+  "chosen": null
+ },
+ "sub_45C22": {
+  "segment": "seg107",
+  "kind": "approchée",
+  "instructions": 53,
+  "candidates": {
+   "sub_2DC66": "LayerGroup_Construct_2DC66"
+  },
+  "chosen": "sub_2DC66",
+  "calls_confirmed": 3,
+  "operand_diffs": 7
+ },
+ "sub_45CB8": {
+  "segment": "seg107",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_2DCFC": "Scene_Destruct_2DCFC"
+  },
+  "chosen": "sub_2DCFC",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_45D1D": {
+  "segment": "seg107",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_2E29E": "Layer_MoveBy_2E29E"
+  },
+  "chosen": "sub_2E29E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_45D42": {
+  "segment": "seg107",
+  "kind": "stricte",
+  "instructions": 55,
+  "candidates": {
+   "sub_2DD86": "LayerGroup_PlayFrame_2DD86"
+  },
+  "chosen": null
+ },
+ "sub_45DD0": {
+  "segment": "seg107",
+  "kind": "stricte",
+  "instructions": 13,
+  "candidates": {
+   "sub_2DE14": "Scene_AdvanceFrame_2DE14"
+  },
+  "chosen": "sub_2DE14",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_45DE3": {
+  "segment": "seg107",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_2DE27": "Scene_SetFps_2DE27"
+  },
+  "chosen": "sub_2DE27",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_45E51": {
+  "segment": "seg107",
+  "kind": "approchée",
+  "instructions": 40,
+  "candidates": {
+   "sub_2DE95": "Layer_ConstructAtOrigin_2DE95"
+  },
+  "chosen": "sub_2DE95",
+  "calls_confirmed": 1,
+  "operand_diffs": 8
+ },
+ "sub_45F57": {
+  "segment": "seg107",
+  "kind": "approchée",
+  "instructions": 51,
+  "candidates": {
+   "sub_2DF9B": "Layer_Construct_2DF9B"
+  },
+  "chosen": "sub_2DF9B",
+  "calls_confirmed": 1,
+  "operand_diffs": 8
+ },
+ "sub_45FE8": {
+  "segment": "seg107",
+  "kind": "approchée",
+  "instructions": 54,
+  "candidates": {
+   "sub_2E02C": "ImageLayer_Construct_2E02C"
+  },
+  "chosen": "sub_2E02C",
+  "calls_confirmed": 1,
+  "operand_diffs": 8
+ },
+ "sub_461CC": {
+  "segment": "seg107",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_2E202": "Layer_DrawAtOwnPos_2E202"
+  },
+  "chosen": "sub_2E202",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_46268": {
+  "segment": "seg107",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_2E29E": "Layer_MoveBy_2E29E"
+  },
+  "chosen": "sub_2E29E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_4628D": {
+  "segment": "seg107",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_2E2C3": "Layer_Advance_2E2C3",
+   "sub_3C5C8": "ResourceRecord_ResetIfSet_3C5C8"
+  },
+  "chosen": null
+ },
+ "sub_462C6": {
+  "segment": "seg107",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_2DCFC": "Scene_Destruct_2DCFC"
+  },
+  "chosen": "sub_2DCFC",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_464C0": {
+  "segment": "seg107",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_2DCFC": "Scene_Destruct_2DCFC"
+  },
+  "chosen": null
+ },
+ "sub_46599": {
+  "segment": "seg107",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_2E5CF": "AnimLayer_Construct_2E5CF"
+  },
+  "chosen": "sub_2E5CF",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_466A5": {
+  "segment": "seg107",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_2DCFC": "Scene_Destruct_2DCFC"
+  },
+  "chosen": "sub_2DCFC",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_46782": {
+  "segment": "seg107",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_2DCFC": "Scene_Destruct_2DCFC"
+  },
+  "chosen": "sub_2DCFC",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_468A3": {
+  "segment": "seg107",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_2DCFC": "Scene_Destruct_2DCFC"
+  },
+  "chosen": null
+ },
+ "sub_46A29": {
+  "segment": "seg110",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_2CC76": "Palette_Alloc_2CC76"
+  },
+  "chosen": "sub_2CC76",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_46BA1": {
+  "segment": "seg110",
+  "kind": "approchée",
+  "instructions": 92,
+  "candidates": {
+   "sub_2CDE1": "Palette_Upload_2CDE1"
+  },
+  "chosen": "sub_2CDE1",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_46CC8": {
+  "segment": "seg110",
+  "kind": "approchée",
+  "instructions": 57,
+  "candidates": {
+   "sub_2CF08": "Palette_FillRange_2CF08"
+  },
+  "chosen": "sub_2CF08",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_46D40": {
+  "segment": "seg110",
+  "kind": "approchée",
+  "instructions": 50,
+  "candidates": {
+   "sub_2CF80": "Palette_CopyInto_2CF80"
+  },
+  "chosen": "sub_2CF80",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_46DD3": {
+  "segment": "seg110",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_2D013": "Palette_FadeStep_2D013"
+  },
+  "chosen": "sub_2D013",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_46E20": {
+  "segment": "seg110",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_2D077": "Palette_LoadAndUpload_2D077"
+  },
+  "chosen": "sub_2D077",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_46FA2": {
+  "segment": "seg111",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_2D201": "CachedObject_Allocate_2D201"
+  },
+  "chosen": "sub_2D201",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_471E1": {
+  "segment": "seg111",
+  "kind": "approchée",
+  "instructions": 60,
+  "candidates": {
+   "sub_2D440": "CachedObject_Destruct_2D440"
+  },
+  "chosen": "sub_2D440",
+  "calls_confirmed": 3,
+  "operand_diffs": 5
+ },
+ "sub_47283": {
+  "segment": "seg111",
+  "kind": "approchée",
+  "instructions": 42,
+  "candidates": {
+   "sub_2D4E2": "CachedObject_ReleaseFields_2D4E2"
+  },
+  "chosen": "sub_2D4E2",
+  "calls_confirmed": 2,
+  "operand_diffs": 4
+ },
+ "sub_47301": {
+  "segment": "seg111",
+  "kind": "approchée",
+  "instructions": 45,
+  "candidates": {
+   "sub_2D560": "CachedObject_DestructCore_2D560"
+  },
+  "chosen": "sub_2D560",
+  "calls_confirmed": 2,
+  "operand_diffs": 4
+ },
+ "sub_4738E": {
+  "segment": "seg111",
+  "kind": "stricte",
+  "instructions": 34,
+  "candidates": {
+   "sub_2D5ED": "CachedObject_DestructHelper_2D5ED"
+  },
+  "chosen": "sub_2D5ED",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_473E0": {
+  "segment": "seg111",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_2D63F": "CachedObject_DestructHelper_2D63F"
+  },
+  "chosen": "sub_2D63F",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_47877": {
+  "segment": "seg112",
+  "kind": "stricte",
+  "instructions": 44,
+  "candidates": {
+   "sub_2E9A4": "TextFormat_ApplyStyleAttribute_2E9A4"
+  },
+  "chosen": "sub_2E9A4",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_478D0": {
+  "segment": "seg112",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_2E9FD": "TextFormat_ApplyStyleAttributeB_2E9FD"
+  },
+  "chosen": "sub_2E9FD",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_478F4": {
+  "segment": "seg112",
+  "kind": "approchée",
+  "instructions": 81,
+  "candidates": {
+   "sub_2EA21": "TextRenderer_ApplyFormatChange_2EA21"
+  },
+  "chosen": "sub_2EA21",
+  "calls_confirmed": 4,
+  "operand_diffs": 5
+ },
+ "sub_479C4": {
+  "segment": "seg112",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_2EAF1": "TextFormat_SetAttribute_2EAF1"
+  },
+  "chosen": "sub_2EAF1",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_47A04": {
+  "segment": "seg112",
+  "kind": "stricte",
+  "instructions": 61,
+  "candidates": {
+   "sub_2EB31": "TextFormat_InitAttributeTable_2EB31"
+  },
+  "chosen": "sub_2EB31",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_47A6F": {
+  "segment": "seg112",
+  "kind": "stricte",
+  "instructions": 43,
+  "candidates": {
+   "sub_2EB9C": "TextFormat_ResolveStyleEntry_2EB9C"
+  },
+  "chosen": "sub_2EB9C",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_47ACD": {
+  "segment": "seg112",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_2EBFA": "TextFormat_ReleaseStyleList_2EBFA"
+  },
+  "chosen": "sub_2EBFA",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_47B1D": {
+  "segment": "seg112",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_2EC4A": "UI_ApplyEncodingHelper_2EC4A"
+  },
+  "chosen": "sub_2EC4A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_47B38": {
+  "segment": "seg112",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_2EC65": "UI_ApplyEncodingHelper_2EC65"
+  },
+  "chosen": "sub_2EC65",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_47B53": {
+  "segment": "seg112",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_2EC80": "TextFormat_ReleaseAttribute_2EC80"
+  },
+  "chosen": "sub_2EC80",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_47BFE": {
+  "segment": "seg113",
+  "kind": "stricte",
+  "instructions": 44,
+  "candidates": {
+   "sub_2ED42": "TextFormat_RebuildLinearTable_2ED42"
+  },
+  "chosen": "sub_2ED42",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_47E2A": {
+  "segment": "seg119",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_2FD7D": "PagedResourceC_RefreshAndFinalize_2FD7D"
+  },
+  "chosen": "sub_2FD7D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_47E79": {
+  "segment": "seg120",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_2F362": "FontStyle_ClearFlag_2F362"
+  },
+  "chosen": "sub_2F362",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_47EA4": {
+  "segment": "seg120",
+  "kind": "stricte",
+  "instructions": 50,
+  "candidates": {
+   "sub_2F38D": "FontStyle_Construct_2F38D"
+  },
+  "chosen": "sub_2F38D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_48166": {
+  "segment": "seg120",
+  "kind": "stricte",
+  "instructions": 56,
+  "candidates": {
+   "sub_2F661": "FontStyle_ApplyVariantB_2F661"
+  },
+  "chosen": "sub_2F661",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_4833F": {
+  "segment": "seg122",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_2FA11": "LinkedList_InsertAtHead_2FA11"
+  },
+  "chosen": "sub_2FA11",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_4836D": {
+  "segment": "seg122",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_2FA3F": "LinkedList_InsertAtTail_2FA3F"
+  },
+  "chosen": "sub_2FA3F",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_4839B": {
+  "segment": "seg122",
+  "kind": "stricte",
+  "instructions": 38,
+  "candidates": {
+   "sub_2FA6D": "LinkedList_InsertAfter_2FA6D"
+  },
+  "chosen": "sub_2FA6D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_483E8": {
+  "segment": "seg122",
+  "kind": "stricte",
+  "instructions": 38,
+  "candidates": {
+   "sub_2FABA": "LinkedList_InsertBefore_2FABA"
+  },
+  "chosen": "sub_2FABA",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_484C7": {
+  "segment": "seg122",
+  "kind": "stricte",
+  "instructions": 35,
+  "candidates": {
+   "sub_2FB99": "LinkedList_Remove_2FB99"
+  },
+  "chosen": "sub_2FB99",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_48578": {
+  "segment": "seg122",
+  "kind": "approchée",
+  "instructions": 24,
+  "candidates": {
+   "sub_2FC76": "LinkedList_Helper_2FC76"
+  },
+  "chosen": "sub_2FC76",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_485A4": {
+  "segment": "seg122",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_2FC76": "LinkedList_Helper_2FC76"
+  },
+  "chosen": "sub_2FC76",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_48623": {
+  "segment": "seg123",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_2FDF4": "LinkedListB_InsertAtTail_2FDF4"
+  },
+  "chosen": "sub_2FDF4",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_4863": {
+  "segment": "seg004",
+  "kind": "approchée",
+  "instructions": 15,
+  "candidates": {
+   "sub_3B920": "StreamReader_RegistryAdd_3B920"
+  },
+  "chosen": "sub_3B920",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_48648": {
+  "segment": "seg123",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_2FE19": "LinkedListB_FindAndDispatch_2FE19"
+  },
+  "chosen": "sub_2FE19",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_486A8": {
+  "segment": "seg123",
+  "kind": "stricte",
+  "instructions": 47,
+  "candidates": {
+   "sub_2FE79": "LinkedListB_FindByKey_2FE79"
+  },
+  "chosen": "sub_2FE79",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_4874D": {
+  "segment": "seg123",
+  "kind": "approchée",
+  "instructions": 24,
+  "candidates": {
+   "sub_2FC76": "LinkedList_Helper_2FC76"
+  },
+  "chosen": "sub_2FC76",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_487A4": {
+  "segment": "seg124",
+  "kind": "approchée",
+  "instructions": 58,
+  "candidates": {
+   "sub_2FF75": "Runtime_FatalErrorHandler_2FF75"
+  },
+  "chosen": "sub_2FF75",
+  "calls_confirmed": 8,
+  "operand_diffs": 3
+ },
+ "sub_4887": {
+  "segment": "seg004",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_3B944": "StreamReader_RegistryRemove_3B944"
+  },
+  "chosen": "sub_3B944",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_488D3": {
+  "segment": "seg125",
+  "kind": "approchée",
+  "instructions": 23,
+  "candidates": {
+   "sub_31191": "GlyphObject_AllocateBuffer_31191"
+  },
+  "chosen": "sub_31191",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_48911": {
+  "segment": "seg125",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_311CF": "GlyphObject_ConstructWithBuffer_311CF"
+  },
+  "chosen": "sub_311CF",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_48C4D": {
+  "segment": "seg126",
+  "kind": "approchée",
+  "instructions": 40,
+  "candidates": {
+   "sub_3144B": "Widget_ApplyStyleAndAllocate_3144B"
+  },
+  "chosen": "sub_3144B",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_48CAB": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_314A9": "Widget_Method_Dispatch8_314A9"
+  },
+  "chosen": "sub_314A9",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_48CCD": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_314CB": "Widget_Method_DispatchC_314CB"
+  },
+  "chosen": "sub_314CB",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_48D9F": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 69,
+  "candidates": {
+   "sub_3159D": "Widget_RenderWithAttributes_3159D"
+  },
+  "chosen": "sub_3159D",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_48F57": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 29,
+  "candidates": {
+   "sub_31755": "Widget_ComputeBoundsExtent_31755"
+  },
+  "chosen": "sub_31755",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_49013": {
+  "segment": "seg126",
+  "kind": "approchée",
+  "instructions": 189,
+  "candidates": {
+   "sub_31810": "Widget_RenderComplexLayout_31810"
+  },
+  "chosen": "sub_31810",
+  "calls_confirmed": 8,
+  "operand_diffs": 3
+ },
+ "sub_4923E": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_31A3B": "Widget_RenderComplexLayoutWrapper_31A3B"
+  },
+  "chosen": "sub_31A3B",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_492D2": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 88,
+  "candidates": {
+   "sub_31ACA": "GlyphObject_LayoutAndRenderAll_31ACA"
+  },
+  "chosen": "sub_31ACA",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_495B": {
+  "segment": "seg004",
+  "kind": "approchée",
+  "instructions": 28,
+  "candidates": {
+   "sub_3B9E5": "StreamReader_DispatchWrite_3B9E5"
+  },
+  "chosen": "sub_3B9E5",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_497": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_40F": "CRT_GetVect"
+  },
+  "chosen": "sub_40F",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_4998": {
+  "segment": "seg004",
+  "kind": "approchée",
+  "instructions": 32,
+  "candidates": {
+   "sub_3BA22": "StreamReader_ParseFormattedValueB_3BA22"
+  },
+  "chosen": "sub_3BA22",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_49D1": {
+  "segment": "seg004",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_3BA5B": "StreamReader_PrepareParse_3BA5B"
+  },
+  "chosen": "sub_3BA5B",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_49D9A": {
+  "segment": "seg133",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_328DE": "Render_SetPixelClipped_328DE"
+  },
+  "chosen": "sub_328DE",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_4A6": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_41E": "CRT_SetVect"
+  },
+  "chosen": "sub_41E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_4B8B": {
+  "segment": "seg004",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_1ECAB": "Palette_DestructResource"
+  },
+  "chosen": "sub_1ECAB",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_4BF0": {
+  "segment": "seg005",
+  "kind": "approchée",
+  "instructions": 35,
+  "candidates": {
+   "sub_3D240": "IndexedRecordReader_Destruct_3D240"
+  },
+  "chosen": "sub_3D240",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_4C3A": {
+  "segment": "seg005",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_3D28A": "IndexedRecordReader_ConstructVariantA_3D28A"
+  },
+  "chosen": "sub_3D28A",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_4C6A": {
+  "segment": "seg005",
+  "kind": "approchée",
+  "instructions": 35,
+  "candidates": {
+   "sub_3D2BA": "IndexedRecordReader_ConstructVariantB_3D2BA"
+  },
+  "chosen": "sub_3D2BA",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_4CAA": {
+  "segment": "seg005",
+  "kind": "approchée",
+  "instructions": 53,
+  "candidates": {
+   "sub_3D2FA": "IndexedRecordReader_ConstructVariantC_3D2FA"
+  },
+  "chosen": "sub_3D2FA",
+  "calls_confirmed": 2,
+  "operand_diffs": 4
+ },
+ "sub_4D23": {
+  "segment": "seg005",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_3D373": "IndexedRecordReader_InitFields_3D373"
+  },
+  "chosen": "sub_3D373",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_51BDA": {
+  "segment": "seg154",
+  "kind": "approchée",
+  "instructions": 20,
+  "candidates": {
+   "sub_3ACA4": "File_OpenWithRetry_3ACA4"
+  },
+  "chosen": "sub_3ACA4",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_51CC4": {
+  "segment": "seg156",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_3AD81": "Handle_ReadWordField_3AD81"
+  },
+  "chosen": "sub_3AD81",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_51CE7": {
+  "segment": "seg156",
+  "kind": "approchée",
+  "instructions": 18,
+  "candidates": {
+   "sub_3ADA4": "Handle_ReadByteField_3ADA4"
+  },
+  "chosen": "sub_3ADA4",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_51D61": {
+  "segment": "seg157",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_3AE1E": "FileStream_Construct_3AE1E"
+  },
+  "chosen": "sub_3AE1E",
+  "calls_confirmed": 1,
+  "operand_diffs": 9
+ },
+ "sub_51E2C": {
+  "segment": "seg157",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_3CEB3": "StreamReader_ReleaseBuffer_3CEB3"
+  },
+  "chosen": "sub_3CEB3",
+  "calls_confirmed": 1,
+  "operand_diffs": 5
+ },
+ "sub_5213A": {
+  "segment": "seg157",
+  "kind": "approchée",
+  "instructions": 46,
+  "candidates": {
+   "sub_3AFFF": "FileStream_ReadBuffered_3AFFF"
+  },
+  "chosen": "sub_3AFFF",
+  "calls_confirmed": 0,
+  "operand_diffs": 7
+ },
+ "sub_522AE": {
+  "segment": "seg157",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_3B8D2": "StreamReader_GetCapacity_3B8D2"
+  },
+  "chosen": "sub_3B8D2",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_52306": {
+  "segment": "seg158",
+  "kind": "approchée",
+  "instructions": 41,
+  "candidates": {
+   "sub_3B16F": "StreamReader_Destruct_3B16F"
+  },
+  "chosen": "sub_3B16F",
+  "calls_confirmed": 3,
+  "operand_diffs": 4
+ },
+ "sub_52369": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 34,
+  "candidates": {
+   "sub_3B1D2": "StreamReader_Helper_3B1D2"
+  },
+  "chosen": "sub_3B1D2",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_523A9": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_3B212": "StreamReader_Helper_3B212"
+  },
+  "chosen": "sub_3B212",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_523D4": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_3B23D": "StreamReader_Helper_3B23D"
+  },
+  "chosen": "sub_3B23D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_523F8": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_3B261": "StreamReader_ValidateAndDispatch_3B261"
+  },
+  "chosen": "sub_3B261",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_52419": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_3B282": "StreamReader_Helper_3B282"
+  },
+  "chosen": "sub_3B282",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_52440": {
+  "segment": "seg158",
+  "kind": "approchée",
+  "instructions": 32,
+  "candidates": {
+   "sub_3B2A9": "StreamReader_ConstructVariantA_3B2A9"
+  },
+  "chosen": "sub_3B2A9",
+  "calls_confirmed": 2,
+  "operand_diffs": 3
+ },
+ "sub_5248F": {
+  "segment": "seg158",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_3B2F8": "StreamReader_ConstructVariantB_3B2F8"
+  },
+  "chosen": "sub_3B2F8",
+  "calls_confirmed": 3,
+  "operand_diffs": 3
+ },
+ "sub_524DA": {
+  "segment": "seg158",
+  "kind": "approchée",
+  "instructions": 37,
+  "candidates": {
+   "sub_3B343": "StreamReader_ConstructVariantC_3B343"
+  },
+  "chosen": "sub_3B343",
+  "calls_confirmed": 3,
+  "operand_diffs": 3
+ },
+ "sub_52616": {
+  "segment": "seg158",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_3B445": "StreamReader_Close_3B445"
+  },
+  "chosen": "sub_3B445",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_52671": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_3B4A0": "StreamReader_DispatchRead_3B4A0"
+  },
+  "chosen": "sub_3B4A0",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_5274A": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_3B57E": "StreamReader_ReadDispatch_3B57E"
+  },
+  "chosen": "sub_3B57E",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_52769": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_3B59D": "StreamReader_ReadDispatchB_3B59D"
+  },
+  "chosen": "sub_3B59D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_5280D": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_3B625": "StreamReader_ValidateState_3B625"
+  },
+  "chosen": "sub_3B625",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_52833": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_3B64B": "StreamReader_CheckBufferValid_3B64B"
+  },
+  "chosen": "sub_3B64B",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_5284E": {
+  "segment": "seg158",
+  "kind": "approchée",
+  "instructions": 53,
+  "candidates": {
+   "sub_3B666": "StreamReader_SeekVariant_3B666"
+  },
+  "chosen": "sub_3B666",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_5293D": {
+  "segment": "seg158",
+  "kind": "approchée",
+  "instructions": 45,
+  "candidates": {
+   "sub_3B755": "StreamReader_RefillBuffer_3B755"
+  },
+  "chosen": "sub_3B755",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_5299E": {
+  "segment": "seg158",
+  "kind": "approchée",
+  "instructions": 43,
+  "candidates": {
+   "sub_3B7B6": "StreamReader_PrepareForRead_3B7B6"
+  },
+  "chosen": "sub_3B7B6",
+  "calls_confirmed": 3,
+  "operand_diffs": 2
+ },
+ "sub_529F9": {
+  "segment": "seg158",
+  "kind": "approchée",
+  "instructions": 69,
+  "candidates": {
+   "sub_3B811": "StreamReader_ReadTyped_3B811"
+  },
+  "chosen": "sub_3B811",
+  "calls_confirmed": 5,
+  "operand_diffs": 1
+ },
+ "sub_52A94": {
+  "segment": "seg158",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_52AA6": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_3B8BE": "StreamReader_ReportError_3B8BE"
+  },
+  "chosen": "sub_3B8BE",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_52ABA": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_3B8D2": "StreamReader_GetCapacity_3B8D2"
+  },
+  "chosen": "sub_3B8D2",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_52ACD": {
+  "segment": "seg158",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_3B8D2": "StreamReader_GetCapacity_3B8D2"
+  },
+  "chosen": "sub_3B8D2",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_52AE0": {
+  "segment": "seg158",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_52AFB": {
+  "segment": "seg159",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_3BBC3": "FileStream_Method_Read_3BBC3"
+  },
+  "chosen": "sub_3BBC3",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_53B24": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_3BE15": "ResourceRecord_Helper_3BE15"
+  },
+  "chosen": "sub_3BE15",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_53B4C": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 33,
+  "candidates": {
+   "sub_3BE3D": "ResourceRecord_InitAndValidate_3BE3D"
+  },
+  "chosen": "sub_3BE3D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_53C17": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_3BF08": "ResourceRecord_ReadHeaderFields_3BF08"
+  },
+  "chosen": "sub_3BF08",
+  "calls_confirmed": 1,
+  "operand_diffs": 4
+ },
+ "sub_53C5A": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 28,
+  "candidates": {
+   "sub_3BF4B": "ResourceRecord_ComputeRecordBounds_3BF4B"
+  },
+  "chosen": "sub_3BF4B",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_53C8E": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 28,
+  "candidates": {
+   "sub_3BF7F": "ResourceRecord_ComputeRecordBoundsB_3BF7F"
+  },
+  "chosen": "sub_3BF7F",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_53CC2": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 56,
+  "candidates": {
+   "sub_3BFB3": "ResourceRecord_SeekAndRead_3BFB3"
+  },
+  "chosen": "sub_3BFB3",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_53D31": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 62,
+  "candidates": {
+   "sub_3C022": "ResourceRecord_SeekAndReadB_3C022"
+  },
+  "chosen": "sub_3C022",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_53DAA": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 59,
+  "candidates": {
+   "sub_3C09B": "ResourceRecord_SeekAndReadC_3C09B"
+  },
+  "chosen": "sub_3C09B",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_53E1D": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_3C10E": "ResourceRecord_Helper_3C10E"
+  },
+  "chosen": "sub_3C10E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_53E62": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 56,
+  "candidates": {
+   "sub_3C153": "ResourceRecord_ReadStructured_3C153"
+  },
+  "chosen": "sub_3C153",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_53F40": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_3C231": "ResourceRecord_AdvanceByArrayCount_3C231"
+  },
+  "chosen": "sub_3C231",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_53F98": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_3C289": "ResourceRecord_ReadFieldGroupA_3C289"
+  },
+  "chosen": "sub_3C289",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_53FD3": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 20,
+  "candidates": {
+   "sub_3C2C4": "ResourceRecord_ReadFieldGroupB_3C2C4"
+  },
+  "chosen": "sub_3C2C4",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_53FFD": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_3C2EE": "ResourceRecord_ReadFieldGroupC_3C2EE"
+  },
+  "chosen": "sub_3C2EE",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_54058": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_3C349": "ResourceRecord_ReadViaHelper_3C349"
+  },
+  "chosen": "sub_3C349",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_5407E": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_3C36F": "ResourceRecord_ReadDwordFieldB_3C36F"
+  },
+  "chosen": "sub_3C36F",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_540D0": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 22,
+  "candidates": {
+   "sub_3C3C1": "ResourceRecord_ReadFinalField_3C3C1"
+  },
+  "chosen": "sub_3C3C1",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_5411A": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 18,
+  "candidates": {
+   "sub_3C40B": "ResourceRecord_ReadDwordAdvance_3C40B"
+  },
+  "chosen": "sub_3C40B",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_54140": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_3C431": "ResourceRecord_ComputeAlignedBounds_3C431"
+  },
+  "chosen": "sub_3C431",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_54177": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_3C468": "ResourceRecord_SeekToStart_3C468"
+  },
+  "chosen": "sub_3C468",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_542A4": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 23,
+  "candidates": {
+   "sub_3C595": "ResourceRecord_ReleaseAndClear_3C595"
+  },
+  "chosen": "sub_3C595",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_542D7": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_2E2C3": "Layer_Advance_2E2C3",
+   "sub_3C5C8": "ResourceRecord_ResetIfSet_3C5C8"
+  },
+  "chosen": "sub_3C5C8",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_542E5": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_3C5D6": "ResourceRecord_RecordCount_3C5D6"
+  },
+  "chosen": "sub_3C5D6",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_54332": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_3C623": "ResourceRecord_ReadPayload_3C623"
+  },
+  "chosen": "sub_3C623",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_544B1": {
+  "segment": "seg162",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_3CEB3": "StreamReader_ReleaseBuffer_3CEB3"
+  },
+  "chosen": "sub_3CEB3",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_544FD": {
+  "segment": "seg162",
+  "kind": "approchée",
+  "instructions": 97,
+  "candidates": {
+   "sub_3CEFF": "StreamReader_WriteTyped_3CEFF"
+  },
+  "chosen": "sub_3CEFF",
+  "calls_confirmed": 6,
+  "operand_diffs": 3
+ },
+ "sub_54603": {
+  "segment": "seg162",
+  "kind": "approchée",
+  "instructions": 196,
+  "candidates": {
+   "sub_3D005": "StreamReader_WriteWithGrowth_3D005"
+  },
+  "chosen": "sub_3D005",
+  "calls_confirmed": 10,
+  "operand_diffs": 6
+ },
+ "sub_5483E": {
+  "segment": "seg163",
+  "kind": "approchée",
+  "instructions": 35,
+  "candidates": {
+   "sub_3D240": "IndexedRecordReader_Destruct_3D240"
+  },
+  "chosen": "sub_3D240",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_54888": {
+  "segment": "seg163",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_3D28A": "IndexedRecordReader_ConstructVariantA_3D28A"
+  },
+  "chosen": "sub_3D28A",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_548B8": {
+  "segment": "seg163",
+  "kind": "approchée",
+  "instructions": 35,
+  "candidates": {
+   "sub_3D2BA": "IndexedRecordReader_ConstructVariantB_3D2BA"
+  },
+  "chosen": "sub_3D2BA",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_548F8": {
+  "segment": "seg163",
+  "kind": "approchée",
+  "instructions": 53,
+  "candidates": {
+   "sub_3D2FA": "IndexedRecordReader_ConstructVariantC_3D2FA"
+  },
+  "chosen": "sub_3D2FA",
+  "calls_confirmed": 2,
+  "operand_diffs": 4
+ },
+ "sub_54971": {
+  "segment": "seg163",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_3D373": "IndexedRecordReader_InitFields_3D373"
+  },
+  "chosen": "sub_3D373",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_54B9F": {
+  "segment": "seg163",
+  "kind": "approchée",
+  "instructions": 49,
+  "candidates": {
+   "sub_3D619": "IndexedRecordReader_ReadEntry_3D619"
+  },
+  "chosen": "sub_3D619",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_54C22": {
+  "segment": "seg163",
+  "kind": "approchée",
+  "instructions": 70,
+  "candidates": {
+   "sub_3D69C": "IndexedRecordReader_AdvanceIndex_3D69C"
+  },
+  "chosen": "sub_3D69C",
+  "calls_confirmed": 5,
+  "operand_diffs": 1
+ },
+ "sub_54D15": {
+  "segment": "seg164",
+  "kind": "approchée",
+  "instructions": 72,
+  "candidates": {
+   "sub_3DA1F": "TextRenderer_LoadResourceFile_3DA1F"
+  },
+  "chosen": "sub_3DA1F",
+  "calls_confirmed": 8,
+  "operand_diffs": 2
+ },
+ "sub_54EF1": {
+  "segment": "seg165",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_3DBFB": "Joystick_ReadAxesAndButtons_3DBFB"
+  },
+  "chosen": "sub_3DBFB",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_54F61": {
+  "segment": "seg165",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_3DC2D": "Joystick_ReadButtonsOnly_3DC2D"
+  },
+  "chosen": "sub_3DC2D",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_54FE2": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_3DC46": "JoystickCallback_Construct_3DC46"
+  },
+  "chosen": "sub_3DC46",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_5504D": {
+  "segment": "seg166",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_3DCB1": "JoystickCallback_SetValueAndEcho_3DCB1"
+  },
+  "chosen": "sub_3DCB1",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_5506D": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 49,
+  "candidates": {
+   "sub_3DCD1": "JoystickCallback_UpdateAndNotifyChain_3DCD1"
+  },
+  "chosen": "sub_3DCD1",
+  "calls_confirmed": 5,
+  "operand_diffs": 2
+ },
+ "sub_550E1": {
+  "segment": "seg166",
+  "kind": "stricte",
+  "instructions": 41,
+  "candidates": {
+   "sub_3DD45": "JoystickCallback_RegisterInChain_3DD45"
+  },
+  "chosen": "sub_3DD45",
+  "calls_confirmed": 4,
+  "operand_diffs": 0
+ },
+ "sub_5517F": {
+  "segment": "seg166",
+  "kind": "stricte",
+  "instructions": 33,
+  "candidates": {
+   "sub_3DDE3": "JoystickCallback_FindOrTraverse_3DDE3"
+  },
+  "chosen": null
+ },
+ "sub_55206": {
+  "segment": "seg166",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_3DE6A": "JoystickManager_Construct_3DE6A"
+  },
+  "chosen": null
+ },
+ "sub_5523B": {
+  "segment": "seg166",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_2E2C3": "Layer_Advance_2E2C3",
+   "sub_3C5C8": "ResourceRecord_ResetIfSet_3C5C8"
+  },
+  "chosen": null
+ },
+ "sub_5534B": {
+  "segment": "seg167",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_3DF86": "ConfigOption_ConstructFull_3DF86"
+  },
+  "chosen": "sub_3DF86",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_5548B": {
+  "segment": "seg167",
+  "kind": "approchée",
+  "instructions": 41,
+  "candidates": {
+   "sub_3E0C6": "ConfigOption_FormatValue_3E0C6"
+  },
+  "chosen": "sub_3E0C6",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_554E8": {
+  "segment": "seg167",
+  "kind": "approchée",
+  "instructions": 31,
+  "candidates": {
+   "sub_3E123": "ConfigOption_FormatValueB_3E123"
+  },
+  "chosen": "sub_3E123",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_55578": {
+  "segment": "seg167",
+  "kind": "approchée",
+  "instructions": 78,
+  "candidates": {
+   "sub_3E1B3": "ConfigOption_ApplyAndDisplayB_3E1B3"
+  },
+  "chosen": "sub_3E1B3",
+  "calls_confirmed": 5,
+  "operand_diffs": 6
+ },
+ "sub_55638": {
+  "segment": "seg167",
+  "kind": "approchée",
+  "instructions": 24,
+  "candidates": {
+   "sub_3E273": "ConfigOption_Dispatch_3E273"
+  },
+  "chosen": "sub_3E273",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_5568D": {
+  "segment": "seg167",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_557AD": {
+  "segment": "seg168",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_3E3DE": "Keyboard_RegisterOrInitHandlerTable_3E3DE"
+  },
+  "chosen": "sub_3E3DE",
+  "calls_confirmed": 4,
+  "operand_diffs": 0
+ },
+ "sub_55811": {
+  "segment": "seg168",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_3E442": "Keyboard_ClearHandlerTable_3E442",
+   "sub_3E6F9": "InputBinding_ReleaseJoystickCallback_3E6F9",
+   "sub_3E774": "Keyboard_InstallHandlerMask_3E774"
+  },
+  "chosen": "sub_3E442",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_55827": {
+  "segment": "seg168",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_3E458": "Keyboard_InitSystem_3E458"
+  },
+  "chosen": "sub_3E458",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_55855": {
+  "segment": "seg168",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_3E486": "Keyboard_UnregisterHandlerTable_3E486"
+  },
+  "chosen": "sub_3E486",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_55890": {
+  "segment": "seg168",
+  "kind": "approchée",
+  "instructions": 37,
+  "candidates": {
+   "sub_3E4C1": "Keyboard_PushEventToQueue_3E4C1"
+  },
+  "chosen": "sub_3E4C1",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_558E8": {
+  "segment": "seg168",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_3E519": "Keyboard_PeekOrPopEvent_3E519"
+  },
+  "chosen": "sub_3E519",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_5592C": {
+  "segment": "seg168",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_3E55D": "Keyboard_QueryHandlerTable_3E55D"
+  },
+  "chosen": "sub_3E55D",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_55960": {
+  "segment": "seg168",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_3E591": "Keyboard_Method_ReturnTypeTag_3E591"
+  },
+  "chosen": "sub_3E591",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_559AD": {
+  "segment": "seg169",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_3E5DE": "InputBinding_Construct_3E5DE",
+   "sub_3EA8B": "TextScrollDisplay_Construct_3EA8B"
+  },
+  "chosen": null
+ },
+ "sub_559D0": {
+  "segment": "seg169",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_3E601": "InputBinding_Destruct_3E601",
+   "sub_3EAAE": "TextScrollDisplay_Destruct_3EAAE"
+  },
+  "chosen": null
+ },
+ "sub_55A4B": {
+  "segment": "seg169",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_3E442": "Keyboard_ClearHandlerTable_3E442",
+   "sub_3E6F9": "InputBinding_ReleaseJoystickCallback_3E6F9",
+   "sub_3E774": "Keyboard_InstallHandlerMask_3E774"
+  },
+  "chosen": null
+ },
+ "sub_55A5D": {
+  "segment": "seg169",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_55A7F": {
+  "segment": "seg169",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_3E72D": "Keyboard_AllocateHandlerMask_3E72D"
+  },
+  "chosen": "sub_3E72D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_55AC6": {
+  "segment": "seg169",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_3E442": "Keyboard_ClearHandlerTable_3E442",
+   "sub_3E6F9": "InputBinding_ReleaseJoystickCallback_3E6F9",
+   "sub_3E774": "Keyboard_InstallHandlerMask_3E774"
+  },
+  "chosen": null
+ },
+ "sub_55AD7": {
+  "segment": "seg169",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_3E785": "Keyboard_ConfigureHandlerMask_3E785"
+  },
+  "chosen": "sub_3E785",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_55AFA": {
+  "segment": "seg169",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_55B0F": {
+  "segment": "seg169",
+  "kind": "stricte",
+  "instructions": 7,
+  "candidates": {
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_55B3A": {
+  "segment": "seg170",
+  "kind": "stricte",
+  "instructions": 29,
+  "candidates": {
+   "sub_3E7E8": "TextScroll_Construct_3E7E8"
+  },
+  "chosen": "sub_3E7E8",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_55BBE": {
+  "segment": "seg170",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_3E86C": "TextScroll_ComputeParams_3E86C"
+  },
+  "chosen": "sub_3E86C",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_55BF2": {
+  "segment": "seg170",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_3E8A0": "TextScroll_Helper_3E8A0"
+  },
+  "chosen": "sub_3E8A0",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_55C1B": {
+  "segment": "seg170",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_3E8C9": "TextScroll_HelperB_3E8C9"
+  },
+  "chosen": "sub_3E8C9",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_55CAC": {
+  "segment": "seg170",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_3E958": "TextScroll_ApplyHelperB_3E958"
+  },
+  "chosen": "sub_3E958",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_55D45": {
+  "segment": "seg170",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_3E9EE": "TextScroll_RegisterHandler_3E9EE"
+  },
+  "chosen": "sub_3E9EE",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_55D5F": {
+  "segment": "seg170",
+  "kind": "approchée",
+  "instructions": 16,
+  "candidates": {
+   "sub_3EA08": "TextScroll_ApplyHelperC_3EA08"
+  },
+  "chosen": "sub_3EA08",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_55D7F": {
+  "segment": "seg170",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_3EA28": "TextScroll_FormatAndApply_3EA28"
+  },
+  "chosen": "sub_3EA28",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_55D9D": {
+  "segment": "seg170",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_3EA46": "TextScroll_ApplyHelperD_3EA46"
+  },
+  "chosen": "sub_3EA46",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_55DE2": {
+  "segment": "seg171",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_3E5DE": "InputBinding_Construct_3E5DE",
+   "sub_3EA8B": "TextScrollDisplay_Construct_3EA8B"
+  },
+  "chosen": "sub_3EA8B",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_55E05": {
+  "segment": "seg171",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_3E601": "InputBinding_Destruct_3E601",
+   "sub_3EAAE": "TextScrollDisplay_Destruct_3EAAE"
+  },
+  "chosen": "sub_3EAAE",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_55E2A": {
+  "segment": "seg171",
+  "kind": "approchée",
+  "instructions": 42,
+  "candidates": {
+   "sub_3EAD3": "TextScrollDisplay_ComputeLayout_3EAD3"
+  },
+  "chosen": "sub_3EAD3",
+  "calls_confirmed": 4,
+  "operand_diffs": 2
+ },
+ "sub_55EBA": {
+  "segment": "seg171",
+  "kind": "approchée",
+  "instructions": 31,
+  "candidates": {
+   "sub_3EB63": "TextScrollDisplay_InitState_3EB63"
+  },
+  "chosen": "sub_3EB63",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_55EFF": {
+  "segment": "seg171",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_3EBA8": "TextScrollDisplay_Cleanup_3EBA8"
+  },
+  "chosen": "sub_3EBA8",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_55F34": {
+  "segment": "seg171",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_3EBDD": "TextScrollDisplay_RegisterEntries_3EBDD"
+  },
+  "chosen": "sub_3EBDD",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_56092": {
+  "segment": "seg171",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_3ED3B": "HandlerRegistry4Slot_Register_3ED3B"
+  },
+  "chosen": "sub_3ED3B",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_5618C": {
+  "segment": "seg173",
+  "kind": "approchée",
+  "instructions": 31,
+  "candidates": {
+   "sub_3EE35": "Stopwatch_RegisterTickModule_3EE35"
+  },
+  "chosen": "sub_3EE35",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_561DD": {
+  "segment": "seg173",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_3EE86": "Stopwatch_RegisterTickModuleVariant_3EE86"
+  },
+  "chosen": "sub_3EE86",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_5621A": {
+  "segment": "seg173",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_3EEC3": "Stopwatch_UnregisterTickModule_3EEC3"
+  },
+  "chosen": "sub_3EEC3",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_56232": {
+  "segment": "seg173",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_3EEC3": "Stopwatch_UnregisterTickModule_3EEC3"
+  },
+  "chosen": "sub_3EEC3",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_5624A": {
+  "segment": "seg173",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_3EEC3": "Stopwatch_UnregisterTickModule_3EEC3"
+  },
+  "chosen": "sub_3EEC3",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_5626C": {
+  "segment": "seg173",
+  "kind": "stricte",
+  "instructions": 79,
+  "candidates": {
+   "sub_3EF15": "Stopwatch_StartOrStop_3EF15"
+  },
+  "chosen": "sub_3EF15",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_56336": {
+  "segment": "seg173",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_3EFDF": "Stopwatch_Elapsed_3EFDF"
+  },
+  "chosen": "sub_3EFDF",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_5637A": {
+  "segment": "seg173",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_3F023": "Stopwatch_WaitElapsed_3F023"
+  },
+  "chosen": "sub_3F023",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_565F5": {
+  "segment": "seg174",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_3F12A": "Joystick_ReadButtonsWrapper_3F12A"
+  },
+  "chosen": "sub_3F12A",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_56AF4": {
+  "segment": "seg174",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_3F35E": "Joystick_FormatCalibrationDisplay_3F35E"
+  },
+  "chosen": "sub_3F35E",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_56B26": {
+  "segment": "seg174",
+  "kind": "approchée",
+  "instructions": 12,
+  "candidates": {
+   "sub_3F390": "Joystick_TestButtonMasked_3F390"
+  },
+  "chosen": "sub_3F390",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_5700C": {
+  "segment": "seg174",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_3F5C8": "OptionCounter_Construct_3F5C8"
+  },
+  "chosen": "sub_3F5C8",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_57052": {
+  "segment": "seg175",
+  "kind": "stricte",
+  "instructions": 7,
+  "candidates": {
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": "sub_3F60E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_5705D": {
+  "segment": "seg175",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_3F619": "TextScrollDisplayB_ConstructAndReset_3F619"
+  },
+  "chosen": "sub_3F619",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_5709C": {
+  "segment": "seg175",
+  "kind": "stricte",
+  "instructions": 40,
+  "candidates": {
+   "sub_3F658": "TextScrollDisplayB_InitAndRegister_3F658"
+  },
+  "chosen": "sub_3F658",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_57104": {
+  "segment": "seg175",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_3F6C0": "TextScrollDisplayB_ApplyHelperA_3F6C0"
+  },
+  "chosen": "sub_3F6C0",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_57148": {
+  "segment": "seg175",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_3F704": "TextScrollDisplayB_ApplyHelperB_3F704"
+  },
+  "chosen": "sub_3F704",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_5717B": {
+  "segment": "seg175",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_3F737": "TextScrollDisplayB_TickHelper_3F737"
+  },
+  "chosen": "sub_3F737",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_571A4": {
+  "segment": "seg175",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_3F74A": "TextScrollDisplayB_ApplyHelperC_3F74A"
+  },
+  "chosen": "sub_3F74A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_571DE": {
+  "segment": "seg175",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_3F784": "TextScrollDisplayB_ApplyHelperD_3F784"
+  },
+  "chosen": "sub_3F784",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_572AE": {
+  "segment": "seg175",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_3F863": "TextScrollDisplayB_StopAnimation_3F863"
+  },
+  "chosen": "sub_3F863",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_572E8": {
+  "segment": "seg175",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_3F89D": "TextScrollDisplayB_StartAnimation_3F89D"
+  },
+  "chosen": "sub_3F89D",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_57317": {
+  "segment": "seg175",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_2E2C3": "Layer_Advance_2E2C3",
+   "sub_3C5C8": "ResourceRecord_ResetIfSet_3C5C8"
+  },
+  "chosen": null
+ },
+ "sub_578C9": {
+  "segment": "seg177",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_3FA5E": "Keyboard_DrainBufferBIOS_3FA5E"
+  },
+  "chosen": "sub_3FA5E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_5B0": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_528": "CRT_IsAtty"
+  },
+  "chosen": "sub_528",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_5C1": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_539": "CRT_NormalizeSign32"
+  },
+  "chosen": "sub_539",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_683": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 22,
+  "candidates": {
+   "sub_5FB": "CRT_Lseek"
+  },
+  "chosen": "sub_5FB",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_68599": {
+  "segment": "ovr186",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_3D231": "StreamReader_DestructWrapper_3D231"
+  },
+  "chosen": "sub_3D231",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_6AC57": {
+  "segment": "ovr188",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_2E2C3": "Layer_Advance_2E2C3",
+   "sub_3C5C8": "ResourceRecord_ResetIfSet_3C5C8"
+  },
+  "chosen": null
+ },
+ "sub_6B176": {
+  "segment": "ovr188",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_3D231": "StreamReader_DestructWrapper_3D231"
+  },
+  "chosen": "sub_3D231",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_6B1EB": {
+  "segment": "ovr188",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_3D231": "StreamReader_DestructWrapper_3D231"
+  },
+  "chosen": "sub_3D231",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_6CC8A": {
+  "segment": "ovr190",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_3C848": "ResourceRecord_WriteFieldWrapper_3C848"
+  },
+  "chosen": "sub_3C848",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_6CF30": {
+  "segment": "ovr191",
+  "kind": "approchée",
+  "instructions": 15,
+  "candidates": {
+   "sub_5EEB0": "AudioQueue_RegisterTickModule_5EEB0"
+  },
+  "chosen": "sub_5EEB0",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_6D6": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_64E": "CRT_Malloc16_Retry"
+  },
+  "chosen": "sub_64E",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_6DBF3": {
+  "segment": "ovr191",
+  "kind": "stricte",
+  "instructions": 13,
+  "candidates": {
+   "sub_5FC6C": "AudioQueue_Helper_5FC6C"
+  },
+  "chosen": "sub_5FC6C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_6F41C": {
+  "segment": "ovr195",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_BFD41": "EntityTracker_AddEntryObj"
+  },
+  "chosen": "sub_BFD41",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_6F442": {
+  "segment": "ovr195",
+  "kind": "approchée",
+  "instructions": 24,
+  "candidates": {
+   "sub_BFD69": "EntityTracker_AddEntryText"
+  },
+  "chosen": "sub_BFD69",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_6F683": {
+  "segment": "ovr195",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_3C848": "ResourceRecord_WriteFieldWrapper_3C848"
+  },
+  "chosen": "sub_3C848",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_703E0": {
+  "segment": "ovr197",
+  "kind": "stricte",
+  "instructions": 63,
+  "candidates": {
+   "sub_C0F30": "MissionText_ApplyDualStyle_C0F30"
+  },
+  "chosen": "sub_C0F30",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_70946": {
+  "segment": "ovr197",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_C14F9": "MissionText_Helper4_C14F9"
+  },
+  "chosen": "sub_C14F9",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_7095F": {
+  "segment": "ovr197",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_C1512": "MissionText_Helper5_C1512"
+  },
+  "chosen": "sub_C1512",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_712": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 36,
+  "candidates": {
+   "sub_68A": "CRT_Malloc32_Retry"
+  },
+  "chosen": "sub_68A",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_71AFC": {
+  "segment": "ovr199",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_C2578": "Debris_ContainerOpWrapper_C2578"
+  },
+  "chosen": "sub_C2578",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_71B1": {
+  "segment": "seg009",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_2E2C3": "Layer_Advance_2E2C3",
+   "sub_3C5C8": "ResourceRecord_ResetIfSet_3C5C8"
+  },
+  "chosen": null
+ },
+ "sub_71C2": {
+  "segment": "seg009",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_2E2C3": "Layer_Advance_2E2C3",
+   "sub_3C5C8": "ResourceRecord_ResetIfSet_3C5C8"
+  },
+  "chosen": null
+ },
+ "sub_71C98": {
+  "segment": "ovr200",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_739BA": {
+  "segment": "ovr205",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_3F737": "TextScrollDisplayB_TickHelper_3F737"
+  },
+  "chosen": "sub_3F737",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_77A": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 8,
+  "candidates": {
+   "sub_6F2": "CRT_Srand_6F2"
+  },
+  "chosen": "sub_6F2",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_78B": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 13,
+  "candidates": {
+   "sub_703": "CRT_Rand"
+  },
+  "chosen": "sub_703",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_7B1": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 13,
+  "candidates": {
+   "sub_729": "CRT_Unlink"
+  },
+  "chosen": "sub_729",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_8684": {
+  "segment": "seg014",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_8737": {
+  "segment": "seg014",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_8742": {
+  "segment": "seg014",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_875F": {
+  "segment": "seg014",
+  "kind": "approchée",
+  "instructions": 41,
+  "candidates": {
+   "sub_2B23C": "PagedMemory_ReadTextResource_2B23C"
+  },
+  "chosen": "sub_2B23C",
+  "calls_confirmed": 2,
+  "operand_diffs": 7
+ },
+ "sub_87D90": {
+  "segment": "ovr239",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_C7F50": "AudioQueue_Helper2_C7F50"
+  },
+  "chosen": "sub_C7F50",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_88062": {
+  "segment": "ovr240",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_C8242": "InfoWidget_CopyFieldB_C8242"
+  },
+  "chosen": "sub_C8242",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_884B5": {
+  "segment": "ovr240",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_C85CB": "InfoWidget_Method_DispatchField2A_C85CB"
+  },
+  "chosen": "sub_C85CB",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_889C0": {
+  "segment": "ovr242",
+  "kind": "approchée",
+  "instructions": 54,
+  "candidates": {
+   "sub_2BB8C": "TextRenderer_ReleaseCachedGlyph_2BB8C"
+  },
+  "chosen": "sub_2BB8C",
+  "calls_confirmed": 5,
+  "operand_diffs": 4
+ },
+ "sub_88A52": {
+  "segment": "ovr242",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_2BC1E": "Memory_AllocatorSlot_Helper_2BC1E"
+  },
+  "chosen": "sub_2BC1E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_88A85": {
+  "segment": "ovr242",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_2BC51": "Memory_AllocatorSlotArray_Construct_2BC51"
+  },
+  "chosen": "sub_2BC51",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_88AC0": {
+  "segment": "ovr243",
+  "kind": "approchée",
+  "instructions": 131,
+  "candidates": {
+   "sub_2BC87": "Memory_AllocatorTable_PopulateSlots_2BC87"
+  },
+  "chosen": "sub_2BC87",
+  "calls_confirmed": 16,
+  "operand_diffs": 1
+ },
+ "sub_88EF1": {
+  "segment": "ovr246",
+  "kind": "stricte",
+  "instructions": 38,
+  "candidates": {
+   "sub_2CBE5": "Primitive_SetRectColorAndDraw_2CBE5"
+  },
+  "chosen": "sub_2CBE5",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_88F68": {
+  "segment": "ovr248",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_2E977": "TextRenderer_EncodeCharB_2E977"
+  },
+  "chosen": "sub_2E977",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_88FC0": {
+  "segment": "ovr250",
+  "kind": "stricte",
+  "instructions": 138,
+  "candidates": {
+   "sub_2ED93": "Palette_StepTowardTarget_2ED93"
+  },
+  "chosen": "sub_2ED93",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_89130": {
+  "segment": "ovr251",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_2F05F": "Video_SetModeIfChanged_2F05F"
+  },
+  "chosen": "sub_2F05F",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_89160": {
+  "segment": "ovr252",
+  "kind": "stricte",
+  "instructions": 58,
+  "candidates": {
+   "sub_2F08E": "DisplaySurface_Construct_2F08E"
+  },
+  "chosen": "sub_2F08E",
+  "calls_confirmed": 6,
+  "operand_diffs": 0
+ },
+ "sub_891E5": {
+  "segment": "ovr252",
+  "kind": "stricte",
+  "instructions": 79,
+  "candidates": {
+   "sub_2F113": "DisplaySurface_CloneOrResize_2F113"
+  },
+  "chosen": "sub_2F113",
+  "calls_confirmed": 7,
+  "operand_diffs": 0
+ },
+ "sub_892A1": {
+  "segment": "ovr252",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_2F1CF": "CachedObject_DestructSubobjects_2F1CF"
+  },
+  "chosen": "sub_2F1CF",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_892BE": {
+  "segment": "ovr252",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_2F1EC": "DisplaySurface_Helper_2F1EC"
+  },
+  "chosen": "sub_2F1EC",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_892F0": {
+  "segment": "ovr252",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_2F21E": "DisplaySurface_ConstructWithMode_2F21E"
+  },
+  "chosen": "sub_2F21E",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_89350": {
+  "segment": "ovr253",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_2F278": "Member_ClearAndFree_2F278"
+  },
+  "chosen": "sub_2F278",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_89370": {
+  "segment": "ovr253",
+  "kind": "stricte",
+  "instructions": 33,
+  "candidates": {
+   "sub_2F298": "Member_AllocateAndCopy_2F298"
+  },
+  "chosen": "sub_2F298",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_893B2": {
+  "segment": "ovr253",
+  "kind": "approchée",
+  "instructions": 41,
+  "candidates": {
+   "sub_2F2DA": "Member_CopyRaw_2F2DA"
+  },
+  "chosen": "sub_2F2DA",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_89401": {
+  "segment": "ovr253",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_2F329": "Member_NullTerminateIfSet_2F329"
+  },
+  "chosen": "sub_2F329",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_89440": {
+  "segment": "ovr254",
+  "kind": "stricte",
+  "instructions": 35,
+  "candidates": {
+   "sub_2F848": "Video_PrintString_2F848"
+  },
+  "chosen": "sub_2F848",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_89618": {
+  "segment": "ovr255",
+  "kind": "stricte",
+  "instructions": 35,
+  "candidates": {
+   "sub_2FCD5": "DisplayContext_CommitFrame_2FCD5"
+  },
+  "chosen": "sub_2FCD5",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_89661": {
+  "segment": "ovr255",
+  "kind": "approchée",
+  "instructions": 13,
+  "candidates": {
+   "sub_2FD1E": "DisplayContext_CommitFrameWithTag_2FD1E"
+  },
+  "chosen": "sub_2FD1E",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_89677": {
+  "segment": "ovr255",
+  "kind": "approchée",
+  "instructions": 15,
+  "candidates": {
+   "sub_C38E": "ConvData_LoadByName_C38E"
+  },
+  "chosen": null
+ },
+ "sub_89690": {
+  "segment": "ovr256",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_3C68D": "ResourceRecord_WriteField_3C68D"
+  },
+  "chosen": "sub_3C68D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_896C3": {
+  "segment": "ovr256",
+  "kind": "approchée",
+  "instructions": 43,
+  "candidates": {
+   "sub_3C6C0": "ResourceRecord_WriteFieldGroupA_3C6C0"
+  },
+  "chosen": "sub_3C6C0",
+  "calls_confirmed": 2,
+  "operand_diffs": 3
+ },
+ "sub_89733": {
+  "segment": "ovr256",
+  "kind": "approchée",
+  "instructions": 55,
+  "candidates": {
+   "sub_3C730": "ResourceRecord_WriteFieldGroupB_3C730"
+  },
+  "chosen": "sub_3C730",
+  "calls_confirmed": 3,
+  "operand_diffs": 5
+ },
+ "sub_8984B": {
+  "segment": "ovr256",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_3C848": "ResourceRecord_WriteFieldWrapper_3C848"
+  },
+  "chosen": "sub_3C848",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_8985A": {
+  "segment": "ovr256",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_3C857": "ResourceRecord_SeekAndRelease_3C857"
+  },
+  "chosen": "sub_3C857",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_89891": {
+  "segment": "ovr256",
+  "kind": "approchée",
+  "instructions": 32,
+  "candidates": {
+   "sub_3C88E": "ResourceRecord_WriteFieldGroupC_3C88E"
+  },
+  "chosen": "sub_3C88E",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_898E6": {
+  "segment": "ovr256",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_3C8E3": "ResourceRecord_WriteFieldGroupD_3C8E3"
+  },
+  "chosen": "sub_3C8E3",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_89941": {
+  "segment": "ovr256",
+  "kind": "approchée",
+  "instructions": 51,
+  "candidates": {
+   "sub_3C93E": "ResourceRecord_ReadAndWriteBridge_3C93E"
+  },
+  "chosen": "sub_3C93E",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_899CB": {
+  "segment": "ovr256",
+  "kind": "approchée",
+  "instructions": 48,
+  "candidates": {
+   "sub_3C9C8": "ResourceRecord_ReadAndWriteBridgeB_3C9C8"
+  },
+  "chosen": "sub_3C9C8",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_89A52": {
+  "segment": "ovr256",
+  "kind": "approchée",
+  "instructions": 27,
+  "candidates": {
+   "sub_3CA4F": "ResourceRecord_BridgeWrapperA_3CA4F"
+  },
+  "chosen": "sub_3CA4F",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_89AA5": {
+  "segment": "ovr256",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_3CAA2": "ResourceRecord_BridgeWrapperB_3CAA2"
+  },
+  "chosen": "sub_3CAA2",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_89B48": {
+  "segment": "ovr256",
+  "kind": "approchée",
+  "instructions": 32,
+  "candidates": {
+   "sub_3CB45": "ResourceRecord_CopyOrTransform_3CB45"
+  },
+  "chosen": "sub_3CB45",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_89BF9": {
+  "segment": "ovr256",
+  "kind": "stricte",
+  "instructions": 55,
+  "candidates": {
+   "sub_3CBF6": "ResourceRecord_CopyChunksUntilTag_3CBF6"
+  },
+  "chosen": "sub_3CBF6",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_941C": {
+  "segment": "seg016",
+  "kind": "approchée",
+  "instructions": 23,
+  "candidates": {
+   "sub_303E4": "AIL_find_proc_303E4"
+  },
+  "chosen": "sub_303E4",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_957E": {
+  "segment": "seg016",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_30503": "AIL_init_DDA_arrays_30503"
+  },
+  "chosen": "sub_30503",
+  "calls_confirmed": 0,
+  "operand_diffs": 5
+ },
+ "sub_95BB": {
+  "segment": "seg016",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_30540": "AIL_hook_timer_process_30540"
+  },
+  "chosen": "sub_30540",
+  "calls_confirmed": 0,
+  "operand_diffs": 10
+ },
+ "sub_9601": {
+  "segment": "seg016",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_30586": "AIL_unhook_timer_process_30586"
+  },
+  "chosen": "sub_30586",
+  "calls_confirmed": 0,
+  "operand_diffs": 5
+ },
+ "sub_962B": {
+  "segment": "seg016",
+  "kind": "approchée",
+  "instructions": 23,
+  "candidates": {
+   "sub_305B0": "AIL_set_PIT_divisor_305B0"
+  },
+  "chosen": "sub_305B0",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_964E": {
+  "segment": "seg016",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_305D3": "AIL_set_PIT_period_305D3"
+  },
+  "chosen": "sub_305D3",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_9678": {
+  "segment": "seg016",
+  "kind": "approchée",
+  "instructions": 44,
+  "candidates": {
+   "sub_305FD": "AIL_ul_divide_305FD"
+  },
+  "chosen": "sub_305FD",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_96C3": {
+  "segment": "seg016",
+  "kind": "approchée",
+  "instructions": 50,
+  "candidates": {
+   "sub_30648": "AIL_program_timers_30648"
+  },
+  "chosen": "sub_30648",
+  "calls_confirmed": 1,
+  "operand_diffs": 17
+ },
+ "sub_9752": {
+  "segment": "seg016",
+  "kind": "approchée",
+  "instructions": 27,
+  "candidates": {
+   "sub_306D7": "AIL_startup_306D7"
+  },
+  "chosen": "sub_306D7",
+  "calls_confirmed": 0,
+  "operand_diffs": 5
+ },
+ "sub_98F1": {
+  "segment": "seg016",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_30876": "AIL_release_all_timers_30876"
+  },
+  "chosen": "sub_30876",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_997D": {
+  "segment": "seg016",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_30902": "AIL_set_timer_period_30902"
+  },
+  "chosen": "sub_30902",
+  "calls_confirmed": 1,
+  "operand_diffs": 7
+ },
+ "sub_9A4B": {
+  "segment": "seg016",
+  "kind": "approchée",
+  "instructions": 65,
+  "candidates": {
+   "sub_309D0": "AIL_register_driver_309D0"
+  },
+  "chosen": "sub_309D0",
+  "calls_confirmed": 0,
+  "operand_diffs": 13
+ },
+ "sub_9AF1": {
+  "segment": "seg016",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_30A76": "AIL_release_driver_handle_30A76"
+  },
+  "chosen": "sub_30A76",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_9BF4": {
+  "segment": "seg016",
+  "kind": "approchée",
+  "instructions": 19,
+  "candidates": {
+   "sub_30B79": "AIL_shutdown_driver_30B79"
+  },
+  "chosen": "sub_30B79",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_A12D": {
+  "segment": "seg017",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_A1C4": {
+  "segment": "seg017",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_3E70B": "Keyboard_SetHandlerPointer_3E70B",
+   "sub_3F60E": "OptionCounter_Set_3F60E"
+  },
+  "chosen": null
+ },
+ "sub_A8C": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 45,
+  "candidates": {
+   "sub_85A": "CRT_Time_85A"
+  },
+  "chosen": "sub_85A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_AD9": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_8A7": "CRT_CtypeLookup"
+  },
+  "chosen": "sub_8A7",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_D7C": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 187,
+  "candidates": {
+   "sub_8D3": "CRT_Doprnt_Core"
+  },
+  "chosen": "sub_8D3",
+  "calls_confirmed": 0,
+  "operand_diffs": 8
+ },
+ "sub_F6E": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 156,
+  "candidates": {
+   "sub_D57": "CRT_Doprnt_Dispatch"
+  },
+  "chosen": "sub_D57",
+  "calls_confirmed": 1,
+  "operand_diffs": 13
+ }
+}

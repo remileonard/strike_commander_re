@@ -9,6 +9,8 @@ L'archive couvre deux exécutables du jeu :
              listing reconstruit par tools/vroomm_listing.py (source/topttst1.asm, analysis/topt/)
   - pacific: PACIFIC.EXE, Pacific Strike (vol et hors-vol dans le même exécutable) ; sans base IDA,
              listing reconstruit par tools/vroomm_listing.py (source/pacific.asm, analysis/pacific/)
+  - wings  : WINGS_OF.EXE, Wings of Glory (même moteur RealSpace) ; sans base IDA,
+             listing reconstruit par tools/vroomm_listing.py (source/wings.asm, analysis/wings/)
 
 Chaque outil accepte `--exe <nom>` (défaut : strike). Les adresses IDA
 (`sub_XXXXX`) sont propres à chaque exécutable : une même adresse ne désigne
@@ -35,6 +37,10 @@ EXES = {
         'asm': os.path.join(ROOT, 'source', 'pacific.asm'),
         'analysis': os.path.join(ROOT, 'analysis', 'pacific'),
     },
+    'wings': {
+        'asm': os.path.join(ROOT, 'source', 'wings.asm'),
+        'analysis': os.path.join(ROOT, 'analysis', 'wings'),
+    },
 }
 
 
@@ -60,7 +66,7 @@ def pop_exe_arg(argv):
     if '--exe' in args:
         i = args.index('--exe')
         if i + 1 >= len(args):
-            raise SystemExit("--exe attend un nom d'exécutable (strike, optest, topt, pacific).")
+            raise SystemExit("--exe attend un nom d'exécutable (strike, optest, topt, pacific, wings).")
         exe = args[i + 1]
         del args[i:i + 2]
     return exe, args
