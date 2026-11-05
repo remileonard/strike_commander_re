@@ -630,11 +630,46 @@ Lu le 2026-11-05 sur la première mission, `PRLH-M1` (« Scramble »). Chaîne d
 | face | 16 octets | 28 octets, toujours un triangle |
 | couleur de la face | mot à l'octet 8 | mot à l'octet 20, numéro de matériau (14 à 17 = double face) |
 | u, v des 3 sommets | octets 10 à 15 | octets 22 à 27 |
-| autres champs | groupe (octet 0), type (octet 7) | groupe (octet 0), octet 19 ; octets 7 à 18 non lus par ce chargeur |
+| type de la face | octet 7 | octet 19 (rangé à la même place de la face en mémoire, +0) |
+| autres champs | groupe (octet 0) | groupe (octet 0) ; octets 7 à 18 non lus par ce chargeur |
 
   `OAHU.ZIP` n'a qu'une région (cellule 188) : 28 sommets, 14 triangles, une piste d'environ 80 m sur 1 600 m à
   121 m d'altitude, au bord de Pearl Harbor ; matériaux 0 à 6, deux triangles par matériau.
 - **Objets posés** : aucun dans `OAHU.ZIP` (ressource vide).
+
+**Lecture d'une région de pistes, pour le portage** (ordre de `TRI_ParseOverlayGeometry_A7710`) :
+
+```
+en-tête, 10 octets
+    mot : nombre de sommets
+    mot : nombre de faces
+    mot : non lu
+    mot : côté de la grille
+    mot : longueur de la table des listes (en mots)
+sommets, 13 octets chacun (comme Strike Commander)
+    i32 X, i32 (plan horizontal, Z de libRealSpace = −valeur), i32 altitude Y, tous ÷ 256
+    octet : éclairage
+faces, 28 octets chacune
+    octet 0       : groupe de détail
+    mots 1, 3, 5  : les 3 sommets
+    octets 7 à 18 : non lus
+    octet 19      : type
+    mot 20        : matériau (14 à 17 = double face)
+    octets 22 à 27: u, v des 3 sommets
+table des listes : longueur × mot
+grille : côté × côté mots
+```
+
+**Écart avec libRealSpace.** `PSMission` charge bien `TERRAIN\<nom>.ZIP` (`RSArea::InitFromZipFileName`), mais les
+pistes passent par `RSArea::ParseTriFile`, qui lit le format de Strike Commander. Sur `OAHU.ZIP` :
+
+- l'en-tête est lu sur 4 mots : le mot non lu (35) devient le côté de la grille, et le côté de la grille (1) devient
+  la longueur de la table des listes ;
+- les sommets commencent 2 octets trop tôt : le premier sommet est lu à X = 7 934 464 m, altitude 7 930 111 m ;
+- les faces sont lues sur 16 octets au lieu de 28 ;
+- la lecture attend 3 048 octets alors que l'entrée en fait 798 : elle déborde de l'entrée.
+
+La correction tient dans `RSArea::ParseTriFile` (lecture selon le jeu) ; elle sera écrite avec l'implémentation.
 
 ![Oahu : relief (pistes en rouge) et champ « éclairage » des sommets](images/ps_terrain_oahu.png)
 
