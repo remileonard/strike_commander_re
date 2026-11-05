@@ -244,7 +244,8 @@ visionneuse d'objets 3D (`objview.pak`), générique et score final.
   `segment_boundaries.json`, `annotated_segments/`, `strike_matches.json`.
 - Tous les outils de consultation et de génération prennent **`--exe optest`** (défaut `strike`),
   chemins dans `tools/exe_paths.py`. Troisième exécutable : **`--exe topt`** = `TOPTTST1.EXE` de
-  Tactical Operations, sans base IDA (listing reconstruit, `analysis/topt/README.md`).
+  Tactical Operations, sans base IDA (listing reconstruit, `analysis/topt/README.md`). Quatrième : **`--exe pacific`** = `PACIFIC.EXE` de Pacific Strike
+  (vol et hors-vol dans un seul exécutable ; `analysis/pacific/README.md`).
 - **Noms repris de STRIKE.EXE** par `tools/match_functions.py --write` : 567 fonctions dont le
   code est identique (412) ou de même suite d'instructions avec des adresses de données
   différentes (155, « à vérifier »), appels sortants contrôlés. Leur résumé commence par
@@ -271,9 +272,14 @@ strike_commander_re/
 │   ├── strike.map                   fichier map du linker
 │   ├── optest.asm                   désassemblage IDA d'OPTEST.EXE (358 861 lignes)
 │   ├── optest.map                   fichier map d'OPTEST.EXE
-│   └── topttst1.asm                 TOPTTST1.EXE (Tactical Operations), listing reconstruit au format IDA
-│                                      par tools/vroomm_listing.py — analysis/topt/README.md
+│   ├── topttst1.asm                 TOPTTST1.EXE (Tactical Operations), listing reconstruit au format IDA
+│   │                                  par tools/vroomm_listing.py — analysis/topt/README.md
+│   └── pacific.asm                  PACIFIC.EXE (Pacific Strike, vol et hors-vol), listing reconstruit
+│                                      (--exe pacific) — analysis/pacific/README.md
 ├── analysis/
+│   ├── pacific/                     analyse de PACIFIC.EXE (Pacific Strike, --exe pacific) : README.md = déroulement
+│   │                                  (GAMEFLOW.IFF, 42 commandes, variables et drapeaux, date) et conversations
+│   │                                  (CONV.PAK compressé, commandes, voix) comparés à Strike Commander
 │   ├── topt/                        analyse de TOPTTST1.EXE (Tactical Operations, --exe topt) : README.md,
 │   │                                  known_functions, cinématiques (midgames/, iff/), midgame_engine.json porté
 │   ├── optest/                      analyse d'OPTEST.EXE : mêmes fichiers que ci-dessous
