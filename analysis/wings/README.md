@@ -387,16 +387,19 @@ enregistrements de fichier qu'aucune case de l'index ne désigne).
 
 `tools/wog_map_render.py MAP2.PAK -o map2.png` (fichier extrait par `tools/xtre_extract.py`).
 
-`MAP2.PAK` est un `PAK` de 7 entrées :
+`MAP2.PAK` est un `PAK` de 7 entrées. Les fichiers cités par `FORM BLOX` (`NEWMAP.ELV`, `NEWMAP.AVG`, `NEWMAP.TRI`,
+`NEWMAP.OBJ`) n'existent dans aucune archive (cherchés par leur hachage dans `FLIGHTHD.TRE` et `FLIGHTCD.TRE`, et
+par leur nom dans `WOGDATA1.TRE` et `WOGDATA3.TRE`) : comme dans Strike Commander (`DATA_MODEL.md`, `MAURITAN.PAK`),
+ce sont les noms des entrées du `PAK` lui-même.
 
 | Entrée | Taille | Contenu |
 |---|---|---|
-| 0 | 508 | `FORM TERA` : `VERS` (2), `INFO`, `FORM BLOX` (`ELEV`, `ATRI`, `OBJS`, qui citent `NEWMAP.ELV`, `NEWMAP.AVG`, `NEWMAP.TRI`, `NEWMAP.OBJ`), `FORM TXMS` (`INFO`, `MAPS`) |
-| 1 | 259 200 | grille de 360 × 360 cases de 2 octets |
-| 2 et 3 | 0 | vides |
+| 0 | 508 | `FORM TERA` : `VERS` (2), `INFO`, `FORM BLOX` (un seul `ELEV`, puis `ATRI`, `OBJS`), `FORM TXMS` (`INFO`, `MAPS`) |
+| 1 | 259 200 | grille de 360 × 360 sommets de 2 octets (`ELEV` : 18 cellules, `dw 18`, de 20 sommets, `dw 20`, espacés de 1 000, `dw 1000` ; 18 × 20 = 360). Lue d'un bloc, ligne après ligne, l'image est continue. Strike Commander : `PAK` de cellules, 6 octets par sommet |
+| 2 et 3 | 0 | vides (Strike Commander : niveaux de détail moyen et bas) |
 | 4 | 1 300 | non décodée |
-| 5 | 51 370 | non décodée ; commence comme une table de `PAK` (positions sur 3 octets, octets de type 0E0h et 0FFh) |
-| 6 | 648 | non décodée ; contient le nom `BRIDGE` |
+| 5 | 51 370 | `PAK` de 324 cellules (18 × 18), dont 80 non vides : listes d'objets posés (`u16` nombre, puis enregistrements avec un nom : `SMHOUS1` à `SMHOUS5`, `SMHOUSD1`, `HOUSE1`, `BRIDGE`, `DBRIDGE`…), comme l'entrée 5 d'`ALASKA.PAK` |
+| 6 | 648 | non décodée ; contient des noms d'objets (`BRIDGE`, `SMHOUS1`…) ; Strike Commander : 324 `u16` |
 
 Le chunk `MAPS` cite 23 noms : `BEACH`, `GR2RTH`, `RCK2RTH`, `GTRNCH`, `INRSXN`, `INTGRSS`, `INTTREE`, `INTRCK`,
 `RDXRV`, `FARMS`, `RIVER`, `TOWN`, `DTOWN`, `ATRNCH`, `RUNWAY`, `TRACK`, `ROAD`, `NOMAN`, `CROSS`, `NML`, `GROAD`,
