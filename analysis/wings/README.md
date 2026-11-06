@@ -545,8 +545,12 @@ Adresses du code de `GLORY.EXE` (§ 7.6). Aucune fonction n'a de nom.
 - La taille du chunk doit être un multiple de 4 (`test byte ptr [ebp-8Ch], 3`, sinon erreur 9116h). Vérifié : les
   43 chunks `PROG` des 47 missions de `FLIGHTHD.TRE` et `FLIGHTCD.TRE` le sont.
 - Le chunk est copié tel quel, puis découpé : un mot tous les 4 octets est examiné ; un mot nul termine un programme,
-  le suivant commence 4 octets plus loin. 24 programmes au plus (`cmp edx, 18h`, sinon erreur 9011h). Les
-  programmes sont numérotés à partir de 1.
+  le suivant commence 4 octets plus loin. 24 programmes au plus (`cmp edx, 18h`, sinon erreur 9011h).
+- **Correction (2026-11-06)** : les programmes sont numérotés **à partir de 0** (écrit « à partir de 1 »
+  auparavant). Le n° 0 commence au début du chunk (`mov [edi+8], eax` avant la boucle), le n° k après le k-ième mot
+  nul (`inc edx` / `mov [edi+edx*4+8], ecx`) ; la recherche d'un numéro (0F544h) rend « pas de programme » si le
+  numéro atteint le nombre de mots nuls. Vérifié sur les données : le champ « début de mission » du joueur de
+  `MISN-2.IFF` vaut 0 et le programme 0 est bien son plan de vol (`OP_SET_OBJ_TAKE_OFF` en tête, § 8.5).
 
 ### 8.2 Lecture d'une instruction (0E61Ch)
 
@@ -824,6 +828,25 @@ enregistrements, un second les crée. Enregistrement : forme (1 octet), puis `Ar
 
 Une autre lettre arrête le programme (message d'erreur 900Fh).
 
+Tests d'appartenance (méthode +8 de chaque forme ; 109E0h, 10A4Ch, 10AA8h, 10B2Ch) — valeurs en mètres, en
+libRealSpace `réf.x = c0`, `réf.y = c2`, `réf.z = −c1` :
+
+| Forme | Dedans si |
+|---|---|
+| `S` | distance 3D au point de référence ≤ v0 : **sphère de rayon v0** |
+| `C` | altitude entre réf.y et réf.y + v0, distance dans le plan X/Z ≤ v1 : **cylindre, hauteur v0, rayon v1** |
+| `B` | x entre réf.x − v1 et réf.x + v0 ; c1 entre réf.c1 − v3 et réf.c1 + v2 (v2 vers le nord, donc vers −Z) ; altitude entre réf.y et réf.y + v4 : **boîte, v0 est, v1 ouest, v2 nord, v3 sud, v4 hauteur** |
+| `P` | même boîte que `B`, puis point dans le **polygone** des n points (c0, c1) **absolus** (pas ajoutés à la référence) : comptage des côtés croisés, impair = dedans |
+
+`S`, `C` et `B` sont ceux de Strike Commander (`IMPL_MISSION_AREAS.md`).
+
+**Scènes (`FORM PLAY` / `SCNE`).** Lecteur 151CCh (32 scènes au plus) et 14FACh pour chacune : en-tête de
+24 octets lu d'un bloc (`push 18h`), puis (taille − 24) ÷ 2 mots = index `PART` de la scène. Même découpage que
+Strike Commander (`IMPL_MISSION_AREAS.md` § 4) : octet 0 (actif), mot zone (pointeur, nul si hors liste), trois
+numéros de programme, octet 9, mot, 3 int32. **Entrée dans une scène** (`Scene_SpawnParts`, fonction pas encore
+nommée, 10DF8h) : pour chaque index de la liste, l'objet qui n'existe pas encore est activé (`call 0F5C0h`, le
+placement ci-dessous). Un objet peut aussi être activé par `OP_ACTIVATE_OBJ` dans un script (0ED2Ah).
+
 **Lecture d'un `PART`.** `Mission_ReadParts` (14DC8h) exige une taille multiple de 62 (sinon erreur 9036h) et lit
 chaque enregistrement par `Mission_ReadPartRecord` (14888h) dans une structure de 112 octets. Découpage identique à
 Strike Commander (`IMPL_MISSION_PART.md` § 1), avec ces constats :
@@ -882,7 +905,7 @@ Contrôles sur les données :
 ### 8.9 Rendu 3D d'une mission
 
 `tools/wog_mission_render.py` applique le § 8.8 et dessine les objets sur le terrain du § 7.7 (page WebGL autonome,
-liste des objets cliquable pour s'y rendre) :
+liste des objets, des zones et des scènes) :
 
 ```
 python3 tools/wog_mission_render.py <DATA> MISN-1 --html misn1_3d.html [--avion camel]
@@ -897,8 +920,34 @@ cap 90), ennemis à 300-400 m vers l'est :
 
 ![GAUNTLET, vue 3D](images/wog_gauntlet_3d.png)
 
-Limites : tous les objets `PART` sont dessinés, quel que soit le moment de leur activation par les scripts ; ceux
-placés dans le repère du joueur le sont par rapport à sa position de départ ; l'éclairage des objets est une
+**Zones et scènes.** Chaque zone est dessinée en fil de fer d'après les dimensions de son test d'appartenance
+(sphère : trois cercles ; cylindre ; boîte ; polygone en prisme), d'une couleur propre ; la page liste les zones
+(clic : y aller) et les scènes avec les objets qui apparaissent à leur entrée. `MISN-2` vue d'en haut : sphères de
+6 000 m « Aerodrome », « Patrouille 1 », « Roulers », « Patrouille 2 » :
+
+![MISN-2, zones](images/wog_misn2_zones.png)
+
+**Objets placés dans le repère du joueur.** Ils apparaissent quand le joueur entre dans la scène qui les liste ;
+le jeu les pose alors autour de la position et du cap qu'a le joueur à cet instant. Le rendu choisit une
+**hypothèse** pour cet instant : le joueur va en ligne droite de son point de départ vers le point de référence de
+la zone ; il entre au premier point de ce trajet (pas de 10 m) qui passe le test de la zone dans le plan X/Z, avec
+le cap de ce trajet et son altitude de départ. Ce point est marqué en blanc (trait vertical et direction).
+Recherche de la scène, dans l'ordre :
+
+1. une scène à zone dont la liste contient l'objet ;
+2. sinon, un programme qui contient `OP_ACTIVATE_OBJ` de cet objet et qui est l'un des trois scripts d'une scène à
+   zone, ou l'un des quatre scripts d'un objet lui-même rattaché à une telle scène (exemple, `MISN-2` : les
+   objets 12 et 13 sont activés par le programme 10, script des objets 10 et 11, qui sont dans la scène
+   « Patrouille 1 ») ;
+3. sinon : position de départ du joueur, signalée « aucune scène à zone trouvée » (exemple, `MISN-24` : les
+   objets 20 à 23 sont activés par le programme 14, qui n'est rattaché qu'à ces mêmes objets ; ce qui lance ce
+   programme n'est pas établi).
+
+Sur les 43 missions (`MISN-*`, `BOMBRUN`, `DOGFIGHT`, `GAUNTLET`), 295 objets liés au joueur sont rattachés à une
+scène à zone et 62 restent au départ (dont 17 dans `GAUNTLET`, qu'aucune liste de scène ne contient).
+
+Limites : tous les objets `PART` sont dessinés, quel que soit le moment de leur activation par les scripts ; le
+point d'entrée dans une scène est une hypothèse (ci-dessus) ; l'éclairage des objets est une
 lumière simple (celui du jeu n'est pas lu) ; l'indice 255 des textures d'objets est rendu transparent (supposé,
 case à cocher) ; seul le niveau de détail `LVL0` et la 1re image des `TXMA` sont dessinés ; ombres (`*SHA*.IFF`) et
 objets de l'entrée 5 du terrain non dessinés.
