@@ -536,6 +536,200 @@ distance (le jeu ne texture qu'une fenêtre de 25 × 25 sommets et passe aux cou
 cocher montre ces couleurs) ; l'animation de la classe 0 change d'image toutes les 0,25 s, car l'unité du pas de
 temps `[0AEB30h]` n'est pas établie ; les objets posés (entrée 5) ne sont pas dessinés.
 
+## 8. Scripts de mission de `GLORY.EXE` (lu le 2026-11-06)
+
+Adresses du code de `GLORY.EXE` (§ 7.6). Aucune fonction n'a de nom.
+
+### 8.1 Chargement (chunk `PROG`, 13338h et 14EBCh)
+
+- La taille du chunk doit être un multiple de 4 (`test byte ptr [ebp-8Ch], 3`, sinon erreur 9116h). Vérifié : les
+  43 chunks `PROG` des 47 missions de `FLIGHTHD.TRE` et `FLIGHTCD.TRE` le sont.
+- Le chunk est copié tel quel, puis découpé : un mot tous les 4 octets est examiné ; un mot nul termine un programme,
+  le suivant commence 4 octets plus loin. 24 programmes au plus (`cmp edx, 18h`, sinon erreur 9011h). Les
+  programmes sont numérotés à partir de 1.
+
+### 8.2 Lecture d'une instruction (0E61Ch)
+
+```
+opcode   = mot signé
+argument = mot signé suivant
+si le mot suivant vaut 9 : argument supplémentaire = le mot d'après (sinon −1)
+```
+
+Mots de 16 bits, comme Strike Commander ; un seul argument supplémentaire (Pacific Strike : jusqu'à 3). Une
+instruction fait donc 4 octets, ou 8 avec l'argument supplémentaire : la taille du chunk reste un multiple de 4.
+Vérifié sur les 43 chunks : tous se lisent sans reste ; 107 instructions ont l'argument supplémentaire.
+
+Étiquette (0E65Ch) : recherche **depuis le début du programme**, par paires (opcode, argument), de l'opcode 8 dont
+l'argument vaut n ; introuvable : erreur 901Fh (Strike Commander : recherche en avant depuis l'instruction courante).
+
+### 8.3 La machine (0E790h)
+
+Contexte d'exécution : `[ctx+4]` pointeur d'instruction, `[ctx+8]` opcode, `[ctx+0Ch]` argument, `[ctx+10h]`
+argument supplémentaire, `[ctx+14h]` registre, `[ctx+18h]` résultat du dernier ordre natif, `[ctx+1Ch]` fin,
+`[ctx+20h]` objet courant, `[ctx+24h]` résultat de comparaison (bit 1 = inférieur, bit 2 = égal, bit 4 = supérieur).
+Les instructions s'enchaînent jusqu'à la fin du script, y compris après un ordre natif.
+
+Aiguillage : `cmp ecx, 0D0h` puis `jmp dword ptr cs:[ecx*4 + 0F18Ch]` : **209 valeurs**, dont 97 traitées ; les 112
+autres mènent à l'erreur 911Bh. Une erreur (9501Ch → 94F70h) affiche « Error #%04x » et **termine le programme**.
+
+Variables : variable n < 256 = mot signé (table `[0BFF0Ch]`) ; n ≥ 256 = bit (table `[0BFED0h]`), comme le
+déroulement de `WINGS_OF.EXE` (§ 4.1). Lecture 29BE0h, écriture 29C6Ch.
+
+Noms : ceux de Strike Commander (`MISSION_SCRIPT_OPCODES.md`) quand l'effet est le même ; \* = nom proposé.
+
+| Valeur | Nom | Effet constaté |
+|---|---|---|
+| 0 | `OP_NOOP` | retour : fin du programme, ou retour d'un appel (0E734h) |
+| 1 | `OP_EXIT_PROG` | même code que 0 |
+| 2 | `OP_EXEC_SUB_PROG` | appel du programme n (pile de 24 appels, 0E6C8h) |
+| 3 | `OP_EXEC_SUB_PROG_WORK` | appel du programme numéro registre |
+| 4 | `OP_STOP_SCRIPT` | arrêt du script (`[ctx+1Ch]` = 1) |
+| 5 | `—` | rien |
+| 8 | `OP_SET_LABEL` | étiquette n (rien à l'exécution) |
+| 15 | `OP_SET_EXIT_CODE` | octet `[0AEBD0h]` = n |
+| 16 | `OP_MOVE_VALUE_TO_WORK_REGISTER` | registre = n |
+| 17 | `OP_MOVE_FLAG_TO_WORK_REGISTER` | registre = variable n |
+| 18 | `OP_SWAP_WORK_AND_FLAG` | échange registre et variable n |
+| 19 | `OP_MOVE_RESULT_TO_WORK` | registre = résultat du dernier ordre natif |
+| 21 | `OP_RANDOM_TO_WORK` | registre = hasard (164BCh, avec n + 1) |
+| 32 | `OP_ADD_VALUE_TO_WORK` | registre += n |
+| 33 | `OP_ADD_FLAG_TO_WORK` | registre += variable n |
+| 34 | `OP_ADD_VALUE_TO_FLAG` | variable n += n |
+| 35 | `OP_ADD_WORK_REGISTER_TO_FLAG` | variable n += registre |
+| 36 | `OP_SUB_VALUE_FROM_WORK` | registre −= n |
+| 37 | `OP_SUB_FLAG_FROM_WORK` | registre −= variable n |
+| 38 | `OP_SUB_VALUE_FROM_FLAG` | variable n −= n |
+| 39 | `OP_SUB_WORK_FROM_FLAG` | variable n −= registre |
+| 40 | `OP_OR_VALUE_WITH_WORK` | registre \|= n |
+| 41 | `OP_OR_FLAG_WITH_WORK` | registre \|= variable n |
+| 42 | `OP_AND_VALUE_WITH_WORK` | registre &= n |
+| 43 | `OP_AND_FLAG_WITH_WORK` | registre &= variable n |
+| 44 | `OP_XOR_VALUE_WITH_WORK` | registre ^= n |
+| 45 | `OP_XOR_FLAG_WITH_WORK` | registre ^= variable n |
+| 46 | `OP_MUL_VALUE_WITH_WORK` | registre ×= n |
+| 47 | `OP_MUL_FLAG_WITH_WORK` | registre ×= variable n |
+| 48 | `OP_DIV_WORK_BY_VALUE` | registre /= n |
+| 49 | `OP_DIV_WORK_BY_FLAG` | registre /= variable n |
+| 64 | `OP_CMP_WORK_WITH_VALUE` | comparer registre à n |
+| 65 | `OP_CMP_VALUE_WITH_WORK` | comparer n à registre |
+| 66 | `OP_CMP_WORK_WITH_FLAG` | comparer registre à variable n |
+| 67 | `OP_CMP_FLAG_WITH_WORK` | comparer variable n à registre |
+| 68 | `OP_CMP_RESULT_WITH_VALUE` | comparer le résultat natif à n |
+| 69 | `OP_TEST_FLAG` | comparer variable n à 1 |
+| 70 | `OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS` | aller à l'étiquette n si le résultat natif ≠ 0 |
+| 71 | `OP_GOTO_IF_CURRENT_COMMAND_DONE` | aller à l'étiquette n si le résultat natif = 0 |
+| 72 | `OP_BRANCH_IF_EQUAL` | aller à l'étiquette n si égal (bit 2) |
+| 73 | `OP_BRANCH_IF_NOT_EQUAL` | … si différent |
+| 74 | `OP_BRANCH_IF_LESS` | … si inférieur (bit 1) |
+| 75 | `OP_BRANCH_IF_GREATER` | … si supérieur (bit 4) |
+| 76 | `OP_BRANCH_IF_LESS_EQUAL` | … si inférieur ou égal (bits 1 ou 2) |
+| 77 | `OP_BRANCH_IF_GREATER_EQUAL` | … si supérieur ou égal (bits 2 ou 4) |
+| 78 | `OP_BRANCH` | aller à l'étiquette n |
+| 79 | `OP_EXECUTE_CALL` | aller à l'étiquette numéro registre (saut, pas appel) |
+| 80 | `OP_MOVE_WORK_REGISTER_TO_FLAG` | variable n = registre |
+| 81 | `OP_MOVE_RESULT_TO_FLAG` | variable n = résultat natif |
+| 82 | `OP_SET_FLAG_TO_TRUE` | variable n = 1 |
+| 83 | `OP_SET_FLAG_TO_FALSE` | variable n = 0 |
+| 84 | `OP_TOGGLE_FLAG` | variable n inversée (29D14h) |
+| 85 | `OP_ADD_1_TO_FLAG` | variable n += 1 |
+| 86 | `OP_REMOVE_1_TO_FLAG` | variable n −= 1 |
+| 128 | `OP_ACTIVATE_SCENE` | octet d'état de la scène n = 1 (scènes en `[mission+34h]`, états en `[mission+74h]`) |
+| 129 | `OP_DEACTIVATE_SCENE` | octet d'état de la scène n = 0 |
+| 130 | `OP_IS_SCENE_ACTIVE`\* | bit « égal » = état de la scène n ≠ 0 |
+| 136 | `OP_OBJ_136`\* | objet n → fonction 0FAF0h (rôle non établi) |
+| 137 | `OP_OBJ_137`\* | registre = 43E44h(objet n) (rôle non établi ; 0 si l'objet n'existe pas) |
+| 144 | `OP_ACTIVATE_OBJ` | activation de l'objet n (0F5C0h) |
+| 145 | `OP_DEACTIVATE_OBJ` | désactivation de l'objet n (0FA9Ch) |
+| 146 | `OP_IF_TARGET_IN_AREA` | bit « égal » = bit 1 de `[objet n+48h]` (rôle du bit non établi) |
+| 147 | `OP_IS_TARGET_ALIVE` | bit « égal » = bit 2 de `[objet n+48h]` (le bit qui interdit les ordres natifs : objet détruit) |
+| 148 | `OP_INSTANT_DESTROY_TARGET` | objet n → 10064h |
+| 149 | `OP_DIST_TO_TARGET` | registre = distance objet n – objet courant ÷ 1 000, plafonnée à 255 |
+| 150 | `OP_ALTITUDE_OF_TARGET`\* | registre = (altitude de l'objet n − 2 250 m) ÷ 100 m, plafonnée à 255 |
+| 151 | `OP_DIST_TO_SPOT` | registre = distance objet courant – SPOT n ÷ 1 000, plafonnée à 255 |
+| 152 | `OP_IS_TARGET_ACTIVE` | bit « égal » = objet n existant (`[objet+68h]` ≠ 0) |
+| 153 | `OP_DIST_TO_TARGET_METRES`\* | comme 149, sans la division par 1 000 |
+| 154 | `OP_OBJ_136_WORK`\* | comme 136, objet numéro registre |
+| 155 | `OP_IF_TARGET_IN_AREA_WORK`\* | comme 146, objet numéro registre |
+| 156 | `OP_ACTIVATE_OBJ_WORK`\* | comme 144, objet numéro registre |
+| 160 | `OP_SET_WAIT_FOR_SECONDS` | minuterie de l'objet courant (`[objet+4Ch]`) ; résultat 1 tant qu'elle court, 0 à la fin ; n = 0 la remet à zéro |
+| 161 | `OP_SET_OBJ_TAKE_OFF` | ordre natif : position SPOT n |
+| 162 | `OP_SET_OBJ_LAND` | ordre natif : SPOT n, et SPOT supplémentaire (obligatoire, erreur 901Ch sinon) |
+| 163 | `OP_SET_OBJ_163`\* | ordre natif : si l'objet n'est pas dans la zone n, ordre 164 vers le centre de la zone, SPOT supplémentaire obligatoire (901Eh) |
+| 164 | `OP_SET_OBJ_164`\* | ordre natif : SPOT n et SPOT supplémentaire (obligatoire, 901Dh) |
+| 165 | `OP_SET_OBJ_FLY_TO_WP` | ordre natif : comme 164 |
+| 167 | `OP_SET_OBJ_DESTROY_TARGET` | ordre natif : cible = objet n, position = la sienne |
+| 168 | `OP_SET_OBJ_DEFEND_TARGET` | ordre natif : comme 167 ; objet absent → résultat 1 |
+| 169 | `OP_SET_OBJ_DEFEND_AREA` | ordre natif : SPOT n |
+| 170 | `OP_SET_OBJ_FOLLOW_ALLY` | ordre natif : cible = objet n (255 = allié par défaut `[objet+39h]`) |
+| 171 | `OP_SET_MESSAGE` | ordre natif : message n, vers l'objet `[mission+0F8h]` (le joueur) |
+| 172 | `OP_SET_OBJ_172`\* | ordre natif : comme 164 |
+| 177 | `OP_SET_OBJ_177`\* | ordre natif : valeur n d'une liste de la mission (`[mission+58h]`) dans la 2ᵉ composante de la position |
+| 178 | `OP_SET_OBJ_178`\* | ordre natif : même liste, dans la 1ʳᵉ composante |
+| 179 | `OP_SET_OBJ_179`\* | `[objet courant+39h]` = n, puis ordre natif vers la position de l'objet n |
+| 180 | `OP_SET_OBJ_180`\* | ordre natif : SPOT n |
+| 181 | `OP_SET_OBJ_181`\* | ordre natif : position de l'objet n |
+| 182 | `OP_SHOW_ON_NAV_MAP` | `[objet n+48h]` \|= 10h |
+| 183 | `OP_HIDE_FROM_NAV_MAP` | `[objet n+48h]` &= ~10h |
+| 184 | `OP_JOIN_PLAYER_TEAM` | `[objet n+48h]` \|= 20h |
+| 185 | `OP_LEAVE_PLAYER_TEAM` | `[objet n+48h]` &= ~20h |
+| 190 | `OP_PACIFY_TARGET` | ordre natif donné à l'objet n (s'il n'est pas détruit) |
+| 191 | `OP_SET_OBJ_PATROL_POSITION` | ordre natif : SPOT n |
+| 192 | `OP_MISSION_192`\* | 11288h(mission, n) (rôle non établi) |
+| 208 | `OP_SELECT_FLAG_208` | octet `[0AF6EDh]` = n |
+
+Absents de la table (erreur fatale), alors qu'ils existent dans Strike Commander : `OP_SAVE_VALUE_TO_GAMFLOW_REGISTER`
+(20) et 166 (voir 8.5).
+
+### 8.4 Ordres natifs (10098h)
+
+Refusés (résultat 0) si l'objet courant n'existe pas (`[objet+68h]` = 0) ou est détruit (bit 2 de `[objet+48h]`).
+Aiguillage par opcode − 161 (table en 10570h, ordres 161 à 191). Chaque ordre calcule une position (SPOT, centre de
+zone ou position d'un objet ; SPOT = enregistrement de 16 octets de `[mission+3Ch]`), éventuellement un objet cible
+et une seconde position, puis appelle la méthode +90h du contrôleur de l'objet : (contrôleur, code de l'ordre, objet
+cible, position, seconde position ou numéro de message). Le résultat est rangé en `[ctx+18h]`.
+
+### 8.5 Le plan de vol du joueur (55C28h à 56060h)
+
+Distinct de la machine : le programme `[objet du joueur+64h]` est lu comme une **liste d'étapes**. Une étape =
+une instruction (octet bas de l'opcode, octet bas de l'argument), suivie éventuellement d'un argument
+supplémentaire (marqueur 9) et d'un **message** (l'argument d'un `OP_SET_MESSAGE` qui suit ; 255 sinon). Le plan
+avance quand la condition de l'étape est remplie (55E2Ch, puis 55E04h) :
+
+| Étape | Terminée quand |
+|---|---|
+| 161 | le joueur a quitté le sol (`[contrôleur+68h → +20h]` = 0) |
+| 162 | le joueur est au sol |
+| 163 | erreur 710Dh |
+| 164 | erreur 710Dh |
+| 165 | distance horizontale joueur – SPOT n < 1 750 m (`cmp dword ptr [ebp-24h], 6D600h`) |
+| 166 | la zone n contient le joueur (méthode +8 de la zone) |
+| 167 | l'objet n est détruit |
+| 168 | l'objet n est détruit |
+| 169 | jamais |
+| 170 | l'objet n est détruit |
+
+`OP_SET_OBJ_FLY_TO_AREA` (166) n'est traité que par ce plan : la machine s'arrêterait dessus. Exemple d'un programme
+de cette forme, `BOMBRUN.IFF`, programme 1 (quel objet le porte n'a pas été vérifié) :
+
+```
+OP_SET_OBJ_TAKE_OFF 1
+OP_SET_OBJ_FLY_TO_AREA 3
+OP_SET_MESSAGE 0
+OP_SET_OBJ_FLY_TO_AREA 7
+OP_SET_MESSAGE 4
+…
+OP_SET_OBJ_FLY_TO_WP 2
+OP_SET_MESSAGE 6
+OP_SET_OBJ_LAND 2, 1
+```
+
+### 8.6 Opcodes employés par les missions
+
+Relevé sur les 43 chunks `PROG` (`FLIGHTHD.TRE`, `FLIGHTCD.TRE`) : 0, 1, 2, 8, 16, 17, 21, 32, 35, 36, 37, 39, 64, 66,
+69, 70, 72 à 80, 82 à 85, 130, 137, 144 à 147, 149, 151, 154, 155, 160 à 162, 165 à 171, 182 à 185, 190, 191, 208. Tous sont
+dans la table de la machine, sauf 166 (75 emplois, tous dans le plan de vol).
+
 ## 8. Le reste n'est pas lu
 
 Aucune autre fonction propre à Wings of Glory n'a été lue. Les données du jeu n'ont pas été fournies.
