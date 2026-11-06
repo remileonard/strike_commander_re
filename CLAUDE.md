@@ -287,7 +287,8 @@ strike_commander_re/
 │   │                                  ; PACIFIC_TERRAIN.html (terrain, pistes, sol, eau) et PACIFIC_PHYSIQUE.html (objets 3D,
 │   │                                  FORM DYNM, modèle de vol, PSEntity / PSPlane prévus ; tools/ps_physics_figures.py)
 │   ├── wings/                       analyse de WINGS_OF.EXE (Wings of Glory, --exe wings) : README.md, noms repris de
-│   │                                  PACIFIC, STRIKE et OPTEST (match_functions.py), annotated_segments/
+│   │                                  PACIFIC, STRIKE et OPTEST (match_functions.py), annotated_segments/ ;
+│   │                                  WINGS_OF_GLORY.html = version illustrée (archives, déroulement, GLORY.EXE, terrain, missions)
 │   ├── topt/                        analyse de TOPTTST1.EXE (Tactical Operations, --exe topt) : README.md,
 │   │                                  known_functions, cinématiques (midgames/, iff/), midgame_engine.json porté
 │   ├── optest/                      analyse d'OPTEST.EXE : mêmes fichiers que ci-dessous

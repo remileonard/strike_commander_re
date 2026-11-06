@@ -107,12 +107,10 @@ Les sauvegardes (`saved\`, `tapes\`) passent par le disque.
 Un cache de fichiers en mémoire EMS (`EmsFileCache_FindOrAdd_53245`) compare aussi les noms en clair (`strncmp` sur
 40 caractères).
 
-### 3.5 Écart avec les données de Rémi
+### 3.5 Les archives à noms hachés
 
-Rémi décrit des archives TRE dont l'index contient des **hachages des noms**. Ce `WINGS_OF.EXE` (603 888 octets) ne
-peut pas les lire : sa recherche compare des noms. Pour trouver le hachage, il faut l'exécutable livré avec ces
-archives (autre version du jeu). Recherches faites sans résultat ici : table de CRC 32 (octets `96h, 30h, 7, 77h`),
-polynômes `0EDB88320h` / `4C11DB7h`.
+Les archives dont l'index contient des **hachages des noms** (`FLIGHTHD.TRE`, `FLIGHTCD.TRE`, lignes `@` de
+`WG.CFG`) ne sont pas lues par `WINGS_OF.EXE` mais par le programme du vol, `GLORY.EXE` : format et hachage au § 7.
 
 ## 4. Déroulement (scripts `EFCT` et conditions `REQU`) — lu le 2026-11-05
 
@@ -954,4 +952,9 @@ objets de l'entrée 5 du terrain non dessinés.
 
 ## 9. Le reste n'est pas lu
 
-Aucune autre fonction propre à Wings of Glory n'a été lue. Les données du jeu n'ont pas été fournies.
+Pas encore lus : le modèle de vol de `GLORY.EXE` ; le rôle de `HOME`, `TYPE` et des valeurs de la forme de zone `P`
+au-delà du test ; ce qui lance certains programmes (`MISN-24`, objets 20 à 23) ; les entrées 4 et 6 du terrain ;
+l'éclairage des modèles ; dans `WINGS_OF.EXE`, les 8 blocs de 26 octets de la partie et les cinématiques.
+
+Version illustrée de ce document : `WINGS_OF_GLORY.html` (images intégrées ; après une modification de la page,
+`python3 tools/conv_doc_images.py --embarquer analysis/wings/WINGS_OF_GLORY.html` remet les images à jour).
