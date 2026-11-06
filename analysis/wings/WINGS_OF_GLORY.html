@@ -78,6 +78,7 @@ figure { margin: 12px 0; }
 figure img { display: block; max-width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 6px; background: #000; }
 figure img.pix { image-rendering: pixelated; }
 figcaption { font-size: 12.5px; color: var(--muted); margin-top: 6px; max-width: 82ch; }
+pre.tpl.conv { white-space: pre-wrap; }
 pre.tpl { background: var(--bg); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.5; margin: 8px 0; }
 .flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin: 12px 0; }
 .flow div { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; background: var(--bg); }
@@ -334,6 +335,61 @@ p code, li code, td code { overflow-wrap: anywhere; }
   <code>GROUP_SHOT_ADD_CHARACTER</code> qui le suivent. Dans un plan <code>GROUP_SHOT_WWI</code>, le nom de figure
   n'est pas un nom de <code>CONVDATA.IFF</code> : son dernier caractère est retiré et le reste, converti en nombre
   (<code>CRT_Atol_22B1</code>), donne l'entrée de <code>WWISHPS.PAK</code> (« 210 » → entrée 21).</p>
+  <h3>Exemples</h3>
+  <p><b>1. Gros plans</b> — <code>CONV.PAK</code>, conversation 0, en entier (le major Daniel et Charles ; le joueur
+  répond). Chaque <code>CLOSEUP</code> donne le visage, l'image du visage, le décor du gros plan, la position, le texte
+  et la couleur du texte ; les <code>CLOSEUP_CONTINUATION</code> ajoutent une réplique au même gros plan.</p>
+<pre class="tpl conv">CLOSEUP daniel, image 13, décor boff1_cu, x 160, y 128, « Despite what you may think, Lieutenants... », couleur 231
+CLOSEUP_CONTINUATION « We are not holding this war at your convenience. »
+CLOSEUP charles, image 21, décor boff2_cu, x 160, y 128, « I should say not, Major. », couleur 181
+CLOSEUP_CONTINUATION « The quality of champagne around here leaves quite a bit to be desired. »
+CLOSEUP daniel, image 24, décor boff1_cu, x 160, y 128, « Getting lit up like a new saloon... », couleur 231
+CLOSEUP_CONTINUATION « And being carted back here with the morning dispatches is intolerable! »
+CLOSEUP_CONTINUATION « A Flight left half an hour ago, without you. »
+CLOSEUP_CONTINUATION « I had to roust out Shikes and Hallock to take your places. »
+CLOSEUP player, image 18, décor boff3_cu, x 160, y 128, « Sorry, sir... », couleur 224
+CLOSEUP daniel, image 13, décor boff1_cu, x 160, y 128, « Aside from patrols, consider yourselves confined to the aerodrome... », couleur 231
+CLOSEUP_CONTINUATION « ...Until further notice. »
+CLOSEUP daniel, image 23, décor boff1_cu, x 160, y 128, « And get yourselves sober... You're going up with B Flight. », couleur 231</pre>
+  <p>La même conversation dans <code>CONVF.PAK</code> : mêmes visages, images, décors et couleurs, seul le texte change
+  (début) :</p>
+<pre class="tpl conv">CLOSEUP daniel, image 13, décor boff1_cu, x 160, y 128, « Malgré ce que vous pouvez penser, Lieutenant... », couleur 231
+CLOSEUP_CONTINUATION « Nous ne continuons pas cette guerre à votre convenance. »
+CLOSEUP charles, image 21, décor boff2_cu, x 160, y 128, « Là, vous avez raison, Major. », couleur 181
+CLOSEUP_CONTINUATION « Car la qualité du champagne d'ici laisse quelque peu à désirer. »</pre>
+  <p>Les octets du premier gros plan (en décimal, traduits à droite ; mots en petit-boutiste) :</p>
+  <pre class="tpl">3                                   CLOSEUP
+100 97 110 105 101 108 0 0 0        visage « daniel » (9 octets)
+13                                  image 13
+98 111 102 102 49 95 99 117 0       décor « boff1_cu » (9 octets)
+160 0                               x = 160
+128 0                               y = 128
+68 101 115 112 … 46 46 46 0         texte « Despite what you may think, Lieutenants... », terminé par 0
+231                                 couleur 231
+4                                   CLOSEUP_CONTINUATION
+87 101 32 97 … 0                    texte « We are not holding this war at your convenience. »</pre>
+  <p><b>2. Carton de lieu et de date</b> — conversation 223 : un <code>GROUP_SHOT</code> sur le décor
+  <code>brit_ext</code>, puis trois <code>SHOW_TEXT</code>. Dans les trois fichiers, les 40 <code>GROUP_SHOT</code> sont
+  tous suivis d'un <code>SHOW_TEXT</code> : aucun n'ajoute de figure.</p>
+<pre class="tpl conv">GROUP_SHOT brit_ext
+SHOW_TEXT couleur 176, « Near St. Marie Cappel, Belgium »
+SHOW_TEXT couleur 176, « No. 23 Squadron RFC »
+SHOW_TEXT couleur 176, « January 25, 1917  0830 Hours »</pre>
+  <p><b>3. Plan de groupe avec figures</b> — conversation 48 : <code>GROUP_SHOT_WWI</code> sur le décor
+  <code>bhn2_int</code>, deux figures désignées par les entrées 33 et 34 de <code>WWISHPS.PAK</code> (« 330 »,
+  « 340 » sans leur dernier caractère), puis retour aux gros plans.</p>
+<pre class="tpl conv">CLOSEUP daniel, image 0, décor bhn9_cu, x 160, y 128, « Thought you chaps would like to know. », couleur 231
+GROUP_SHOT_WWI bhn2_int
+GROUP_SHOT_ADD_CHARACTER 330, x 0, y 0
+GROUP_SHOT_ADD_CHARACTER 340, x 0, y 0
+CLOSEUP player2, image 21, décor bhn16_cu, x 160, y 128, « Albert Ball? The famous British ace? », couleur 224
+CLOSEUP charles3, image 24, décor bhn1_cu, x 160, y 128, « The very same one, dash it all. », couleur 181</pre>
+  <p><b>4. <code>CLOSEUP_SAME</code></b> — conversation 212 : la suite d'une phrase coupée, lue comme
+  <code>CLOSEUP_CONTINUATION</code> : les deux sont lues par la même fonction, <code>ConvRec_ReadCloseup_18AD6</code>
+  (texte seul) ; ce qui les distingue ensuite à l'affichage n'a pas été lu.</p>
+<pre class="tpl conv">CLOSEUP_CONTINUATION « With over thirty kills to his credit, »
+CLOSEUP_SAME « the Lieutenant is a shining example of American bravery. »</pre>
+  <p>Pour afficher une conversation : <code>python3 tools/wog_conv_dump.py WOGDATA1.TRE --pak CONV.PAK --entree 48</code>.</p>
   <h3>Test de lecture</h3>
   <p><code>tools/wog_conv_dump.py WOGDATA1.TRE --test</code> applique ces règles à toutes les conversations :</p>
   <div class="tablewrap"><table><thead><tr><th>Fichier</th><th>Conversations</th><th>Lues jusqu'au dernier octet</th><th>Anomalies</th></tr></thead><tbody>
@@ -343,9 +399,10 @@ p code, li code, td code { overflow-wrap: anywhere; }
   </tbody></table></div>
   <div class="ok"><p>Dans <code>CONV.PAK</code> : <code>CLOSEUP</code> 1 389, <code>CLOSEUP_CONTINUATION</code> 364,
   <code>CLOSEUP_SAME</code> 4, <code>GROUP_SHOT</code> 40, <code>GROUP_SHOT_ADD_CHARACTER</code> 31,
-  <code>GROUP_SHOT_WWI</code> 20, <code>SHOW_TEXT</code> 51. Tous les visages sont dans <code>FACE</code>, toutes les
-  figures dans <code>FIGR</code>, tous les décors de plan de groupe dans <code>BACK</code>, et toutes les entrées de
-  <code>WWISHPS.PAK</code> désignées existent. Les décors de gros plan (<code>boff1_cu</code>…) ne sont pas dans
+  <code>GROUP_SHOT_WWI</code> 20, <code>SHOW_TEXT</code> 51. Tous les visages sont dans <code>FACE</code>, tous les
+  décors de plan de groupe dans <code>BACK</code>, et toutes les entrées de <code>WWISHPS.PAK</code> désignées existent.
+  Les 31 figures sont toutes dans des plans <code>GROUP_SHOT_WWI</code> : <code>FIGR</code> n'est cité par aucune
+  conversation. Les décors de gros plan (<code>boff1_cu</code>…) ne sont pas dans
   <code>BACK</code> : où le jeu les cherche n'a pas été lu.</p></div>
 </article>
 

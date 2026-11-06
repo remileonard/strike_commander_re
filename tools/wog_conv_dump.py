@@ -187,6 +187,7 @@ def test(archive):
         counts = collections.Counter()
         missing = collections.Counter()
         wwi_used = set()
+        figr_cited = 0
         empty = 0
         bad = 0
         for k, data in enumerate(entries):
@@ -208,8 +209,10 @@ def test(archive):
                         missing["entrée de WWISHPS.PAK %d (figure %s)" % (n, fields["figure"])] += 1
                     else:
                         wwi_used.add(n)
-                elif code == 1 and fields["figure"].lower() not in names["FIGR"]:
-                    missing["figure " + fields["figure"]] += 1
+                elif code == 1:
+                    figr_cited += 1
+                    if fields["figure"].lower() not in names["FIGR"]:
+                        missing["figure " + fields["figure"]] += 1
                 if code in (0, 18) and fields["décor"].lower() not in names["BACK"]:
                     missing["décor " + fields["décor"]] += 1
         failures += bad
@@ -220,7 +223,7 @@ def test(archive):
         if missing:
             print("  noms absents de CONVDATA.IFF : " + ", ".join("%s (%d)" % kv for kv in sorted(missing.items())))
         else:
-            print("  tous les noms se retrouvent : visages (FACE), figures (FIGR), décors de plan de groupe (BACK), entrées de WWISHPS.PAK")
+            print("  tous les noms se retrouvent : visages (FACE), figures (FIGR, %d citées), décors de plan de groupe (BACK), entrées de WWISHPS.PAK" % figr_cited)
     return failures
 
 

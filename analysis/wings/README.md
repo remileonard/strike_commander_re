@@ -254,8 +254,9 @@ de `GAMEFLOW\WWISHPS.PAK` (figure « 210 » → entrée 21).
 
 Commandes rencontrées dans `CONV.PAK` : `CLOSEUP` 1 389, `CLOSEUP_CONTINUATION` 364, `CLOSEUP_SAME` 4,
 `GROUP_SHOT` 40, `GROUP_SHOT_ADD_CHARACTER` 31, `GROUP_SHOT_WWI` 20, `SHOW_TEXT` 51 ; aucun `JUMP` ni `NOP_16`.
-Tous les visages de gros plan sont dans `FACE` de `CONVDATA.IFF`, toutes les figures de plan de groupe dans
-`FIGR`, tous les décors de plan de groupe dans `BACK` ; les figures des plans `GROUP_SHOT_WWI` désignent les
+Tous les visages de gros plan sont dans `FACE` de `CONVDATA.IFF`, tous les décors de plan de groupe dans `BACK`.
+Les 40 `GROUP_SHOT` sont tous suivis d'un `SHOW_TEXT` (cartons de lieu et de date) : les 31 figures sont toutes dans
+des plans `GROUP_SHOT_WWI`, et aucune conversation ne cite de nom de `FIGR` ; les figures des plans `GROUP_SHOT_WWI` désignent les
 entrées 21 à 26, 32 à 34 et 48 de `WWISHPS.PAK`, toutes présentes. Textes en CP437 (accents du français justes).
 Les décors de gros plan (`boff1_cu`…) ne sont pas dans `BACK` : où le jeu les cherche n'a pas été lu.
 
