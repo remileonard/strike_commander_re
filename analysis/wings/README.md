@@ -506,6 +506,36 @@ détail vaut 0 ; hors carte : 255. Elle range aussi **octet 0 >> 6** dans `[0B00
 Sens des classes 0, 1, 2 et des zones : non établi dans le code. Sur `MAP2.PAK` (§ 7.5) : la classe 0 occupe le coin
 nord-ouest et elle a quatre textures animées par défaut ; les zones 1 et 2 sont séparées par une limite continue.
 
+### 7.7 Rendu de `MAP2.PAK` avec les règles du jeu
+
+`tools/wog_terrain_render.py` applique les règles du § 7.6 (pose vérifiée dans le code) : texture n = entrée n de
+`TXM\TXMPACK.PAK` ; une texture entière par case de 1 km, coins (1, 1), (l − 2, 1), (l − 2, h − 2), (1, h − 2) sur
+v0 = (r, c), v1 = (r, c + 1), v2 = (r + 1, c + 1), v3 = (r + 1, c), donc u vers l'est et v vers le sud ; sans
+texture, texture de la classe (0 → 0 à 3 tour à tour, 1 → 101, 2 → 100) ; palette `PALETTE\PALETTE.IFF` (6 bits).
+Les rivières, routes et tranchées se raccordent d'une case à l'autre, ce qui confirme le sens.
+
+Couleurs lointaines (couleur de base de la classe : 183, 110, 74) :
+
+![MAP2.PAK, couleurs lointaines](images/wog_map2_couleurs.png)
+
+Textures (chaque case réduite à 4 × 4 pixels) :
+
+![MAP2.PAK, textures](images/wog_map2_textures.png)
+
+Vue 3D (page WebGL autonome produite par l'outil, `--html`) :
+
+![MAP2.PAK, vue 3D](images/wog_map2_3d.png)
+
+```
+python3 tools/wog_terrain_render.py MAP2.PAK --txmpack TXMPACK.PAK --palette PALETTE.IFF \
+        --couleurs map2_couleurs.png --textures map2_textures.png --html map2_3d.html
+```
+
+Limites de la vue 3D : le terrain est plat (aucune hauteur dans la grille) ; tout est texturé quelle que soit la
+distance (le jeu ne texture qu'une fenêtre de 25 × 25 sommets et passe aux couleurs lointaines au-delà ; la case à
+cocher montre ces couleurs) ; l'animation de la classe 0 change d'image toutes les 0,25 s, car l'unité du pas de
+temps `[0AEB30h]` n'est pas établie ; les objets posés (entrée 5) ne sont pas dessinés.
+
 ## 8. Le reste n'est pas lu
 
 Aucune autre fonction propre à Wings of Glory n'a été lue. Les données du jeu n'ont pas été fournies.
