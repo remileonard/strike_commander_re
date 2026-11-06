@@ -6,10 +6,11 @@ Ajouté le 2026-11-05. Exécutable fourni par Rémi ; il n'est pas dans le dép�
 
 - `WINGS_OF.EXE`, 603 888 octets. Borland C++ 1991, gestionnaire d'overlays VROOMM (en-tête `FBOV` après l'image),
   comme STRIKE.EXE, OPTEST.EXE et PACIFIC.EXE. Lancé par `WG` (« Please type WG to run Wings of Glory. »).
-- Comme PACIFIC.EXE, **un seul exécutable pour le vol et le hors-vol** : on y trouve les noms `convdata.iff`,
-  `faces.iff`, `convfont.shp`, `cvno%04d.pak` (voix des conversations), `bkglist.iff`, `instant.iff` (mission
-  d'entraînement), `options.cfg`, `optdflt.cfg`, `wg.cfg`, et la liste des avions (Sopwith Pup, Sopwith Camel, SPAD XIII,
-  Albatros D III, Albatros C III, Albatros D V, Fokker D VII, Fokker D VIII, Fokker Dr. I, Zeppelin L71).
+- `WINGS_OF.EXE` est le programme **hors vol** (déroulement, conversations, cinématiques, options, entraînement) :
+  on y trouve les noms `convdata.iff`, `faces.iff`, `convfont.shp`, `cvno%04d.pak`, `bkglist.iff`, `instant.iff`,
+  `options.cfg`, `optdflt.cfg`, `wg.cfg`, et la liste des avions (Sopwith Pup, Sopwith Camel, SPAD XIII, Albatros D III,
+  Albatros C III, Albatros D V, Fokker D VII, Fokker D VIII, Fokker Dr. I, Zeppelin L71). Le vol est un autre
+  programme, `GLORY.EXE` (§ 6 et § 7).
 - Listing au format IDA reconstruit par `tools/vroomm_listing.py` : `source/wings.asm` (330 segments dont 71
   overlays, 2 988 fonctions repérées). Tous les outils prennent `--exe wings` (`tools/exe_paths.py`).
 
@@ -255,9 +256,131 @@ Les étiquettes `PROG`, `PART`, `CAST` et `AREA` n'apparaissent que dans l'écri
 sans les interpréter. Aucun aiguillage d'instructions de mission n'existe dans cet exécutable, et il ne contient
 aucune étiquette du modèle de vol (`DYNM`, `JDYN`).
 
-**Les instructions des scripts de mission sont dans l'exécutable du vol**, lancé ensuite par le lanceur `WG` ; il
-n'a pas été fourni.
+**Les instructions des scripts de mission sont dans l'exécutable du vol**, `GLORY.EXE` (§ 7), lancé ensuite par le
+lanceur `WG.EXE`.
 
-## 7. Le reste n'est pas lu
+## 7. Archives XTRE et programme du vol (`GLORY.EXE`) — lu le 2026-11-06
+
+### 7.1 Les deux sortes d'archives
+
+`WG.CFG` (fourni par Rémi) liste deux sortes d'archives :
+
+```
+@C:\WINGS\flighthd.tre
+@D:\flightcd.tre
+=D:\wogdata1.tre
+=D:\wogdata2.tre
+=C:\WINGS\wogdata3.tre
+```
+
+- Lignes `=` : archives **TRE** à noms en clair (en-tête de 8 octets, enregistrements de 74 octets), montées par
+  `WINGS_OF.EXE` (§ 3 ; `WOGDATA1.TRE`, `WOGDATA3.TRE` vérifiés).
+- Lignes `@` : archives **XTRE** à noms hachés (`FLIGHTHD.TRE`, `FLIGHTCD.TRE`), lues par `GLORY.EXE`, le programme
+  du vol. Le code de lecture de la ligne `@` dans `GLORY.EXE` n'a pas été lu ; la lecture de la ligne de commande de
+  `WINGS_OF.EXE` ne connaît que `=`, `+` et `-`.
+
+`GLORY.EXE` est un programme **32 bits en mode protégé** : extenseur DOS Phar Lap (en-tête `P3` à l'octet 6 560,
+image de 750 380 octets à l'octet 7 072), compilé avec MetaWare High C. Les offsets ci-dessous sont des offsets dans
+cette image (`push ebp / mov ebp, esp`, code 32 bits).
+
+### 7.2 Format XTRE (constaté dans `GLORY.EXE` et sur les deux archives)
+
+En-tête de 24 octets, lu en `[objet+114h]` et vérifié à l'offset 914DCh (`cmp dword ptr [esi+114h], 45525458h`,
+`cmp dword ptr [esi+118h], 0`) :
+
+| Octets | Contenu |
+|---|---|
+| 0 | `XTRE` |
+| 4 | 0 |
+| 8 | début de l'index des hachages (24) |
+| 12 | fin de l'index des hachages |
+| 16 | début de la table des fichiers |
+| 20 | début des données ; tout ce qui précède (index et table) est chargé en mémoire d'un bloc |
+
+**Index des hachages** : enregistrements de 8 octets, u32 hachage puis u32 position de l'enregistrement du fichier
+(0FFFFFFFFh = case vide). Rangés en **arbre binaire dans un tableau** (recherche à l'offset 91B9Eh) : on part de la
+case 1 ; hachage égal → trouvé ; hachage cherché plus petit (comparaison sans signe) → case 2i ; plus grand → case
+2i + 1 ; on s'arrête à la fin de l'index. Si la position trouvée est avant la table des fichiers, elle désigne une
+liste de noms en clair (collisions) : octet longueur, nom, u32 position ; aucune dans les deux archives fournies.
+
+**Table des fichiers** : enregistrements de 8 octets (offset 918E6h) :
+
+| Octets | Contenu |
+|---|---|
+| 0 | u32 position du fichier dans l'archive ; la longueur stockée = position suivante − celle-ci (fin de l'archive pour le dernier) |
+| 4 | u32 : taille décompressée sur les 30 bits bas (`and ecx, 3FFFFFFFh`), mode de stockage dans les bits 31 et 30 |
+
+| Mode | Stockage | Décodeur |
+|---|---|---|
+| 0 | en clair | — |
+| 2 (bit 31) | LZW, codes de 9 à 12 bits lus du bit bas au bit haut, 256 = remise à zéro (retour à 9 bits), 257 = fin, premier code libre 258 | offset 93046h |
+| 3 (bits 31 et 30) | LZ77 à 4 formes de commande (ci-dessous) | offset 932FCh |
+
+Mode 3, octet de tête b0 (les « octets copiés » viennent du flux, la « copie » vient de ce qui est déjà décodé) :
+
+| b0 | Octets lus | Copiés du flux | Copie : longueur | Copie : distance en arrière |
+|---|---|---|---|---|
+| `0xxxxxxx` | b0, b1 | b0 & 3 | ((b0 & 1Ch) >> 2) + 3 | ((b0 & 60h) << 3) + b1 + 1 |
+| `10xxxxxx` | b0, b1, b2 | b1 >> 6 | (b0 & 3Fh) + 4 | ((b1 & 3Fh) << 8) + b2 + 1 |
+| `110xxxxx` | b0, b1, b2, b3 | b0 & 3 | ((b0 & 0Ch) << 6) + b3 + 5 | ((b0 & 10h) << 12) + (b1 << 8) + b2 + 1 |
+| `111xxxxx` | b0 | ((b0 & 1Fh) << 2) + 4 ; si plus de 112 : b0 & 3 puis fin | — | — |
+
+Vérifié sur les 400 fichiers des deux archives : chaque fichier décompressé a exactement la taille annoncée.
+
+### 7.3 Le hachage des noms (offset 91CD6h)
+
+```
+h = 0
+pour chaque octet c du nom :
+    h = rotation à gauche de h de 3 bits (32 bits)
+    h = h + c          (octet sans signe, résultat sur 32 bits)
+```
+
+Le nom haché est le **chemin complet en majuscules**, tel que le jeu le construit : par exemple
+`..\..\DATA\AIRDENS.TBL`, `..\..\DATA\TERRAIN\MAP2.PAK`. Avant le hachage, le nom est recopié (80 octets au plus,
+offset 91D22h) puis passé à une fonction que l'image compactée ne permet pas de lire ; la mise en majuscules est
+établie par les données (le hachage du nom en majuscules est dans l'index, pas celui en minuscules).
+
+En C++ (style de libRealSpace) :
+
+```cpp
+uint32_t XtreHash(const char *name) {
+    uint32_t h = 0;
+    for (const unsigned char *p = (const unsigned char *)name; *p != 0; p++) {
+        h = (h << 3) | (h >> 29);
+        h = h + (uint32_t)toupper(*p);
+    }
+    return h;
+}
+```
+
+Le hachage est faible : deux noms courts peuvent donner la même valeur (`..\..\DATA\TERRAIN\MAP2.PAK` et
+`..\..\DATA\TERRAIN\KRH2.PAK` ont tous deux F04CA7B4h). Pour un portage, il suffit de hacher le nom demandé et de
+chercher la valeur : le jeu fait de même.
+
+### 7.4 Noms retrouvés
+
+`tools/xtre_extract.py` liste et extrait une archive XTRE. Les noms ne sont pas dans l'archive : l'outil hache les
+noms des archives à noms en clair (`WOGDATA1.TRE`, `BIGTRE.TRE`, `PACIFIC.DAT`, `TOBIGTRE.TRE`) et les noms de
+`analysis/wings/xtre_noms_supplementaires.txt` (retrouvés en hachant les mots des exécutables : `MAP2.PAK`,
+`CLOUD1.IFF` à `CLOUD3.IFF`, `CRATER.TXM`, `FCHKEXIT.SHP`, `FRESTART.SHP`, `OPTMENUF.PAK`).
+
+| Archive | Fichiers | Noms retrouvés |
+|---|---|---|
+| `FLIGHTHD.TRE` | 260 | 215 |
+| `FLIGHTCD.TRE` | 140 (135 dans l'index des hachages) | 122 |
+
+`..\..\DATA\TERRAIN\MAP2.PAK` est dans `FLIGHTHD.TRE` (mode 3, 31 663 octets stockés, 313 058 décompressés ; table
+`PAK` à l'octet 0).
+
+```
+python3 tools/xtre_extract.py FLIGHTHD.TRE --noms WOGDATA1.TRE BIGTRE.TRE PACIFIC.DAT TOBIGTRE.TRE \
+        analysis/wings/xtre_noms_supplementaires.txt --extraire DONNEES
+```
+
+Les fichiers sans nom retrouvé sont écrits dans `INCONNU/<hachage>` (et `SANS_HACHAGE/<position>` pour les
+enregistrements de fichier qu'aucune case de l'index ne désigne).
+
+## 8. Le reste n'est pas lu
 
 Aucune autre fonction propre à Wings of Glory n'a été lue. Les données du jeu n'ont pas été fournies.
