@@ -233,6 +233,37 @@ Lecteurs des champs dans seg031.
 
 4 ou 19 rencontrés seuls : « CONT or SAME out of place! ».
 
+**Fin d'un script et enchaînements** (lu le 2026-11-06) : le script est l'entrée n de `GAMEFLOW\CONV.PAK`
+(`push offset aConv` / `aPak`, entrée `[partie+116]`) ; la boucle s'arrête quand le pointeur atteint la fin de
+l'entrée (`mov ax, [di]` / `add ax, [di+8]` / `cmp ax, [di+4]`). Après un `CLOSEUP`, le jeu lit aussitôt les
+`CLOSEUP_SAME` (`cmp byte ptr es:[bx], 13h`) et `CLOSEUP_CONTINUATION` (`cmp byte ptr es:[bx], 4`) qui suivent,
+texte seul ; le texte d'un `CLOSEUP` précède son octet de couleur. Après `GROUP_SHOT` et `GROUP_SHOT_WWI`, il lit
+les `GROUP_SHOT_ADD_CHARACTER` qui suivent (`cmp byte ptr es:[bx], 1`).
+
+**Figures d'un plan `GROUP_SHOT_WWI`** : le nom n'est pas cherché dans `CONVDATA.IFF`. Son dernier caractère est
+effacé (`mov byte ptr [bx-1], 0`), le reste est converti en nombre (`CRT_Atol_22B1`) : c'est le numéro de l'entrée
+de `GAMEFLOW\WWISHPS.PAK` (figure « 210 » → entrée 21).
+
+**Test de lecture** (`tools/wog_conv_dump.py WOGDATA1.TRE --test`, règles ci-dessus) :
+
+| Fichier | Conversations | Lues jusqu'au dernier octet | Anomalies |
+|---|---|---|---|
+| `CONV.PAK` (anglais ; celui qu'ouvre `Conv_PlayScript_14F62`) | 287 | 287 | 0 |
+| `CONVF.PAK` (français) | 287 | 287 | 0 |
+| `CONVG.PAK` (allemand) | 287 | 287 | 0 |
+
+Commandes rencontrées dans `CONV.PAK` : `CLOSEUP` 1 389, `CLOSEUP_CONTINUATION` 364, `CLOSEUP_SAME` 4,
+`GROUP_SHOT` 40, `GROUP_SHOT_ADD_CHARACTER` 31, `GROUP_SHOT_WWI` 20, `SHOW_TEXT` 51 ; aucun `JUMP` ni `NOP_16`.
+Tous les visages de gros plan sont dans `FACE` de `CONVDATA.IFF`, toutes les figures de plan de groupe dans
+`FIGR`, tous les décors de plan de groupe dans `BACK` ; les figures des plans `GROUP_SHOT_WWI` désignent les
+entrées 21 à 26, 32 à 34 et 48 de `WWISHPS.PAK`, toutes présentes. Textes en CP437 (accents du français justes).
+Les décors de gros plan (`boff1_cu`…) ne sont pas dans `BACK` : où le jeu les cherche n'a pas été lu.
+
+```
+python3 tools/wog_conv_dump.py WOGDATA1.TRE --test
+python3 tools/wog_conv_dump.py WOGDATA1.TRE --pak CONVF.PAK --entree 0
+```
+
 Différences avec Pacific Strike :
 - pas de 4 octets de voix après le texte ;
 - pas de blocs conditionnels (`IF_FLAG`, `ELSE`, `ENDIF`) ;

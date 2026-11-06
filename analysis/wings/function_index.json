@@ -1133,8 +1133,8 @@
 "lines": 78,
 "type": "far",
 "calls": [],
-"new_name": "sub_22B1",
-"summary": ""
+"new_name": "CRT_Atol_22B1",
+"summary": "far (chaîne) : conversion texte → entier long de la bibliothèque C (atol) : saute les blancs (table de classes de caractères 4CFBh), signe + ou −, puis chiffres décimaux (mul cx avec cx = 10). Appelée par Conv_PlayScript_14F62 pour le numéro d'entrée de WWISHPS.PAK d'une figure de plan GROUP_SHOT_WWI."
 },
 "sub_2321": {
 "segment": "seg000",

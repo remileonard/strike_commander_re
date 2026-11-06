@@ -2259,7 +2259,7 @@ loc_15124:
 		mov	ax, word ptr [bp+var_32]
 		mov	word ptr [bp+var_3A+2], ax
 		push	ax
-		call	sub_22B1
+		call	CRT_Atol_22B1
 		pop	cx
 		mov	[bp+var_36], ax
 		inc	word ptr [bp+var_32+2]

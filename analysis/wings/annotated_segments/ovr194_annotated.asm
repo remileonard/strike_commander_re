@@ -857,7 +857,7 @@ loc_6EEFF:
 		mov	ax, [di+1Eh]
 		mov	[bp+var_8], ax
 		push	ax
-		call	sub_22B1
+		call	CRT_Atol_22B1
 		pop	cx
 		mov	bx, [di+22h]
 		mov	[bx], ax
@@ -867,7 +867,7 @@ loc_6EF19:
 		cmp	word ptr [di+24h], 0
 		jz	short loc_6EF34
 		push	word ptr [di+1Eh]
-		call	sub_22B1
+		call	CRT_Atol_22B1
 		push	dx
 		push	ax
 		pop	eax
@@ -1012,7 +1012,7 @@ arg_2		= word ptr  8
 		jz	short loc_6F035
 		mov	word ptr [bp+var_4], dx
 		push	word ptr [bp+var_4]
-		call	sub_22B1
+		call	CRT_Atol_22B1
 		pop	cx
 		mov	word ptr [bp+var_4+2], ax
 		movsx	eax, word ptr [bp+var_4+2]
@@ -1030,7 +1030,7 @@ loc_6F035:
 		cmp	word ptr [si+24h], 0
 		jz	short loc_6F04E
 		push	dx
-		call	sub_22B1
+		call	CRT_Atol_22B1
 		push	dx
 		push	ax
 		pop	eax

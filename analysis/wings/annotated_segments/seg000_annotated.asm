@@ -6024,7 +6024,13 @@ CRT_Write_TextMode		endp
 
 ; Attributes: bp-based frame
 
-sub_22B1		proc far
+; ==============================================================================================
+; far (chaîne) : conversion texte → entier long de la bibliothèque C (atol) : saute les blancs
+; (table de classes de caractères 4CFBh), signe + ou −, puis chiffres décimaux (mul cx avec cx
+; = 10). Appelée par Conv_PlayScript_14F62 pour le numéro d'entrée de WWISHPS.PAK d'une figure
+; de plan GROUP_SHOT_WWI.
+; ==============================================================================================
+CRT_Atol_22B1		proc far
 
 arg_0		= word ptr  6
 
@@ -6101,7 +6107,7 @@ loc_231C:
 		pop	si
 		pop	bp
 		retf
-sub_22B1		endp
+CRT_Atol_22B1		endp
 
 ; ----------------------------------------------------------------------
 
@@ -6115,7 +6121,7 @@ arg_0		= word ptr  6
 		mov	bp, sp
 		push	[bp+arg_0]
 		push	cs
-		call	near ptr sub_22B1
+		call	near ptr CRT_Atol_22B1
 		pop	cx
 		pop	bp
 		retf
@@ -9145,7 +9151,7 @@ loc_32F7:
 		push	ax
 		nop
 		push	cs
-		call	near ptr sub_22B1
+		call	near ptr CRT_Atol_22B1
 		pop	cx
 		push	ax
 		push	dx

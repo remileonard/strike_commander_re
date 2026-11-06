@@ -299,7 +299,7 @@ loc_669E0:
 		add	ax, 3
 		mov	[bp+var_4], ax
 		push	ax
-		call	sub_22B1
+		call	CRT_Atol_22B1
 		pop	cx
 		mov	[si+10Dh], al
 		jmp	short loc_66A47
@@ -315,7 +315,7 @@ loc_669FF:
 		add	ax, 3
 		mov	[bp+var_6], ax
 		push	ax
-		call	sub_22B1
+		call	CRT_Atol_22B1
 		pop	cx
 		push	ax
 		push	si
@@ -330,7 +330,7 @@ loc_66A1D:
 		add	ax, 3
 		mov	[bp+var_8], ax
 		push	ax
-		call	sub_22B1
+		call	CRT_Atol_22B1
 		pop	cx
 		push	ax
 		push	si

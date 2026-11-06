@@ -328,6 +328,25 @@ p code, li code, td code { overflow-wrap: anywhere; }
   <p>Par rapport à Pacific Strike : pas de voix après le texte, pas de blocs conditionnels, pas de commandant devant
   la carte ; nouveaux : <code>GROUP_SHOT_WWI</code>, <code>CLOSEUP_SAME</code>, <code>JUMP</code>. Une autre valeur
   arrête la conversation (« Got lost while running the conversation! »).</p>
+  <p><b>Enchaînements.</b> Le script est l'entrée n de <code>GAMEFLOW\CONV.PAK</code> ; il se lit jusqu'à la fin
+  de l'entrée. Un <code>CLOSEUP</code> lit aussitôt les <code>CLOSEUP_SAME</code> et <code>CLOSEUP_CONTINUATION</code>
+  qui le suivent (texte seul) ; son texte précède son octet de couleur. Un plan de groupe lit les
+  <code>GROUP_SHOT_ADD_CHARACTER</code> qui le suivent. Dans un plan <code>GROUP_SHOT_WWI</code>, le nom de figure
+  n'est pas un nom de <code>CONVDATA.IFF</code> : son dernier caractère est retiré et le reste, converti en nombre
+  (<code>CRT_Atol_22B1</code>), donne l'entrée de <code>WWISHPS.PAK</code> (« 210 » → entrée 21).</p>
+  <h3>Test de lecture</h3>
+  <p><code>tools/wog_conv_dump.py WOGDATA1.TRE --test</code> applique ces règles à toutes les conversations :</p>
+  <div class="tablewrap"><table><thead><tr><th>Fichier</th><th>Conversations</th><th>Lues jusqu'au dernier octet</th><th>Anomalies</th></tr></thead><tbody>
+    <tr><td><code>CONV.PAK</code> (anglais, ouvert par le jeu)</td><td>287</td><td>287</td><td>0</td></tr>
+    <tr><td><code>CONVF.PAK</code> (français)</td><td>287</td><td>287</td><td>0</td></tr>
+    <tr><td><code>CONVG.PAK</code> (allemand)</td><td>287</td><td>287</td><td>0</td></tr>
+  </tbody></table></div>
+  <div class="ok"><p>Dans <code>CONV.PAK</code> : <code>CLOSEUP</code> 1 389, <code>CLOSEUP_CONTINUATION</code> 364,
+  <code>CLOSEUP_SAME</code> 4, <code>GROUP_SHOT</code> 40, <code>GROUP_SHOT_ADD_CHARACTER</code> 31,
+  <code>GROUP_SHOT_WWI</code> 20, <code>SHOW_TEXT</code> 51. Tous les visages sont dans <code>FACE</code>, toutes les
+  figures dans <code>FIGR</code>, tous les décors de plan de groupe dans <code>BACK</code>, et toutes les entrées de
+  <code>WWISHPS.PAK</code> désignées existent. Les décors de gros plan (<code>boff1_cu</code>…) ne sont pas dans
+  <code>BACK</code> : où le jeu les cherche n'a pas été lu.</p></div>
 </article>
 
 <!-- 6 -->
