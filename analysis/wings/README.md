@@ -416,6 +416,94 @@ Grille (rôles non établis, couleurs choisies pour l'image) :
 
 La ligne 0 de la grille est en haut de l'image ; l'orientation n'est pas vérifiée.
 
+### 7.6 Chargeur du terrain de `GLORY.EXE` (lu le 2026-11-06)
+
+**Image du programme.** L'image Phar Lap est compactée par blocs. Mot n : si le bit 15 est nul, n octets suivent tels
+quels ; sinon un octet k, puis k octets de motif répétés jusqu'à n & 7FFFh octets (k = 0 : octets nuls). Décompactée,
+elle fait 768 442 octets, la taille demandée par l'en-tête. Elle est chargée à l'adresse 1000h : une adresse du code
+vaut l'offset dans l'image décompactée + 1000h (vérifié sur les chaînes : 0B09E8h « %s: Bad TreeFile format. »,
+0B00C4h « TERRAIN », 0BC234h « .ELV »). Les adresses ci-dessous sont celles du code. Aucune fonction n'a de nom : les
+noms proposés sont suivis de l'adresse.
+
+**`Terrain_Load_8D004`** (objet terrain, nom) :
+
+1. ouvre le fichier `PAK` (dossier « TERRAIN », chaîne 0B00C4h) et lit l'IFF de l'entrée 0 ;
+2. exige `FORM TERA` (`cmp` avec 41524554h), puis `VERS` ≥ 200h (`cmp ax, 200h` ; sinon erreur 0E00Bh, et 0E00Ch
+   si `VERS` manque) ;
+3. `INFO` : un dword rangé en `[terrain+4CF8h]` (rôle non établi) ;
+4. `FORM BLOX` puis `ELEV` : appelle `Terrain_LoadElevationGrid_88DF0` ; puis `Terrain_LoadObjectGrid_8CA84` (`OBJS`).
+   L'étiquette `ATRI` n'apparaît nulle part dans le code (ni en valeur immédiate ni en chaîne).
+
+**`Terrain_LoadElevationGrid_88DF0`** : le contenu du chunk `ELEV` n'est pas lu. Les dimensions sont des constantes :
+
+| Champ | Valeur | Preuve |
+|---|---|---|
+| sommets par côté | 360 | `mov eax, 168h` → `[grille+4]`, `[grille+10h]` |
+| pas | 1 000 m | `mov dword ptr [ebx+0Ch], 3E8h` |
+| bord ouest, en sommets | −180 | `mov dword ptr [ebx+4AECh], 0FFFFFF4Ch` |
+| bord nord, en sommets | 180 | `mov dword ptr [ebx+4AF0h], 0B4h` |
+
+La grille réserve 360 × 360 × 2 octets (`imul eax, eax / shl eax, 1`) et lit d'un bloc **l'entrée 1 du `PAK`**.
+
+**`Terrain_PakEntryForExtension_88850`** : l'extension d'un nom cité dans l'IFF choisit l'entrée du `PAK` :
+
+| Extension | Entrée |
+|---|---|
+| `.ELV` | 1 |
+| `.MED` | 2 |
+| `.LOW` | 3 |
+| `.TRI` | 4 |
+| `.OBJ` | 5 |
+
+`OBJS` (27 octets lus d'un bloc) : mot 18 (cellules par côté), dword 20 000 (taille d'une cellule), deux dwords, nom
+`NEWMAP.OBJ` → entrée 5, une liste d'objets par cellule (18 × 18). Strike Commander a la même disposition dans les
+données (`DATA_MODEL.md`, `ALASKA.PAK` : `[4]` = régions `.TRI`, `[5]` = objets posés). L'entrée 6 n'est pas
+désignée par cette fonction ; son lecteur n'est pas trouvé.
+
+**Un sommet = 2 octets** ; adresse = grille + (colonne + ligne × 360) × 2. Colonne = X ÷ 1 000 + 180 (vers l'est) ;
+ligne = 180 − c1 ÷ 1 000 (`neg ecx` à 89768h) : la ligne 0 est au nord (c1 = +180 000). En libRealSpace
+(`z = −c1`) : colonne = x ÷ 1 000 + 180, ligne = z ÷ 1 000 + 180. Aucun des deux octets n'est une altitude dans le code
+lu.
+
+| Octet | Bits | Rôle constaté |
+|---|---|---|
+| 0 | 0 à 3 | **classe de sol** (`and al, 0Fh`) : 0, 1 ou 2 |
+| 0 | 6 et 7 | **zone** 0, 1 ou 2 (`sar ecx, 6`) ; voir « Requête de sol » |
+| 1 | 8 bits | **texture** ; 255 = aucune (`cmp al, 0FFh`) |
+
+**Dessin** (`Terrain_BuildWindow_89xxx` vers 89660h, `Terrain_DrawCells` vers 8B270h) :
+
+- fenêtre de 25 × 25 sommets autour de la caméra (`mov ecx, 19h`), de −12 à +12 sommets, bornée aux bords ;
+- un compteur par texture (`[0BF3C8h + n]`) suit les cases de la fenêtre qui l'utilisent, pour charger les textures ;
+  une case sans texture compte celle de sa classe : classe 0 → textures 0 à 3 ensemble, classe 1 → texture 101
+  (`[0BF42Dh]`), classe 2 → texture 100 (`[0BF42Ch]`) ;
+- couleur sans texture, par classe (`mov dword ptr [ebp-18Ch], …` et `[ebp-16Ch]`) :
+
+  | Classe | Couleur de base | Nombre de teintes |
+  |---|---|---|
+  | 0 | 183 | 8 |
+  | 1 | 110 | 17 |
+  | 2 | 74 | 21 |
+
+  index de palette d'un sommet = couleur de base, + (profondeur − seuil proche) ÷ (seuil lointain − seuil proche)
+  × nombre de teintes entre les deux seuils (`[0BF504h]`, `[0BF508h]`), + le nombre de teintes au-delà ;
+- de près, la texture de l'octet 1 (si elle existe et selon le niveau de détail `[0B00CCh]`), sinon celle de la classe.
+
+**Requête de sol** (`Terrain_GroundTypeAt_8BF78`, appelée par `8D964h`) : rend le numéro de texture de la case
+(octet 1), ou la classe (octet 0 & 0Fh) si l'octet 1 vaut 255 ou si le niveau de détail vaut 1, ou 2 si le niveau de
+détail vaut 0 ; hors carte : 255. Elle range aussi **octet 0 >> 6** dans `[0B00A4h]` (0 hors carte). Appelants :
+
+| Adresse | Usage constaté |
+|---|---|
+| 11384h | zone = 1 (bit 40h) → `sub_AF9C(…, 4)` ; sinon, si `[objet+30h]` ≠ 0 → `sub_AF9C(…, 3)` (rôle non établi) |
+| 40926h | type de sol testé avant de créer un objet |
+| 6346Ch | type de sol = 2 → recherche dans une liste d'objets |
+| 76E2Eh | types 1, 2, 174 à 179 et 248 → `[objet+20h]` = 1 ; 224 et plus → autre branche |
+| 8D687h | types 0, 6 à 14, 136 à 147, 185, 186, 191 à 199, 246, 247… → résultat 0 |
+
+Sens des classes 0, 1, 2 et des zones : non établi dans le code. Sur `MAP2.PAK` (§ 7.5) : la classe 0 occupe le coin
+nord-ouest et elle a quatre textures animées par défaut ; les zones 1 et 2 sont séparées par une limite continue.
+
 ## 8. Le reste n'est pas lu
 
 Aucune autre fonction propre à Wings of Glory n'a été lue. Les données du jeu n'ont pas été fournies.
