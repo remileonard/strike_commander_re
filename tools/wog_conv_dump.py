@@ -213,7 +213,7 @@ def test(archive):
                     figr_cited += 1
                     if fields["figure"].lower() not in names["FIGR"]:
                         missing["figure " + fields["figure"]] += 1
-                if code in (0, 18) and fields["décor"].lower() not in names["BACK"]:
+                if code in (0, 3, 18) and fields["décor"].lower() not in names["BACK"]:
                     missing["décor " + fields["décor"]] += 1
         failures += bad
         print("%s : %d entrées, %d vides, %d lues jusqu'au dernier octet sans anomalie, %d avec anomalie"
@@ -223,7 +223,7 @@ def test(archive):
         if missing:
             print("  noms absents de CONVDATA.IFF : " + ", ".join("%s (%d)" % kv for kv in sorted(missing.items())))
         else:
-            print("  tous les noms se retrouvent : visages (FACE), figures (FIGR, %d citées), décors de plan de groupe (BACK), entrées de WWISHPS.PAK" % figr_cited)
+            print("  tous les noms se retrouvent : visages (FACE), figures (FIGR, %d citées), décors de gros plan et de plan de groupe (BACK), entrées de WWISHPS.PAK" % figr_cited)
     return failures
 
 

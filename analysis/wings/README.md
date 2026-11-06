@@ -258,7 +258,45 @@ Tous les visages de gros plan sont dans `FACE` de `CONVDATA.IFF`, tous les déco
 Les 40 `GROUP_SHOT` sont tous suivis d'un `SHOW_TEXT` (cartons de lieu et de date) : les 31 figures sont toutes dans
 des plans `GROUP_SHOT_WWI`, et aucune conversation ne cite de nom de `FIGR` ; les figures des plans `GROUP_SHOT_WWI` désignent les
 entrées 21 à 26, 32 à 34 et 48 de `WWISHPS.PAK`, toutes présentes. Textes en CP437 (accents du français justes).
-Les décors de gros plan (`boff1_cu`…) ne sont pas dans `BACK` : où le jeu les cherche n'a pas été lu.
+Les décors de gros plan (`boff1_cu`…) sont eux aussi dans `BACK` (contrôlé par le test).
+
+**Composition des images** (lue le 2026-11-06 ; `tools/wog_conv_render.py`) :
+
+- décor : fonction pas encore nommée en 14A86 (proposé `ConvData_LoadBackground_14A86`). Elle ouvre
+  `CONVDATA.IFF`, cherche dans `BCKS` le `FORM BACK` dont l'`INFO` est le nom du décor (`CRT_Strncmp_Like`), puis lit
+  son `DATA` : (taille ÷ 5) éléments (`mov ebx, 5` / `idiv ebx`). Chaque élément = octet source, octet image, octet
+  palette (`ResourceRecord_ReadFinalField_540D0` trois fois), puis un mot (`ResourceRecord_ReadFieldGroupB_53FD3`).
+  Source 0 : image dans `CONVSHPS.PAK`, palette dans `CONVPALS.PAK` ; source 1 : `WWISHPS.PAK`, `WWIPALS.PAK` ; autre :
+  erreur. `Conv_PlayScript_14F62` en fait des calques `Layer_Construct_45F57(image, 0, mot)` : position (0, mot), et
+  copie chaque palette dans celle de la scène (`Palette_CopyInto_46D40`), dans l'ordre ;
+- visage d'un `CLOSEUP` : fonction pas encore nommée en 14825 (type 0 = `FACE`, 1 = `FIGR`, 2 = `FCPL`, 3 = `FGPL`,
+  4 = `PFIG`) : nom cherché dans le `FORM` du type, l'octet qui suit le nom est le numéro d'entrée dans
+  `CONVSHPS.PAK` (types 0 et 1) ou `CONVPALS.PAK` (autres). Le gros plan prend le visage (type 0) et la palette
+  « normal » de `FCPL` (type 2, chaîne « night » sinon), copiée après celles du décor ;
+- dessin du visage : fonction pas encore nommée en 1C860 (proposé `TalkingHead_Draw_1C860`) : image 0, puis l'image
+  `[+27h]` (l'image de base, posée par `TalkingHead_SetBaseFrame_1C84D` avec l'octet « image ») si elle n'est ni 0 ni
+  −1, puis l'image `[+25h]` (la bouche) si elle n'est ni 0 ni −1 (0 à la construction), puis les calques enfants.
+  Strike Commander dessine en plus la coiffure (image 1) et les habits (image 34) : pas Wings of Glory ;
+- figures d'un `GROUP_SHOT_WWI` : entrée de `WWISHPS.PAK` (atol, ci-dessus), calque en (x, y) de la commande ;
+  aucune palette n'est ajoutée pour elles.
+
+```
+python3 tools/wog_conv_render.py WOGDATA1.TRE CONV.PAK 0 0 daniel.png
+```
+
+(conversation 0, commande 0 : le plan en cours et le texte de la commande.)
+
+- texte : zone de (0, 152) à (319, 199) (`mov [bp+var_2A], 98h`, `13Fh`, `0C7h`, puis `sub_59CE5` → constructeur
+  de zone de texte en ovr257), police `FONTS\CONVFONT.SHP` (`[conv+44]`), couleur = octet couleur (méthode +16 de
+  la police, `call dword ptr [bx+10h]`) ; même zone pour `SHOW_TEXT`. Mise en page : fonction pas encore nommée en
+  145D8 (proposé `Conv_DrawText_145D8`), appelée si l'octet `[603B5h]` n'est pas nul : codes `$S`, `$N`, `$C`, `$W`,
+  `$L`, `$O`, `$A`, `$B`, `$P`, `$T` et `$K` (nouveau, même forme que `$P`) remplacés, puis lignes de 30 caractères
+  au plus (`cmp dx, 1Eh`), coupées au dernier espace à partir du 31ᵉ caractère, dessinées par
+  `Widget_RenderComplexLayoutWrapper_4923E` avec « %Y%J%S », Y = 4, 19, 34… (`add [bp+var_6], 0Fh`), J = 2 (centré).
+  C'est la mise en page de Strike Commander (`CONV_SYSTEM.md` § 7) : lignes à y = 156 + 15 × n. Le dessin des
+  caractères suit les règles de ce moteur (largeur = 1er mot de l'en-tête + 1, espacement 2, espace = tiret,
+  ancrage à hauteur de « A » + 1) ; la mesure des caractères n'a pas été relue dans `WINGS_OF.EXE`. Où la scène de
+  128 lignes se place sur l'écran n'a pas été lu (`tools/wog_conv_render.py` la dessine en haut).
 
 ```
 python3 tools/wog_conv_dump.py WOGDATA1.TRE --test
