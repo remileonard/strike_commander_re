@@ -634,9 +634,9 @@ Noms : ceux de Strike Commander (`MISSION_SCRIPT_OPCODES.md`) quand l'effet est 
 | 84 | `OP_TOGGLE_FLAG` | variable n inversée (29D14h) |
 | 85 | `OP_ADD_1_TO_FLAG` | variable n += 1 |
 | 86 | `OP_REMOVE_1_TO_FLAG` | variable n −= 1 |
-| 128 | `OP_ACTIVATE_SCENE` | octet d'état de la scène n = 1 (scènes en `[mission+34h]`, états en `[mission+74h]`) |
-| 129 | `OP_DEACTIVATE_SCENE` | octet d'état de la scène n = 0 |
-| 130 | `OP_IS_SCENE_ACTIVE`\* | bit « égal » = état de la scène n ≠ 0 |
+| 128 | `OP_ACTIVATE_SCENE` | zone n (`[mission+34h]`, 10D5Ch), puis son entrée dans `[mission+74h]` (10FDCh) : octet d'état = 1 |
+| 129 | `OP_DEACTIVATE_SCENE` | même entrée : octet d'état = 0 |
+| 130 | `OP_IS_SCENE_ACTIVE`\* | bit « égal » = octet d'état de la même entrée ≠ 0 |
 | 136 | `OP_OBJ_136`\* | objet n → fonction 0FAF0h (rôle non établi) |
 | 137 | `OP_OBJ_137`\* | registre = 43E44h(objet n) (rôle non établi ; 0 si l'objet n'existe pas) |
 | 144 | `OP_ACTIVATE_OBJ` | activation de l'objet n (0F5C0h) |
@@ -730,6 +730,77 @@ Relevé sur les 43 chunks `PROG` (`FLIGHTHD.TRE`, `FLIGHTCD.TRE`) : 0, 1, 2, 8, 
 69, 70, 72 à 80, 82 à 85, 130, 137, 144 à 147, 149, 151, 154, 155, 160 à 162, 165 à 171, 182 à 185, 190, 191, 208. Tous sont
 dans la table de la machine, sauf 166 (75 emplois, tous dans le plan de vol).
 
-## 8. Le reste n'est pas lu
+### 8.7 Chunks d'un fichier de mission (`MISSIONS\MISN-1.IFF`, comparé à `MISN-1A.IFF` de Strike Commander)
+
+Arbre de `MISN-1.IFF` (tailles en octets) :
+
+```
+FORM MISN 2996
+  HOME 14
+  VERS 2
+  TUNE 1
+  NAME 14
+  FNAM 12
+  GNAM 10
+  MOBJ 18
+  FMOB 20
+  GMOB 23
+  TYPE 1
+  FORM WRLD 20
+    FILE 8
+  AREA 114
+  FARE 114
+  GARE 114
+  SPOT 84
+  NUMS 0
+  MSGS 35
+  FMSG 37
+  GMSG 43
+  FLAG 0
+  CAST 153
+  PROG 780
+  PART 930
+  TEAM 8
+  FORM PLAY 122
+    SCNE 32
+    SCNE 38
+    SCNE 24
+  LOAD 108
+```
+
+**Mêmes formats que Strike Commander** (vérifié sur les valeurs) :
+
+| Chunk | Format | Constat sur `MISN-1.IFF` |
+|---|---|---|
+| `AREA` | forme, nom de 32 octets, point (3 int32 24.8), dimensions selon la forme | une boîte `B` « Base » (65 octets) + une sphère `S` « Enemies » (49 octets) = 114 |
+| `SPOT` | enregistrements de 14 octets | 6 |
+| `CAST` | noms de 9 octets | 17 (`CHARLES`, `LIFESON`, `ROOK-A`, `MESSAGE`, `PLAYER`, `GEN-A`…) |
+| `PART` | enregistrements de 62 octets (`IMPL_MISSION_PART.md` § 1) | 15 ; noms (`HANGAR`/`DHANGAR`, `AERODROM`, `albad3`), positions vers x = −146 900 m, camps 1 / 255, allié par défaut 12 et postes en formation (0, −100, 50) pour l'escadrille, 4 programmes |
+| `SCNE` | en-tête de 24 octets + liste de mots | 32, 38, 24 octets |
+| `LOAD` | enregistrements de 9 octets | 12 (`FUELEXP1`, `EXPLODE1`, `ALBAD3`, `CRASH`…) |
+| `FORM WRLD` / `FILE` | nom du monde | `brit0` |
+| `TEAM` | mots | 7, 8, 9, 10 |
+| `PROG` | § 8.1 et 8.2 | — |
+
+**Différences** :
+
+| Chunk | Constat | Lecture par `GLORY.EXE` |
+|---|---|---|
+| `VERS` | `00 05` (Strike Commander : `00 02`) | mot ≥ 500h exigé (`cmp eax, 500h`), sinon message d'erreur et fin du programme : une mission de Strike Commander est refusée |
+| `HOME` (nouveau) | mot 23, puis 3 int32 24.8 = (−146 000, 111 000, 0) m, le point de référence de la zone « Base » | mot → zone de ce numéro (10D5Ch, nulle si le numéro dépasse le nombre de zones) en `[mission+0FCh]` ; les 3 int32 en `[mission+100h]` à `[mission+108h]` ; rôle non établi au-delà du nom |
+| `TYPE` (nouveau) | 1 octet, 0 | octet en `[0AEBF0h]`, ramené à 0 s'il dépasse 2 (chaîne « BOGUS MISSION TYPE » dans l'exécutable) |
+| `MOBJ` (nouveau) | objectif : « defend \naerodrome » | lu (12F8Bh) |
+| `NAME` / `FNAM` / `GNAM` | nom anglais / français / allemand (« Western Front », « Front Ouest », « Westfront ») | `FNAM` d'abord, sinon `NAME`, sinon « UNK » ; `GNAM` jamais lu |
+| `MOBJ` / `FMOB` / `GMOB` | objectif en trois langues (l'allemand en CP437 : « ü » = 81h) | `FMOB` d'abord, sinon `MOBJ` ; `GMOB` jamais lu |
+| `AREA` / `FARE` / `GARE` | même contenu, seuls les noms des zones changent (« Enemies », « Ennemis », « Feinde ») | `FARE` d'abord, sinon `AREA` ; `GARE` jamais lu |
+| `MSGS` / `FMSG` / `GMSG` | messages en trois langues | `FMSG` d'abord, sinon `MSGS` ; `GMSG` jamais lu |
+| `INFO` | absent (Strike Commander : 11 octets) | — |
+| `CACH` | absent (Strike Commander : 420 octets) | étiquette absente du code |
+| `FLAG` | présent, vide | étiquette absente du code |
+
+Ce `GLORY.EXE` cherche donc les chunks français en premier, sans variable de langue : c'est une version française ;
+les chunks allemands servent sans doute à une version allemande de l'exécutable (non vue).
+
+## 9. Le reste n'est pas lu
 
 Aucune autre fonction propre à Wings of Glory n'a été lue. Les données du jeu n'ont pas été fournies.
