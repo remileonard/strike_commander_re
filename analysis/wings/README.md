@@ -381,6 +381,38 @@ python3 tools/xtre_extract.py FLIGHTHD.TRE --noms WOGDATA1.TRE BIGTRE.TRE PACIFI
 Les fichiers sans nom retrouvé sont écrits dans `INCONNU/<hachage>` (et `SANS_HACHAGE/<position>` pour les
 enregistrements de fichier qu'aucune case de l'index ne désigne).
 
+### 7.5 Rendu de `MAP2.PAK` (constaté sur le fichier, pas encore relu dans `GLORY.EXE`)
+
+![MAP2.PAK](images/wog_map2.png)
+
+`tools/wog_map_render.py MAP2.PAK -o map2.png` (fichier extrait par `tools/xtre_extract.py`).
+
+`MAP2.PAK` est un `PAK` de 7 entrées :
+
+| Entrée | Taille | Contenu |
+|---|---|---|
+| 0 | 508 | `FORM TERA` : `VERS` (2), `INFO`, `FORM BLOX` (`ELEV`, `ATRI`, `OBJS`, qui citent `NEWMAP.ELV`, `NEWMAP.AVG`, `NEWMAP.TRI`, `NEWMAP.OBJ`), `FORM TXMS` (`INFO`, `MAPS`) |
+| 1 | 259 200 | grille de 360 × 360 cases de 2 octets |
+| 2 et 3 | 0 | vides |
+| 4 | 1 300 | non décodée |
+| 5 | 51 370 | non décodée ; commence comme une table de `PAK` (positions sur 3 octets, octets de type 0E0h et 0FFh) |
+| 6 | 648 | non décodée ; contient le nom `BRIDGE` |
+
+Le chunk `MAPS` cite 23 noms : `BEACH`, `GR2RTH`, `RCK2RTH`, `GTRNCH`, `INRSXN`, `INTGRSS`, `INTTREE`, `INTRCK`,
+`RDXRV`, `FARMS`, `RIVER`, `TOWN`, `DTOWN`, `ATRNCH`, `RUNWAY`, `TRACK`, `ROAD`, `NOMAN`, `CROSS`, `NML`, `GROAD`,
+`COAST`, `TOWNS`.
+
+Grille (rôles non établis, couleurs choisies pour l'image) :
+
+- 1ᵉʳ octet, 2 bits bas : 0 (3 202 cases, coin en haut à gauche, bleu foncé sur l'image), 1, 2 (deux grandes régions) ;
+- 1ᵉʳ octet, bits 40h / 80h : deux zones séparées par une limite qui part de la côte et descend vers le sud-est
+  (vert / ocre sur l'image) ; cases sans ces bits = marge sombre ;
+- 2ᵉ octet : 255 sur 119 328 cases ; les autres valeurs (6 à 252) forment des lignes. Elles sont dessinées par bande de
+  valeurs : 6 à 53 crème, 54 à 99 gris, 174 à 209 rouge, 210 à 254 noir. Le lien avec les noms de `MAPS` n'est pas
+  établi.
+
+La ligne 0 de la grille est en haut de l'image ; l'orientation n'est pas vérifiée.
+
 ## 8. Le reste n'est pas lu
 
 Aucune autre fonction propre à Wings of Glory n'a été lue. Les données du jeu n'ont pas été fournies.
