@@ -99,13 +99,13 @@ def corner_window(pixels, size):
 
 
 def write_png(path, rgb):
-    height, width, _ = rgb.shape
+    height, width, channels = rgb.shape
     raw = b"".join(b"\0" + rgb[y].tobytes() for y in range(height))
 
     def chunk(tag, body):
         return struct.pack(">I", len(body)) + tag + body + struct.pack(">I", zlib.crc32(tag + body) & 0xFFFFFFFF)
 
-    header = struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)
+    header = struct.pack(">IIBBBBB", width, height, 8, 6 if channels == 4 else 2, 0, 0, 0)
     png = b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", header) + chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b"")
     open(path, "wb").write(png)
     return png
@@ -190,6 +190,7 @@ Glisser : orienter · Z / S ou flèches : avancer / reculer · Q / D : côté ·
 <label><input type="checkbox" id="loin"> couleurs lointaines (couleur de base de la classe)</label>
 <label><input type="checkbox" id="grille"> grille des cases</label>
 <div id="pos"></div>
+__PANEL__
 </div>
 <script>
 "use strict";
@@ -384,7 +385,7 @@ const uWater = gl.getUniformLocation(program, "uWater");
 const uFar = gl.getUniformLocation(program, "uFar");
 const uGrid = gl.getUniformLocation(program, "uGrid");
 
-const camera = { x: -60000, y: 1500, z: -40000, yaw: 0.6, pitch: -0.25 };
+const camera = __CAMERA__;
 const keys = {};
 window.addEventListener("keydown", function (e) { keys[e.key.toLowerCase()] = true; });
 window.addEventListener("keyup", function (e) { keys[e.key.toLowerCase()] = false; });
@@ -424,7 +425,7 @@ function view() {
 let previous = performance.now();
 let accumulator = 0;
 function frame(now) {
-  const dt = Math.min(0.1, (now - previous) / 1000);
+  const dt = Math.max(0, Math.min(0.1, (now - previous) / 1000));
   previous = now;
   const speed = (keys["shift"] ? 4000 : 600) * dt;
   const fx = Math.sin(camera.yaw);
@@ -436,6 +437,10 @@ function frame(now) {
   if (keys["a"]) { camera.y += speed; }
   if (keys["e"]) { camera.y = Math.max(20, camera.y - speed); }
   accumulator += dt;
+  gl.useProgram(program);
+  gl.bindVertexArray(vao);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, atlasTexture);
   const water = Math.floor(accumulator / 0.25) % 4;
   const ws = SLOTS[water];
   gl.uniform4f(uWater, ws.slot, ws.w, ws.h, 0);
@@ -451,14 +456,18 @@ function frame(now) {
   gl.clearColor(0.55, 0.65, 0.8, 1);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.DEPTH_TEST);
-  gl.uniformMatrix4fv(uProj, false, perspective(1.0, w / h, 10, 400000));
-  gl.uniformMatrix4fv(uView, false, view());
+  const projection = perspective(1.0, w / h, 2, 400000);
+  const viewMatrix = view();
+  gl.uniformMatrix4fv(uProj, false, projection);
+  gl.uniformMatrix4fv(uView, false, viewMatrix);
   gl.drawElements(gl.TRIANGLES, index.length, gl.UNSIGNED_INT, 0);
+  drawExtra(projection, viewMatrix);
   const col = Math.floor(camera.x / 1000 + 180);
   const row = Math.floor(camera.z / 1000 + 180);
   document.getElementById("pos").textContent = "x " + Math.round(camera.x) + " m · z " + Math.round(camera.z) + " m · altitude " + Math.round(camera.y) + " m · case ligne " + row + ", colonne " + col;
   requestAnimationFrame(frame);
 }
+__EXTRA__
 requestAnimationFrame(frame);
 </script>
 </body>
@@ -497,6 +506,9 @@ def main():
         page = page.replace("__SLOTS__", json.dumps(slots))
         page = page.replace("__PER_ROW__", str(per_row))
         page = page.replace("__COLOURS__", json.dumps(colours))
+        page = page.replace("__PANEL__", "")
+        page = page.replace("__CAMERA__", "{ x: -60000, y: 1500, z: -40000, yaw: 0.6, pitch: -0.25 }")
+        page = page.replace("__EXTRA__", "function drawExtra(projection, viewMatrix) {\n}")
         open(args.html, "w", encoding="utf-8").write(page)
         print(args.html, len(page), "octets")
 

@@ -246,7 +246,7 @@ visionneuse d'objets 3D (`objview.pak`), générique et score final.
   chemins dans `tools/exe_paths.py`. Troisième exécutable : **`--exe topt`** = `TOPTTST1.EXE` de
   Tactical Operations, sans base IDA (listing reconstruit, `analysis/topt/README.md`). Quatrième : **`--exe pacific`** = `PACIFIC.EXE` de Pacific Strike
   (vol et hors-vol dans un seul exécutable ; `analysis/pacific/README.md`). Cinquième : **`--exe wings`** =
-  `WINGS_OF.EXE` de Wings of Glory (hors-vol ; le vol est `GLORY.EXE`, 32 bits Phar Lap ; archives XTRE : `tools/xtre_extract.py` ; `analysis/wings/README.md`).
+  `WINGS_OF.EXE` de Wings of Glory (hors-vol ; le vol est `GLORY.EXE`, 32 bits Phar Lap ; archives XTRE : `tools/xtre_extract.py` ; terrain et mission en 3D : `tools/wog_terrain_render.py`, `tools/wog_mission_render.py` ; `analysis/wings/README.md`).
 - **Noms repris de STRIKE.EXE** par `tools/match_functions.py --write` : 567 fonctions dont le
   code est identique (412) ou de même suite d'instructions avec des adresses de données
   différentes (155, « à vérifier »), appels sortants contrôlés. Leur résumé commence par

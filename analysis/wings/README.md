@@ -801,6 +801,108 @@ FORM MISN 2996
 Ce `GLORY.EXE` cherche donc les chunks français en premier, sans variable de langue : c'est une version française ;
 les chunks allemands servent sans doute à une version allemande de l'exécutable (non vue).
 
+### 8.8 Placement des objets d'une mission (lu le 2026-11-06)
+
+Les fonctions de `GLORY.EXE` n'ont pas de nom (pas de base IDA) : chacune est donnée par un nom proposé, puis son
+adresse dans l'image chargée à 1000h.
+
+**Du fichier de mission au terrain.** `FORM WRLD` / `FILE` nomme le monde (`brit0`) = `MISSIONS\BRIT0.IFF` ; son
+chunk `TERA` nomme le terrain (`map`) = `TERRAIN\MAP.PAK`. Le lecteur de `TERA` (`World_ReadTera`, D420h) lit le
+nom sur 8 octets, le compare au terrain déjà chargé et, s'il change, crée l'objet terrain de 19708 octets et appelle
+le chargeur du § 7.6 (`call 8D004h`). `MAP.PAK` (dans `FLIGHTHD.TRE`) est identique octet pour octet à `MAP2.PAK`.
+
+**Zones (`FARE`, sinon `AREA`).** Lecteur `Mission_ReadAreas` (14208h) : un premier passage compte les
+enregistrements, un second les crée. Enregistrement : forme (1 octet), puis `Area_ReadCommon` (13FE4h) : nom de
+32 octets et point de référence 3 × int32 24.8 (rangés en `+20h`, `+24h`, `+28h` de la zone), puis selon la forme :
+
+| Forme | Valeurs lues ensuite | Taille | Comme Strike Commander |
+|---|---|---|---|
+| `S` | 1 int32 | 49 octets | oui |
+| `C` | 2 int32 | 53 octets | oui |
+| `B` | 5 int32 | 65 octets | oui |
+| `P` (nouvelle) | 5 int32, un mot n, puis n × 2 int32 | 67 + 8 × n octets | — ; rôle des valeurs non lu |
+
+Une autre lettre arrête le programme (message d'erreur 900Fh).
+
+**Lecture d'un `PART`.** `Mission_ReadParts` (14DC8h) exige une taille multiple de 62 (sinon erreur 9036h) et lit
+chaque enregistrement par `Mission_ReadPartRecord` (14888h) dans une structure de 112 octets. Découpage identique à
+Strike Commander (`IMPL_MISSION_PART.md` § 1), avec ces constats :
+
+- l'index CAST (octets 0-1) n'est gardé que sur son **octet bas** (`mov byte ptr [esi+1Bh], al`) ;
+- l'allié par défaut (octets 46-47) est lu en mot et seul l'octet bas est gardé (`mov byte ptr [esi+39h], al`) :
+  l'octet 47 n'est pas recopié, comme dans Strike Commander ;
+- le numéro de zone (octets 26-27) devient un pointeur sur la zone (`call 10D5Ch`), nul si le numéro dépasse le
+  nombre de zones : **65535 = aucune zone** ;
+- le nom d'objet **`plch`** désigne l'avion du joueur. Mission lancée par `OP2MISN.IFF` (déroulement de
+  `WINGS_OF.EXE`) : le nom devient `pup`, `camel`, `spadxiii`, `se5a`, `fokkdr1` ou `planex` selon le premier des
+  bits 760, 761, 762, 763, 764, 766 du déroulement qui vaut 1 (`push 2F8h` … `push 2FEh` / `call 29BE0h`) ; aucun :
+  le nom reste `plch`. Mission lancée sans `OP2MISN.IFF` : toujours `camel` (149E4h). La même substitution est
+  faite sur le joueur après le chargement (13538h).
+
+**Le joueur** est le premier `PART` dont le nom CAST est `PLAYER` (`Mission_FindPlayerPart`, 138D4h :
+recherche de la chaîne `PLAYER` sur 8 octets dans les noms CAST, 108E8h).
+
+**Placement** (`Part_Activate`, F5C0h), selon l'octet 28 :
+
+- **octet 28 = 0** : position = décalage du fichier + point de référence de la zone, ou décalage seul sans zone
+  (`Part_ZonePosition`, E5C0h). En libRealSpace (Y-up, mètres) : `x = ref.c0 + d.c0`, `y = ref.c2 + d.c2`,
+  `z = −(ref.c1 + d.c1)` ;
+- **octet 28 ≠ 0** : la zone est ignorée ; position = position du joueur au moment de l'activation + décalage
+  tourné par l'orientation du joueur (côté, nez, haut ; F625h à F884h), **altitude au moins 300 m**
+  (`cmp dword ptr [ebp-20h], 12C00h` / `jge` / `mov … 12C00h`) ; cap = cap du fichier + cap du joueur (calculé
+  depuis le nez du joueur, `call 16940h`). Pour un joueur de cap P à plat, en libRealSpace :
+  `x = jx + d.c0·cos P + d.c1·sin P`, `z = jz + d.c0·sin P − d.c1·cos P`, `y = max(jy + d.c2, 300)`.
+
+**Cap.** Octets 41-42, `int16` en degrés. L'orientation part de l'identité et tourne de **−cap** autour de la
+verticale (`neg eax` puis `call 1815Ch`, qui combine les deux premières lignes de la matrice avec le cosinus et le
+sinus de la table de Strike Commander, 15E0Eh et 15DC8h). Le nez du modèle est son axe +c1 (vérifié sur `CAMEL.IFF` :
+dérive et empennage étroits vers −c1). Donc **cap 0 = nord, cap 90 = est**, sens des aiguilles d'une montre ; nez en
+libRealSpace = `(sin cap, 0, −cos cap)`.
+
+Contrôles sur les données :
+
+- `MISN-2.IFF` pose ses hangars par rapport à la zone « Aerodrome » (point de référence (−146 000, 111 000) en c0,
+  c1) avec un décalage (−945, 550) ; `MISN-1.IFF` pose les mêmes hangars en absolu à (−146 945, 111 550) : même
+  endroit ;
+- `GAUNTLET.IFF` place 18 ennemis en cercle de 1 000 m autour du joueur (octet 28 = 1) avec le cap qui les tourne
+  vers le centre (ennemi au nord : cap 180 ; à l'est : cap 270) ; la vue ci-dessous les montre tous tournés vers le
+  joueur.
+
+**Modèles** (`OBJECTS\<nom>.IFF`, `FORM REAL` / `APPR` / `POLY`), lecteur 2EF00h à 31CA0h :
+
+- `VERT` : 3 × int32 24.8 par sommet ; `TRIS` / `FACE` : 8 octets (type, couleur, 3 mots sommet, 2F3F8h ; le type
+  est comparé à 10 avant un aiguillage, rôle non lu) ; `QUAD` / `FACE` : 10 octets ;
+- `MAPS` : 16 octets par triangle (mot face, mot texture, 3 × (u, v)), 20 par quadrilatère (31B2Ch, 31CA0h) ; u et v
+  sont bornés à largeur − 1 et hauteur − 1 ; texture n < nombre de `TXMP` = n-ième `TXMP`, sinon n-ième `TXMA`
+  après les `TXMP` (les deux nombres viennent du `INFO` de `TXMS`) ;
+- `TXMP` : nom de 8 octets, largeur, hauteur (mots), puis largeur × hauteur pixels **bruts** (2917Ch). `TXMA` : même
+  en-tête + mot nombre d'images, images à la suite (293A0h, 29458h). **Différence avec Pacific Strike**, dont les
+  pixels sont compressés (PKWARE DCL, une ligne sur deux).
+
+### 8.9 Rendu 3D d'une mission
+
+`tools/wog_mission_render.py` applique le § 8.8 et dessine les objets sur le terrain du § 7.7 (page WebGL autonome,
+liste des objets cliquable pour s'y rendre) :
+
+```
+python3 tools/wog_mission_render.py <DATA> MISN-1 --html misn1_3d.html [--avion camel]
+```
+
+`MISN-1` (« Front Ouest ») : hangars, dépôt, maison et quatre Camel du joueur et de son escadrille au sol (y = 3 m,
+cap 90), ennemis à 300-400 m vers l'est :
+
+![MISN-1, vue 3D](images/wog_misn1_3d.png)
+
+`GAUNTLET`, vu d'en haut (objets agrandis 5 fois) : le joueur au centre, 18 avions placés dans son repère :
+
+![GAUNTLET, vue 3D](images/wog_gauntlet_3d.png)
+
+Limites : tous les objets `PART` sont dessinés, quel que soit le moment de leur activation par les scripts ; ceux
+placés dans le repère du joueur le sont par rapport à sa position de départ ; l'éclairage des objets est une
+lumière simple (celui du jeu n'est pas lu) ; l'indice 255 des textures d'objets est rendu transparent (supposé,
+case à cocher) ; seul le niveau de détail `LVL0` et la 1re image des `TXMA` sont dessinés ; ombres (`*SHA*.IFF`) et
+objets de l'entrée 5 du terrain non dessinés.
+
 ## 9. Le reste n'est pas lu
 
 Aucune autre fonction propre à Wings of Glory n'a été lue. Les données du jeu n'ont pas été fournies.
