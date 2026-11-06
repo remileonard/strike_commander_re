@@ -485,8 +485,10 @@ lu.
   | 1 | 110 | 17 |
   | 2 | 74 | 21 |
 
-  index de palette d'un sommet = couleur de base, + (profondeur − seuil proche) ÷ (seuil lointain − seuil proche)
-  × nombre de teintes entre les deux seuils (`[0BF504h]`, `[0BF508h]`), + le nombre de teintes au-delà ;
+  index de palette d'un sommet = couleur de base + d, avec d selon la profondeur du sommet (marque `[sommet+1Bh]`,
+  posée à 8AE4Ah) : avant le seuil proche `[0BF504h]`, d = 0 ; entre le seuil proche et le seuil lointain
+  `[0BF508h]` (marque 80h), d = (profondeur − seuil proche) ÷ (seuil lointain − seuil proche) × nombre de teintes ;
+  au-delà (marque 40h), d = nombre de teintes. Les seuils dépendent de l'altitude de la caméra (89520h à 8965Ah) ;
 - de près, la texture de l'octet 1 (si elle existe et selon le niveau de détail `[0B00CCh]`), sinon celle de la classe.
 
 **Requête de sol** (`Terrain_GroundTypeAt_8BF78`, appelée par `8D964h`) : rend le numéro de texture de la case
