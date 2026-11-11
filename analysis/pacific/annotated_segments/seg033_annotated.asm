@@ -22,7 +22,13 @@ sub_17924		endp
 
 ; Attributes: bp-based frame
 
-sub_1792C		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +24 des instruments : vue 0 → centre (+3Ch) = premier point
+; (+34h), cadre (+8, +16h) = premier cadre (+2Ch…), actif (+20h) = 1 ; vue 1 → si le second
+; cadre existe (+24h ≠ 65 535) : centre = second point (+38h), cadre = second cadre, actif = 1
+; ; sinon actif = 0.
+; ==============================================================================================
+CockpitInstrument_SelectView_1792C		proc far
 
 var_20		= word ptr -20h
 var_1E		= word ptr -1Eh
@@ -137,7 +143,7 @@ loc_17A20:
 		pop	si
 		leave
 		retf
-sub_1792C		endp
+CockpitInstrument_SelectView_1792C		endp
 
 ; ----------------------------------------------------------------------
 

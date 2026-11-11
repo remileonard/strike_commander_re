@@ -41,7 +41,7 @@ arg_2		= word ptr  8
 		push	[bp+var_4]
 		push	ax
 		push	si
-		call	sub_16738
+		call	Cockpit_TurnHead_16738
 		add	sp, 8
 		push	1
 		push	0

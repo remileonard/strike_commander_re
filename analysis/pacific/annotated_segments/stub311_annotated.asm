@@ -15,7 +15,7 @@ stru_744B0	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_744D0	proc far
-		jmp	sub_ADEA0
+		jmp	Weapon_IdToMask_ADEA0
 sub_744D0	endp
 
 ; ----------------------------------------------------------------------
@@ -103,7 +103,7 @@ sub_74502	endp
 ; Attributes: thunk
 
 sub_74507	proc far
-		jmp	sub_AE513
+		jmp	WeaponSys_LoadStoresOnHardpoint_AE513
 sub_74507	endp
 
 ; ----------------------------------------------------------------------
@@ -175,7 +175,7 @@ sub_7452F	endp
 ; Attributes: thunk
 
 sub_74534	proc far
-		jmp	sub_AEC5A
+		jmp	WeaponSys_DistributeStores_AEC5A
 sub_74534	endp
 
 ; ----------------------------------------------------------------------

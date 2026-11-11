@@ -6,7 +6,14 @@ ovr254		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_96000		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. FORM INST du cockpit : un objet par FORM d'instrument, dans cet ordre :
+; GUNS (6Eh octets, Cockpit_LoadGunsInstrument_1BB54), puis ALTI, AIRS, COMP, TACH, VASI,
+; FUEL, BANK, HORI, GEAR, FLAP, STAL, AMMO, AGNS, BCOM, RUDR (classe de base commune,
+; Cockpit_LoadInstrument_97050 ; chacun sa table de méthodes). Chaque objet est ajouté à la
+; liste des instruments.
+; ==============================================================================================
+Cockpit_LoadInstruments_96000		proc far
 
 var_8		= word ptr -8
 var_6		= word ptr -6
@@ -66,7 +73,7 @@ loc_96026:
 		mov	[bx+2], ax
 		push	[bp+var_6]
 		push	bx
-		call	sub_1BB54
+		call	Cockpit_LoadGunsInstrument_1BB54
 		add	sp, 4
 		mov	ax, [bp+var_8]
 		jmp	short loc_960B4
@@ -1051,7 +1058,7 @@ loc_96BBD:
 		pop	si
 		leave
 		retf
-sub_96000		endp
+Cockpit_LoadInstruments_96000		endp
 
 ; ----------------------------------------------------------------------
 

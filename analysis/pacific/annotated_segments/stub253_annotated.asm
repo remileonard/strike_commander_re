@@ -63,7 +63,7 @@ sub_735B9	endp
 ; Attributes: thunk
 
 sub_735BE	proc far
-		jmp	sub_95311
+		jmp	Cockpit_LoadFromIFF_95311
 sub_735BE	endp
 
 ; ----------------------------------------------------------------------

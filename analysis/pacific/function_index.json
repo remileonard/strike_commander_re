@@ -6445,8 +6445,8 @@
 "sub_59B4A",
 "sub_73110"
 ],
-"new_name": "sub_16738",
-"summary": ""
+"new_name": "Cockpit_TurnHead_16738",
+"summary": "far, LUE EN PARTIE 2026-11-11 (fin de fonction). Angles de la tête : +14Ah borné entre les mots +144h et +146h, +148h borné entre +140h et +142h (les 4 mots du chunk INFO du FORM REAL ; Corsair : −90, 90, −180, 180)."
 },
 "sub_16802": {
 "segment": "seg032",
@@ -6555,8 +6555,8 @@
 "sub_5A629",
 "sub_36BFD"
 ],
-"new_name": "sub_1699B",
-"summary": ""
+"new_name": "Cockpit_UpdateView_1699B",
+"summary": "far, LUE EN PARTIE 2026-11-11 (fin de fonction). Place l'objet 3D du cockpit ([cockpit+1DCh]) : orientation = matrice de l'avion (méthode +40h), position = position rendue par Debris_ResolveForceBuffer + les 3 u32 du chunk INFO du FORM REAL (+134h) tournés par la matrice de l'avion (sub_5A629)."
 },
 "sub_17413": {
 "segment": "seg032",
@@ -6631,8 +6631,8 @@
 "lines": 116,
 "type": "far",
 "calls": [],
-"new_name": "sub_1792C",
-"summary": ""
+"new_name": "CockpitInstrument_SelectView_1792C",
+"summary": "far, LUE 2026-11-11. Méthode +24 des instruments : vue 0 → centre (+3Ch) = premier point (+34h), cadre (+8, +16h) = premier cadre (+2Ch…), actif (+20h) = 1 ; vue 1 → si le second cadre existe (+24h ≠ 65 535) : centre = second point (+38h), cadre = second cadre, actif = 1 ; sinon actif = 0."
 },
 "sub_17A23": {
 "segment": "seg033",
@@ -6776,8 +6776,8 @@
 "calls": [
 "sub_237B0"
 ],
-"new_name": "sub_185B9",
-"summary": ""
+"new_name": "CockpitInstrument_DrawIn3D_185B9",
+"summary": "far, LUE 2026-11-11. Méthode +20 de la classe de base des instruments (table B7Eh) : appelle la méthode +1Ch (dessin de l'instrument dans sa zone +61h), puis, si l'orientation de la tête du cockpit ([cockpit+148h] et [cockpit+14Ah]) reste sous 45 en valeur absolue, pose l'image sur l'objet 3D du cockpit ([cockpit+1DCh]) au point du chunk 3SPC (+40h, +4Ch, +50h) par sub_237B0 (pas encore nommée)."
 },
 "sub_18643": {
 "segment": "seg035",
@@ -6786,8 +6786,8 @@
 "lines": 89,
 "type": "far",
 "calls": [],
-"new_name": "sub_18643",
-"summary": ""
+"new_name": "Altimeter_UpdateValue_18643",
+"summary": "far, LUE 2026-11-11. Méthode +12 de l'altimètre (table B9Eh) : altitude du joueur ([word_7CADA+1Ah]) × facteur (dword_79762 × dword_7979B, en 24.8) en +6Fh ; angles des aiguilles : (altitude mod 1000) ÷ 10 × 3,6 → +73h, (altitude mod 100) × 3,6 → +5Eh (constante 399h = 3,6 en 24.8)."
 },
 "sub_18746": {
 "segment": "seg035",
@@ -6802,8 +6802,8 @@
 "sub_2CEF",
 "sub_75D4A"
 ],
-"new_name": "sub_18746",
-"summary": ""
+"new_name": "Altimeter_Draw_18746",
+"summary": "far, LUE 2026-11-11. Méthode +16 de l'altimètre : si byte_7709E et l'instrument actif (+20h) : fond (sub_1A95F, sub_187E7), aiguille +5Eh de longueur (+3Ch − +16h) × 3 ÷ 4 puis aiguille +73h de longueur (+3Ch − +16h) ÷ 2, couleur 1Dh (méthode +20h = CockpitInstrument_DrawNeedle_18945) ; sinon affiche l'altitude en texte."
 },
 "sub_187E7": {
 "segment": "seg035",
@@ -6821,8 +6821,8 @@
 "sub_6534F",
 "sub_6A514"
 ],
-"new_name": "sub_187E7",
-"summary": ""
+"new_name": "Altimeter_DrawDigits_187E7",
+"summary": "far, LUE 2026-11-11. Chiffres de l'altimètre, altitude a = +6Fh : (a mod 100000) ÷ 10000 et (a mod 10000) ÷ 1000. Vue 0 ([cockpit+1E1h] = 0) : images chiffre + 2 en (centre x − 3, centre y + 2) et (centre x + 1, centre y + 2) ; vue 1 : images chiffre + 12 en (centre x − 4, centre y + 2) et (centre x + 1, centre y + 2) (sub_6A514)."
 },
 "sub_18945": {
 "segment": "seg035",
@@ -6838,8 +6838,8 @@
 "sub_5666C",
 "sub_69F22"
 ],
-"new_name": "sub_18945",
-"summary": ""
+"new_name": "CockpitInstrument_DrawNeedle_18945",
+"summary": "far, LUE 2026-11-11. Méthode +28 (altimètre) : trace une aiguille d'angle +5Eh (degrés) depuis le second point (+38h, +3Ah) moins l'origine du second cadre (+24h, +26h), longueur (+3Ch − +16h) : bout = point + (longueur × sin, −longueur × cos) (sub_566A3 et Math_CosDeg_5666C), couleur 1Dh, par sub_69F22 (pas encore nommée) dans l'image de l'instrument."
 },
 "sub_18A3E": {
 "segment": "seg035",
@@ -6852,8 +6852,8 @@
 "sub_5666C",
 "sub_69F22"
 ],
-"new_name": "sub_18A3E",
-"summary": ""
+"new_name": "CockpitInstrument_DrawNeedleFromCenter_18A3E",
+"summary": "far, LUE 2026-11-11. Méthode +32 de l'altimètre : aiguille d'angle +5Eh (degrés), longueur arg_2, couleur arg_4, depuis le centre de la vue (+3Ch, +3Eh) : bout = centre + (longueur × sin, −longueur × cos) (sub_566A3 = sinus, Math_CosDeg_5666C), tracée par sub_69F22 dans le cadre (+12h)."
 },
 "sub_18AF1": {
 "segment": "seg035",
@@ -6864,8 +6864,8 @@
 "calls": [
 "sub_5A065"
 ],
-"new_name": "sub_18AF1",
-"summary": ""
+"new_name": "Airspeed_UpdateValue_18AF1",
+"summary": "far, LUE 2026-11-11. Méthode +12 de l'anémomètre : norme de la vitesse du joueur (méthode +50h, sub_5A065) × dword_797A3 (1F1h = 1,94 en 24.8 : m/s → nœuds) en +6Fh ; angle de l'aiguille = vitesse × B8h (0,71875 °) en +5Eh, au plus 167h (359°)."
 },
 "sub_18B8A": {
 "segment": "seg035",
@@ -6880,8 +6880,8 @@
 "sub_2CEF",
 "sub_75D4A"
 ],
-"new_name": "sub_18B8A",
-"summary": ""
+"new_name": "Airspeed_Draw_18B8A",
+"summary": "far, LUE 2026-11-11. Méthode +16 de l'anémomètre : si byte_7709E et instrument actif : aiguille +5Eh de longueur (centre − bord gauche) × 3 ÷ 4, couleur 1Dh (sub_18BFD, même calcul que CockpitInstrument_DrawNeedleFromCenter_18A3E) ; sinon la vitesse en texte."
 },
 "sub_18BFD": {
 "segment": "seg035",
@@ -6921,8 +6921,8 @@
 "lines": 86,
 "type": "far",
 "calls": [],
-"new_name": "sub_18DA9",
-"summary": ""
+"new_name": "VerticalSpeed_UpdateValue_18DA9",
+"summary": "far, LUE 2026-11-11. Méthode +12 du variomètre : 3e composante (altitude) de la vitesse du joueur (méthode +50h) × dword_7979B (m → pieds) en +6Fh ; angle = valeur × 73h (0,449°) − 90 (+ 360 si négatif) en +5Eh ; en descente au moins 90 si sous 90, en montée ramené à 90 entre 90 et 270 (bornes à ± 400 ft/s)."
 },
 "sub_18E6D": {
 "segment": "seg035",
@@ -6934,8 +6934,8 @@
 "sub_1A95F",
 "sub_18EA6"
 ],
-"new_name": "sub_18E6D",
-"summary": ""
+"new_name": "VerticalSpeed_Draw_18E6D",
+"summary": "far, LUE 2026-11-11. Méthode +16 du variomètre : aiguille +5Eh de 3/4 du rayon, couleur 1Dh (sub_18EA6)."
 },
 "sub_18EA6": {
 "segment": "seg035",
@@ -6975,8 +6975,8 @@
 "lines": 35,
 "type": "far",
 "calls": [],
-"new_name": "sub_1906A",
-"summary": ""
+"new_name": "Rudder_UpdateValue_1906A",
+"summary": "far, LUE 2026-11-11. Méthode +12 de l'indicateur de palonnier : mot +23h du bloc de commandes (word_7C884) × 50 ÷ 16 en +5Eh."
 },
 "sub_190AE": {
 "segment": "seg035",
@@ -6987,8 +6987,8 @@
 "calls": [
 "sub_1A95F"
 ],
-"new_name": "sub_190AE",
-"summary": ""
+"new_name": "Rudder_Draw_190AE",
+"summary": "far, LUE 2026-11-11. Méthode +16 de l'indicateur de palonnier : aiguille +5Eh de 3/4 du rayon, couleur 1Dh (méthode +32, sub_190E7)."
 },
 "sub_190E7": {
 "segment": "seg035",
@@ -7030,8 +7030,8 @@
 "calls": [
 "sub_59A30"
 ],
-"new_name": "sub_192AB",
-"summary": ""
+"new_name": "Horizon_UpdateValue_192AB",
+"summary": "far, LUE 2026-11-11. Méthode +12 de l'horizon : −roulis (Matrix_RollAngle_59A30) en +6Fh ; angle = −roulis − 90° (FFFFA600h) en +5Eh. Le tangage n'est pas lu."
 },
 "sub_1930C": {
 "segment": "seg035",
@@ -7050,8 +7050,8 @@
 "sub_6534F",
 "sub_6A514"
 ],
-"new_name": "sub_1930C",
-"summary": ""
+"new_name": "Horizon_Draw_1930C",
+"summary": "far, LUE 2026-11-11. Méthode +16 de l'horizon : image 0 (vue 0) ou 1 (vue 1) au coin du cadre, barre (Horizon_DrawBar_1941F, 3/4 du rayon, couleur 1Dh), puis image 2 (vue 0) ou 3 (vue 1) au centre."
 },
 "sub_1941F": {
 "segment": "seg035",
@@ -7067,8 +7067,8 @@
 "sub_5666C",
 "sub_69F22"
 ],
-"new_name": "sub_1941F",
-"summary": ""
+"new_name": "Horizon_DrawBar_1941F",
+"summary": "far, LUE 2026-11-11. Deux traits depuis le centre : à l'angle +5Eh et à l'angle +5Eh − 180° (FF4Ch), même longueur."
 },
 "sub_19589": {
 "segment": "seg035",
@@ -7099,8 +7099,8 @@
 "calls": [
 "sub_59A30"
 ],
-"new_name": "sub_19721",
-"summary": ""
+"new_name": "Bank_UpdateValue_19721",
+"summary": "far, LUE 2026-11-11. Méthode +12 de l'indicateur de roulis : Matrix_RollAngle_59A30 du joueur, partie entière en +5Eh."
 },
 "sub_19765": {
 "segment": "seg035",
@@ -7112,8 +7112,8 @@
 "sub_1A95F",
 "sub_1979E"
 ],
-"new_name": "sub_19765",
-"summary": ""
+"new_name": "Bank_Draw_19765",
+"summary": "far, LUE 2026-11-11. Méthode +16 de l'indicateur de roulis : aiguille +5Eh de 3/4 du rayon, couleur 1Dh (sub_1979E)."
 },
 "sub_1979E": {
 "segment": "seg035",
@@ -7146,8 +7146,8 @@
 "lines": 41,
 "type": "far",
 "calls": [],
-"new_name": "sub_19859",
-"summary": ""
+"new_name": "Tachometer_UpdateValue_19859",
+"summary": "far, LUE 2026-11-11. Méthode +12 du compte-tours : cran de la manette (octet signé +1Eh du bloc de commandes word_7C884, rempli par sub_17A7B depuis la méthode +8 de [joueur+5Ah]) en +6Fh ; angle = cran × 1E00h (30°) en +5Eh."
 },
 "sub_198B4": {
 "segment": "seg035",
@@ -7159,8 +7159,8 @@
 "sub_1A95F",
 "sub_198ED"
 ],
-"new_name": "sub_198B4",
-"summary": ""
+"new_name": "Tachometer_Draw_198B4",
+"summary": "far, LUE 2026-11-11. Méthode +16 du compte-tours : aiguille +5Eh de longueur (centre − bord gauche) × 3 ÷ 4, couleur 1Dh (sub_198ED)."
 },
 "sub_198ED": {
 "segment": "seg035",
@@ -7200,8 +7200,8 @@
 "lines": 86,
 "type": "far",
 "calls": [],
-"new_name": "sub_19AB1",
-"summary": ""
+"new_name": "FuelGauge_UpdateValue_19AB1",
+"summary": "far, LUE 2026-11-11. Méthode +12 de la jauge de carburant : objet [joueur+52h], méthode +48h : mot +87h = capacité, mot +8Bh = carburant restant (+6Fh) ; angle = restant ÷ capacité × 16800h (360°) en +5Eh."
 },
 "sub_19B7B": {
 "segment": "seg035",
@@ -7213,8 +7213,8 @@
 "sub_1A95F",
 "sub_19BB4"
 ],
-"new_name": "sub_19B7B",
-"summary": ""
+"new_name": "FuelGauge_Draw_19B7B",
+"summary": "far, LUE 2026-11-11. Méthode +16 de la jauge de carburant : aiguille +5Eh de 3/4 du rayon, couleur 1Dh (sub_19BB4)."
 },
 "sub_19BB4": {
 "segment": "seg035",
@@ -7256,8 +7256,8 @@
 "calls": [
 "sub_5720C"
 ],
-"new_name": "sub_19D7A",
-"summary": ""
+"new_name": "Compass_UpdateValue_19D7A",
+"summary": "far, LUE 2026-11-11. Méthode +12 du compas : cap du joueur (sub_5720C sur la ligne +0Ch de sa matrice, partie entière, + 360 si négatif) en +5Eh."
 },
 "sub_19DC3": {
 "segment": "seg035",
@@ -7272,8 +7272,8 @@
 "sub_2CEF",
 "sub_75D4A"
 ],
-"new_name": "sub_19DC3",
-"summary": ""
+"new_name": "Compass_Draw_19DC3",
+"summary": "far, LUE 2026-11-11. Méthode +16 du compas : aiguille +5Eh de 3/4 du rayon, couleur 1Dh (sub_19E36) ; sinon le cap en texte."
 },
 "sub_19E36": {
 "segment": "seg035",
@@ -7327,8 +7327,8 @@
 "lines": 31,
 "type": "far",
 "calls": [],
-"new_name": "sub_1A03E",
-"summary": ""
+"new_name": "GearLamp_UpdateValue_1A03E",
+"summary": "far, LUE 2026-11-11. Méthode +12 du voyant de train : bit 2 de l'octet +92h (objet [joueur+52h], méthode +48h) en +6Fh."
 },
 "sub_1A072": {
 "segment": "seg035",
@@ -7344,8 +7344,8 @@
 "sub_75D27",
 "sub_75D4A"
 ],
-"new_name": "sub_1A072",
-"summary": ""
+"new_name": "GearLamp_Draw_1A072",
+"summary": "far, LUE 2026-11-11. Méthode +16 du voyant de train : image +6Fh (vue 0) ou +6Fh + 2 (vue 1) au coin du cadre."
 },
 "sub_1A139": {
 "segment": "seg035",
@@ -7368,8 +7368,8 @@
 "lines": 31,
 "type": "far",
 "calls": [],
-"new_name": "sub_1A180",
-"summary": ""
+"new_name": "FlapLamp_UpdateValue_1A180",
+"summary": "far, LUE 2026-11-11. Méthode +12 du voyant de volets : bit 1 de l'octet +92h en +6Fh."
 },
 "sub_1A1B3": {
 "segment": "seg035",
@@ -7387,8 +7387,8 @@
 "sub_75D27",
 "sub_75D4A"
 ],
-"new_name": "sub_1A1B3",
-"summary": ""
+"new_name": "FlapLamp_Draw_1A1B3",
+"summary": "far, LUE 2026-11-11. Méthode +16 du voyant de volets : image +6Fh (vue 0) ou +6Fh + 2 (vue 1) au coin du cadre ; en mode texte, signale aussi le bit 0 de +92h."
 },
 "sub_1A2BF": {
 "segment": "seg035",
@@ -7411,8 +7411,8 @@
 "lines": 31,
 "type": "far",
 "calls": [],
-"new_name": "sub_1A303",
-"summary": ""
+"new_name": "StallLamp_UpdateValue_1A303",
+"summary": "far, LUE 2026-11-11. Méthode +12 du voyant de décrochage : bit 6 de l'octet +92h en +6Fh."
 },
 "sub_1A337": {
 "segment": "seg035",
@@ -7428,8 +7428,8 @@
 "sub_75D27",
 "sub_75D4A"
 ],
-"new_name": "sub_1A337",
-"summary": ""
+"new_name": "StallLamp_Draw_1A337",
+"summary": "far, LUE 2026-11-11. Méthode +16 du voyant de décrochage : image +6Fh (vue 0) ou +6Fh + 2 (vue 1) au coin du cadre."
 },
 "sub_1A3FE": {
 "segment": "seg035",
@@ -7438,8 +7438,8 @@
 "lines": 38,
 "type": "far",
 "calls": [],
-"new_name": "sub_1A3FE",
-"summary": ""
+"new_name": "Ammo_UpdateValue_1A3FE",
+"summary": "far, LUE 2026-11-11. Méthode +12 du compteur de munitions : mot +3Ah du système d'armes ([joueur+5Fh], munitions des canons du groupe 1) en milliers (+6Fh), centaines (+71h), dizaines (+73h), unités (+75h)."
 },
 "sub_1A442": {
 "segment": "seg035",
@@ -7478,8 +7478,8 @@
 "sub_2CEF",
 "sub_75D4A"
 ],
-"new_name": "sub_1A44F",
-"summary": ""
+"new_name": "Ammo_Draw_1A44F",
+"summary": "far, LUE 2026-11-11. Méthode +16 du compteur de munitions : 4 images de chiffre (chiffre en vue 0, chiffre + 10 en vue 1) au coin du cadre, espacées de (largeur du cadre + 3) ÷ 4."
 },
 "sub_1A691": {
 "segment": "seg035",
@@ -7491,8 +7491,8 @@
 "sub_6534F",
 "sub_6AB8C"
 ],
-"new_name": "sub_1A691",
-"summary": ""
+"new_name": "ArmedGuns_UpdateValue_1A691",
+"summary": "far, LUE 2026-11-11. Méthode +12 de l'indicateur des canons armés, n = nombre d'images : si l'octet +0Ch du système d'armes est posé : (+1Eh + +22h) ÷ 2 + 1 ; sinon, si l'arme choisie (+18h) est un canon (masque 40h) : (+1Ch + +20h) ÷ 2 + 1, au plus n ÷ 2 ; sinon 0. En vue 1 : + n ÷ 2."
 },
 "sub_1A74D": {
 "segment": "seg035",
@@ -7504,8 +7504,8 @@
 "sub_6534F",
 "sub_6A514"
 ],
-"new_name": "sub_1A74D",
-"summary": ""
+"new_name": "ArmedGuns_Draw_1A74D",
+"summary": "far, LUE 2026-11-11. Méthode +16 de l'indicateur des canons armés : image +6Fh au coin du cadre."
 },
 "sub_1A792": {
 "segment": "seg035",
@@ -7544,8 +7544,8 @@
 "sub_6534F",
 "sub_6A514"
 ],
-"new_name": "sub_1A7DB",
-"summary": ""
+"new_name": "BackupCompass_Draw_1A7DB",
+"summary": "far, LUE 2026-11-11. Méthode +16 du compas de secours : image 0 (vue 0) ou 1 (vue 1) en (centre x − (+3Eh × cap ÷ 360), haut du cadre), dans le cadre."
 },
 "sub_1A8A1": {
 "segment": "seg036",
@@ -8048,8 +8048,8 @@
 "calls": [
 "sub_1792C"
 ],
-"new_name": "sub_1BA41",
-"summary": ""
+"new_name": "GunSight_SelectView_1BA41",
+"summary": "far, LUE 2026-11-11. Méthode +24 du viseur : vues 0 et 1 comme CockpitInstrument_SelectView_1792C ; autre vue : cadre = les 4 mots du chunk GUNS (+58h à +5Eh)."
 },
 "sub_1BAD9": {
 "segment": "seg040",
@@ -8062,8 +8062,8 @@
 "sub_6534F",
 "sub_6A762"
 ],
-"new_name": "sub_1BAD9",
-"summary": ""
+"new_name": "GunSight_Draw_1BAD9",
+"summary": "far, LUE 2026-11-11. Méthode +16 du viseur (GUNS) : image de la vue (+6Ch) au coin du cadre, dessinée à travers une table de teinte (dword_7CC6C, ligne = premier mot du chunk GUNS) par sub_6A762 (pas encore nommée)."
 },
 "sub_1BB54": {
 "segment": "seg041",
@@ -8097,8 +8097,8 @@
 "sub_6DACD",
 "sub_17A47"
 ],
-"new_name": "sub_1BB54",
-"summary": ""
+"new_name": "Cockpit_LoadGunsInstrument_1BB54",
+"summary": "far, LUE 2026-11-11. Instrument GUNS : chunk GUNS = mot (+6Ah) puis 4 mots (+58h à +5Eh) ; SHAP (+60h) ; INFO lu comme Cockpit_LoadInstrument_97050. Pas de 3SPC."
 },
 "sub_1BD2A": {
 "segment": "seg042",
@@ -8192,8 +8192,8 @@
 "sub_6534F",
 "sub_6DB78"
 ],
-"new_name": "sub_1BF5C",
-"summary": ""
+"new_name": "Cockpit_LoadDamage_1BF5C",
+"summary": "far, LUE 2026-11-11. FORM DAMG du cockpit : DATA = entrées de 13 octets (6 mots, un octet), rangées sur 14 octets (+0Dh mis à 0), nombre en +0Eh ; SHAP = PAK d'images (+2)."
 },
 "sub_1C0E9": {
 "segment": "seg043",
@@ -10989,8 +10989,8 @@
 "sub_25882",
 "sub_293E7"
 ],
-"new_name": "sub_237B0",
-"summary": ""
+"new_name": "CockpitInstrument_PlaceQuadIn3D_237B0",
+"summary": "far, LUE EN PARTIE 2026-11-11 (construction du quadrilatère). (image de l'instrument, objet du cockpit, point du 3SPC, largeur, hauteur) : coin 0 = position de l'objet du cockpit (+12h) + point tourné par sa matrice (sub_5A629) ; coin 1 = coin 0 + (largeur, 0, 0) tourné ; coin 2 = coin 0 + (largeur, 0, −hauteur) ; coin 3 = coin 0 + (0, 0, −hauteur) : rectangle dans le plan vertical de l'avion, la largeur le long de l'envergure, la hauteur vers le bas. 15 instruments au plus par image (compteur word_777AA, erreur D00Fh). La suite (envoi au dessin) n'est pas lue."
 },
 "sub_23D3E": {
 "segment": "seg059",
@@ -19803,8 +19803,8 @@
 "lines": 66,
 "type": "far",
 "calls": [],
-"new_name": "sub_3E19B",
-"summary": ""
+"new_name": "WeaponStation_FindFullestOfMask_3E19B",
+"summary": "far, LUE 2026-11-11. (système d'armes, masque) : point d'emport de ce masque qui a le plus d'armes (+13h), en écartant le dernier point utilisé (+30h du système) sauf s'il est le seul ; rien si le point retenu est vide."
 },
 "sub_3E237": {
 "segment": "seg099",
@@ -19813,8 +19813,8 @@
 "lines": 90,
 "type": "far",
 "calls": [],
-"new_name": "sub_3E237",
-"summary": ""
+"new_name": "WeaponStation_NextGunOfGroup_3E237",
+"summary": "far, LUE 2026-11-11. (système d'armes, groupe 1 ou 2) : point canon (masque 40h) suivant le dernier utilisé (+30h), en tournant sur la liste des points, dont le groupe (+1) a le bit demandé ; borne de recherche = nombre de points du groupe 1 (+1Eh). Rien si aucun."
 },
 "sub_3E2EC": {
 "segment": "seg099",
@@ -19834,8 +19834,8 @@
 "sub_65BFD",
 "sub_3F657"
 ],
-"new_name": "sub_3E2EC",
-"summary": ""
+"new_name": "WeaponSystem_LaunchFromStation_3E2EC",
+"summary": "far, LUE 2026-11-11 (aiguillage). Équivalent de WeaponSystem_LaunchFromStation_3E744 de STRIKE.EXE. Args : arme WPNS (arg_0), tireur (si), cible (arg_6), point d'emport (arg_8), système (arg_C). Rien si le minuteur du point (+23h) n'est pas écoulé. Joueur sur le dos (roulis > 90°) : pas de bombe. Aiguillage sur la catégorie (méthode +8 de l'objet ; 1Ch sans objet) : 9 et 1Ah = bombe : plafond de bombes en vol par camp (word_79793 joueur / word_79795 autres, comparé à DisplayCache_ComputeChecksum_65BFD ÷ 750), puis sub_3F391 (pas encore nommée) ; 8 = roquette : plafond (word_79791 / word_7978D, ÷ 1000), puis sub_3F657 (pas encore nommée) ; 13 = canon : si l'arme est du groupe 1 (bit 1 de +12h), autant de tirs que de points du groupe 1 (+1Ch), chacun sur le point suivant (WeaponStation_NextGunOfGroup_3E237) dont le minuteur est à 0 et qui a des munitions : traçante (sub_4F6E6), munitions −1 sauf si byte_7CB0D (munitions infinies) ; groupe 2 de même avec +20h. Le dernier point utilisé va en +30h. Rend 1 si un canon a tiré."
 },
 "sub_3E5CD": {
 "segment": "seg099",
@@ -56813,8 +56813,8 @@
 "sub_1BEB1",
 "sub_1BF5C"
 ],
-"new_name": "sub_95311",
-"summary": ""
+"new_name": "Cockpit_LoadFromIFF_95311",
+"summary": "far, LUE 2026-11-11. Charge le fichier de cockpit OBJECTS\\<nom> (nom du chunk CKPT de l'avion, ex. corscock) : FORM CKPT ; INFO = octet nombre d'entrées (+E4h), octet (mis à 0), entrées de 1Dh octets (+F4h) ; ARTP = images du tableau de bord (lecteur indexé, en entier si plus de 1 500 000 octets libres, cmp 16E360h) ; VTMP (+EAh) ; GUNF (+1C7h, absent des 6 cockpits de PACIFIC.DAT) ; FORM REAL : INFO = 3 u32 (+134h…) et 4 mots (+140h…), OBJS = objet 3D du cockpit (sub_379D2) ; FORM INST → Cockpit_LoadInstruments_96000 ; FADE = 8 u32, 3 octets, 2 u32, 3 octets (46 octets ; deux quotients calculés en +182h et +18Ah, valeurs par défaut 5 et 15 en 8.8 si nulles) ; FORM DAMG → Cockpit_LoadDamage_1BF5C."
 },
 "sub_9598D": {
 "segment": "ovr253",
@@ -57056,8 +57056,8 @@
 "sub_96BC1",
 "sub_6DD9E"
 ],
-"new_name": "sub_96000",
-"summary": ""
+"new_name": "Cockpit_LoadInstruments_96000",
+"summary": "far, LUE 2026-11-11. FORM INST du cockpit : un objet par FORM d'instrument, dans cet ordre : GUNS (6Eh octets, Cockpit_LoadGunsInstrument_1BB54), puis ALTI, AIRS, COMP, TACH, VASI, FUEL, BANK, HORI, GEAR, FLAP, STAL, AMMO, AGNS, BCOM, RUDR (classe de base commune, Cockpit_LoadInstrument_97050 ; chacun sa table de méthodes). Chaque objet est ajouté à la liste des instruments."
 },
 "sub_96BC1": {
 "segment": "ovr254",
@@ -57399,8 +57399,8 @@
 "sub_67CBE",
 "sub_1DDFE"
 ],
-"new_name": "sub_97050",
-"summary": ""
+"new_name": "Cockpit_LoadInstrument_97050",
+"summary": "far, LUE 2026-11-11. Un instrument : INFO = mots +2Ch, +2Eh, +30h, +32h (cadre, recopié en +8 et +16h), +34h, +36h (point), +24h ; si +24h ≠ 65 535 : +26h, +28h, +2Ah (second cadre avec +24h) et +38h, +3Ah (second point) ; sinon second cadre = (65 535, 0, largeur, hauteur de la 1re image). SHAP = PAK d'images (+54h). 3SPC = 5 u32 (+40h à +50h) ; sans 3SPC : erreur 7017h."
 },
 "sub_972BB": {
 "segment": "ovr255",
@@ -63125,8 +63125,8 @@
 "calls": [
 "sub_1DDFE"
 ],
-"new_name": "sub_ADEA0",
-"summary": ""
+"new_name": "Weapon_IdToMask_ADEA0",
+"summary": "far, LUE 2026-11-11. Numéro d'arme du WDAT (0 à 7) → masque d'un octet : 0→0, 1→1 (B100LB), 2→2 (B500LB), 3→10h (HVAR), 4→4 (B1000LB), 5→8 (MK-13), 6→20h (NAPALM), 7→40h (canons) ; au-delà de 7 : erreur C019h. Noms entre parenthèses : objets de PACIFIC.DAT qui portent ces numéros."
 },
 "sub_ADEFA": {
 "segment": "ovr311",
@@ -63267,8 +63267,8 @@
 "calls": [
 "sub_39E1"
 ],
-"new_name": "sub_AE513",
-"summary": ""
+"new_name": "WeaponSys_LoadStoresOnHardpoint_AE513",
+"summary": "far, LUE 2026-11-11. (point d'emport, arme WPNS, quantité n) : rien si le point porte déjà une arme (masque +0Eh ≠ 0). Capacité selon le type HPTS du point (+15h) et le masque de l'arme : 0 et 4 = canon (40h), toute la quantité ; 1 = 10h ×1 ; 2 = 1 ×1 ; 3 = 2, 4, 8 ou 20h ×1 ; autre type : rien de défini. Charge min(n, capacité − déjà chargé) (+13h), pose masque (+0Eh), arme (+0Fh) et nom (+1Ah) ; rend le nombre chargé. Équivalent de WeaponSys_LoadStoresOnHardpoint_9EA2E de STRIKE.EXE."
 },
 "sub_AE64B": {
 "segment": "ovr311",
@@ -63454,8 +63454,8 @@
 "sub_AE513",
 "sub_AE513"
 ],
-"new_name": "sub_AEC5A",
-"summary": ""
+"new_name": "WeaponSys_DistributeStores_AEC5A",
+"summary": "far, LUE 2026-11-11. Répartit les armes WPNS (enregistrements de 13h octets, +14h, nombre +24h) sur les points d'emport (27h octets, +2Ch, nombre +34h). Canon (masque 40h) : le PREMIER canon de la liste va sur tous les points de type 0 (groupe 1 : +1 du point = 1, +1Eh compte, bit 1 de +12h de l'arme), les canons suivants sur les points de type 4 (groupe 2 : +1 = 2, +22h, bit 2), chacun avec toute sa quantité (WeaponSys_LoadStoresOnHardpoint_AE513). Autres armes : deux curseurs aux deux bouts de la liste des points ; même type aux deux bouts : moitié du reste (sar 1) à chacun, les deux avancent ; sinon tout le reste au premier, seul lui avance ; reste non chargé gardé en +10h. Enfin masse d'emport (somme nombre × masse, méthode +10h de l'objet) en +28h. Équivalent de PlayerComponent_OrchestrateComplex_9F286 de STRIKE.EXE."
 },
 "sub_AEEDF": {
 "segment": "ovr311",
@@ -64099,8 +64099,8 @@
 "sub_6DAF7",
 "sub_1DDFE"
 ],
-"new_name": "sub_B0360",
-"summary": ""
+"new_name": "Weapon_LoadWDATChunk_B0360",
+"summary": "far, LUE 2026-11-11. Chunk WDAT de Pacific Strike, 14 octets (STRIKE.EXE Weapon_LoadWDATChunk_A0700 : 22) : mot dégâts (+59h), mot rayon (+5Bh), octet catégorie de l'objet tiré (+5Dh ; 8 roquette, 9 bombe, 13 traçante dans les données), octet numéro d'arme converti en masque par Weapon_IdToMask_ADEA0 (+5Eh), u32 (+5Fh), u32 (+63h) ; rôle des deux u32 non relu. Erreur C01Fh si le chunk manque."
 },
 "sub_B03EF": {
 "segment": "ovr315",

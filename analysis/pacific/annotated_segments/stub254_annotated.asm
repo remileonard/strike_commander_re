@@ -175,7 +175,7 @@ sub_7365F	endp
 ; Attributes: thunk
 
 sub_73664	proc far
-		jmp	sub_96000
+		jmp	Cockpit_LoadInstruments_96000
 sub_73664	endp
 
 ; ----------------------------------------------------------------------

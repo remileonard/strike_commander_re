@@ -15,7 +15,7 @@ stru_73680	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_736A0	proc far
-		jmp	sub_97050
+		jmp	Cockpit_LoadInstrument_97050
 sub_736A0	endp
 
 ; ----------------------------------------------------------------------

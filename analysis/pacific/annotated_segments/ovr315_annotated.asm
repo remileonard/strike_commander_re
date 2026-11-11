@@ -6,7 +6,14 @@ ovr315		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_B0360		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Chunk WDAT de Pacific Strike, 14 octets (STRIKE.EXE
+; Weapon_LoadWDATChunk_A0700 : 22) : mot dégâts (+59h), mot rayon (+5Bh), octet catégorie de
+; l'objet tiré (+5Dh ; 8 roquette, 9 bombe, 13 traçante dans les données), octet numéro d'arme
+; converti en masque par Weapon_IdToMask_ADEA0 (+5Eh), u32 (+5Fh), u32 (+63h) ; rôle des deux
+; u32 non relu. Erreur C01Fh si le chunk manque.
+; ==============================================================================================
+Weapon_LoadWDATChunk_B0360		proc far
 
 arg_0		= word ptr  6
 arg_4		= word ptr  0Ah
@@ -72,7 +79,7 @@ loc_B03EC:
 		pop	si
 		pop	bp
 		retf
-sub_B0360		endp
+Weapon_LoadWDATChunk_B0360		endp
 
 ; ----------------------------------------------------------------------
 
@@ -100,7 +107,7 @@ arg_4		= word ptr  0Ah
 		push	si
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_B0360
+		call	near ptr Weapon_LoadWDATChunk_B0360
 		add	sp, 6
 		pop	si
 		pop	bp

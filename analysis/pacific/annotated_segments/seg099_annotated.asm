@@ -53,7 +53,12 @@ sub_3E140		endp
 
 ; Attributes: bp-based frame
 
-sub_3E19B		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. (système d'armes, masque) : point d'emport de ce masque qui a le plus
+; d'armes (+13h), en écartant le dernier point utilisé (+30h du système) sauf s'il est le seul
+; ; rien si le point retenu est vide.
+; ==============================================================================================
+WeaponStation_FindFullestOfMask_3E19B		proc far
 
 var_9		= byte ptr -9
 var_8		= dword ptr -8
@@ -118,13 +123,18 @@ loc_3E22F:
 		mov	ax, word ptr [bp+var_4]
 		leave
 		retf
-sub_3E19B		endp
+WeaponStation_FindFullestOfMask_3E19B		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_3E237		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. (système d'armes, groupe 1 ou 2) : point canon (masque 40h) suivant le
+; dernier utilisé (+30h), en tournant sur la liste des points, dont le groupe (+1) a le bit
+; demandé ; borne de recherche = nombre de points du groupe 1 (+1Eh). Rien si aucun.
+; ==============================================================================================
+WeaponStation_NextGunOfGroup_3E237		proc far
 
 var_4		= dword ptr -4
 arg_0		= word ptr  6
@@ -213,13 +223,27 @@ loc_3E2E6:
 loc_3E2EA:
 		leave
 		retf
-sub_3E237		endp
+WeaponStation_NextGunOfGroup_3E237		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_3E2EC		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11 (aiguillage). Équivalent de WeaponSystem_LaunchFromStation_3E744 de
+; STRIKE.EXE. Args : arme WPNS (arg_0), tireur (si), cible (arg_6), point d'emport (arg_8),
+; système (arg_C). Rien si le minuteur du point (+23h) n'est pas écoulé. Joueur sur le dos
+; (roulis > 90°) : pas de bombe. Aiguillage sur la catégorie (méthode +8 de l'objet ; 1Ch sans
+; objet) : 9 et 1Ah = bombe : plafond de bombes en vol par camp (word_79793 joueur /
+; word_79795 autres, comparé à DisplayCache_ComputeChecksum_65BFD ÷ 750), puis sub_3F391 (pas
+; encore nommée) ; 8 = roquette : plafond (word_79791 / word_7978D, ÷ 1000), puis sub_3F657
+; (pas encore nommée) ; 13 = canon : si l'arme est du groupe 1 (bit 1 de +12h), autant de tirs
+; que de points du groupe 1 (+1Ch), chacun sur le point suivant
+; (WeaponStation_NextGunOfGroup_3E237) dont le minuteur est à 0 et qui a des munitions :
+; traçante (sub_4F6E6), munitions −1 sauf si byte_7CB0D (munitions infinies) ; groupe 2 de
+; même avec +20h. Le dernier point utilisé va en +30h. Rend 1 si un canon a tiré.
+; ==============================================================================================
+WeaponSystem_LaunchFromStation_3E2EC		proc far
 
 var_40		= word ptr -40h
 var_1C		= word ptr -1Ch
@@ -415,7 +439,7 @@ loc_3E458:
 		push	1
 		push	large [bp+arg_C]
 		push	cs
-		call	near ptr sub_3E237
+		call	near ptr WeaponStation_NextGunOfGroup_3E237
 		add	sp, 6
 		mov	word ptr [bp+arg_8+2], dx
 		mov	word ptr [bp+arg_8], ax
@@ -483,7 +507,7 @@ loc_3E4F2:
 		push	2
 		push	large [bp+arg_C]
 		push	cs
-		call	near ptr sub_3E237
+		call	near ptr WeaponStation_NextGunOfGroup_3E237
 		add	sp, 6
 		mov	word ptr [bp+arg_8+2], dx
 		mov	word ptr [bp+arg_8], ax
@@ -574,9 +598,9 @@ loc_3E5B9:
 		pop	si
 		leave
 		retf
-sub_3E2EC		endp
+WeaponSystem_LaunchFromStation_3E2EC		endp
 
-; START OF FUNCTION CHUNK FOR sub_3E2EC
+; START OF FUNCTION CHUNK FOR WeaponSystem_LaunchFromStation_3E2EC
 word_3E5BD	dw 8
 		dw 9
 		dw 0Dh
@@ -585,7 +609,7 @@ off_3E5C5	dw offset loc_3E570
 		dw offset loc_3E3D1
 		dw offset loc_3E447
 		dw offset loc_3E3D1
-; END OF FUNCTION CHUNK FOR sub_3E2EC
+; END OF FUNCTION CHUNK FOR WeaponSystem_LaunchFromStation_3E2EC
 
 ; ----------------------------------------------------------------------
 
@@ -999,7 +1023,7 @@ loc_3E93A:
 		push	ax
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_3E19B
+		call	near ptr WeaponStation_FindFullestOfMask_3E19B
 		add	sp, 6
 		mov	word ptr [bp+var_18+2], dx
 		mov	word ptr [bp+var_18], ax
@@ -1128,7 +1152,7 @@ loc_3EA6F:
 		push	word ptr es:[bx+9]
 		push	large es:[bx+18h]
 		push	cs
-		call	near ptr sub_3E2EC
+		call	near ptr WeaponSystem_LaunchFromStation_3E2EC
 		add	sp, 10h
 		or	al, al
 		jnz	short loc_3EA93
@@ -1224,7 +1248,7 @@ loc_3EB73:
 		push	ax
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_3E19B
+		call	near ptr WeaponStation_FindFullestOfMask_3E19B
 		add	sp, 6
 		mov	word ptr [bp+var_18], dx
 		mov	word ptr [bp+var_1A], ax
@@ -1241,7 +1265,7 @@ loc_3EB92:
 		push	word ptr es:[bx+9]
 		push	large es:[bx+18h]
 		push	cs
-		call	near ptr sub_3E2EC
+		call	near ptr WeaponSystem_LaunchFromStation_3E2EC
 		add	sp, 10h
 		or	al, al
 		jnz	short loc_3EBB4
@@ -1297,7 +1321,7 @@ loc_3EC41:
 		push	ax
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_3E19B
+		call	near ptr WeaponStation_FindFullestOfMask_3E19B
 		add	sp, 6
 		or	ax, dx
 		jnz	short loc_3EC86
@@ -2109,7 +2133,7 @@ loc_3F279:
 		push	ax
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_3E19B
+		call	near ptr WeaponStation_FindFullestOfMask_3E19B
 		add	sp, 6
 		mov	word ptr [bp+var_6+2], dx
 		mov	word ptr [bp+var_6], ax

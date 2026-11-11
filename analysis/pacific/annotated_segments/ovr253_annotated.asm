@@ -102,7 +102,17 @@ sub_95190		endp
 
 ; Attributes: bp-based frame
 
-sub_95311		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Charge le fichier de cockpit OBJECTS\<nom> (nom du chunk CKPT de
+; l'avion, ex. corscock) : FORM CKPT ; INFO = octet nombre d'entrées (+E4h), octet (mis à 0),
+; entrées de 1Dh octets (+F4h) ; ARTP = images du tableau de bord (lecteur indexé, en entier
+; si plus de 1 500 000 octets libres, cmp 16E360h) ; VTMP (+EAh) ; GUNF (+1C7h, absent des 6
+; cockpits de PACIFIC.DAT) ; FORM REAL : INFO = 3 u32 (+134h…) et 4 mots (+140h…), OBJS =
+; objet 3D du cockpit (sub_379D2) ; FORM INST → Cockpit_LoadInstruments_96000 ; FADE = 8 u32,
+; 3 octets, 2 u32, 3 octets (46 octets ; deux quotients calculés en +182h et +18Ah, valeurs
+; par défaut 5 et 15 en 8.8 si nulles) ; FORM DAMG → Cockpit_LoadDamage_1BF5C.
+; ==============================================================================================
+Cockpit_LoadFromIFF_95311		proc far
 
 var_108		= word ptr -108h
 var_A7		= dword ptr -0A7h
@@ -733,7 +743,7 @@ loc_95950:
 		push	ax
 		push	si
 		push	word ptr [si+0E2h]
-		call	sub_1BF5C
+		call	Cockpit_LoadDamage_1BF5C
 		add	sp, 6
 
 loc_95989:
@@ -741,7 +751,7 @@ loc_95989:
 		pop	si
 		leave
 		retf
-sub_95311		endp
+Cockpit_LoadFromIFF_95311		endp
 
 ; ----------------------------------------------------------------------
 

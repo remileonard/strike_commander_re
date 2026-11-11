@@ -7,7 +7,12 @@ seg032		segment	para public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_16738		proc far
+; ==============================================================================================
+; far, LUE EN PARTIE 2026-11-11 (fin de fonction). Angles de la tête : +14Ah borné entre les
+; mots +144h et +146h, +148h borné entre +140h et +142h (les 4 mots du chunk INFO du FORM REAL
+; ; Corsair : −90, 90, −180, 180).
+; ==============================================================================================
+Cockpit_TurnHead_16738		proc far
 
 var_8		= word ptr -8
 var_7		= word ptr -7
@@ -102,7 +107,7 @@ loc_167FE:
 		pop	si
 		leave
 		retf
-sub_16738		endp
+Cockpit_TurnHead_16738		endp
 
 ; ----------------------------------------------------------------------
 
@@ -339,7 +344,13 @@ sub_16996		endp
 
 ; Attributes: bp-based frame
 
-sub_1699B		proc far
+; ==============================================================================================
+; far, LUE EN PARTIE 2026-11-11 (fin de fonction). Place l'objet 3D du cockpit
+; ([cockpit+1DCh]) : orientation = matrice de l'avion (méthode +40h), position = position
+; rendue par Debris_ResolveForceBuffer + les 3 u32 du chunk INFO du FORM REAL (+134h) tournés
+; par la matrice de l'avion (sub_5A629).
+; ==============================================================================================
+Cockpit_UpdateView_1699B		proc far
 
 var_CA		= dword ptr -0CAh
 var_C2		= dword ptr -0C2h
@@ -1019,7 +1030,7 @@ loc_16F02:
 		push	ax
 		push	si
 		push	cs
-		call	near ptr sub_16738
+		call	near ptr Cockpit_TurnHead_16738
 		add	sp, 8
 		mov	byte ptr [si+17Dh], 0
 		jmp	short loc_16F5D
@@ -1432,9 +1443,9 @@ loc_173F3:
 		pop	si
 		leave
 		retf
-sub_1699B		endp
+Cockpit_UpdateView_1699B		endp
 
-; START OF FUNCTION CHUNK FOR sub_1699B
+; START OF FUNCTION CHUNK FOR Cockpit_UpdateView_1699B
 off_173F7	dw offset loc_16F79
 		dw offset loc_16F6D
 		dw offset loc_16F9B
@@ -1449,7 +1460,7 @@ off_1740B	dw offset loc_16D3F
 		dw offset loc_16E33
 		dw offset loc_16E42
 		dw offset loc_16E8D
-; END OF FUNCTION CHUNK FOR sub_1699B
+; END OF FUNCTION CHUNK FOR Cockpit_UpdateView_1699B
 
 ; ----------------------------------------------------------------------
 

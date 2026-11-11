@@ -25,7 +25,12 @@ sub_1BA39		endp
 
 ; Attributes: bp-based frame
 
-sub_1BA41		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +24 du viseur : vues 0 et 1 comme
+; CockpitInstrument_SelectView_1792C ; autre vue : cadre = les 4 mots du chunk GUNS (+58h à
+; +5Eh).
+; ==============================================================================================
+GunSight_SelectView_1BA41		proc far
 
 var_10		= word ptr -10h
 var_E		= word ptr -0Eh
@@ -55,7 +60,7 @@ arg_2		= word ptr  8
 loc_1BA5E:
 		push	dx
 		push	si
-		call	sub_1792C
+		call	CockpitInstrument_SelectView_1792C
 		add	sp, 4
 		jmp	short loc_1BAD6
 
@@ -100,13 +105,18 @@ loc_1BAD6:
 		pop	si
 		leave
 		retf
-sub_1BA41		endp
+GunSight_SelectView_1BA41		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_1BAD9		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 du viseur (GUNS) : image de la vue (+6Ch) au coin du cadre,
+; dessinée à travers une table de teinte (dword_7CC6C, ligne = premier mot du chunk GUNS) par
+; sub_6A762 (pas encore nommée).
+; ==============================================================================================
+GunSight_Draw_1BAD9		proc far
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -161,5 +171,5 @@ loc_1BB0E:
 		push	ax
 		call	sub_6A762
 		add	sp, 18h
-sub_1BAD9		endp
+GunSight_Draw_1BAD9		endp
 seg040		ends

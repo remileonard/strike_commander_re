@@ -131,7 +131,11 @@ sub_1BF47		endp
 
 ; Attributes: bp-based frame
 
-sub_1BF5C		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. FORM DAMG du cockpit : DATA = entrées de 13 octets (6 mots, un octet),
+; rangées sur 14 octets (+0Dh mis à 0), nombre en +0Eh ; SHAP = PAK d'images (+2).
+; ==============================================================================================
+Cockpit_LoadDamage_1BF5C		proc far
 
 var_18		= word ptr -18h
 var_16		= word ptr -16h
@@ -296,7 +300,7 @@ loc_1C0DB:
 		pop	si
 		leave
 		retf
-sub_1BF5C		endp
+Cockpit_LoadDamage_1BF5C		endp
 
 ; ----------------------------------------------------------------------
 

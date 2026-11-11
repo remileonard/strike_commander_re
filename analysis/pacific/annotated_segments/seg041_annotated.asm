@@ -7,7 +7,11 @@ seg041		segment	para public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_1BB54		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Instrument GUNS : chunk GUNS = mot (+6Ah) puis 4 mots (+58h à +5Eh) ;
+; SHAP (+60h) ; INFO lu comme Cockpit_LoadInstrument_97050. Pas de 3SPC.
+; ==============================================================================================
+Cockpit_LoadGunsInstrument_1BB54		proc far
 
 var_18		= word ptr -18h
 var_16		= word ptr -16h
@@ -194,5 +198,5 @@ loc_1BCBF:
 		mov	[si+18h], ax
 		mov	ax, [bp+var_16]
 		mov	[si+1Ah], ax
-sub_1BB54		endp
+Cockpit_LoadGunsInstrument_1BB54		endp
 seg041		ends

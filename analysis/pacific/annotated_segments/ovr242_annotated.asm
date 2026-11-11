@@ -156,7 +156,7 @@ loc_8A6E1:
 		push	word ptr [si+14Eh]
 		push	word ptr [si+14Ch]
 		push	si
-		call	sub_16738
+		call	Cockpit_TurnHead_16738
 		add	sp, 8
 		pop	si
 		pop	bp

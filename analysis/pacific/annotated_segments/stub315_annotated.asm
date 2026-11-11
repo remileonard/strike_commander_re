@@ -15,7 +15,7 @@ stru_746B0	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_746D0	proc far
-		jmp	sub_B0360
+		jmp	Weapon_LoadWDATChunk_B0360
 sub_746D0	endp
 
 ; ----------------------------------------------------------------------

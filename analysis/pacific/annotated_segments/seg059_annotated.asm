@@ -6,7 +6,16 @@ seg059		segment	para public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_237B0		proc far
+; ==============================================================================================
+; far, LUE EN PARTIE 2026-11-11 (construction du quadrilatère). (image de l'instrument, objet
+; du cockpit, point du 3SPC, largeur, hauteur) : coin 0 = position de l'objet du cockpit
+; (+12h) + point tourné par sa matrice (sub_5A629) ; coin 1 = coin 0 + (largeur, 0, 0) tourné
+; ; coin 2 = coin 0 + (largeur, 0, −hauteur) ; coin 3 = coin 0 + (0, 0, −hauteur) : rectangle
+; dans le plan vertical de l'avion, la largeur le long de l'envergure, la hauteur vers le bas.
+; 15 instruments au plus par image (compteur word_777AA, erreur D00Fh). La suite (envoi au
+; dessin) n'est pas lue.
+; ==============================================================================================
+CockpitInstrument_PlaceQuadIn3D_237B0		proc far
 
 var_156		= dword ptr -156h
 var_152		= dword ptr -152h
@@ -506,7 +515,7 @@ loc_23D3A:
 		pop	si
 		leave
 		retf
-sub_237B0		endp
+CockpitInstrument_PlaceQuadIn3D_237B0		endp
 
 ; ----------------------------------------------------------------------
 

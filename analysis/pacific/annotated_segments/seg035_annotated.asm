@@ -7,7 +7,14 @@ seg035		segment	para public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_185B9		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +20 de la classe de base des instruments (table B7Eh) : appelle
+; la méthode +1Ch (dessin de l'instrument dans sa zone +61h), puis, si l'orientation de la
+; tête du cockpit ([cockpit+148h] et [cockpit+14Ah]) reste sous 45 en valeur absolue, pose
+; l'image sur l'objet 3D du cockpit ([cockpit+1DCh]) au point du chunk 3SPC (+40h, +4Ch, +50h)
+; par sub_237B0 (pas encore nommée).
+; ==============================================================================================
+CockpitInstrument_DrawIn3D_185B9		proc far
 
 var_10		= dword ptr -10h
 var_C		= dword ptr -0Ch
@@ -67,7 +74,7 @@ arg_2		= word ptr  8
 		add	ax, 61h
 		push	ax
 		push	[bp+arg_2]
-		call	sub_237B0
+		call	CockpitInstrument_PlaceQuadIn3D_237B0
 		add	sp, 10h
 
 loc_1863F:
@@ -75,13 +82,19 @@ loc_1863F:
 		pop	si
 		leave
 		retf
-sub_185B9		endp
+CockpitInstrument_DrawIn3D_185B9		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_18643		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +12 de l'altimètre (table B9Eh) : altitude du joueur
+; ([word_7CADA+1Ah]) × facteur (dword_79762 × dword_7979B, en 24.8) en +6Fh ; angles des
+; aiguilles : (altitude mod 1000) ÷ 10 × 3,6 → +73h, (altitude mod 100) × 3,6 → +5Eh
+; (constante 399h = 3,6 en 24.8).
+; ==============================================================================================
+Altimeter_UpdateValue_18643		proc far
 
 var_3C		= dword ptr -3Ch
 var_38		= dword ptr -38h
@@ -169,13 +182,19 @@ arg_0		= word ptr  6
 		pop	si
 		leave
 		retf
-sub_18643		endp
+Altimeter_UpdateValue_18643		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_18746		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 de l'altimètre : si byte_7709E et l'instrument actif (+20h)
+; : fond (sub_1A95F, sub_187E7), aiguille +5Eh de longueur (+3Ch − +16h) × 3 ÷ 4 puis aiguille
+; +73h de longueur (+3Ch − +16h) ÷ 2, couleur 1Dh (méthode +20h =
+; CockpitInstrument_DrawNeedle_18945) ; sinon affiche l'altitude en texte.
+; ==============================================================================================
+Altimeter_Draw_18746		proc far
 
 var_14		= word ptr -14h
 arg_0		= word ptr  6
@@ -198,7 +217,7 @@ loc_18760:
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_187E7
+		call	near ptr Altimeter_DrawDigits_187E7
 		pop	cx
 		push	1Dh
 		mov	ax, [si+3Ch]
@@ -250,13 +269,19 @@ loc_187E4:
 		pop	si
 		leave
 		retf
-sub_18746		endp
+Altimeter_Draw_18746		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_187E7		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Chiffres de l'altimètre, altitude a = +6Fh : (a mod 100000) ÷ 10000 et
+; (a mod 10000) ÷ 1000. Vue 0 ([cockpit+1E1h] = 0) : images chiffre + 2 en (centre x − 3,
+; centre y + 2) et (centre x + 1, centre y + 2) ; vue 1 : images chiffre + 12 en (centre x −
+; 4, centre y + 2) et (centre x + 1, centre y + 2) (sub_6A514).
+; ==============================================================================================
+Altimeter_DrawDigits_187E7		proc far
 
 var_8		= dword ptr -8
 var_4		= dword ptr -4
@@ -399,13 +424,20 @@ loc_18942:
 		pop	si
 		leave
 		retf
-sub_187E7		endp
+Altimeter_DrawDigits_187E7		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_18945		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +28 (altimètre) : trace une aiguille d'angle +5Eh (degrés)
+; depuis le second point (+38h, +3Ah) moins l'origine du second cadre (+24h, +26h), longueur
+; (+3Ch − +16h) : bout = point + (longueur × sin, −longueur × cos) (sub_566A3 et
+; Math_CosDeg_5666C), couleur 1Dh, par sub_69F22 (pas encore nommée) dans l'image de
+; l'instrument.
+; ==============================================================================================
+CockpitInstrument_DrawNeedle_18945		proc far
 
 var_26		= dword ptr -26h
 var_22		= dword ptr -22h
@@ -510,13 +542,19 @@ arg_2		= word ptr  8
 		pop	si
 		leave
 		retf
-sub_18945		endp
+CockpitInstrument_DrawNeedle_18945		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_18A3E		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +32 de l'altimètre : aiguille d'angle +5Eh (degrés), longueur
+; arg_2, couleur arg_4, depuis le centre de la vue (+3Ch, +3Eh) : bout = centre + (longueur ×
+; sin, −longueur × cos) (sub_566A3 = sinus, Math_CosDeg_5666C), tracée par sub_69F22 dans le
+; cadre (+12h).
+; ==============================================================================================
+CockpitInstrument_DrawNeedleFromCenter_18A3E		proc far
 
 var_26		= dword ptr -26h
 var_22		= dword ptr -22h
@@ -598,13 +636,18 @@ arg_4		= byte ptr  0Ah
 		pop	si
 		leave
 		retf
-sub_18A3E		endp
+CockpitInstrument_DrawNeedleFromCenter_18A3E		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_18AF1		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +12 de l'anémomètre : norme de la vitesse du joueur (méthode
+; +50h, sub_5A065) × dword_797A3 (1F1h = 1,94 en 24.8 : m/s → nœuds) en +6Fh ; angle de
+; l'aiguille = vitesse × B8h (0,71875 °) en +5Eh, au plus 167h (359°).
+; ==============================================================================================
+Airspeed_UpdateValue_18AF1		proc far
 
 var_24		= dword ptr -24h
 var_20		= dword ptr -20h
@@ -666,13 +709,18 @@ loc_18B87:
 		pop	si
 		leave
 		retf
-sub_18AF1		endp
+Airspeed_UpdateValue_18AF1		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_18B8A		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 de l'anémomètre : si byte_7709E et instrument actif :
+; aiguille +5Eh de longueur (centre − bord gauche) × 3 ÷ 4, couleur 1Dh (sub_18BFD, même
+; calcul que CockpitInstrument_DrawNeedleFromCenter_18A3E) ; sinon la vitesse en texte.
+; ==============================================================================================
+Airspeed_Draw_18B8A		proc far
 
 var_14		= word ptr -14h
 arg_0		= word ptr  6
@@ -725,7 +773,7 @@ loc_18BFA:
 		pop	si
 		leave
 		retf
-sub_18B8A		endp
+Airspeed_Draw_18B8A		endp
 
 ; ----------------------------------------------------------------------
 
@@ -930,7 +978,13 @@ sub_18CB0		endp
 
 ; Attributes: bp-based frame
 
-sub_18DA9		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +12 du variomètre : 3e composante (altitude) de la vitesse du
+; joueur (méthode +50h) × dword_7979B (m → pieds) en +6Fh ; angle = valeur × 73h (0,449°) − 90
+; (+ 360 si négatif) en +5Eh ; en descente au moins 90 si sous 90, en montée ramené à 90 entre
+; 90 et 270 (bornes à ± 400 ft/s).
+; ==============================================================================================
+VerticalSpeed_UpdateValue_18DA9		proc far
 
 var_1C		= word ptr -1Ch
 var_14		= dword ptr -14h
@@ -1015,13 +1069,17 @@ loc_18E6A:
 		pop	si
 		leave
 		retf
-sub_18DA9		endp
+VerticalSpeed_UpdateValue_18DA9		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_18E6D		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 du variomètre : aiguille +5Eh de 3/4 du rayon, couleur 1Dh
+; (sub_18EA6).
+; ==============================================================================================
+VerticalSpeed_Draw_18E6D		proc far
 
 arg_0		= word ptr  6
 
@@ -1054,7 +1112,7 @@ loc_18EA3:
 		pop	si
 		pop	bp
 		retf
-sub_18E6D		endp
+VerticalSpeed_Draw_18E6D		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1275,7 +1333,11 @@ sub_18F59		endp
 
 ; Attributes: bp-based frame
 
-sub_1906A		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +12 de l'indicateur de palonnier : mot +23h du bloc de
+; commandes (word_7C884) × 50 ÷ 16 en +5Eh.
+; ==============================================================================================
+Rudder_UpdateValue_1906A		proc far
 
 var_8		= dword ptr -8
 var_4		= word ptr -4
@@ -1309,13 +1371,17 @@ loc_190AB:
 		pop	si
 		leave
 		retf
-sub_1906A		endp
+Rudder_UpdateValue_1906A		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_190AE		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 de l'indicateur de palonnier : aiguille +5Eh de 3/4 du
+; rayon, couleur 1Dh (méthode +32, sub_190E7).
+; ==============================================================================================
+Rudder_Draw_190AE		proc far
 
 arg_0		= word ptr  6
 
@@ -1347,7 +1413,7 @@ loc_190E4:
 		pop	si
 		pop	bp
 		retf
-sub_190AE		endp
+Rudder_Draw_190AE		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1568,7 +1634,11 @@ sub_1919A		endp
 
 ; Attributes: bp-based frame
 
-sub_192AB		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +12 de l'horizon : −roulis (Matrix_RollAngle_59A30) en +6Fh ;
+; angle = −roulis − 90° (FFFFA600h) en +5Eh. Le tangage n'est pas lu.
+; ==============================================================================================
+Horizon_UpdateValue_192AB		proc far
 
 var_14		= dword ptr -14h
 var_10		= dword ptr -10h
@@ -1613,13 +1683,18 @@ loc_19309:
 		pop	si
 		leave
 		retf
-sub_192AB		endp
+Horizon_UpdateValue_192AB		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_1930C		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 de l'horizon : image 0 (vue 0) ou 1 (vue 1) au coin du
+; cadre, barre (Horizon_DrawBar_1941F, 3/4 du rayon, couleur 1Dh), puis image 2 (vue 0) ou 3
+; (vue 1) au centre.
+; ==============================================================================================
+Horizon_Draw_1930C		proc far
 
 arg_0		= word ptr  6
 
@@ -1688,7 +1763,7 @@ loc_1938D:
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_1941F
+		call	near ptr Horizon_DrawBar_1941F
 		add	sp, 6
 		mov	bx, [si+2]
 		cmp	word ptr [bx+1E1h], 0
@@ -1736,13 +1811,17 @@ loc_1941C:
 		pop	si
 		pop	bp
 		retf
-sub_1930C		endp
+Horizon_Draw_1930C		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_1941F		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Deux traits depuis le centre : à l'angle +5Eh et à l'angle +5Eh − 180°
+; (FF4Ch), même longueur.
+; ==============================================================================================
+Horizon_DrawBar_1941F		proc far
 
 var_44		= dword ptr -44h
 var_40		= dword ptr -40h
@@ -1893,7 +1972,7 @@ loc_194EF:
 		pop	si
 		leave
 		retf
-sub_1941F		endp
+Horizon_DrawBar_1941F		endp
 
 ; ----------------------------------------------------------------------
 
@@ -2084,7 +2163,11 @@ sub_19589		endp
 
 ; Attributes: bp-based frame
 
-sub_19721		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +12 de l'indicateur de roulis : Matrix_RollAngle_59A30 du
+; joueur, partie entière en +5Eh.
+; ==============================================================================================
+Bank_UpdateValue_19721		proc far
 
 var_4		= dword ptr -4
 arg_0		= word ptr  6
@@ -2118,13 +2201,17 @@ loc_19762:
 		pop	si
 		leave
 		retf
-sub_19721		endp
+Bank_UpdateValue_19721		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_19765		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 de l'indicateur de roulis : aiguille +5Eh de 3/4 du rayon,
+; couleur 1Dh (sub_1979E).
+; ==============================================================================================
+Bank_Draw_19765		proc far
 
 arg_0		= word ptr  6
 
@@ -2157,7 +2244,7 @@ loc_1979B:
 		pop	si
 		pop	bp
 		retf
-sub_19765		endp
+Bank_Draw_19765		endp
 
 ; ----------------------------------------------------------------------
 
@@ -2266,7 +2353,12 @@ sub_19851		endp
 
 ; Attributes: bp-based frame
 
-sub_19859		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +12 du compte-tours : cran de la manette (octet signé +1Eh du
+; bloc de commandes word_7C884, rempli par sub_17A7B depuis la méthode +8 de [joueur+5Ah]) en
+; +6Fh ; angle = cran × 1E00h (30°) en +5Eh.
+; ==============================================================================================
+Tachometer_UpdateValue_19859		proc far
 
 var_12		= dword ptr -12h
 var_E		= dword ptr -0Eh
@@ -2306,13 +2398,17 @@ loc_198B1:
 		pop	si
 		leave
 		retf
-sub_19859		endp
+Tachometer_UpdateValue_19859		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_198B4		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 du compte-tours : aiguille +5Eh de longueur (centre − bord
+; gauche) × 3 ÷ 4, couleur 1Dh (sub_198ED).
+; ==============================================================================================
+Tachometer_Draw_198B4		proc far
 
 arg_0		= word ptr  6
 
@@ -2345,7 +2441,7 @@ loc_198EA:
 		pop	si
 		pop	bp
 		retf
-sub_198B4		endp
+Tachometer_Draw_198B4		endp
 
 ; ----------------------------------------------------------------------
 
@@ -2566,7 +2662,12 @@ sub_199A0		endp
 
 ; Attributes: bp-based frame
 
-sub_19AB1		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +12 de la jauge de carburant : objet [joueur+52h], méthode +48h
+; : mot +87h = capacité, mot +8Bh = carburant restant (+6Fh) ; angle = restant ÷ capacité ×
+; 16800h (360°) en +5Eh.
+; ==============================================================================================
+FuelGauge_UpdateValue_19AB1		proc far
 
 var_22		= dword ptr -22h
 var_1E		= dword ptr -1Eh
@@ -2651,13 +2752,17 @@ loc_19B77:
 		pop	si
 		leave
 		retf
-sub_19AB1		endp
+FuelGauge_UpdateValue_19AB1		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_19B7B		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 de la jauge de carburant : aiguille +5Eh de 3/4 du rayon,
+; couleur 1Dh (sub_19BB4).
+; ==============================================================================================
+FuelGauge_Draw_19B7B		proc far
 
 arg_0		= word ptr  6
 
@@ -2690,7 +2795,7 @@ loc_19BB1:
 		pop	si
 		pop	bp
 		retf
-sub_19B7B		endp
+FuelGauge_Draw_19B7B		endp
 
 ; ----------------------------------------------------------------------
 
@@ -2912,7 +3017,11 @@ sub_19C69		endp
 
 ; Attributes: bp-based frame
 
-sub_19D7A		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +12 du compas : cap du joueur (sub_5720C sur la ligne +0Ch de
+; sa matrice, partie entière, + 360 si négatif) en +5Eh.
+; ==============================================================================================
+Compass_UpdateValue_19D7A		proc far
 
 var_4		= word ptr -4
 var_3		= word ptr -3
@@ -2955,13 +3064,17 @@ loc_19DC0:
 		pop	si
 		leave
 		retf
-sub_19D7A		endp
+Compass_UpdateValue_19D7A		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_19DC3		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 du compas : aiguille +5Eh de 3/4 du rayon, couleur 1Dh
+; (sub_19E36) ; sinon le cap en texte.
+; ==============================================================================================
+Compass_Draw_19DC3		proc far
 
 var_14		= word ptr -14h
 arg_0		= word ptr  6
@@ -3014,7 +3127,7 @@ loc_19E33:
 		pop	si
 		leave
 		retf
-sub_19DC3		endp
+Compass_Draw_19DC3		endp
 
 ; ----------------------------------------------------------------------
 
@@ -3276,7 +3389,11 @@ sub_19FFA		endp
 
 ; Attributes: bp-based frame
 
-sub_1A03E		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +12 du voyant de train : bit 2 de l'octet +92h (objet
+; [joueur+52h], méthode +48h) en +6Fh.
+; ==============================================================================================
+GearLamp_UpdateValue_1A03E		proc far
 
 arg_0		= word ptr  6
 
@@ -3306,13 +3423,17 @@ loc_1A06F:
 		pop	si
 		pop	bp
 		retf
-sub_1A03E		endp
+GearLamp_UpdateValue_1A03E		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_1A072		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 du voyant de train : image +6Fh (vue 0) ou +6Fh + 2 (vue 1)
+; au coin du cadre.
+; ==============================================================================================
+GearLamp_Draw_1A072		proc far
 
 arg_0		= word ptr  6
 
@@ -3397,7 +3518,7 @@ loc_1A136:
 		pop	si
 		pop	bp
 		retf
-sub_1A072		endp
+GearLamp_Draw_1A072		endp
 
 ; ----------------------------------------------------------------------
 
@@ -3445,7 +3566,10 @@ sub_1A139		endp
 
 ; Attributes: bp-based frame
 
-sub_1A180		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +12 du voyant de volets : bit 1 de l'octet +92h en +6Fh.
+; ==============================================================================================
+FlapLamp_UpdateValue_1A180		proc far
 
 arg_0		= word ptr  6
 
@@ -3475,13 +3599,17 @@ loc_1A1B0:
 		pop	si
 		pop	bp
 		retf
-sub_1A180		endp
+FlapLamp_UpdateValue_1A180		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_1A1B3		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 du voyant de volets : image +6Fh (vue 0) ou +6Fh + 2 (vue
+; 1) au coin du cadre ; en mode texte, signale aussi le bit 0 de +92h.
+; ==============================================================================================
+FlapLamp_Draw_1A1B3		proc far
 
 arg_0		= word ptr  6
 
@@ -3593,7 +3721,7 @@ loc_1A2BC:
 		pop	si
 		pop	bp
 		retf
-sub_1A1B3		endp
+FlapLamp_Draw_1A1B3		endp
 
 ; ----------------------------------------------------------------------
 
@@ -3640,7 +3768,10 @@ sub_1A2BF		endp
 
 ; Attributes: bp-based frame
 
-sub_1A303		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +12 du voyant de décrochage : bit 6 de l'octet +92h en +6Fh.
+; ==============================================================================================
+StallLamp_UpdateValue_1A303		proc far
 
 arg_0		= word ptr  6
 
@@ -3670,13 +3801,17 @@ loc_1A334:
 		pop	si
 		pop	bp
 		retf
-sub_1A303		endp
+StallLamp_UpdateValue_1A303		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_1A337		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 du voyant de décrochage : image +6Fh (vue 0) ou +6Fh + 2
+; (vue 1) au coin du cadre.
+; ==============================================================================================
+StallLamp_Draw_1A337		proc far
 
 arg_0		= word ptr  6
 
@@ -3761,13 +3896,18 @@ loc_1A3FB:
 		pop	si
 		pop	bp
 		retf
-sub_1A337		endp
+StallLamp_Draw_1A337		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_1A3FE		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +12 du compteur de munitions : mot +3Ah du système d'armes
+; ([joueur+5Fh], munitions des canons du groupe 1) en milliers (+6Fh), centaines (+71h),
+; dizaines (+73h), unités (+75h).
+; ==============================================================================================
+Ammo_UpdateValue_1A3FE		proc far
 
 arg_0		= word ptr  6
 
@@ -3804,7 +3944,7 @@ arg_0		= word ptr  6
 		pop	si
 		pop	bp
 		retf
-sub_1A3FE		endp
+Ammo_UpdateValue_1A3FE		endp
 
 ; ----------------------------------------------------------------------
 
@@ -3826,7 +3966,11 @@ sub_1A442		endp
 
 ; Attributes: bp-based frame
 
-sub_1A44F		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 du compteur de munitions : 4 images de chiffre (chiffre en
+; vue 0, chiffre + 10 en vue 1) au coin du cadre, espacées de (largeur du cadre + 3) ÷ 4.
+; ==============================================================================================
+Ammo_Draw_1A44F		proc far
 
 var_16		= word ptr -16h
 var_2		= word ptr -2
@@ -4066,13 +4210,19 @@ loc_1A68D:
 		pop	si
 		leave
 		retf
-sub_1A44F		endp
+Ammo_Draw_1A44F		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_1A691		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +12 de l'indicateur des canons armés, n = nombre d'images : si
+; l'octet +0Ch du système d'armes est posé : (+1Eh + +22h) ÷ 2 + 1 ; sinon, si l'arme choisie
+; (+18h) est un canon (masque 40h) : (+1Ch + +20h) ÷ 2 + 1, au plus n ÷ 2 ; sinon 0. En vue 1
+; : + n ÷ 2.
+; ==============================================================================================
+ArmedGuns_UpdateValue_1A691		proc far
 
 arg_0		= word ptr  6
 
@@ -4164,13 +4314,17 @@ loc_1A749:
 		pop	si
 		pop	bp
 		retf
-sub_1A691		endp
+ArmedGuns_UpdateValue_1A691		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_1A74D		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 de l'indicateur des canons armés : image +6Fh au coin du
+; cadre.
+; ==============================================================================================
+ArmedGuns_Draw_1A74D		proc far
 
 arg_0		= word ptr  6
 
@@ -4204,7 +4358,7 @@ loc_1A78F:
 		pop	si
 		pop	bp
 		retf
-sub_1A74D		endp
+ArmedGuns_Draw_1A74D		endp
 
 ; ----------------------------------------------------------------------
 
@@ -4264,7 +4418,11 @@ sub_1A7D3		endp
 
 ; Attributes: bp-based frame
 
-sub_1A7DB		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Méthode +16 du compas de secours : image 0 (vue 0) ou 1 (vue 1) en
+; (centre x − (+3Eh × cap ÷ 360), haut du cadre), dans le cadre.
+; ==============================================================================================
+BackupCompass_Draw_1A7DB		proc far
 
 var_4		= word ptr -4
 var_3		= word ptr -3
@@ -4357,5 +4515,5 @@ loc_1A89D:
 		pop	di
 		pop	si
 		leave
-sub_1A7DB		endp
+BackupCompass_Draw_1A7DB		endp
 seg035		ends

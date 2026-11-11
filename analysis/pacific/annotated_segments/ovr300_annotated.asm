@@ -139,7 +139,7 @@ loc_AC10A:
 		push	word ptr [si+14Eh]
 		push	word ptr [si+14Ch]
 		push	si
-		call	sub_16738
+		call	Cockpit_TurnHead_16738
 		add	sp, 8
 		pop	di
 		pop	si
@@ -270,7 +270,7 @@ loc_AC1F9:
 		push	word ptr [si+14Eh]
 		push	word ptr [si+14Ch]
 		push	si
-		call	sub_16738
+		call	Cockpit_TurnHead_16738
 		add	sp, 8
 		pop	si
 		leave

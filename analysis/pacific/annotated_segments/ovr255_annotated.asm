@@ -6,7 +6,14 @@ ovr255		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_97050		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Un instrument : INFO = mots +2Ch, +2Eh, +30h, +32h (cadre, recopié en
+; +8 et +16h), +34h, +36h (point), +24h ; si +24h ≠ 65 535 : +26h, +28h, +2Ah (second cadre
+; avec +24h) et +38h, +3Ah (second point) ; sinon second cadre = (65 535, 0, largeur, hauteur
+; de la 1re image). SHAP = PAK d'images (+54h). 3SPC = 5 u32 (+40h à +50h) ; sans 3SPC :
+; erreur 7017h.
+; ==============================================================================================
+Cockpit_LoadInstrument_97050		proc far
 
 var_20		= word ptr -20h
 var_1E		= word ptr -1Eh
@@ -274,7 +281,7 @@ loc_972B7:
 		pop	si
 		leave
 		retf
-sub_97050		endp
+Cockpit_LoadInstrument_97050		endp
 
 ; ----------------------------------------------------------------------
 

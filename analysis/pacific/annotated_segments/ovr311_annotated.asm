@@ -6,7 +6,13 @@ ovr311		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_ADEA0		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Numéro d'arme du WDAT (0 à 7) → masque d'un octet : 0→0, 1→1 (B100LB),
+; 2→2 (B500LB), 3→10h (HVAR), 4→4 (B1000LB), 5→8 (MK-13), 6→20h (NAPALM), 7→40h (canons) ; au-
+; delà de 7 : erreur C019h. Noms entre parenthèses : objets de PACIFIC.DAT qui portent ces
+; numéros.
+; ==============================================================================================
+Weapon_IdToMask_ADEA0		proc far
 
 var_2		= byte ptr -2
 arg_0		= byte ptr  6
@@ -64,9 +70,9 @@ loc_ADEDC:
 loc_ADEE8:
 		leave
 		retf
-sub_ADEA0		endp
+Weapon_IdToMask_ADEA0		endp
 
-; START OF FUNCTION CHUNK FOR sub_ADEA0
+; START OF FUNCTION CHUNK FOR Weapon_IdToMask_ADEA0
 off_ADEEA	dw offset loc_ADEBC
 		dw offset loc_ADEC0
 		dw offset loc_ADEC4
@@ -75,7 +81,7 @@ off_ADEEA	dw offset loc_ADEBC
 		dw offset loc_ADED0
 		dw offset loc_ADED4
 		dw offset loc_ADED8
-; END OF FUNCTION CHUNK FOR sub_ADEA0
+; END OF FUNCTION CHUNK FOR Weapon_IdToMask_ADEA0
 
 ; ----------------------------------------------------------------------
 
@@ -833,7 +839,15 @@ sub_AE30F		endp
 
 ; Attributes: bp-based frame
 
-sub_AE513		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. (point d'emport, arme WPNS, quantité n) : rien si le point porte déjà
+; une arme (masque +0Eh ≠ 0). Capacité selon le type HPTS du point (+15h) et le masque de
+; l'arme : 0 et 4 = canon (40h), toute la quantité ; 1 = 10h ×1 ; 2 = 1 ×1 ; 3 = 2, 4, 8 ou
+; 20h ×1 ; autre type : rien de défini. Charge min(n, capacité − déjà chargé) (+13h), pose
+; masque (+0Eh), arme (+0Fh) et nom (+1Ah) ; rend le nombre chargé. Équivalent de
+; WeaponSys_LoadStoresOnHardpoint_9EA2E de STRIKE.EXE.
+; ==============================================================================================
+WeaponSys_LoadStoresOnHardpoint_AE513		proc far
 
 var_8		= word ptr -8
 var_6		= word ptr -6
@@ -992,9 +1006,9 @@ loc_AE62B:
 		pop	si
 		leave
 		retf
-sub_AE513		endp
+WeaponSys_LoadStoresOnHardpoint_AE513		endp
 
-; START OF FUNCTION CHUNK FOR sub_AE513
+; START OF FUNCTION CHUNK FOR WeaponSys_LoadStoresOnHardpoint_AE513
 word_AE631	dw 2
 		dw 4
 		dw 8
@@ -1008,7 +1022,7 @@ off_AE641	dw offset loc_AE563
 		dw offset loc_AE585
 		dw offset loc_AE595
 		dw offset loc_AE563
-; END OF FUNCTION CHUNK FOR sub_AE513
+; END OF FUNCTION CHUNK FOR WeaponSys_LoadStoresOnHardpoint_AE513
 
 ; ----------------------------------------------------------------------
 
@@ -1373,7 +1387,7 @@ loc_AE91B:
 		push	bx
 		nop
 		push	cs
-		call	near ptr sub_AEC5A
+		call	near ptr WeaponSys_DistributeStores_AEC5A
 		add	sp, 4
 
 loc_AE986:
@@ -1786,7 +1800,19 @@ sub_AEC20		endp
 
 ; Attributes: bp-based frame
 
-sub_AEC5A		proc far
+; ==============================================================================================
+; far, LUE 2026-11-11. Répartit les armes WPNS (enregistrements de 13h octets, +14h, nombre
+; +24h) sur les points d'emport (27h octets, +2Ch, nombre +34h). Canon (masque 40h) : le
+; PREMIER canon de la liste va sur tous les points de type 0 (groupe 1 : +1 du point = 1, +1Eh
+; compte, bit 1 de +12h de l'arme), les canons suivants sur les points de type 4 (groupe 2 :
+; +1 = 2, +22h, bit 2), chacun avec toute sa quantité (WeaponSys_LoadStoresOnHardpoint_AE513).
+; Autres armes : deux curseurs aux deux bouts de la liste des points ; même type aux deux
+; bouts : moitié du reste (sar 1) à chacun, les deux avancent ; sinon tout le reste au
+; premier, seul lui avance ; reste non chargé gardé en +10h. Enfin masse d'emport (somme
+; nombre × masse, méthode +10h de l'objet) en +28h. Équivalent de
+; PlayerComponent_OrchestrateComplex_9F286 de STRIKE.EXE.
+; ==============================================================================================
+WeaponSys_DistributeStores_AEC5A		proc far
 
 var_18		= word ptr -18h
 var_16		= dword ptr -16h
@@ -1870,7 +1896,7 @@ loc_AECD0:
 		push	word ptr es:[bx+2Eh]
 		push	ax
 		push	cs
-		call	near ptr sub_AE513
+		call	near ptr WeaponSys_LoadStoresOnHardpoint_AE513
 		add	sp, 0Ah
 		mov	[bp+var_18], ax
 		or	ax, ax
@@ -1951,7 +1977,7 @@ loc_AEDB4:
 		push	large [bp+var_E]
 		push	large [bp+var_12]
 		push	cs
-		call	near ptr sub_AE513
+		call	near ptr WeaponSys_LoadStoresOnHardpoint_AE513
 		add	sp, 0Ah
 		sub	si, ax
 		add	word ptr [bp+var_12], 27h
@@ -1959,7 +1985,7 @@ loc_AEDB4:
 		push	large [bp+var_E]
 		push	large [bp+var_16]
 		push	cs
-		call	near ptr sub_AE513
+		call	near ptr WeaponSys_LoadStoresOnHardpoint_AE513
 		add	sp, 0Ah
 		sub	si, ax
 		sub	word ptr [bp+var_16], 27h
@@ -1970,7 +1996,7 @@ loc_AEE05:
 		push	large [bp+var_E]
 		push	large [bp+var_12]
 		push	cs
-		call	near ptr sub_AE513
+		call	near ptr WeaponSys_LoadStoresOnHardpoint_AE513
 		add	sp, 0Ah
 		sub	si, ax
 		add	word ptr [bp+var_12], 27h
@@ -2057,7 +2083,7 @@ loc_AEEC1:
 		pop	si
 		leave
 		retf
-sub_AEC5A		endp
+WeaponSys_DistributeStores_AEC5A		endp
 
 ; ----------------------------------------------------------------------
 
@@ -2688,7 +2714,7 @@ loc_AF3A8:
 		mov	al, [bp+var_8]
 		push	ax
 		push	large [bp+arg_0]
-		call	sub_3E19B
+		call	WeaponStation_FindFullestOfMask_3E19B
 		add	sp, 6
 		mov	word ptr [bp+var_C+2], dx
 		mov	word ptr [bp+var_C], ax
