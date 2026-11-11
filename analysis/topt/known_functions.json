@@ -2738,5 +2738,20 @@
     "new_name": "ConvRec_ReadJump_98A8",
     "segment": "seg014",
     "summary": "far. Identique (suite d'instructions) à ConvRec_ReadJump_66A0 d'OPTEST : mot de saut de YESNOCHOICE_BRANCH2."
+  },
+  "sub_5357F": {
+    "new_name": "Gameflow_SaveGameFile_5357F",
+    "segment": "ovr189",
+    "summary": "far, LUE 2026-11-07 (par comparaison avec Gameflow_SaveGameFile_4DAE8 d'OPTEST). Écrit la structure de partie dans un fichier (appelée par le stub sub_47907, entre autres depuis Gameflow_SaveTmpState_5140A pour tmpsav.tm1), champ par champ : sub_40430 = 1 octet, sub_40413 = 1 mot, sub_4044D = 1 dword, StreamReader_WriteTyped_42F91 = n octets. Octets 0 à 579 comme OPTEST, champs de la partie décalés d'un octet en mémoire : 0 en-tête 7 octets (word_48CD8 = 0414h, « SCB1.22 ») ; 7 [+250] ; 8 [+251] ; 9 [+252] ; 10 [+253] ; 11 256 drapeaux [+254] ; 267 100 octets [+510] ; 367 9 mots [+610] ; 385 4 × (octet [+628+2i], octet [+629+2i]) ; 393 dword [+636] ; 397 dword [+640] ; 401 dword [+644] ; 405 dword [+648] ; 409 8 pilotes × 3 mots [+672+26i], [+674+26i], [+676+26i] ; 457 20 octets [+921] ; 477 20 octets [+941] ; 497 20 octets [+961] ; 517 mot [+981] ; 519 61 octets [+860]. Différences avec OPTEST : 580 8 octets dseg 0EB6h (drapeaux des personnages, 7 dans OPTEST) ; 588 4 octets [+984] à [+987] (3e à 6e valeurs de STAT ; OPTEST : 1 octet) ; 592 octet [+983] (7e valeur de STAT) ; 593 octet [+988] (morceau PLAY_GAMEFLOW_TUNE) ; 594 dword score [+989]. Taille 598 octets."
+  },
+  "sub_870B": {
+    "new_name": "OptionScreen_Load_870B",
+    "segment": "seg013",
+    "summary": "far, LUE 2026-11-08 (règles de choix des fichiers). Charge un écran du déroulement (arg_0 objet écran, [si+0E8h] = numéro de l'écran cherché, comparé à l'INFO de chaque SCEN) depuis DATA\\\\GAMEFLOW\\\\OPTIONS2.IFF, toujours. Fichiers par défaut selon arg_2 : 0 = OPTSHPS.PAK et OPTPALS.PAK, 1 = OPTSHPS2.PAK et OPTPALS2.PAK (second écran d'armement Gameflow_WeaponLoadoutAlt_58DEB, push 1). Palette PALT (fond et premier plan) de numéro > 48 : lue dans OPTPALS2.PAK, même numéro (cmp [bp+var_2], 30h / jle). Image de fond BACK/SHAP : lue dans OPTSHPS2.PAK si l'écran a un numéro > 136 (cmp byte ptr [si+0E8h], 88h / jbe). Image d'un sprite FORE/SPRT/SHAP : lue dans OPTSHPS2.PAK si le numéro du sprite (1er octet de SHAP) est > 136 (cmp byte ptr [bp+var_26+1], 88h / jbe). Dans les données : écrans 1 (sprite 138, image 10), 11 (sprite 137, image 8), 29 (sprite 137, image 9) et 139 (fond 11, palettes 49, sprite 140, image 12)."
+  },
+  "sub_5779B": {
+    "new_name": "Gameflow_KillBoard_5779B",
+    "segment": "ovr191",
+    "summary": "far, LUE 2026-11-08 (noms des pilotes). Tableau des victoires (commande 19 LOOK_AT_KILLBOARD, police boardfnt), équivalent de Gameflow_KillBoard_51049 d'OPTEST. Copie d'abord 8 pointeurs de noms depuis DS:08B0h dans un tableau local (mov si, 8B0h / lea di, [bp+var_268] / mov cx, 8 / rep movsw), puis pour chaque pilote affiché (fiche de 26 octets, [+2A4h] ≠ 0) : pilote 0 = indicatif du joueur (var_258), sinon nom du tableau local. Table (dseg, lue dans source/topttst1.asm) : 0 chaîne vide, 1 PRIMETIME, 2 PHOENIX, 3 BASELINE, 4 ZORRO, 5 TEX, 6 TEFLON, 7 HAWK."
   }
 }

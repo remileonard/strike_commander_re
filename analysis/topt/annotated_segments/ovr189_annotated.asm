@@ -2507,7 +2507,23 @@ Gameflow_SaveRequester_5341B		endp
 
 ; Attributes: bp-based frame
 
-sub_5357F		proc far
+; ==============================================================================================
+; far, LUE 2026-11-07 (par comparaison avec Gameflow_SaveGameFile_4DAE8 d'OPTEST). Écrit la
+; structure de partie dans un fichier (appelée par le stub sub_47907, entre autres depuis
+; Gameflow_SaveTmpState_5140A pour tmpsav.tm1), champ par champ : sub_40430 = 1 octet,
+; sub_40413 = 1 mot, sub_4044D = 1 dword, StreamReader_WriteTyped_42F91 = n octets. Octets 0 à
+; 579 comme OPTEST, champs de la partie décalés d'un octet en mémoire : 0 en-tête 7 octets
+; (word_48CD8 = 0414h, « SCB1.22 ») ; 7 [+250] ; 8 [+251] ; 9 [+252] ; 10 [+253] ; 11 256
+; drapeaux [+254] ; 267 100 octets [+510] ; 367 9 mots [+610] ; 385 4 × (octet [+628+2i],
+; octet [+629+2i]) ; 393 dword [+636] ; 397 dword [+640] ; 401 dword [+644] ; 405 dword [+648]
+; ; 409 8 pilotes × 3 mots [+672+26i], [+674+26i], [+676+26i] ; 457 20 octets [+921] ; 477 20
+; octets [+941] ; 497 20 octets [+961] ; 517 mot [+981] ; 519 61 octets [+860]. Différences
+; avec OPTEST : 580 8 octets dseg 0EB6h (drapeaux des personnages, 7 dans OPTEST) ; 588 4
+; octets [+984] à [+987] (3e à 6e valeurs de STAT ; OPTEST : 1 octet) ; 592 octet [+983] (7e
+; valeur de STAT) ; 593 octet [+988] (morceau PLAY_GAMEFLOW_TUNE) ; 594 dword score [+989].
+; Taille 598 octets.
+; ==============================================================================================
+Gameflow_SaveGameFile_5357F		proc far
 
 var_68		= word ptr -68h
 var_B		= dword ptr -0Bh
@@ -2836,7 +2852,7 @@ loc_5388F:
 		pop	si
 		leave
 		retf
-sub_5357F		endp
+Gameflow_SaveGameFile_5357F		endp
 
 ; ----------------------------------------------------------------------
 

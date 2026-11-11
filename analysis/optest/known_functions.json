@@ -3838,5 +3838,20 @@
     "new_name": "WidgetPanel_Construct_DAEB",
     "segment": "seg021",
     "summary": "far, LUE 2026-11-04 (en-tête). Constructeur d'un panneau qui contient des boutons (114 octets, par sub_D2CC → Widget_ConstructRect_FED6) : arguments x, y, largeur, hauteur. Dans TRAINING MISSION, l'image du panneau (TM.SHP) est posée dans l'objet et les positions des boutons sont relatives au coin du panneau (vérifié par rendu)."
+  },
+  "sub_4C4C6": {
+    "new_name": "FileList_Draw_4C4C6",
+    "segment": "ovr185",
+    "summary": "far, LUE 2026-11-07. Méthode de dessin (+18h de la table 87Ch, via le stub sub_41FD0) de la liste de fichiers de l'écran de sauvegarde et de chargement (construite par sub_4C62A : 6 lignes [+30h], 8 pixels par ligne [+20h], marge [+1Eh] = 2). Pour chaque ligne visible : nom donné par sub_1164F, écrit par PaletteScreen_DispatchWidgetLayoutB_11363 en (x + 1, y) avec la police word_45B54. Ligne sélectionnée ([+2Ch] = nom de la ligne) : rectangle rempli de l'octet bas de word_45AE0 (Rect_ComputeIntersection_31EEA), texte en word_45AFE ; autres lignes : texte en word_45B02. Couleurs posées par UiColors_Setup_FBE7 (noir, noir, blanc)."
+  },
+  "sub_FBE7": {
+    "new_name": "UiColors_Setup_FBE7",
+    "segment": "seg023",
+    "summary": "far, LUE 2026-11-07. Couleurs de l'interface (arg_0, palette arg_2 ou palette lue par Palette_ReadAllDACRegisters_FB0A). arg_0 = 0 : chaque couleur est la plus proche, dans la palette, d'une valeur VGA (Palette_FindNearest_FA5F) : (0, 0, 0) dans word_45AE0, word_45B02 et word_45B00 ; (37, 37, 37) word_45B04 ; (21, 21, 21) word_45AF0 ; (41, 44, 41) word_45B06 ; (49, 49, 49) word_45B08 ; (42, 42, 42) word_45AEE ; … ; (63, 63, 63) word_45AFE et word_45B0A. arg_0 non nul : écrit ces valeurs dans les cases déjà choisies (sub_FB39) puis toute la palette (Palette_WriteAllDACRegisters_FB27). Valeurs initiales (dseg) : word_45AE0 = 0, word_45B02 = 0, word_45AFE = 15, word_45B08 = 15."
+  },
+  "sub_FA5F": {
+    "new_name": "Palette_FindNearest_FA5F",
+    "segment": "seg023",
+    "summary": "far, LUE 2026-11-07. Numéro de la couleur la plus proche de (arg_4, arg_6, arg_8) (VGA 0-63) dans une palette de 256 couleurs (arg_0, 3 octets par couleur) : écart |dr| + |dg| + |db|, première couleur d'écart minimal (cmp si, di / jge)."
   }
 }

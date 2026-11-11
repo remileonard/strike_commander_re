@@ -2742,7 +2742,16 @@ off_57791	dw offset loc_56DAC
 
 ; Attributes: bp-based frame
 
-sub_5779B		proc far
+; ==============================================================================================
+; far, LUE 2026-11-08 (noms des pilotes). Tableau des victoires (commande 19
+; LOOK_AT_KILLBOARD, police boardfnt), équivalent de Gameflow_KillBoard_51049 d'OPTEST. Copie
+; d'abord 8 pointeurs de noms depuis DS:08B0h dans un tableau local (mov si, 8B0h / lea di,
+; [bp+var_268] / mov cx, 8 / rep movsw), puis pour chaque pilote affiché (fiche de 26 octets,
+; [+2A4h] ≠ 0) : pilote 0 = indicatif du joueur (var_258), sinon nom du tableau local. Table
+; (dseg, lue dans source/topttst1.asm) : 0 chaîne vide, 1 PRIMETIME, 2 PHOENIX, 3 BASELINE, 4
+; ZORRO, 5 TEX, 6 TEFLON, 7 HAWK.
+; ==============================================================================================
+Gameflow_KillBoard_5779B		proc far
 
 var_286		= word ptr -286h
 var_268		= word ptr -268h
@@ -3547,7 +3556,7 @@ loc_57F3C:
 		pop	si
 		leave
 		retf
-sub_5779B		endp
+Gameflow_KillBoard_5779B		endp
 
 ; ----------------------------------------------------------------------
 

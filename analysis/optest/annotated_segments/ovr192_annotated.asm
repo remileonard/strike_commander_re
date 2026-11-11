@@ -1571,7 +1571,7 @@ var_4		= dword	ptr -4
 		push	word ptr dword_492F3+2
 		push	word ptr dword_492F3
 		push	0
-		call	sub_FBE7
+		call	UiColors_Setup_FBE7
 		add	sp, 6
 		mov	[bp+var_10], 0FFFFh
 		push	0C7h ; '�'

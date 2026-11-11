@@ -103,7 +103,7 @@ sub_47902	endp
 ; Attributes: thunk
 
 sub_47907	proc far
-		jmp	sub_5357F
+		jmp	Gameflow_SaveGameFile_5357F
 sub_47907	endp
 
 ; ----------------------------------------------------------------------

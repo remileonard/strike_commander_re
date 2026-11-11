@@ -374,7 +374,12 @@ PaletteScreen_DrawCurveShape_F9A4	endp
 
 ; Attributes: bp-based frame
 
-sub_FA5F	proc far		; CODE XREF: sub_CE2C+35P sub_FBB3+24p ...
+; ==============================================================================================
+; far, LUE 2026-11-07. Numéro de la couleur la plus proche de (arg_4, arg_6, arg_8) (VGA 0-63)
+; dans une palette de 256 couleurs (arg_0, 3 octets par couleur) : écart |dr| + |dg| + |db|,
+; première couleur d'écart minimal (cmp si, di / jge).
+; ==============================================================================================
+Palette_FindNearest_FA5F	proc far		; CODE XREF: sub_CE2C+35P sub_FBB3+24p ...
 
 var_12		= word ptr -12h
 var_10		= word ptr -10h
@@ -406,7 +411,7 @@ arg_8		= word ptr  0Eh
 		jmp	short loc_FAF7
 ; ���������������������������������������������������������������������������
 
-loc_FA83:				; CODE XREF: sub_FA5F+9Ej
+loc_FA83:				; CODE XREF: Palette_FindNearest_FA5F+9Ej
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx]
 		mov	ah, 0
@@ -455,11 +460,11 @@ loc_FA83:				; CODE XREF: sub_FA5F+9Ej
 		mov	[bp+var_6], cx
 		mov	di, si
 
-loc_FAF2:				; CODE XREF: sub_FA5F+8Cj
+loc_FAF2:				; CODE XREF: Palette_FindNearest_FA5F+8Cj
 		inc	cx
 		add	word ptr [bp+arg_0], 3
 
-loc_FAF7:				; CODE XREF: sub_FA5F+22j
+loc_FAF7:				; CODE XREF: Palette_FindNearest_FA5F+22j
 		mov	ax, word ptr [bp+arg_0]
 		cmp	ax, [bp+var_4]
 		jb	short loc_FA83
@@ -468,7 +473,7 @@ loc_FAF7:				; CODE XREF: sub_FA5F+22j
 		pop	si
 		leave
 		retf
-sub_FA5F	endp
+Palette_FindNearest_FA5F	endp
 
 ; ���������������������������������������������������������������������������
 		pop	di
@@ -486,7 +491,7 @@ sub_FA5F	endp
 ; appelants et contexte à revérifier ici. — far, lit les 256 registres DAC par blocs de 16
 ; (int 10h, fonction 1017h — READ BLOCK OF DAC REGISTERS) dans un tampon fourni.
 ; ==============================================================================================
-Palette_ReadAllDACRegisters_FB0A	proc far		; CODE XREF: sub_FBB3+Ep sub_FBE7+31p
+Palette_ReadAllDACRegisters_FB0A	proc far		; CODE XREF: sub_FBB3+Ep UiColors_Setup_FBE7+31p
 
 arg_0		= dword	ptr  6
 
@@ -521,7 +526,7 @@ Palette_ReadAllDACRegisters_FB0A	endp
 ; appelants et contexte à revérifier ici. — far, écrit les 256 registres DAC en un seul appel
 ; (int 10h, fonction 1012h — SET BLOCK OF DAC REGISTERS).
 ; ==============================================================================================
-Palette_WriteAllDACRegisters_FB27	proc far		; CODE XREF: sub_FBE7+241p
+Palette_WriteAllDACRegisters_FB27	proc far		; CODE XREF: UiColors_Setup_FBE7+241p
 
 arg_0		= dword	ptr  6
 
@@ -544,7 +549,7 @@ Palette_WriteAllDACRegisters_FB27	endp
 
 ; Attributes: bp-based frame
 
-sub_FB39	proc far		; CODE XREF: sub_FBE7+51p sub_FBE7+68p ...
+sub_FB39	proc far		; CODE XREF: UiColors_Setup_FBE7+51p UiColors_Setup_FBE7+68p ...
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -652,7 +657,7 @@ arg_4		= word ptr  0Ah
 		lea	ax, [bp+var_302]
 		push	ax
 		push	cs
-		call	near ptr sub_FA5F
+		call	near ptr Palette_FindNearest_FA5F
 		add	sp, 0Ah
 		mov	[bp+var_2], ax
 		mov	ax, [bp+var_2]
@@ -668,7 +673,17 @@ sub_FBB3	endp
 
 ; Attributes: bp-based frame
 
-sub_FBE7	proc far		; CODE XREF: sub_5DD30+156P
+; ==============================================================================================
+; far, LUE 2026-11-07. Couleurs de l'interface (arg_0, palette arg_2 ou palette lue par
+; Palette_ReadAllDACRegisters_FB0A). arg_0 = 0 : chaque couleur est la plus proche, dans la
+; palette, d'une valeur VGA (Palette_FindNearest_FA5F) : (0, 0, 0) dans word_45AE0, word_45B02
+; et word_45B00 ; (37, 37, 37) word_45B04 ; (21, 21, 21) word_45AF0 ; (41, 44, 41) word_45B06
+; ; (49, 49, 49) word_45B08 ; (42, 42, 42) word_45AEE ; … ; (63, 63, 63) word_45AFE et
+; word_45B0A. arg_0 non nul : écrit ces valeurs dans les cases déjà choisies (sub_FB39) puis
+; toute la palette (Palette_WriteAllDACRegisters_FB27). Valeurs initiales (dseg) : word_45AE0
+; = 0, word_45B02 = 0, word_45AFE = 15, word_45B08 = 15.
+; ==============================================================================================
+UiColors_Setup_FBE7	proc far		; CODE XREF: sub_5DD30+156P
 
 var_304		= word ptr -304h
 var_4		= dword	ptr -4
@@ -686,7 +701,7 @@ arg_2		= dword	ptr  8
 		jmp	short loc_FC1E
 ; ���������������������������������������������������������������������������
 
-loc_FC07:				; CODE XREF: sub_FBE7+14j
+loc_FC07:				; CODE XREF: UiColors_Setup_FBE7+14j
 		lea	ax, [bp+var_304]
 		mov	word ptr [bp+var_4+2], ss
 		mov	word ptr [bp+var_4], ax
@@ -697,13 +712,13 @@ loc_FC07:				; CODE XREF: sub_FBE7+14j
 		call	near ptr Palette_ReadAllDACRegisters_FB0A
 		add	sp, 4
 
-loc_FC1E:				; CODE XREF: sub_FBE7+1Ej
+loc_FC1E:				; CODE XREF: UiColors_Setup_FBE7+1Ej
 		cmp	[bp+arg_0], 0
 		jnz	short loc_FC27
 		jmp	loc_FE31
 ; ���������������������������������������������������������������������������
 
-loc_FC27:				; CODE XREF: sub_FBE7+3Bj
+loc_FC27:				; CODE XREF: UiColors_Setup_FBE7+3Bj
 		push	0
 		push	0
 		push	0
@@ -910,14 +925,14 @@ loc_FC27:				; CODE XREF: sub_FBE7+3Bj
 		jmp	locret_FED4
 ; ���������������������������������������������������������������������������
 
-loc_FE31:				; CODE XREF: sub_FBE7+3Dj
+loc_FE31:				; CODE XREF: UiColors_Setup_FBE7+3Dj
 		push	0
 		push	0
 		push	0
 		push	word ptr [bp+var_4+2]
 		push	word ptr [bp+var_4]
 		push	cs
-		call	near ptr sub_FA5F
+		call	near ptr Palette_FindNearest_FA5F
 		add	sp, 0Ah
 		mov	word_45AE0, ax
 		mov	word_45B02, ax
@@ -928,7 +943,7 @@ loc_FE31:				; CODE XREF: sub_FBE7+3Dj
 		push	word ptr [bp+var_4+2]
 		push	word ptr [bp+var_4]
 		push	cs
-		call	near ptr sub_FA5F
+		call	near ptr Palette_FindNearest_FA5F
 		add	sp, 0Ah
 		mov	word_45B04, ax
 		push	15h
@@ -937,7 +952,7 @@ loc_FE31:				; CODE XREF: sub_FBE7+3Dj
 		push	word ptr [bp+var_4+2]
 		push	word ptr [bp+var_4]
 		push	cs
-		call	near ptr sub_FA5F
+		call	near ptr Palette_FindNearest_FA5F
 		add	sp, 0Ah
 		mov	word_45AF0, ax
 		push	29h ; ')'
@@ -946,7 +961,7 @@ loc_FE31:				; CODE XREF: sub_FBE7+3Dj
 		push	word ptr [bp+var_4+2]
 		push	word ptr [bp+var_4]
 		push	cs
-		call	near ptr sub_FA5F
+		call	near ptr Palette_FindNearest_FA5F
 		add	sp, 0Ah
 		mov	word_45B06, ax
 		push	31h ; '1'
@@ -955,7 +970,7 @@ loc_FE31:				; CODE XREF: sub_FBE7+3Dj
 		push	word ptr [bp+var_4+2]
 		push	word ptr [bp+var_4]
 		push	cs
-		call	near ptr sub_FA5F
+		call	near ptr Palette_FindNearest_FA5F
 		add	sp, 0Ah
 		mov	word_45B08, ax
 		push	2Ah ; '*'
@@ -964,7 +979,7 @@ loc_FE31:				; CODE XREF: sub_FBE7+3Dj
 		push	word ptr [bp+var_4+2]
 		push	word ptr [bp+var_4]
 		push	cs
-		call	near ptr sub_FA5F
+		call	near ptr Palette_FindNearest_FA5F
 		add	sp, 0Ah
 		mov	word_45AEE, ax
 		push	3Fh ; '?'
@@ -973,15 +988,15 @@ loc_FE31:				; CODE XREF: sub_FBE7+3Dj
 		push	word ptr [bp+var_4+2]
 		push	word ptr [bp+var_4]
 		push	cs
-		call	near ptr sub_FA5F
+		call	near ptr Palette_FindNearest_FA5F
 		add	sp, 0Ah
 		mov	word_45AFE, ax
 		mov	word_45B0A, ax
 
-locret_FED4:				; CODE XREF: sub_FBE7+247j
+locret_FED4:				; CODE XREF: UiColors_Setup_FBE7+247j
 		leave
 		retf
-sub_FBE7	endp
+UiColors_Setup_FBE7	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

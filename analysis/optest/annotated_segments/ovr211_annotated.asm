@@ -1412,7 +1412,7 @@ loc_BEB4E:				; CODE XREF: Credits_Play_BDE10+D39j
 		push	32h ; '2'
 		push	ds
 		push	[bp+var_3C]
-		call	sub_FA5F
+		call	Palette_FindNearest_FA5F
 		add	sp, 0Ah
 		mov	[bp+var_3A], ax
 		push	ds

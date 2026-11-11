@@ -42,7 +42,16 @@ sub_4C4A0	endp
 
 ; Attributes: bp-based frame
 
-sub_4C4C6	proc far		; CODE XREF: sub_41FD0J
+; ==============================================================================================
+; far, LUE 2026-11-07. Méthode de dessin (+18h de la table 87Ch, via le stub sub_41FD0) de la
+; liste de fichiers de l'écran de sauvegarde et de chargement (construite par sub_4C62A : 6
+; lignes [+30h], 8 pixels par ligne [+20h], marge [+1Eh] = 2). Pour chaque ligne visible : nom
+; donné par sub_1164F, écrit par PaletteScreen_DispatchWidgetLayoutB_11363 en (x + 1, y) avec
+; la police word_45B54. Ligne sélectionnée ([+2Ch] = nom de la ligne) : rectangle rempli de
+; l'octet bas de word_45AE0 (Rect_ComputeIntersection_31EEA), texte en word_45AFE ; autres
+; lignes : texte en word_45B02. Couleurs posées par UiColors_Setup_FBE7 (noir, noir, blanc).
+; ==============================================================================================
+FileList_Draw_4C4C6	proc far		; CODE XREF: sub_41FD0J
 
 var_E		= word ptr -0Eh
 var_C		= word ptr -0Ch
@@ -72,7 +81,7 @@ arg_0		= word ptr  6
 		jmp	loc_4C57C
 ; ���������������������������������������������������������������������������
 
-loc_4C4F3:				; CODE XREF: sub_4C4C6+BEj
+loc_4C4F3:				; CODE XREF: FileList_Draw_4C4C6+BEj
 		mov	bx, [si+2Eh]
 		mov	ax, [bx]
 		add	ax, [bp+var_A]
@@ -108,14 +117,14 @@ loc_4C4F3:				; CODE XREF: sub_4C4C6+BEj
 		jmp	short loc_4C558
 ; ���������������������������������������������������������������������������
 
-loc_4C54C:				; CODE XREF: sub_4C4C6+50j
-					; sub_4C4C6+58j
+loc_4C54C:				; CODE XREF: FileList_Draw_4C4C6+50j
+					; FileList_Draw_4C4C6+58j
 		mov	ax, word_45B08
 		mov	[bp+var_6], ax
 		mov	ax, word_45B02
 		mov	[bp+var_8], ax
 
-loc_4C558:				; CODE XREF: sub_4C4C6+84j
+loc_4C558:				; CODE XREF: FileList_Draw_4C4C6+84j
 		cmp	[bp+var_E], 0
 		jz	short loc_4C576
 		push	word_45B54
@@ -128,23 +137,23 @@ loc_4C558:				; CODE XREF: sub_4C4C6+84j
 		call	PaletteScreen_DispatchWidgetLayoutB_11363
 		add	sp, 0Ah
 
-loc_4C576:				; CODE XREF: sub_4C4C6+96j
+loc_4C576:				; CODE XREF: FileList_Draw_4C4C6+96j
 		inc	[bp+var_A]
 		add	di, [si+20h]
 
-loc_4C57C:				; CODE XREF: sub_4C4C6+2Aj
+loc_4C57C:				; CODE XREF: FileList_Draw_4C4C6+2Aj
 		mov	ax, [si+30h]
 		cmp	ax, [bp+var_A]
 		jle	short loc_4C587
 		jmp	loc_4C4F3
 ; ���������������������������������������������������������������������������
 
-loc_4C587:				; CODE XREF: sub_4C4C6+BCj
+loc_4C587:				; CODE XREF: FileList_Draw_4C4C6+BCj
 		pop	di
 		pop	si
 		leave
 		retf
-sub_4C4C6	endp
+FileList_Draw_4C4C6	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

@@ -335,7 +335,20 @@ sub_86A2		endp
 
 ; Attributes: bp-based frame
 
-sub_870B		proc far
+; ==============================================================================================
+; far, LUE 2026-11-08 (règles de choix des fichiers). Charge un écran du déroulement (arg_0
+; objet écran, [si+0E8h] = numéro de l'écran cherché, comparé à l'INFO de chaque SCEN) depuis
+; DATA\\GAMEFLOW\\OPTIONS2.IFF, toujours. Fichiers par défaut selon arg_2 : 0 = OPTSHPS.PAK et
+; OPTPALS.PAK, 1 = OPTSHPS2.PAK et OPTPALS2.PAK (second écran d'armement
+; Gameflow_WeaponLoadoutAlt_58DEB, push 1). Palette PALT (fond et premier plan) de numéro > 48
+; : lue dans OPTPALS2.PAK, même numéro (cmp [bp+var_2], 30h / jle). Image de fond BACK/SHAP :
+; lue dans OPTSHPS2.PAK si l'écran a un numéro > 136 (cmp byte ptr [si+0E8h], 88h / jbe).
+; Image d'un sprite FORE/SPRT/SHAP : lue dans OPTSHPS2.PAK si le numéro du sprite (1er octet
+; de SHAP) est > 136 (cmp byte ptr [bp+var_26+1], 88h / jbe). Dans les données : écrans 1
+; (sprite 138, image 10), 11 (sprite 137, image 8), 29 (sprite 137, image 9) et 139 (fond 11,
+; palettes 49, sprite 140, image 12).
+; ==============================================================================================
+OptionScreen_Load_870B		proc far
 
 var_358		= word ptr -358h
 var_2E0		= word ptr -2E0h
@@ -1460,7 +1473,7 @@ loc_920D:
 		pop	si
 		leave
 		retf
-sub_870B		endp
+OptionScreen_Load_870B		endp
 
 ; ----------------------------------------------------------------------
 

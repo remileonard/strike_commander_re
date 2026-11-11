@@ -931,7 +931,7 @@ loc_585CD:
 		push	0
 		lea	ax, [bp+var_32C]
 		push	ax
-		call	sub_870B
+		call	OptionScreen_Load_870B
 		add	sp, 4
 		mov	al, byte_49538
 		mov	ah, 0
@@ -1948,7 +1948,7 @@ loc_58F12:
 		push	1
 		lea	ax, [bp+var_32C]
 		push	ax
-		call	sub_870B
+		call	OptionScreen_Load_870B
 		add	sp, 4
 		mov	al, byte_49538
 		mov	ah, 0
@@ -3248,7 +3248,7 @@ loc_59B49:
 		push	0
 		lea	ax, [bp+var_2C0]
 		push	ax
-		call	sub_870B
+		call	OptionScreen_Load_870B
 		add	sp, 4
 		push	ds
 		push	offset aShp
@@ -4880,7 +4880,7 @@ arg_0		= word ptr  6
 		push	0
 		lea	ax, [bp+var_70E]
 		push	ax
-		call	sub_870B
+		call	OptionScreen_Load_870B
 		add	sp, 4
 		lea	ax, [bp+var_54E]
 		push	ax

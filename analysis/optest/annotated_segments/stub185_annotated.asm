@@ -162,7 +162,7 @@ sub_41FCB	endp
 ; Attributes: thunk
 
 sub_41FD0	proc far		; DATA XREF: dseg:0894o
-		jmp	sub_4C4C6
+		jmp	FileList_Draw_4C4C6
 sub_41FD0	endp
 
 

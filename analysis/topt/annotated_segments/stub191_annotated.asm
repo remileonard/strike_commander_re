@@ -55,7 +55,7 @@ sub_479B4	endp
 ; Attributes: thunk
 
 sub_479B9	proc far
-		jmp	sub_5779B
+		jmp	Gameflow_KillBoard_5779B
 sub_479B9	endp
 		db 0, 0
 stub191		ends

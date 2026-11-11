@@ -1103,7 +1103,7 @@ loc_69A1:
 		push	0
 		lea	ax, [bp+var_11C]
 		push	ax
-		call	sub_870B
+		call	OptionScreen_Load_870B
 		add	sp, 4
 		cmp	[bp+var_6], 0FFh
 		jz	short loc_69CE
