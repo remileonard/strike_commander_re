@@ -23,7 +23,7 @@ a été lue), l'effet sur `PRLH-M1`, et ce qu'il faut regarder au débogueur. Ri
 | 10 | `OP_ATTACK_RANDOM_ENEMY_OF_TYPE` : choix de la cible et valeur rendue | JESTER ne passe pas à `OP_SET_OBJ_FOLLOW_ALLY 36` | haute |
 | 11 | Choix des armes par l'IA lié aux numéros d'armes de Strike Commander | canon correct ; roquettes, bombes, torpilles et napalm mal reconnus | conception |
 | 12 | `GOAL` 7, 8 et 9 de Pacific Strike ignorés, `GOAL` 5 différent | JESTER ne suit pas son chef par ses `GOAL` | haute |
-| 13 | Scènes activées au chargement d'après `is_active` | à vérifier : la copie du 2026-11-11 fait comme le jeu ; la logique décrite jouerait le programme 14 au chargement | à vérifier |
+| 13 | Scènes activées au chargement d'après `is_active` | aucun : libRealSpace fait comme le jeu (confirmé par Rémi le 2026-11-13) | réglé |
 
 ---
 
@@ -100,6 +100,9 @@ lui aussi l'objet du monde à cette étape (relu seulement pour le test du drape
   sort. Aucune instruction de script trouvée ne le lit.
 
 Les noms `OP_ACTIVATE_SCENE` et `OP_DEACTIVATE_SCENE` sont ceux de libRealSpace ; ils changent l'état « autorisée ».
+
+**À implémenter (Rémi, 2026-11-13)** : l'instruction 130 rend « égal » si `is_active` de la scène de la zone n vaut 1,
+rien d'autre.
 
 **Constat.** L'instruction 130 n'a pas de méthode dans `PSProg` : `SCProg::execute` l'ignore sans message. Le bit de
 comparaison garde sa valeur de départ (`PROG_CMP_UNSET`, posée par le constructeur de `SCProg`), donc
@@ -346,6 +349,9 @@ joueur. Dans le jeu, il suit donc le joueur par le 7 tant qu'il est en formation
 ---
 
 ## 13. Scènes activées au chargement d'après `is_active`
+
+**Réglé (Rémi, 2026-11-13).** Le code de libRealSpace est celui de la copie lue (`SCMission::startScenes`) : pas d'écart.
+`is_active` sera renommé par Rémi : il dit si la scène peut être activée par le joueur.
 
 **Logique actuelle de libRealSpace (décrite par Rémi, 2026-11-13).** Au chargement, le programme d'activation est
 lancé pour toutes les scènes dont `is_active` vaut 1 dans le fichier. À l'entrée du joueur, si `is_active` vaut 0,
