@@ -23,6 +23,7 @@ a été lue), l'effet sur `PRLH-M1`, et ce qu'il faut regarder au débogueur. Ri
 | 10 | `OP_ATTACK_RANDOM_ENEMY_OF_TYPE` : choix de la cible et valeur rendue | JESTER ne passe pas à `OP_SET_OBJ_FOLLOW_ALLY 36` | haute |
 | 11 | Choix des armes par l'IA lié aux numéros d'armes de Strike Commander | canon correct ; roquettes, bombes, torpilles et napalm mal reconnus | conception |
 | 12 | `GOAL` 7, 8 et 9 de Pacific Strike ignorés, `GOAL` 5 différent | JESTER ne suit pas son chef par ses `GOAL` | haute |
+| 13 | Départ sur le pont du porte-avions | aucun dans PRLH-M1 ; dans PRLH-M2 et les 43 autres missions de porte-avions, le joueur part en l'air sans vitesse et tombe | haute |
 
 ---
 
@@ -342,6 +343,29 @@ pour reconnaître l'ailier du joueur (point 10).
 
 **Effet sur PRLH-M1.** La liste de JESTER est `5 7 2 4 8 3 9 1` : son allié par défaut (champ du `PART`) est l'objet n° 36, le
 joueur. Dans le jeu, il suit donc le joueur par le 7 tant qu'il est en formation, avant même l'ordre du programme 16 ; dans libRealSpace, seul l'ordre du script peut le faire suivre.
+
+---
+
+## 13. Départ sur le pont du porte-avions
+
+Détail : `IMPL_PORTE_AVIONS.md` (proposition retenue par Rémi le 2026-11-13, code non écrit).
+
+**Dans le jeu.** Le pont n'est pas une hauteur de sol : quand un avion touche le porte-avions,
+`Aircraft_ContactWithObject_3CA69` le remonte à 33 m (1er champ du chunk `CARD`) et le met au sol, sans écrasement.
+
+**Dans libRealSpace.** La branche du joueur de `PSMission::loadMission` ne pose pas `on_ground` ; le sol de
+`SCJetpPlane::Simulate` est le terrain (`area->getY`, la mer à 0) ; `SCPlane::isOnRunWay` ne connaît que les pistes.
+
+**Piste retenue.**
+
+| Classe | Changement |
+|---|---|
+| `PSEntity` | lire `CARD` |
+| `SCPlane` | méthode virtuelle `groundLevelAt(x, z)` (terrain par défaut), appelée par `SCJetpPlane::Simulate` ; `isOnRunWay` virtuelle |
+| `PSPlane` | `groundLevelAt` : pont d'un porte-avions actif = hauteur du navire + 33 m ; `isOnRunWay` vrai sur le pont |
+| `PSMission` | même départ pour le joueur et l'IA : recalage sur `groundLevelAt`, au sol à vitesse 0 |
+
+Ouverts : seuil de décollage (10 m au-dessus du pont dans le jeu), boîte du pont.
 
 ---
 

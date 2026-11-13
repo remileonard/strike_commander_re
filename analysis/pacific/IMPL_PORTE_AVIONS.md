@@ -1,8 +1,9 @@
 # Porte-avions : départ et posé sur le pont (proposition pour libRealSpace)
 
 Rédigé le 2026-11-13 à la demande de Rémi : dans `PRLH-M2` (« Raid on Taroa »), le joueur part du pont de l'USS
-Enterprise ; libRealSpace le fait partir en l'air, sans vitesse, et l'avion tombe. **Proposition à valider avant
-d'écrire le code** ; les fichiers complets de libRealSpace modifiés viendront ensuite.
+Enterprise ; libRealSpace le fait partir en l'air, sans vitesse, et l'avion tombe. **Proposition retenue par Rémi
+(2026-11-13), notée seulement : le code n'est pas écrit ici.** Restent ouverts : le seuil de décollage (10 m au-dessus
+du pont comme le jeu, ou 1 m comme `SCJetpPlane::checkStatus`) et la boîte du pont (boîte du modèle proposée).
 
 Repère et unités : Y-up, mètres (libRealSpace). Valeurs de fichier en 24.8 : ÷ 256.
 
@@ -124,7 +125,7 @@ veux.
 **Pas dans cette proposition** : navire en mouvement (l'avion posé devrait suivre le pont), IA qui se pose ou décolle
 du pont, `LSOD` et `CHLD`.
 
-Exemple de `PSPlane::groundLevelAt` (style de libRealSpace, à compiler avec les fichiers livrés) :
+Esquisse de `PSPlane::groundLevelAt`, pour illustrer la proposition (non compilée) :
 ```cpp
 float PSPlane::groundLevelAt(float x, float z) {
     float ground = this->area->getY(x, z);
