@@ -146,7 +146,11 @@ sub_4156B		endp
 
 ; Attributes: bp-based frame
 
-sub_41595		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Pourcentage d'un système d'avion n (< 59) : 100 × octet[n + 59] /
+; octet[n] ; 100 sinon.
+; ==============================================================================================
+DamageSys_PercentOfSystem_41595		proc far
 
 arg_0		= word ptr  6
 arg_4		= word ptr  0Ah
@@ -180,7 +184,7 @@ loc_415C9:
 		mov	al, dl
 		pop	bp
 		retf
-sub_41595		endp
+DamageSys_PercentOfSystem_41595		endp
 
 ; ----------------------------------------------------------------------
 
@@ -195,14 +199,14 @@ arg_0		= dword ptr  6
 		push	4
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_41595
+		call	near ptr DamageSys_PercentOfSystem_41595
 		add	sp, 6
 		mov	ah, 0
 		push	ax
 		push	3
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_41595
+		call	near ptr DamageSys_PercentOfSystem_41595
 		add	sp, 6
 		mov	ah, 0
 		pop	bx
@@ -211,7 +215,7 @@ arg_0		= dword ptr  6
 		push	0
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_41595
+		call	near ptr DamageSys_PercentOfSystem_41595
 		add	sp, 6
 		mov	ah, 0
 		pop	bx
@@ -230,7 +234,11 @@ sub_415CD		endp
 
 ; Attributes: bp-based frame
 
-sub_41612		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. 1 si DamageSys_PercentOfSystem_41595 du système 0 > 30, ou du système 4
+; > 50, ou du système 3 > 50.
+; ==============================================================================================
+DamageSys_IsSeriouslyDamaged_41612		proc far
 
 var_1		= byte ptr -1
 arg_0		= dword ptr  6
@@ -242,21 +250,21 @@ arg_0		= dword ptr  6
 		push	0
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_41595
+		call	near ptr DamageSys_PercentOfSystem_41595
 		add	sp, 6
 		cmp	al, 1Eh
 		ja	short loc_4164F
 		push	4
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_41595
+		call	near ptr DamageSys_PercentOfSystem_41595
 		add	sp, 6
 		cmp	al, 32h
 		ja	short loc_4164F
 		push	3
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_41595
+		call	near ptr DamageSys_PercentOfSystem_41595
 		add	sp, 6
 		cmp	al, 32h
 		jbe	short loc_41653
@@ -268,7 +276,7 @@ loc_41653:
 		mov	al, [bp+var_1]
 		leave
 		retf
-sub_41612		endp
+DamageSys_IsSeriouslyDamaged_41612		endp
 
 ; ----------------------------------------------------------------------
 
@@ -286,21 +294,21 @@ arg_0		= dword ptr  6
 		push	0
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_41595
+		call	near ptr DamageSys_PercentOfSystem_41595
 		add	sp, 6
 		cmp	al, 5Ah
 		ja	short loc_41695
 		push	4
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_41595
+		call	near ptr DamageSys_PercentOfSystem_41595
 		add	sp, 6
 		cmp	al, 5Ah
 		ja	short loc_41695
 		push	3
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_41595
+		call	near ptr DamageSys_PercentOfSystem_41595
 sub_41658		endp
 
 ; START OF FUNCTION CHUNK FOR sub_41658

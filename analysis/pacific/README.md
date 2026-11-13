@@ -1061,6 +1061,110 @@ Ce que la classe aura besoin de connaître (trouvé le 2026-11-05) :
 
 Le code sera écrit après la relecture de cette section (fichiers complets de libRealSpace modifiés, comme pour les
 missions).
+## 10. IA : les valeurs du chunk `GOAL` (lu le 2026-11-13)
+
+Le chunk `GOAL` du profil (`/PROF/_AI_/GOAL`) est une liste d'au plus 9 octets. Le chargeur
+`PilotProfile_LoadFromPROF_843EA` lit chaque octet ; `PilotProfile_GoalHandlerFromValue_84AA0` le traduit en
+gestionnaire, rangé dans une liste d'emplacements de 8 octets de l'entité (`[entité+363]`). À chaque tick,
+`AI_TopLevelThink_B0C4` appelle ces gestionnaires dans l'ordre du fichier et s'arrête au premier qui renvoie
+« j'ai agi » (`call dword ptr es:[bx+16Bh]`, puis `or al, al / jnz`). Au sol, comme dans Strike Commander,
+`Goal_ExecuteObjective_C9E4` est appelé directement, sans la liste.
+
+| Valeur | Ce que fait le chargeur | Gestionnaire | Comparé à Strike Commander |
+|---|---|---|---|
+| 1 | octet `[entité+505]` = 1, pas d'emplacement | — | Strike : emplacement vide. Lecteur de `[entité+505]` pas trouvé par recherche de motifs ; rôle non établi |
+| 2 | emplacement | `Goal_ExecuteObjective_C9E4` | même rôle que `Goal_ExecuteAction` (ordre en cours du script) |
+| 3 | emplacement | `Goal_WanderRandom_D001` | même algorithme que `Goal_WanderRandom` |
+| 4 | emplacement | `AI_BehaviorStateMachine_B968` | même tournoi pondéré sur `MVRS` qu'`AI_BehaviorStateMachine` |
+| 5 | emplacement | `Goal_MoraleReaction_B712` | seule la fuite existe (détail plus bas) |
+| 6 | erreur 32 776, emplacement vide | — | n'existe pas ; aucun profil de `PACIFIC.DAT` ne l'utilise |
+| 7 | emplacement | `Goal_FollowLeaderInFormation_C91C` | nouveau : suivre le chef tant que l'avion est « en formation » |
+| 8 | emplacement | `Goal_FollowLeader_C93E` | nouveau : suivre le chef |
+| 9 | octet `[entité+359]` = 1, pas d'emplacement | — | nouveau : règle de recherche de cible (détail plus bas) |
+
+Table des gestionnaires : 8 octets par valeur à partir de dseg 76B10 (pointeurs far), lue dans `source/pacific.asm`
+parce que le segment de données n'est pas dans les fichiers annotés.
+
+### 10.1 Le chef et l'octet « en formation »
+
+- **Le chef** est rangé dans `[entité+305]` par l'ordre 179 de `Goal_SetObjective_C2A8` (cas `loc_C676`). Cet ordre
+  est passé au chargement de la mission avec l'allié par défaut du `PART` (seg125 : `push 0B3h` puis
+  `call dword ptr [bx+8Ch]`). C'est le même mécanisme que dans Strike Commander (`IMPL_MISSION_PART.md` § 1.1).
+- **Dans Pacific Strike, l'ordre `OP_SET_OBJ_FOLLOW_ALLY` ne fait rien dans `Goal_SetObjective_C2A8`** : sa valeur
+  est dans la table `word_C6E8` (9ᵉ entrée), et son cas saute directement à la fin (`loc_C6C2`), sans écrire de
+  cible ni d'ordre. Le suivi du chef passe par les `GOAL` 7 et 8.
+- **L'octet « en formation » `[entité+357]`** (nom donné d'après ce qui le lit et l'écrit : la condition du `GOAL` 7,
+  la fuite et le message « Here I come! » le remettent à 0) vaut 1 à la création de l'entité (`sub_84CE8`). Il est remis à 1 par
+  `AI_JoinFormation_E36E` et mis à 0 par `AI_LeaveFormation_E39C`, par la fuite (`AI_FleeHome_E8E5`), par
+  `Targeting_AcquireTarget_FF8B` (voir 10.3) et par plusieurs cas de `sub_E3CA` (fonction pas encore nommée,
+  appelée en tête d'`AI_TopLevelThink_B0C4`, aiguillage sur 10 cas ; nom proposé : `AI_MessageDispatcher_E3CA`).
+
+**`GOAL` 8, `Goal_FollowLeader_C93E`** :
+```
+si pas de chef : renvoie 0
+si le chef est détruit (bit 5 de l'octet +146 de son objet monde) : efface le chef, renvoie 0
+sub_FA7E(entité)
+si [entité+353] = 0 :
+    comportement en cours (méthode +12), ou sinon sub_D2AC(entité)   ; sub_D2AC lit le chef, non lue
+renvoie 1
+```
+**`GOAL` 7, `Goal_FollowLeaderInFormation_C91C`** : le `GOAL` 8, seulement si `[entité+357]` ≠ 0 ; sinon renvoie 0
+et le gestionnaire suivant prend la main.
+
+Dans la liste la plus fréquente, `5 7 2 8 4 3 1 9` (9 profils sur 26), le 7 passe avant l'ordre du script (2) et
+le 8 après : un avion en formation suit son chef avant d'exécuter l'ordre ; hors formation, il exécute l'ordre,
+et ne suit son chef que si l'ordre n'a rien donné.
+
+### 10.2 `GOAL` 5 : la fuite
+
+`Goal_MoraleReaction_B712`, au plus toutes les 5 s :
+```
+moral = AI_ComputeMorale_EC40(entité)        ; 2 bon, 3, 4, 5 panique (seuils 80, 50, 25)
+si moral = 5 et Math_RandomScale_56C2F(36) = 1 et [entité+309] ≠ 2 :
+    message radio 8 au joueur                ; JESTER : « Heading for home. Sorry to leave you like this... »
+    AI_FleeHome_E8E5(entité)                 ; quitte la formation, ordres du script refusés, vol vers un point 1000 m plus haut
+renvoie 0
+```
+Différences avec `Goal_MoraleReaction_878F` de Strike Commander : seul le moral 5 compte (pas le 4), une chance
+sur 36 par évaluation, aucun test de camp, et aucune des autres branches (retournement contre le joueur, prise
+d'initiative, appel à l'aide). Il renvoie toujours 0 : il n'empêche jamais les gestionnaires suivants de tourner.
+
+### 10.3 `GOAL` 9 : quand chercher une cible
+
+`[entité+359]` est lu par `Targeting_MayAcquireTarget_FF05` et `Targeting_AcquireTarget_FF8B`, la recherche de
+cible aérienne appelée par `AI_TopLevelThink_B0C4`. La règle dépend du **rôle de l'avion**, octet 5 du chunk `JINF`
+de son fichier objet (lu par le chargeur de `JINF`, ovr307 : 4ᵉ champ, `mov es:[bx+65h], al`) :
+
+| Rôle `JINF` | Avions de `PACIFIC.DAT` |
+|---|---|
+| 0 | HELLDIVE, JUDY, SBD, VAL |
+| 1 | JILL, KATETORP, TBD, TBF |
+| 2 | BETTY, EMILY, KATE |
+| 3 | BEARCAT, CLAUDE, CORSAIR, F4F3, F4F4, FRANK, GEORGE, HELLCAT, HELLCAT2, ZERO, ZERO5, ZEROF |
+| 4 | BAKA, ZEROK |
+
+`Targeting_MayAcquireTarget_FF05` :
+```
+si rôle = 3 :
+    peut chercher, sauf si GOAL 9 et en formation
+sinon :
+    peut chercher si touché ([entité+506]) et en formation et GOAL 9
+    ou si touché et sérieusement endommagé (DamageSys_IsSeriouslyDamaged_41612)
+```
+Puis `Targeting_AcquireTarget_FF8B`, si la recherche est permise, pour un avion de rôle autre que 3 en formation
+avec `GOAL` 9 : il quitte la formation (`[entité+357]` = 0), envoie le message radio 18 au joueur (JESTER :
+« Here I come! ») et ne cherche sa cible qu'au tick suivant.
+
+Donc, avec `GOAL` 9 : un chasseur ne chasse pas tant qu'il est en formation ; un autre avion en formation qui est
+touché rompt la formation pour se défendre. « Touché » = `[entité+506]`, mis à 1 par `AI_RecordHit_BAC4` quand
+l'entité est atteinte par un objet de type 6 (avion), 8 ou 13.
+
+### 10.4 Pour libRealSpace
+
+`SCAIBrain::runGoalSelectors` traite 1 à 5 comme dans Strike Commander et saute 6 à 9 (`default: continue`) :
+pour Pacific Strike, il manque le suivi du chef (7 et 8) et la règle de recherche de cible (9) ; la valeur 5
+diffère (fuite seule), et 1 n'est pas un simple emplacement vide (rôle non établi).
+
 ## 5. Rapport avec libRealSpace
 
 - `PSGameFlowParser::parseOpCode` : les longueurs sont celles du code pour 0, 6, 7, 9, 10, 35 et 36 (2 octets).

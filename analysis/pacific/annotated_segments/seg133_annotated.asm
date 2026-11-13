@@ -807,7 +807,7 @@ loc_5BCCB:
 
 loc_5BCEB:
 		push	large [bp+var_8]
-		call	sub_41612
+		call	DamageSys_IsSeriouslyDamaged_41612
 		add	sp, 4
 		or	al, al
 		jz	short loc_5BD00

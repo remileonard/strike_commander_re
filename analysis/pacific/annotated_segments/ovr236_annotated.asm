@@ -612,7 +612,7 @@ loc_84968:
 		push	ax
 		nop
 		push	cs
-		call	near ptr sub_84AA0
+		call	near ptr PilotProfile_GoalHandlerFromValue_84AA0
 		add	sp, 0Ah
 		lea	ax, [bp+var_50]
 		push	ss
@@ -708,7 +708,16 @@ sub_849F2		endp
 
 ; Attributes: bp-based frame
 
-sub_84AA0		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Appelée par PilotProfile_LoadFromPROF_843EA pour chaque valeur du chunk
+; GOAL autre que 1 et 9 : recopie l'emplacement de 8 octets (pointeur far du gestionnaire) de
+; la table dseg 76B10 + 8 × (valeur − 2). 2 = Goal_ExecuteObjective_C9E4, 3 =
+; Goal_WanderRandom_D001, 4 = AI_BehaviorStateMachine_B968, 5 = Goal_MoraleReaction_B712, 7 =
+; Goal_FollowLeaderInFormation_C91C, 8 = Goal_FollowLeader_C93E. 6 : cas par défaut, erreur
+; 32776 (push 8008h) et emplacement vide. Les valeurs 1 et 9 sont traitées par le chargeur
+; (octets [entité+505] et [entité+359]) sans emplacement.
+; ==============================================================================================
+PilotProfile_GoalHandlerFromValue_84AA0		proc far
 
 arg_0		= dword ptr  6
 arg_8		= byte ptr  0Eh
@@ -775,9 +784,9 @@ loc_84B06:
 		mov	ax, word ptr [bp+arg_0]
 		pop	bp
 		retf
-sub_84AA0		endp
+PilotProfile_GoalHandlerFromValue_84AA0		endp
 
-; START OF FUNCTION CHUNK FOR sub_84AA0
+; START OF FUNCTION CHUNK FOR PilotProfile_GoalHandlerFromValue_84AA0
 off_84B16	dw offset loc_84AB9
 		dw offset loc_84AC3
 		dw offset loc_84ACD
@@ -785,7 +794,7 @@ off_84B16	dw offset loc_84AB9
 		dw offset loc_84AF5
 		dw offset loc_84AE1
 		dw offset loc_84AEB
-; END OF FUNCTION CHUNK FOR sub_84AA0
+; END OF FUNCTION CHUNK FOR PilotProfile_GoalHandlerFromValue_84AA0
 
 ; ----------------------------------------------------------------------
 

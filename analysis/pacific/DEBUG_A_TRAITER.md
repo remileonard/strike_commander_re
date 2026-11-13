@@ -22,6 +22,7 @@ a été lue), l'effet sur `PRLH-M1`, et ce qu'il faut regarder au débogueur. Ri
 | 9 | Profil ou fichier objet introuvable | silence ou plantage | à vérifier |
 | 10 | `OP_ATTACK_RANDOM_ENEMY_OF_TYPE` : choix de la cible et valeur rendue | JESTER ne passe pas à `OP_SET_OBJ_FOLLOW_ALLY 36` | haute |
 | 11 | Choix des armes par l'IA lié aux numéros d'armes de Strike Commander | canon correct ; roquettes, bombes, torpilles et napalm mal reconnus | conception |
+| 12 | `GOAL` 7, 8 et 9 de Pacific Strike ignorés, `GOAL` 5 différent | JESTER ne suit pas son chef par ses `GOAL` | haute |
 
 ---
 
@@ -308,6 +309,29 @@ confondus.
 demander à l'avion qu'elle pilote s'il a une arme pour tirer sur sa cible (air ou sol, portée), sans connaître les
 numéros d'armes d'un jeu. La traduction vers `ID_20MM` / `ID_MK82` / `ID_AIM9J` dans `PSEntity` n'aurait alors plus
 lieu d'être.
+
+---
+
+## 12. `GOAL` 7, 8 et 9 de Pacific Strike ignorés, `GOAL` 5 différent
+
+Détail du jeu : `README.md` § 10.
+
+**Dans le jeu.**
+- `GOAL` 7 et 8 font suivre **le chef** : l'allié par défaut du `PART`, passé au chargement par l'ordre 179
+  (`Goal_FollowLeaderInFormation_C91C`, `Goal_FollowLeader_C93E`). Le 7 ne joue que si l'avion est « en
+  formation » (`[entité+357]`, vrai à la création).
+- `OP_SET_OBJ_FOLLOW_ALLY` ne fait rien dans `Goal_SetObjective_C2A8` (son cas saute à la fin) : le suivi passe
+  par les `GOAL`, pas par l'ordre.
+- `GOAL` 9 change la recherche de cible : un chasseur (rôle 3 du `JINF`) en formation ne chasse pas ; un autre avion
+  en formation qui est touché rompt la formation (message 18, « Here I come! »).
+- `GOAL` 5 : fuite seule, au moral 5, une chance sur 36 par évaluation (toutes les 5 s), quel que soit le camp.
+
+**Dans libRealSpace.** `SCAIBrain::runGoalSelectors` saute 7, 8 et 9 (`default: continue`) et applique au 5 la
+réaction au moral de Strike Commander (`SCAIBrain::moraleReaction`), qui demande l'ordre `OP_SET_OBJ_FOLLOW_ALLY`
+pour reconnaître l'ailier du joueur (point 10).
+
+**Effet sur PRLH-M1.** La liste de JESTER est `5 7 2 8 4 3 9 1` : son allié par défaut (champ du `PART`) est l'objet n° 36, le
+joueur. Dans le jeu, il suit donc le joueur par le 7 tant qu'il est en formation, avant même l'ordre du programme 16 ; dans libRealSpace, seul l'ordre du script peut le faire suivre.
 
 ---
 

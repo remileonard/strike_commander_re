@@ -378,7 +378,15 @@ sub_FE3D		endp
 
 ; Attributes: bp-based frame
 
-sub_FF05		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Dit si l'IA peut chercher une cible. Rôle de l'avion = octet 5 du chunk
+; JINF (rangé à +101 de l'objet type ; 0 SBD, SB2C, VAL, JUDY ; 1 TBD, TBF, JILL, KATETORP ; 2
+; BETTY, EMILY, KATE ; 3 chasseurs ; 4 BAKA, ZEROK). Rôle 3 : oui, sauf si GOAL 9
+; ([entité+359]) et en formation ([entité+357]). Autre rôle : oui si touché ([entité+506]), en
+; formation et GOAL 9 ; ou si touché et sérieusement endommagé
+; (DamageSys_IsSeriouslyDamaged_41612) ; sinon non.
+; ==============================================================================================
+Targeting_MayAcquireTarget_FF05		proc far
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -414,7 +422,7 @@ loc_FF43:
 		mov	[bp+var_4], dx
 		push	ax
 		push	dx
-		call	sub_41612
+		call	DamageSys_IsSeriouslyDamaged_41612
 		add	sp, 4
 		or	al, al
 		jz	short loc_FF70
@@ -439,13 +447,22 @@ loc_FF87:
 loc_FF89:
 		leave
 		retf
-sub_FF05		endp
+Targeting_MayAcquireTarget_FF05		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_FF8B		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-13. Recherche de cible aérienne, [entité+495] = 1 au début. Avion
+; du camp 1 sans IA ennemie active à l'image précédente (byte_776B9) : rien.
+; Targeting_MayAcquireTarget_FF05 refuse : rien. Rôle JINF ≠ 3, en formation et GOAL 9 :
+; quitte la formation ([entité+357] = 0), message radio 18 au joueur (« Here I come! » chez
+; JESTER), renvoie 0. Sinon choisit la cible selon [entité+178] (sub_101C0, sub_10197,
+; sub_10173), la range dans [entité+501] ; camp 255 : AI_BehaviorStateMachine_B968, autre camp
+; : sub_E30A.
+; ==============================================================================================
+Targeting_AcquireTarget_FF8B		proc far
 
 var_4		= word ptr -4
 var_1		= byte ptr -1
@@ -478,7 +495,7 @@ loc_FFC0:
 loc_FFCF:
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_FF05
+		call	near ptr Targeting_MayAcquireTarget_FF05
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -634,7 +651,7 @@ loc_1012B:
 		cmp	byte ptr [bx+51h], 0FFh
 		jnz	short loc_10162
 		push	large [bp+arg_0]
-		call	sub_B968
+		call	AI_BehaviorStateMachine_B968
 		add	sp, 4
 		mov	[bp+var_1], al
 		jmp	short loc_1016E
@@ -650,7 +667,7 @@ loc_1016E:
 loc_10171:
 		leave
 		retf
-sub_FF8B		endp
+Targeting_AcquireTarget_FF8B		endp
 
 ; ----------------------------------------------------------------------
 

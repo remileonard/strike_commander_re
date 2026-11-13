@@ -4427,8 +4427,8 @@
 "sub_FF8B",
 "sub_C9E4"
 ],
-"new_name": "sub_B0C4",
-"summary": ""
+"new_name": "AI_TopLevelThink_B0C4",
+"summary": "far. LUE 2026-11-13 (structure). Réflexion de l'IA à chaque tick, équivalent d'AI_TopLevelThink de STRIKE. Pose byte_776AB si l'avion est du camp 255. Puis réactions, recherche de cible (Targeting_AcquireTarget_FF8B si [entité+495] ≤ 1), comportement en cours [entité+13] (méthode +12), et enfin les objectifs : au sol (octet +32 du sous-objet de l'avion) et après 5 images, Goal_ExecuteObjective_C9E4 directement ; sinon boucle sur les emplacements GOAL de 8 octets à [entité+363] ('call dword ptr es:[bx+16Bh]'), appel avec la seule entité, arrêt au premier gestionnaire qui renvoie non nul ou au premier emplacement vide."
 },
 "sub_B4D4": {
 "segment": "seg022",
@@ -4456,8 +4456,8 @@
 "sub_EA0E",
 "sub_E8E5"
 ],
-"new_name": "sub_B712",
-"summary": ""
+"new_name": "Goal_MoraleReaction_B712",
+"summary": "far. LUE 2026-11-13. Gestionnaire GOAL 5. Au plus toutes les 5 s (horloge [entité+226] en secondes contre [entité+338]). Moral = AI_ComputeMorale_EC40 ; si 5 (panique), une chance sur 36 (Math_RandomScale_56C2F(36) == 1) et [entité+309] ≠ 2 (pas déjà en fuite) : message radio 8 au joueur (« Heading for home… » chez JESTER) puis AI_FleeHome_E8E5. Renvoie toujours 0 : le gestionnaire GOAL suivant prend la main dans le même tick. Seule la branche « fuite » de Goal_MoraleReaction_878F de STRIKE existe, sans test de camp."
 },
 "sub_B797": {
 "segment": "seg022",
@@ -4557,8 +4557,8 @@
 "sub_9D0A",
 "sub_81F"
 ],
-"new_name": "sub_B968",
-"summary": ""
+"new_name": "AI_BehaviorStateMachine_B968",
+"summary": "far. LUE 2026-11-13. Gestionnaire GOAL 4 : même rôle qu'AI_BehaviorStateMachine de STRIKE. Comportement en cours [entité+13] : sa méthode +12, renvoie 1. Sinon cible = [entité+499] ou sub_BEB6(entité, 1) ; sans cible renvoie 0. Tournoi sur la liste MVRS ([entité+443] éléments de 5 octets à [entité+445] : pointeur du nœud + poids signé) : score = méthode +4 du nœud ; si non nul, total = score + poids ± 1 (rand & 1), le plus grand gagne. Nœud de type 19 : cible remplacée par [entité+497]. Lance le gagnant (méthode +8), renvoie 1."
 },
 "sub_BAC4": {
 "segment": "seg022",
@@ -4569,8 +4569,8 @@
 "calls": [
 "sub_39519"
 ],
-"new_name": "sub_BAC4",
-"summary": ""
+"new_name": "AI_RecordHit_BAC4",
+"summary": "far. LUE 2026-11-13. Reçoit l'entité et un objet (arg 4) dont la méthode +56 donne le propriétaire. Objet de type 6, 8 ou 13 : [entité+506] = 1 (touché), type 8 ou 13 : propriétaire rangé dans [entité+503]. Propriétaire d'un autre type : [entité+358] = 1. Si le propriétaire est le joueur (word_7CADA) : byte_776A6 (camp 255) ou byte_776A7 (camp 1) ; objet = propriétaire = joueur : byte_776AD."
 },
 "sub_BBB3": {
 "segment": "seg022",
@@ -4696,8 +4696,8 @@
 "calls": [
 "sub_C93E"
 ],
-"new_name": "sub_C91C",
-"summary": ""
+"new_name": "Goal_FollowLeaderInFormation_C91C",
+"summary": "far. LUE 2026-11-13. Gestionnaire GOAL 7 (propre à Pacific Strike). Si l'octet « en formation » [entité+357] est non nul : Goal_FollowLeader_C93E et renvoie son résultat ; sinon renvoie 0."
 },
 "sub_C93E": {
 "segment": "seg023",
@@ -4710,8 +4710,8 @@
 "sub_FA7E",
 "sub_D2AC"
 ],
-"new_name": "sub_C93E",
-"summary": ""
+"new_name": "Goal_FollowLeader_C93E",
+"summary": "far. LUE 2026-11-13. Gestionnaire GOAL 8 (propre à Pacific Strike). Chef = [entité+305], rangé par l'ordre 179 (Goal_SetObjective_C2A8, cas loc_C676), que le chargeur de mission passe avec l'allié par défaut du PART (seg125, push 0B3h). Pas de chef : renvoie 0. Chef détruit (bit 5 de l'octet +146 de son objet monde) : chef effacé, renvoie 0. Sinon sub_FA7E(entité), puis si [entité+353] = 0 : comportement en cours [entité+13] (méthode +12) ou sub_D2AC(entité) (lit le chef, probable vol en formation, non lue) ; renvoie 1."
 },
 "sub_C9E4": {
 "segment": "seg023",
@@ -4754,8 +4754,8 @@
 "sub_57715",
 "sub_3664D"
 ],
-"new_name": "sub_D001",
-"summary": ""
+"new_name": "Goal_WanderRandom_D001",
+"summary": "far. LUE 2026-11-13. Gestionnaire GOAL 3 : même algorithme que Goal_WanderRandom de STRIKE. Comportement en cours : sa méthode +12. Sinon, sauf si le nœud de navigation [entité+7] n'a pas atteint son point (+26 = 0) et que le dernier comportement est le 21 : direction = normalise(rand()%20000 − 10000, rand()%20000 − 10000, 0), point = moi + direction × 30000 m dans le plan, altitude = moi + borne(sol sous moi + [entité+297] − mon altitude, ±1000 m) ; vitesse = direction × [entité+301]. [entité+297] et [entité+301] sont posés par les ordres 177 et 178 de Goal_SetObjective_C2A8. Lance le nœud [entité+192] (méthode +8). Renvoie toujours 1. Différence relevée : pas de minuteur de 30 s (seulement 2 s, 200h)."
 },
 "sub_D2AC": {
 "segment": "seg023",
@@ -4930,8 +4930,8 @@
 "calls": [
 "sub_39519"
 ],
-"new_name": "sub_E36E",
-"summary": ""
+"new_name": "AI_JoinFormation_E36E",
+"summary": "far. LUE 2026-11-13. [entité+357] = 1 (en formation), [entité+309] = 0, [entité+355] = 0, cible [entité+499] effacée."
 },
 "sub_E39C": {
 "segment": "seg024",
@@ -4942,8 +4942,8 @@
 "calls": [
 "sub_39519"
 ],
-"new_name": "sub_E39C",
-"summary": ""
+"new_name": "AI_LeaveFormation_E39C",
+"summary": "far. LUE 2026-11-13. [entité+357] = 0, [entité+309] = 0, [entité+355] = 0, cible [entité+499] effacée."
 },
 "sub_E3CA": {
 "segment": "seg024",
@@ -4996,8 +4996,8 @@
 "sub_103CB",
 "sub_55DCA"
 ],
-"new_name": "sub_E8E5",
-"summary": ""
+"new_name": "AI_FleeHome_E8E5",
+"summary": "far. LUE EN PARTIE 2026-11-13. Fuite : [entité+357] = 0 (quitte la formation), [entité+355] = 1 (ordres du script refusés, cf. Goal_SetObjective_C2A8), cible [entité+499] effacée, [entité+309] = 2, comportement en cours abandonné (sub_103CB), point donné par Expr_Node_Accessor_546E4 relevé de 1000 m (add 3E800h), lance la navigation."
 },
 "sub_E9FB": {
 "segment": "seg024",
@@ -5047,8 +5047,8 @@
 "sub_EFF3",
 "sub_EA0E"
 ],
-"new_name": "sub_EC40",
-"summary": ""
+"new_name": "AI_ComputeMorale_EC40",
+"summary": "far. LUE EN PARTIE 2026-11-13. Moral de l'IA, même échelle qu'AI_ComputeMorale_CD4A de STRIKE : score < 25 → 5, < 50 → 4, < 80 → 3, sinon 2. Les termes du score (sub_415CD, sub_EF65, sub_EE87, sub_EE6F, sub_EFF3) ne sont pas lus."
 },
 "sub_EDC7": {
 "segment": "seg024",
@@ -5237,8 +5237,8 @@
 "calls": [
 "sub_41612"
 ],
-"new_name": "sub_FF05",
-"summary": ""
+"new_name": "Targeting_MayAcquireTarget_FF05",
+"summary": "far. LUE 2026-11-13. Dit si l'IA peut chercher une cible. Rôle de l'avion = octet 5 du chunk JINF (rangé à +101 de l'objet type ; 0 SBD, SB2C, VAL, JUDY ; 1 TBD, TBF, JILL, KATETORP ; 2 BETTY, EMILY, KATE ; 3 chasseurs ; 4 BAKA, ZEROK). Rôle 3 : oui, sauf si GOAL 9 ([entité+359]) et en formation ([entité+357]). Autre rôle : oui si touché ([entité+506]), en formation et GOAL 9 ; ou si touché et sérieusement endommagé (DamageSys_IsSeriouslyDamaged_41612) ; sinon non."
 },
 "sub_FF8B": {
 "segment": "seg025",
@@ -5256,8 +5256,8 @@
 "sub_B968",
 "sub_E30A"
 ],
-"new_name": "sub_FF8B",
-"summary": ""
+"new_name": "Targeting_AcquireTarget_FF8B",
+"summary": "far. LUE EN PARTIE 2026-11-13. Recherche de cible aérienne, [entité+495] = 1 au début. Avion du camp 1 sans IA ennemie active à l'image précédente (byte_776B9) : rien. Targeting_MayAcquireTarget_FF05 refuse : rien. Rôle JINF ≠ 3, en formation et GOAL 9 : quitte la formation ([entité+357] = 0), message radio 18 au joueur (« Here I come! » chez JESTER), renvoie 0. Sinon choisit la cible selon [entité+178] (sub_101C0, sub_10197, sub_10173), la range dans [entité+501] ; camp 255 : AI_BehaviorStateMachine_B968, autre camp : sub_E30A."
 },
 "sub_10173": {
 "segment": "seg025",
@@ -20580,8 +20580,8 @@
 "lines": 35,
 "type": "far",
 "calls": [],
-"new_name": "sub_41595",
-"summary": ""
+"new_name": "DamageSys_PercentOfSystem_41595",
+"summary": "far. LUE 2026-11-13. Pourcentage d'un système d'avion n (< 59) : 100 × octet[n + 59] / octet[n] ; 100 sinon."
 },
 "sub_415CD": {
 "segment": "seg103",
@@ -20608,8 +20608,8 @@
 "sub_41595",
 "sub_41595"
 ],
-"new_name": "sub_41612",
-"summary": ""
+"new_name": "DamageSys_IsSeriouslyDamaged_41612",
+"summary": "far. LUE 2026-11-13. 1 si DamageSys_PercentOfSystem_41595 du système 0 > 30, ou du système 4 > 50, ou du système 3 > 50."
 },
 "sub_41658": {
 "segment": "seg103",
@@ -53594,8 +53594,8 @@
 "sub_1DDFE",
 "sub_4E9"
 ],
-"new_name": "sub_84AA0",
-"summary": ""
+"new_name": "PilotProfile_GoalHandlerFromValue_84AA0",
+"summary": "far. LUE 2026-11-13. Appelée par PilotProfile_LoadFromPROF_843EA pour chaque valeur du chunk GOAL autre que 1 et 9 : recopie l'emplacement de 8 octets (pointeur far du gestionnaire) de la table dseg 76B10 + 8 × (valeur − 2). 2 = Goal_ExecuteObjective_C9E4, 3 = Goal_WanderRandom_D001, 4 = AI_BehaviorStateMachine_B968, 5 = Goal_MoraleReaction_B712, 7 = Goal_FollowLeaderInFormation_C91C, 8 = Goal_FollowLeader_C93E. 6 : cas par défaut, erreur 32776 (push 8008h) et emplacement vide. Les valeurs 1 et 9 sont traitées par le chargeur (octets [entité+505] et [entité+359]) sans emplacement."
 },
 "sub_84B24": {
 "segment": "ovr236",

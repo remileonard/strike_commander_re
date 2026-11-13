@@ -1029,7 +1029,7 @@ arg_2		= word ptr  8
 		jge	short loc_10B92
 		les	bx, es:[bx+0Dh]
 		push	large es:[bx+0DAh]
-		call	sub_41612
+		call	DamageSys_IsSeriouslyDamaged_41612
 		add	sp, 4
 		or	al, al
 		jz	short loc_10B92
@@ -1112,7 +1112,7 @@ arg_2		= word ptr  8
 		jge	short loc_10C49
 		les	bx, es:[bx+0Dh]
 		push	large es:[bx+0DAh]
-		call	sub_41612
+		call	DamageSys_IsSeriouslyDamaged_41612
 		add	sp, 4
 		or	al, al
 		jz	short loc_10C49

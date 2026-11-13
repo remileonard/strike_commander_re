@@ -826,7 +826,7 @@ loc_E2A8:
 
 loc_E2C9:
 		push	large [bp+arg_0]
-		call	sub_B968
+		call	AI_BehaviorStateMachine_B968
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -911,7 +911,11 @@ sub_E30A		endp
 
 ; Attributes: bp-based frame
 
-sub_E36E		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. [entité+357] = 1 (en formation), [entité+309] = 0, [entité+355] = 0,
+; cible [entité+499] effacée.
+; ==============================================================================================
+AI_JoinFormation_E36E		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -931,13 +935,17 @@ arg_2		= word ptr  8
 		add	sp, 6
 		pop	bp
 		retf
-sub_E36E		endp
+AI_JoinFormation_E36E		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_E39C		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. [entité+357] = 0, [entité+309] = 0, [entité+355] = 0, cible
+; [entité+499] effacée.
+; ==============================================================================================
+AI_LeaveFormation_E39C		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -957,7 +965,7 @@ arg_2		= word ptr  8
 		add	sp, 6
 		pop	bp
 		retf
-sub_E39C		endp
+AI_LeaveFormation_E39C		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1127,7 +1135,7 @@ loc_E509:
 		mov	[bp+var_4], 1
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_E39C
+		call	near ptr AI_LeaveFormation_E39C
 		add	sp, 4
 		jmp	short loc_E583
 
@@ -1167,7 +1175,7 @@ loc_E561:
 		jz	short loc_E583
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_E39C
+		call	near ptr AI_LeaveFormation_E39C
 		add	sp, 4
 		cmp	byte_776BA, 0
 		jz	short loc_E57F
@@ -1222,7 +1230,7 @@ loc_E5CF:
 loc_E5D3:
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_E36E
+		call	near ptr AI_JoinFormation_E36E
 		jmp	loc_E7FD
 
 loc_E5DE:
@@ -1468,7 +1476,7 @@ loc_E7F0:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_E8E5
+		call	near ptr AI_FleeHome_E8E5
 
 loc_E7FD:
 		add	sp, 4
@@ -1589,7 +1597,13 @@ off_E8D1	dw offset loc_E479
 
 ; Attributes: bp-based frame
 
-sub_E8E5		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-13. Fuite : [entité+357] = 0 (quitte la formation), [entité+355]
+; = 1 (ordres du script refusés, cf. Goal_SetObjective_C2A8), cible [entité+499] effacée,
+; [entité+309] = 2, comportement en cours abandonné (sub_103CB), point donné par
+; Expr_Node_Accessor_546E4 relevé de 1000 m (add 3E800h), lance la navigation.
+; ==============================================================================================
+AI_FleeHome_E8E5		proc far
 
 var_28		= dword ptr -28h
 var_24		= dword ptr -24h
@@ -1681,7 +1695,7 @@ loc_E96D:
 		mov	al, 1
 		leave
 		retf
-sub_E8E5		endp
+AI_FleeHome_E8E5		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1984,7 +1998,12 @@ sub_EB59		endp
 
 ; Attributes: bp-based frame
 
-sub_EC40		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-13. Moral de l'IA, même échelle qu'AI_ComputeMorale_CD4A de
+; STRIKE : score < 25 → 5, < 50 → 4, < 80 → 3, sinon 2. Les termes du score (sub_415CD,
+; sub_EF65, sub_EE87, sub_EE6F, sub_EFF3) ne sont pas lus.
+; ==============================================================================================
+AI_ComputeMorale_EC40		proc far
 
 var_A		= dword ptr -0Ah
 var_6		= word ptr -6
@@ -2163,7 +2182,7 @@ loc_EDC1:
 		pop	si
 		leave
 		retf
-sub_EC40		endp
+AI_ComputeMorale_EC40		endp
 
 ; ----------------------------------------------------------------------
 
@@ -2198,7 +2217,7 @@ loc_EDE5:
 		mov	[bp+var_6], dx
 		push	ax
 		push	dx
-		call	sub_41612
+		call	DamageSys_IsSeriouslyDamaged_41612
 		add	sp, 4
 		or	al, al
 		jz	short loc_EE0B
@@ -2350,7 +2369,7 @@ arg_0		= dword ptr  6
 		mov	[bp+var_1], 0
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_EC40
+		call	near ptr AI_ComputeMorale_EC40
 		add	sp, 4
 		cmp	al, 5
 		jnz	short loc_EF48

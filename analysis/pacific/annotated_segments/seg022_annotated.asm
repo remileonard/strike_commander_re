@@ -10,7 +10,17 @@ loc_B0C1:
 
 ; Attributes: bp-based frame
 
-sub_B0C4		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13 (structure). Réflexion de l'IA à chaque tick, équivalent
+; d'AI_TopLevelThink de STRIKE. Pose byte_776AB si l'avion est du camp 255. Puis réactions,
+; recherche de cible (Targeting_AcquireTarget_FF8B si [entité+495] ≤ 1), comportement en cours
+; [entité+13] (méthode +12), et enfin les objectifs : au sol (octet +32 du sous-objet de
+; l'avion) et après 5 images, Goal_ExecuteObjective_C9E4 directement ; sinon boucle sur les
+; emplacements GOAL de 8 octets à [entité+363] ('call dword ptr es:[bx+16Bh]'), appel avec la
+; seule entité, arrêt au premier gestionnaire qui renvoie non nul ou au premier emplacement
+; vide.
+; ==============================================================================================
+AI_TopLevelThink_B0C4		proc far
 
 var_72		= word ptr -72h
 var_70		= word ptr -70h
@@ -344,7 +354,7 @@ loc_B41E:
 		ja	short loc_B441
 		push	word ptr [bp+arg_0+2]
 		push	bx
-		call	sub_FF8B
+		call	Targeting_AcquireTarget_FF8B
 		add	sp, 4
 		mov	[bp+var_1], al
 
@@ -409,7 +419,7 @@ loc_B4D1:
 		pop	si
 		leave
 		retf
-sub_B0C4		endp
+AI_TopLevelThink_B0C4		endp
 
 ; ----------------------------------------------------------------------
 
@@ -632,7 +642,15 @@ sub_B4D4		endp
 
 ; Attributes: bp-based frame
 
-sub_B712		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Gestionnaire GOAL 5. Au plus toutes les 5 s (horloge [entité+226] en
+; secondes contre [entité+338]). Moral = AI_ComputeMorale_EC40 ; si 5 (panique), une chance
+; sur 36 (Math_RandomScale_56C2F(36) == 1) et [entité+309] ≠ 2 (pas déjà en fuite) : message
+; radio 8 au joueur (« Heading for home… » chez JESTER) puis AI_FleeHome_E8E5. Renvoie
+; toujours 0 : le gestionnaire GOAL suivant prend la main dans le même tick. Seule la branche
+; « fuite » de Goal_MoraleReaction_878F de STRIKE existe, sans test de camp.
+; ==============================================================================================
+Goal_MoraleReaction_B712		proc far
 
 var_2		= byte ptr -2
 var_1		= byte ptr -1
@@ -653,7 +671,7 @@ arg_0		= dword ptr  6
 		mov	es:[bx+152h], eax
 		push	word ptr [bp+arg_0+2]
 		push	bx
-		call	sub_EC40
+		call	AI_ComputeMorale_EC40
 		add	sp, 4
 		mov	[bp+var_2], al
 		cmp	[bp+var_2], 5
@@ -673,14 +691,14 @@ arg_0		= dword ptr  6
 		call	sub_EA0E
 		add	sp, 0Ah
 		push	large [bp+arg_0]
-		call	sub_E8E5
+		call	AI_FleeHome_E8E5
 		add	sp, 4
 
 loc_B792:
 		mov	al, [bp+var_1]
 		leave
 		retf
-sub_B712		endp
+Goal_MoraleReaction_B712		endp
 
 ; ----------------------------------------------------------------------
 
@@ -916,7 +934,7 @@ loc_B8BC:
 		push	4
 		push	word ptr [bp+var_4+2]
 		push	dx
-		call	sub_41595
+		call	DamageSys_PercentOfSystem_41595
 		add	sp, 6
 		mov	ah, 0
 		mov	dx, si
@@ -936,7 +954,7 @@ loc_B8FD:
 
 loc_B903:
 		push	large [bp+var_4]
-		call	sub_41595
+		call	DamageSys_PercentOfSystem_41595
 		add	sp, 6
 		mov	al, 1
 		jmp	short loc_B965
@@ -944,7 +962,7 @@ loc_B903:
 loc_B913:
 		push	3
 		push	large [bp+var_4]
-		call	sub_41595
+		call	DamageSys_PercentOfSystem_41595
 		add	sp, 6
 		mov	ah, 0
 		mov	dx, si
@@ -966,7 +984,7 @@ loc_B933:
 loc_B93B:
 		push	0
 		push	large [bp+var_4]
-		call	sub_41595
+		call	DamageSys_PercentOfSystem_41595
 		add	sp, 6
 		mov	ah, 0
 		mov	dx, si
@@ -998,7 +1016,15 @@ sub_B88D		endp
 
 ; Attributes: bp-based frame
 
-sub_B968		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Gestionnaire GOAL 4 : même rôle qu'AI_BehaviorStateMachine de STRIKE.
+; Comportement en cours [entité+13] : sa méthode +12, renvoie 1. Sinon cible = [entité+499] ou
+; sub_BEB6(entité, 1) ; sans cible renvoie 0. Tournoi sur la liste MVRS ([entité+443] éléments
+; de 5 octets à [entité+445] : pointeur du nœud + poids signé) : score = méthode +4 du nœud ;
+; si non nul, total = score + poids ± 1 (rand & 1), le plus grand gagne. Nœud de type 19 :
+; cible remplacée par [entité+497]. Lance le gagnant (méthode +8), renvoie 1.
+; ==============================================================================================
+AI_BehaviorStateMachine_B968		proc far
 
 var_1E		= word ptr -1Eh
 var_1C		= word ptr -1Ch
@@ -1153,13 +1179,20 @@ loc_BAC0:
 		pop	si
 		leave
 		retf
-sub_B968		endp
+AI_BehaviorStateMachine_B968		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_BAC4		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Reçoit l'entité et un objet (arg 4) dont la méthode +56 donne le
+; propriétaire. Objet de type 6, 8 ou 13 : [entité+506] = 1 (touché), type 8 ou 13 :
+; propriétaire rangé dans [entité+503]. Propriétaire d'un autre type : [entité+358] = 1. Si le
+; propriétaire est le joueur (word_7CADA) : byte_776A6 (camp 255) ou byte_776A7 (camp 1) ;
+; objet = propriétaire = joueur : byte_776AD.
+; ==============================================================================================
+AI_RecordHit_BAC4		proc far
 
 var_8		= byte ptr -8
 var_6		= word ptr -6
@@ -1288,7 +1321,7 @@ loc_BBAF:
 		pop	si
 		leave
 		retf
-sub_BAC4		endp
+AI_RecordHit_BAC4		endp
 
 ; ----------------------------------------------------------------------
 

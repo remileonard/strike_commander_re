@@ -460,7 +460,7 @@ arg_0		= dword ptr  6
 		or	ax, ax
 		jnz	short loc_A7AE
 		push	large [bp+arg_0]
-		call	sub_B0C4
+		call	AI_TopLevelThink_B0C4
 		add	sp, 4
 		jmp	short loc_A7D9
 

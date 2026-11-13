@@ -699,7 +699,12 @@ off_C8FE	dw offset loc_C76C
 
 ; Attributes: bp-based frame
 
-sub_C91C		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Gestionnaire GOAL 7 (propre à Pacific Strike). Si l'octet « en
+; formation » [entité+357] est non nul : Goal_FollowLeader_C93E et renvoie son résultat ;
+; sinon renvoie 0.
+; ==============================================================================================
+Goal_FollowLeaderInFormation_C91C		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -714,7 +719,7 @@ arg_2		= word ptr  8
 		push	bx
 		nop
 		push	cs
-		call	near ptr sub_C93E
+		call	near ptr Goal_FollowLeader_C93E
 		add	sp, 4
 		mov	dl, al
 
@@ -722,13 +727,21 @@ loc_C93A:
 		mov	al, dl
 		pop	bp
 		retf
-sub_C91C		endp
+Goal_FollowLeaderInFormation_C91C		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_C93E		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Gestionnaire GOAL 8 (propre à Pacific Strike). Chef = [entité+305],
+; rangé par l'ordre 179 (Goal_SetObjective_C2A8, cas loc_C676), que le chargeur de mission
+; passe avec l'allié par défaut du PART (seg125, push 0B3h). Pas de chef : renvoie 0. Chef
+; détruit (bit 5 de l'octet +146 de son objet monde) : chef effacé, renvoie 0. Sinon
+; sub_FA7E(entité), puis si [entité+353] = 0 : comportement en cours [entité+13] (méthode +12)
+; ou sub_D2AC(entité) (lit le chef, probable vol en formation, non lue) ; renvoie 1.
+; ==============================================================================================
+Goal_FollowLeader_C93E		proc far
 
 var_1		= byte ptr -1
 arg_0		= dword ptr  6
@@ -799,7 +812,7 @@ loc_C9DF:
 		mov	al, [bp+var_1]
 		leave
 		retf
-sub_C93E		endp
+Goal_FollowLeader_C93E		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1017,7 +1030,7 @@ loc_CB98:
 
 loc_CB9E:
 		push	large [bp+arg_0]
-		call	sub_B968
+		call	AI_BehaviorStateMachine_B968
 		add	sp, 4
 		mov	[bp+var_1], al
 		mov	ah, 0
@@ -1091,7 +1104,7 @@ loc_CC2C:
 
 loc_CC41:
 		push	large [bp+arg_0]
-		call	sub_B968
+		call	AI_BehaviorStateMachine_B968
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -1102,7 +1115,7 @@ loc_CC56:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_D001
+		call	near ptr Goal_WanderRandom_D001
 		jmp	loc_CB98
 
 loc_CC62:
@@ -1168,7 +1181,7 @@ loc_CCF8:
 
 loc_CD0D:
 		push	large [bp+arg_0]
-		call	sub_B968
+		call	AI_BehaviorStateMachine_B968
 
 loc_CD16:
 		add	sp, 4
@@ -1447,7 +1460,17 @@ off_CFE5	dw offset loc_CC00
 
 ; Attributes: bp-based frame
 
-sub_D001		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Gestionnaire GOAL 3 : même algorithme que Goal_WanderRandom de STRIKE.
+; Comportement en cours : sa méthode +12. Sinon, sauf si le nœud de navigation [entité+7] n'a
+; pas atteint son point (+26 = 0) et que le dernier comportement est le 21 : direction =
+; normalise(rand()%20000 − 10000, rand()%20000 − 10000, 0), point = moi + direction × 30000 m
+; dans le plan, altitude = moi + borne(sol sous moi + [entité+297] − mon altitude, ±1000 m) ;
+; vitesse = direction × [entité+301]. [entité+297] et [entité+301] sont posés par les ordres
+; 177 et 178 de Goal_SetObjective_C2A8. Lance le nœud [entité+192] (méthode +8). Renvoie
+; toujours 1. Différence relevée : pas de minuteur de 30 s (seulement 2 s, 200h).
+; ==============================================================================================
+Goal_WanderRandom_D001		proc far
 
 var_68		= dword ptr -68h
 var_64		= dword ptr -64h
@@ -1676,7 +1699,7 @@ loc_D2A7:
 		pop	si
 		leave
 		retf
-sub_D001		endp
+Goal_WanderRandom_D001		endp
 
 ; ----------------------------------------------------------------------
 

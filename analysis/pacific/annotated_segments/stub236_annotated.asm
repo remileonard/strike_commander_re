@@ -143,7 +143,7 @@ sub_72F9B	endp
 ; Attributes: thunk
 
 sub_72FA0	proc far
-		jmp	sub_84AA0
+		jmp	PilotProfile_GoalHandlerFromValue_84AA0
 sub_72FA0	endp
 
 ; ----------------------------------------------------------------------
