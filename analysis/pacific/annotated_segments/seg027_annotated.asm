@@ -595,7 +595,13 @@ sub_11C42		endp
 
 ; Attributes: bp-based frame
 
-sub_11CC8		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13 (fin). Lit les 10 octets d'ATRB vers le profil (+154, +156, +155, +157,
+; +153, +158, +159, +160, +161, +162 ; le 10e borné à 3) ; niveau [profil+152] = 2 si l'octet
+; 5 (+153) > 12, 1 si > 6, sinon 0. Avec le profil à l'entité +26 (sub_84340), ce niveau est
+; [entité+178], qui choisit la recherche de cible de Targeting_AcquireTarget_FF8B.
+; ==============================================================================================
+PilotProfile_LoadATRB_11CC8		proc far
 
 var_A		= word ptr -0Ah
 var_8		= byte ptr -8
@@ -743,7 +749,7 @@ loc_11E76:
 		pop	si
 		leave
 		retf
-sub_11CC8		endp
+PilotProfile_LoadATRB_11CC8		endp
 
 ; ----------------------------------------------------------------------
 

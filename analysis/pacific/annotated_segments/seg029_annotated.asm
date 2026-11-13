@@ -1709,7 +1709,7 @@ loc_146B5:
 		pop	cx
 		add	ax, 0Ch
 		push	ax
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	[bp+var_58], ax
 		cwd
@@ -2274,7 +2274,7 @@ loc_14D6A:
 		pop	cx
 		add	ax, 0Ch
 		push	ax
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	[bp+var_1C], ax
 		cwd
@@ -2340,7 +2340,7 @@ loc_14E25:
 		pop	cx
 		add	ax, 0Ch
 		push	ax
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	[bp+var_24], ax
 		cwd
@@ -2769,7 +2769,7 @@ loc_152BD:
 		pop	cx
 		add	ax, 0Ch
 		push	ax
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	[bp+var_1C], ax
 		cwd
@@ -2832,7 +2832,7 @@ loc_15371:
 		pop	cx
 		add	ax, 0Ch
 		push	ax
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	[bp+var_24], ax
 		cwd
@@ -3115,7 +3115,7 @@ loc_1560E:
 		pop	cx
 		add	ax, 0Ch
 		push	ax
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	[bp+var_8], ax
 		cwd

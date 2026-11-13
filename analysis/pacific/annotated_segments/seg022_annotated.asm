@@ -63,7 +63,7 @@ arg_0		= dword ptr  6
 		push	si
 		mov	[bp+var_1], 0
 		push	large [bp+arg_0]
-		call	sub_E3CA
+		call	AI_PlayerRadioCommand_E3CA
 		add	sp, 4
 		push	large [bp+arg_0]
 		call	sub_DE21
@@ -688,7 +688,7 @@ arg_0		= dword ptr  6
 		push	word_7CADA
 		push	word ptr [bp+arg_0+2]
 		push	bx
-		call	sub_EA0E
+		call	Radio_SendMessage_EA0E
 		add	sp, 0Ah
 		push	large [bp+arg_0]
 		call	AI_FleeHome_E8E5
@@ -1079,7 +1079,7 @@ loc_B9D0:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_BEB6
+		call	near ptr Targeting_SelectBestTarget_BEB6
 		add	sp, 6
 
 loc_B9DE:
@@ -1424,7 +1424,7 @@ loc_BCA8:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_BEB6
+		call	near ptr Targeting_SelectBestTarget_BEB6
 
 loc_BCB3:
 		add	sp, 6
@@ -1437,7 +1437,7 @@ loc_BCB6:
 		jz	short loc_BCD5
 		push	word ptr [bp+arg_0+2]
 		push	bx
-		call	sub_FA7E
+		call	Formation_UpdateTight_FA7E
 		add	sp, 4
 
 loc_BCD5:
@@ -1661,7 +1661,18 @@ sub_BD4C		endp
 
 ; Attributes: bp-based frame
 
-sub_BEB6		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Tournoi de cibles (avions, et objets au sol si arg 3 et arme du masque
+; 119). Au sol : 5, +20 si je ne suis pas chasseur, +20 (mode 19 et portée), +5 à moins de
+; 5000, +10 [497], +70 [499], +40 objectif [291] ; navire coulé : 0. Avion : mort → oublié ;
+; hors niveau 2 et sans [352], refusé si l'écart d'angle > 140 ; chasseur candidat +25, +10 à
+; moins de 2000, +50 de plus si angle < 30 ; candidat en fuite −25 ; si je ne suis pas
+; chasseur : −50 si écart > 90, −40 si mon rôle ≠ 0 ; si je suis chasseur et le candidat est
+; le joueur : + (rand % 10 − 5) si positif ; +2 à moins de 4000, +2 à moins de 45 000 ; +10
+; [503], +15 [501], +70 [499], +25 [291]. Rien et camp 255 : le joueur. Au sol → [497], avion
+; → [501].
+; ==============================================================================================
+Targeting_SelectBestTarget_BEB6		proc far
 
 var_18		= word ptr -18h
 var_16		= word ptr -16h
@@ -1978,7 +1989,7 @@ loc_C10A:
 		pop	cx
 		add	ax, 0Ch
 		push	ax
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	[bp+var_16], ax
 		cwd
@@ -2132,7 +2143,7 @@ loc_C293:
 		pop	si
 		leave
 		retf
-sub_BEB6		endp
+Targeting_SelectBestTarget_BEB6		endp
 
 ; ----------------------------------------------------------------------
 

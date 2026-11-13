@@ -4222,8 +4222,8 @@
 "sub_56937",
 "sub_56937"
 ],
-"new_name": "sub_A41D",
-"summary": ""
+"new_name": "Math_HeadingDelta_A41D",
+"summary": "far. LUE 2026-11-13. Écart de cap horizontal entre deux vecteurs, en degrés entiers, entre −180 et 180 (Math_ArcTan2_56937 sur les composantes 0 et 1)."
 },
 "sub_A520": {
 "segment": "seg021",
@@ -4638,8 +4638,8 @@
 "sub_39519",
 "sub_39519"
 ],
-"new_name": "sub_BEB6",
-"summary": ""
+"new_name": "Targeting_SelectBestTarget_BEB6",
+"summary": "far. LUE 2026-11-13. Tournoi de cibles (avions, et objets au sol si arg 3 et arme du masque 119). Au sol : 5, +20 si je ne suis pas chasseur, +20 (mode 19 et portée), +5 à moins de 5000, +10 [497], +70 [499], +40 objectif [291] ; navire coulé : 0. Avion : mort → oublié ; hors niveau 2 et sans [352], refusé si l'écart d'angle > 140 ; chasseur candidat +25, +10 à moins de 2000, +50 de plus si angle < 30 ; candidat en fuite −25 ; si je ne suis pas chasseur : −50 si écart > 90, −40 si mon rôle ≠ 0 ; si je suis chasseur et le candidat est le joueur : + (rand % 10 − 5) si positif ; +2 à moins de 4000, +2 à moins de 45 000 ; +10 [503], +15 [501], +70 [499], +25 [291]. Rien et camp 255 : le joueur. Au sol → [497], avion → [501]."
 },
 "sub_C29A": {
 "segment": "seg022",
@@ -4769,8 +4769,8 @@
 "sub_3664D",
 "sub_A41D"
 ],
-"new_name": "sub_D2AC",
-"summary": ""
+"new_name": "Goal_FormationFlight_D2AC",
+"summary": "far. LUE 2026-11-13. Vol vers le chef [entité+305] (GOAL 8). Comportement en cours : sa méthode +12. Chef détruit : effacé. N = nez du chef (méthode +60 de son objet, ligne +12). Hauteur du chef au-dessus du sol (sol sous le joueur dword_776A2 si le chef est le joueur, sinon Ground_HeightUnderPoint_3664D) > 333 m (cmp 14D00h) : nœud de formation [entité+204] (méthode +8) avec le chef, le poste [entité+310] (posé par l'ordre 180, défaut (300, 0, 0) m dans sub_84CE8) dont la 1re composante prend le signe du côté où se trouve l'avion (Math_HeadingDelta_A41D(N, moi − chef) < 0 → −|a|), et 2 s. Sinon (chef bas, au décollage) : nœud de navigation [entité+192] vers la position du chef + 1000 m d'altitude, vitesse N × 200 + vitesse du chef."
 },
 "sub_D5E4": {
 "segment": "seg023",
@@ -4981,8 +4981,8 @@
 "sub_39519",
 "sub_EA0E"
 ],
-"new_name": "sub_E3CA",
-"summary": ""
+"new_name": "AI_PlayerRadioCommand_E3CA",
+"summary": "far. LUE 2026-11-13. Ordres radio du joueur aux ailiers (codes 100 à 110 du chunk ASKS de PLAYER.IFF, file RadioQueue_RegisterMessage). Réponse envoyée au joueur (Radio_SendMessage_EA0E forcé). 100 Request status : AI_StatusReportMessage_EDC7 (3 si panique). 101, 102, 110 : réplique 0. 103 Break formation : en fuite 8 ; sans adversaire actif (byte_776A0 = 0) 1 et AI_LeaveFormation_E39C ; état 4 ou 29 : cet état ; sans canon et sans arme pour l'objectif : 5 ; sinon AI_LeaveFormation_E39C et 18 (byte_776BA) ou 1. 104 Form on me : en formation serrée ou en fuite : refus ; sinon 1 et AI_JoinFormation_E36E. 105 Attack target (cible désignée par le joueur, +95 → +14 de son objet) : en fuite 8 ; état 4 ou 29 ; cible au sol non amie : cible [499] = [497], [355] = 1, [309] = 3, 18 ; avion ennemi : [499] = [501], [355] = 1, [309] = 3, 1 ; quitte la formation ; sinon 0. 106 Return to base : accepté (8, AI_FleeHome_E8E5) si état 4 ou 29, désarmé ou panique ; sinon 0. 107 Help me : en fuite 8 ; état 4 ou 29 ; sans canon 5 ; word_7CAE2 non nul : il devient la cible ([499], [501], [309] = 3, [355] = 1, quitte la formation), réplique 0 ; sinon 14. 108 Begin radio silence : [354] = 1 après la réplique 1. 109 End radio silence : 1 et [354] = 0."
 },
 "sub_E8E5": {
 "segment": "seg024",
@@ -5006,8 +5006,8 @@
 "lines": 12,
 "type": "far",
 "calls": [],
-"new_name": "sub_E9FB",
-"summary": ""
+"new_name": "AI_DisciplineCheck_E9FB",
+"summary": "far. LUE 2026-11-13. [entité+356] = 1 et renvoie 1 : toujours discipliné (à comparer à AI_MoraleDisciplineCheck_CA93 de STRIKE)."
 },
 "sub_EA0E": {
 "segment": "seg024",
@@ -5020,8 +5020,8 @@
 "sub_81F",
 "sub_1B066"
 ],
-"new_name": "sub_EA0E",
-"summary": ""
+"new_name": "Radio_SendMessage_EA0E",
+"summary": "far. LUE EN PARTIE 2026-11-13. Envoie la réplique n au destinataire. Non forcée (dernier argument 0) : rien en silence radio ([entité+354]) ni si sub_EB59 refuse. Répliques 9 et 10 remplacées au hasard pour certaines voix (octet +109 = 33, 34 ou 35)."
 },
 "sub_EB59": {
 "segment": "seg024",
@@ -5063,8 +5063,8 @@
 "sub_EE6F",
 "sub_EFF3"
 ],
-"new_name": "sub_EDC7",
-"summary": ""
+"new_name": "AI_StatusReportMessage_EDC7",
+"summary": "far. LUE 2026-11-13. Réplique d'état, la dernière condition vraie l'emporte : 2 (A-OK), 6 si panique, 29 si sérieusement endommagé, 30 sans arme pour l'objectif, 5 sans munitions de canon, 4 si carburant < 55 % ([entité+360] = 1), 8 en fuite."
 },
 "sub_EE6F": {
 "segment": "seg024",
@@ -5075,8 +5075,8 @@
 "calls": [
 "sub_3F1D3"
 ],
-"new_name": "sub_EE6F",
-"summary": ""
+"new_name": "AI_HasGunAmmo_EE6F",
+"summary": "far. LUE 2026-11-13. WeaponStation_FindLoadedCompatible(emport, masque 64)."
 },
 "sub_EE87": {
 "segment": "seg024",
@@ -5088,8 +5088,8 @@
 "sub_3F1D3",
 "sub_3F1D3"
 ],
-"new_name": "sub_EE87",
-"summary": ""
+"new_name": "AI_HasWeaponForObjective_EE87",
+"summary": "far. LUE 2026-11-13. 1 sauf si l'avion n'est pas un chasseur (rôle JINF ≠ 3), que la cible d'objectif [entité+291] est au sol et qu'il n'a aucune arme des masques 31 et 32."
 },
 "sub_EF13": {
 "segment": "seg024",
@@ -5101,8 +5101,8 @@
 "sub_EC40",
 "sub_E9FB"
 ],
-"new_name": "sub_EF13",
-"summary": ""
+"new_name": "AI_IsPanicking_EF13",
+"summary": "far. LUE 2026-11-13. 1 si moral 5, adversaires actifs (byte_776B9) et AI_DisciplineCheck_E9FB = 0 ; cette dernière rend toujours 1, donc renvoie toujours 0."
 },
 "sub_EF4D": {
 "segment": "seg024",
@@ -5144,8 +5144,8 @@
 "lines": 26,
 "type": "far",
 "calls": [],
-"new_name": "sub_EFF3",
-"summary": ""
+"new_name": "AI_FuelPercent_EFF3",
+"summary": "far. LUE 2026-11-13. 100 × carburant (+138 de l'avion) / capacité (+134)."
 },
 "sub_F02F": {
 "segment": "seg024",
@@ -5167,8 +5167,8 @@
 "sub_59429",
 "sub_57715"
 ],
-"new_name": "sub_F02F",
-"summary": ""
+"new_name": "Formation_TightFollowKinematic_F02F",
+"summary": "far. LUE 2026-11-13 (calculs du milieu lus en survol). Formation serrée pilotée directement : s'accroche quand l'écart de cap entre mon nez et celui du chef est < 15°. Poste = champ formation du PART de l'avion (mots +51, +53, +55 de l'enregistrement, Expr_Node_Accessor_546E4 puis +33h), tourné par l'orientation du chef (sub_5A629) et ajouté à la position du chef. Tampon de 32 relevés [entité+342] (positions et orientations du chef, un relevé toutes les 32 unités de temps, compteur [entité+346], indice [entité+350]). Orientation de l'avion = moyenne des 32 orientations (Matrix_OrthonormalizeKeepRow1_59429, méthode +64 de l'objet monde) ; vitesse = moyenne des 32 directions × pas du chef, corrigée vers le poste, gain de rattrapage borné à 20 (50 si loin, > 750 m, et derrière) × dt (méthode +84) ; puis méthode +100. Renvoie accroché."
 },
 "sub_FA7E": {
 "segment": "seg024",
@@ -5182,8 +5182,8 @@
 "sub_D2AC",
 "sub_3C0"
 ],
-"new_name": "sub_FA7E",
-"summary": ""
+"new_name": "Formation_UpdateTight_FA7E",
+"summary": "far. LUE 2026-11-13. Formation serrée, appelée par Goal_FollowLeader_C93E. Permise si déjà accrochée ([entité+353]) ou si l'objet monde n'est pas déjà tenu (octet +94 = 0). Chef détruit : effacé. Si permise, en formation [entité+357], mon avion intact, chef en vol et pas de recherche de cible ([entité+495] = 0) : accroché = Formation_TightFollowKinematic_F02F. Accroché et pas de comportement en cours : Goal_FormationFlight_D2AC. Décroché : tampon [entité+342] libéré (sub_3C0). [entité+353] = accroché ; octet +94 de l'objet monde = accroché si permise."
 },
 "sub_FBB4": {
 "segment": "seg024",
@@ -5268,8 +5268,8 @@
 "calls": [
 "sub_BEB6"
 ],
-"new_name": "sub_10173",
-"summary": ""
+"new_name": "Targeting_RetaliateLevel0_10173",
+"summary": "far. LUE 2026-11-13. Niveau 0 ([entité+178]) : seulement si touché ([entité+506]) : Targeting_SelectBestTarget_BEB6(entité, 1)."
 },
 "sub_10197": {
 "segment": "seg025",
@@ -5280,8 +5280,8 @@
 "calls": [
 "sub_101C0"
 ],
-"new_name": "sub_10197",
-"summary": ""
+"new_name": "Targeting_RetaliateLevel1_10197",
+"summary": "far. LUE 2026-11-13. Niveau 1 : seulement si touché : Targeting_BestAttacker_101C0."
 },
 "sub_101C0": {
 "segment": "seg025",
@@ -5293,8 +5293,8 @@
 "sub_9D0A",
 "sub_1E7CF"
 ],
-"new_name": "sub_101C0",
-"summary": ""
+"new_name": "Targeting_BestAttacker_101C0",
+"summary": "near. LUE 2026-11-13. Niveau 2 (et 1 touché) : parmi les avions vivants d'un autre camp, non neutres, qui visent l'entité ([cible+501] = moi) ou de type d'entité 2 : score = 2000 − distance si < 2000, + (60 − écart d'angle) × 200 si l'angle < 60 ; moitié si l'avion candidat n'est pas un chasseur. Meilleur score."
 },
 "sub_10323": {
 "segment": "seg026",
@@ -5784,8 +5784,8 @@
 "sub_6D7BC",
 "sub_6DA92"
 ],
-"new_name": "sub_11CC8",
-"summary": ""
+"new_name": "PilotProfile_LoadATRB_11CC8",
+"summary": "far. LUE 2026-11-13 (fin). Lit les 10 octets d'ATRB vers le profil (+154, +156, +155, +157, +153, +158, +159, +160, +161, +162 ; le 10e borné à 3) ; niveau [profil+152] = 2 si l'octet 5 (+153) > 12, 1 si > 6, sinon 0. Avec le profil à l'entité +26 (sub_84340), ce niveau est [entité+178], qui choisit la recherche de cible de Targeting_AcquireTarget_FF8B."
 },
 "sub_11E79": {
 "segment": "seg027",

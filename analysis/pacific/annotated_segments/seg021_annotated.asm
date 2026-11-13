@@ -41,7 +41,11 @@ sub_A40D		endp
 
 ; Attributes: bp-based frame
 
-sub_A41D		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Écart de cap horizontal entre deux vecteurs, en degrés entiers, entre
+; −180 et 180 (Math_ArcTan2_56937 sur les composantes 0 et 1).
+; ==============================================================================================
+Math_HeadingDelta_A41D		proc far
 
 var_24		= dword ptr -24h
 var_20		= dword ptr -20h
@@ -154,7 +158,7 @@ loc_A51A:
 		pop	si
 		leave
 		retf
-sub_A41D		endp
+Math_HeadingDelta_A41D		endp
 
 ; ----------------------------------------------------------------------
 
@@ -269,7 +273,7 @@ arg_0		= dword ptr  6
 		push	9
 		push	word_7CADA
 		push	large [bp+arg_0]
-		call	sub_EA0E
+		call	Radio_SendMessage_EA0E
 		add	sp, 0Ah
 		les	bx, word ptr [bp+arg_0]
 		mov	bx, es:[bx+0Bh]
@@ -290,7 +294,7 @@ loc_A612:
 		push	0Ah
 		push	word_7CADA
 		push	large [bp+arg_0]
-		call	sub_EA0E
+		call	Radio_SendMessage_EA0E
 		add	sp, 0Ah
 
 loc_A626:
@@ -401,7 +405,7 @@ loc_A6E4:
 		or	al, al
 		jz	short loc_A740
 		push	large [bp+arg_0]
-		call	sub_FA7E
+		call	Formation_UpdateTight_FA7E
 		jmp	short loc_A749
 
 loc_A740:

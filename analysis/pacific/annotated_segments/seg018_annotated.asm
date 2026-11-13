@@ -235,7 +235,7 @@ var_3		= word ptr -3
 		jnz	short loc_97D1
 		push	60E1h
 		push	60EDh
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	word_7C835, ax
 		push	60E1h
@@ -1117,7 +1117,7 @@ loc_9D50:
 		sub	dword_7C7CB, eax
 		push	6093h
 		push	60EDh
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	word_7C7D3, ax
 		push	word_7C7C0
@@ -1128,7 +1128,7 @@ loc_9D50:
 		add	ax, 0Ch
 		push	ax
 		push	60EDh
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	word_7C7D5, ax
 		push	large dword_7C7CB
@@ -1180,7 +1180,7 @@ loc_9D50:
 		pop	cx
 		add	ax, 0Ch
 		push	ax
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	[bp+var_24], ax
 		cwd

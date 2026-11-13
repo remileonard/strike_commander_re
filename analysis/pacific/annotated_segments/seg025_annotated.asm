@@ -531,7 +531,7 @@ loc_FFF3:
 		push	word_7CADA
 		push	word ptr [bp+arg_0+2]
 		push	bx
-		call	sub_EA0E
+		call	Radio_SendMessage_EA0E
 		add	sp, 0Ah
 
 loc_1003D:
@@ -599,7 +599,7 @@ loc_100CB:
 		push	bx
 		nop
 		push	cs
-		call	sub_101C0
+		call	Targeting_BestAttacker_101C0
 		jmp	short loc_10100
 
 loc_100E1:
@@ -610,14 +610,14 @@ loc_100E1:
 		push	bx
 		nop
 		push	cs
-		call	near ptr sub_10197
+		call	near ptr Targeting_RetaliateLevel1_10197
 		jmp	short loc_10100
 
 loc_100F7:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_10173
+		call	near ptr Targeting_RetaliateLevel0_10173
 
 loc_10100:
 		add	sp, 4
@@ -673,7 +673,11 @@ Targeting_AcquireTarget_FF8B		endp
 
 ; Attributes: bp-based frame
 
-sub_10173		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Niveau 0 ([entité+178]) : seulement si touché ([entité+506]) :
+; Targeting_SelectBestTarget_BEB6(entité, 1).
+; ==============================================================================================
+Targeting_RetaliateLevel0_10173		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -687,7 +691,7 @@ arg_2		= word ptr  8
 		push	1
 		push	[bp+arg_2]
 		push	bx
-		call	sub_BEB6
+		call	Targeting_SelectBestTarget_BEB6
 		add	sp, 6
 		mov	dx, ax
 
@@ -695,13 +699,16 @@ loc_10193:
 		mov	ax, dx
 		pop	bp
 		retf
-sub_10173		endp
+Targeting_RetaliateLevel0_10173		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_10197		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Niveau 1 : seulement si touché : Targeting_BestAttacker_101C0.
+; ==============================================================================================
+Targeting_RetaliateLevel1_10197		proc far
 
 var_2		= word ptr -2
 arg_0		= dword ptr  6
@@ -721,20 +728,26 @@ loc_101AF:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	sub_101C0
+		call	Targeting_BestAttacker_101C0
 		add	sp, 4
 		mov	[bp+var_2], ax
 
 loc_101BE:
 		leave
 		retf
-sub_10197		endp
+Targeting_RetaliateLevel1_10197		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_101C0		proc near
+; ==============================================================================================
+; near. LUE 2026-11-13. Niveau 2 (et 1 touché) : parmi les avions vivants d'un autre camp, non
+; neutres, qui visent l'entité ([cible+501] = moi) ou de type d'entité 2 : score = 2000 −
+; distance si < 2000, + (60 − écart d'angle) × 200 si l'angle < 60 ; moitié si l'avion
+; candidat n'est pas un chasseur. Meilleur score.
+; ==============================================================================================
+Targeting_BestAttacker_101C0		proc near
 
 var_14		= word ptr -14h
 var_12		= word ptr -12h
@@ -905,5 +918,5 @@ loc_10306:
 loc_1031C:
 		mov	ax, [bp+var_2]
 		pop	di
-sub_101C0		endp
+Targeting_BestAttacker_101C0		endp
 seg025		ends

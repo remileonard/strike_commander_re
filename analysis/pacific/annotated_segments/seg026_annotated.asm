@@ -921,7 +921,7 @@ loc_10A59:
 		pop	cx
 		add	ax, 0Ch
 		push	ax
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	[bp+var_8], ax
 		mov	[bp+var_A], ax
@@ -1639,7 +1639,7 @@ loc_10F02:
 		pop	cx
 		add	ax, 0Ch
 		push	ax
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	[bp+var_4], ax
 		les	bx, word ptr [bp+arg_0]

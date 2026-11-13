@@ -1096,16 +1096,15 @@ parce que le segment de données n'est pas dans les fichiers annotés.
 - **L'octet « en formation » `[entité+357]`** (nom donné d'après ce qui le lit et l'écrit : la condition du `GOAL` 7,
   la fuite et le message « Here I come! » le remettent à 0) vaut 1 à la création de l'entité (`sub_84CE8`). Il est remis à 1 par
   `AI_JoinFormation_E36E` et mis à 0 par `AI_LeaveFormation_E39C`, par la fuite (`AI_FleeHome_E8E5`), par
-  `Targeting_AcquireTarget_FF8B` (voir 10.3) et par plusieurs cas de `sub_E3CA` (fonction pas encore nommée,
-  appelée en tête d'`AI_TopLevelThink_B0C4`, aiguillage sur 10 cas ; nom proposé : `AI_MessageDispatcher_E3CA`).
+  `Targeting_AcquireTarget_FF8B` (voir 10.3) et par les ordres radio du joueur (`AI_PlayerRadioCommand_E3CA`, § 10.5).
 
 **`GOAL` 8, `Goal_FollowLeader_C93E`** :
 ```
 si pas de chef : renvoie 0
 si le chef est détruit (bit 5 de l'octet +146 de son objet monde) : efface le chef, renvoie 0
-sub_FA7E(entité)
-si [entité+353] = 0 :
-    comportement en cours (méthode +12), ou sinon sub_D2AC(entité)   ; sub_D2AC lit le chef, non lue
+Formation_UpdateTight_FA7E(entité)          ; formation serrée, § 10.5
+si pas accroché ([entité+353] = 0) :
+    comportement en cours (méthode +12), ou sinon Goal_FormationFlight_D2AC(entité)
 renvoie 1
 ```
 **`GOAL` 7, `Goal_FollowLeaderInFormation_C91C`** : le `GOAL` 8, seulement si `[entité+357]` ≠ 0 ; sinon renvoie 0
@@ -1159,11 +1158,155 @@ Donc, avec `GOAL` 9 : un chasseur ne chasse pas tant qu'il est en formation ; un
 touché rompt la formation pour se défendre. « Touché » = `[entité+506]`, mis à 1 par `AI_RecordHit_BAC4` quand
 l'entité est atteinte par un objet de type 6 (avion), 8 ou 13.
 
+### 10.5 Suite de la lecture : formation, ordres radio, recherche de cible
+
+**Vol vers le chef, `Goal_FormationFlight_D2AC`** (appelée par le `GOAL` 8) :
+```
+si le chef vole à plus de 333 m au-dessus du sol :
+    nœud de formation (objet [entité+204], méthode +8) : chef, poste [entité+310], 2 s
+    ; poste : posé par l'ordre 180, (300, 0, 0) m à la création ; sa 1re composante (côté)
+    ; prend le signe du côté où se trouve déjà l'avion (Math_HeadingDelta_A41D)
+sinon :                                    ; chef au sol ou au décollage
+    navigation (objet [entité+192]) vers le chef + 1000 m d'altitude,
+    vitesse = nez du chef × 200 + vitesse du chef
+```
+Aucune mission ne contient les instructions 177 à 181 (relevé sur les 51 missions) : dans les données, le poste
+[entité+310] reste donc (300, 0, 0).
+
+**Formation serrée, `Formation_UpdateTight_FA7E` et `Formation_TightFollowKinematic_F02F`.** Appelée par le
+`GOAL` 8 avant le vol vers le chef. L'avion « s'accroche » quand il est en formation, intact, que le chef vole,
+qu'il ne cherche pas de cible et que l'écart de cap entre son nez et celui du chef est inférieur à 15°. Accroché
+(`[entité+353]` = 1), **il n'est plus piloté par le modèle de vol** : la fonction écrit directement son
+orientation et sa vitesse dans l'objet monde (méthodes +64 et +84).
+- orientation = moyenne des 32 dernières orientations du chef ;
+- vitesse = moyenne des 32 dernières directions du chef × le pas du chef, plus un rattrapage vers le poste, borné
+  à 20 × dt (50 × dt si le poste est à plus de 750 m et derrière) ;
+- **poste = champ « formation » du `PART` de l'avion** (JESTER : 200, −50, 20), tourné par l'orientation du chef.
+  C'est la seule lecture de ce champ trouvée : l'ordre `OP_SET_OBJ_FOLLOW_ALLY` le calcule aussi
+  (`MissionScript_CallNativeHandler_53B0B`, cas `loc_53E42`), mais `Goal_SetObjective_C2A8` ne le garde pas.
+
+**Ordres radio du joueur, `AI_PlayerRadioCommand_E3CA`.** Les codes sont ceux du chunk `ASKS` de `PLAYER.IFF`. Les
+répliques sont les numéros du chunk `MSGS` du pilote ; ici, les textes de JESTER :
+
+| Code | Ordre (`ASKS`) | Ce que fait l'ailier |
+|---|---|---|
+| 100 | Request status | réplique d'état (`AI_StatusReportMessage_EDC7`) |
+| 101 | Request Takeoff | réplique 0 « I don't think so. » |
+| 102 | Request Landing | réplique 0 |
+| 103 | Break formation | voir le bloc 103 sous le tableau |
+| 104 | Form on me | réplique 1 « Agreed. » et `AI_JoinFormation_E36E` ; refusé en fuite (8) ou déjà en formation serrée |
+| 105 | Attack target | voir le bloc 105 sous le tableau |
+| 106 | Return to base | accepté (8, `AI_FleeHome_E8E5`) seulement si carburant bas, très endommagé, désarmé ou en panique ; sinon 0 |
+| 107 | Help me! | voir le bloc 107 sous le tableau |
+| 108 | Begin radio silence | réplique 1, puis silence radio (`[entité+354]` = 1) |
+| 109 | End radio silence | réplique 1, fin du silence radio |
+| 110 | Request Barrier | réplique 0 |
+
+103 « Break formation » :
+```
+en fuite                                  : réplique 8
+pas d'adversaire actif (byte_776A0 = 0)   : réplique 1, AI_LeaveFormation_E39C
+réplique d'état 4 ou 29                   : cette réplique, reste en formation
+sans canon et sans arme pour l'objectif   : réplique 5, reste en formation
+sinon                                     : AI_LeaveFormation_E39C, réplique 18 (byte_776BA) ou 1
+```
+105 « Attack target » (cible désignée par le joueur) :
+```
+en fuite                    : réplique 8
+réplique d'état 4 ou 29     : cette réplique
+cible au sol, pas amie      : cible au sol, ordres du script refusés ([entité+355] = 1), réplique 18, quitte la formation
+avion du camp adverse       : cible aérienne, ordres du script refusés, réplique 1, quitte la formation
+sinon                       : réplique 0
+```
+107 « Help me! » :
+```
+en fuite                    : réplique 8
+réplique d'état 4 ou 29     : cette réplique
+sans munitions de canon     : réplique 5
+word_7CAE2 non nul          : il devient la cible aérienne, quitte la formation, réplique 0
+sinon                       : réplique 14 « Hey, what's wrong with you? »
+```
+Le rôle de `word_7CAE2` n'est pas établi. Les répliques de ces ordres sont envoyées même en silence radio (argument
+« forcé » de `Radio_SendMessage_EA0E`).
+
+**Réplique d'état, `AI_StatusReportMessage_EDC7`** (la dernière condition vraie l'emporte) :
+```
+2  A-OK
+6  en panique
+29 sérieusement endommagé (DamageSys_IsSeriouslyDamaged_41612)
+30 sans arme pour son objectif au sol
+5  sans munitions de canon
+4  carburant < 55 % (AI_FuelPercent_EFF3)
+8  en fuite
+```
+
+**Discipline et panique.** `AI_DisciplineCheck_E9FB` rend toujours 1. `AI_IsPanicking_EF13` (moral 5, adversaires
+actifs et indiscipliné) rend donc toujours 0 : les branches « panique » des ordres radio ne jouent jamais.
+
+**Recherche de cible selon le niveau du pilote.** `PilotProfile_LoadATRB_11CC8` calcule un niveau à partir du 5ᵉ
+octet d'`ATRB` : 2 s'il dépasse 12, 1 s'il dépasse 6, sinon 0 (recalculé selon l'option « Enemy AI » par
+`PilotProfile_RescaleSkillByEnemyAI_11E79`). Le profil est rangé à l'entité +26 (`sub_84340`), et le niveau est
+l'octet lu par `Targeting_AcquireTarget_FF8B` :
+
+| Niveau | Recherche |
+|---|---|
+| 0 | seulement si touché : `Targeting_SelectBestTarget_BEB6` |
+| 1 | seulement si touché : `Targeting_BestAttacker_101C0` |
+| 2 | toujours : `Targeting_BestAttacker_101C0` |
+
+`Targeting_BestAttacker_101C0` ne retient que les avions ennemis qui visent l'entité (ou dont l'octet +6 de
+l'entité vaut 2) à moins de 2000. Score :
+```
+2000 − distance
++ (60 − écart d'angle) × 200   si l'écart d'angle < 60°
+moitié                         si l'avion candidat n'est pas un chasseur
+```
+
+`Targeting_SelectBestTarget_BEB6` est aussi la recherche du `GOAL` 4 quand il n'a pas de cible. C'est un tournoi
+sur tous les avions et, si l'avion a une arme du masque 119, sur les objets au sol. Bonus pour un objet au sol :
+
+| Condition | Points |
+|---|---|
+| objet au sol | 5 |
+| je ne suis pas un chasseur | 20 |
+| à moins de 5000 | 5 |
+| cible sol déjà choisie (`[entité+497]`) | 10 |
+| cible imposée (`[entité+499]`) | 70 |
+| cible de l'ordre (`[entité+291]`) | 40 |
+
+Bonus pour un avion (refusé hors niveau 2 si l'écart d'angle dépasse 140°) :
+
+| Condition | Points |
+|---|---|
+| candidat chasseur | 25 |
+| candidat chasseur à moins de 2000 | 10 |
+| candidat chasseur à moins de 2000 et écart d'angle < 30° | 50 |
+| candidat en fuite | −25 |
+| je ne suis pas chasseur et écart de cap > 90° | −50 |
+| je ne suis pas chasseur et mon rôle n'est pas 0 | −40 |
+| je suis chasseur et le candidat est le joueur | rand % 10 − 5, si positif |
+| à moins de 4000 | 2 |
+| à moins de 45 000 | 2 |
+| a touché l'entité (`[entité+503]`) | 10 |
+| cible aérienne actuelle (`[entité+501]`) | 15 |
+| cible imposée (`[entité+499]`) | 70 |
+| cible de l'ordre (`[entité+291]`) | 25 |
+
+Rien trouvé et camp 255 : le joueur. Les distances sont comparées telles quelles à 2000, 4000, 5000 et 45 000
+(valeurs du jeu, unité non vérifiée).
+
+**Octet du `GOAL` 1 (`[entité+505]`).** Aucun accès trouvé dans les fichiers annotés ni dans `source/pacific.asm`,
+en dehors de son écriture par le chargeur et de sa remise à 0 à la création. Rôle non établi.
+
 ### 10.4 Pour libRealSpace
 
-`SCAIBrain::runGoalSelectors` traite 1 à 5 comme dans Strike Commander et saute 6 à 9 (`default: continue`) :
-pour Pacific Strike, il manque le suivi du chef (7 et 8) et la règle de recherche de cible (9) ; la valeur 5
-diffère (fuite seule), et 1 n'est pas un simple emplacement vide (rôle non établi).
+`SCAIBrain::runGoalSelectors` traite 1 à 5 comme dans Strike Commander et saute 6 à 9 (`default: continue`).
+Pour Pacific Strike, il manque :
+- le suivi du chef (7 et 8), avec la formation serrée pilotée directement et le poste lu dans le `PART` (§ 10.5) ;
+- la règle de recherche de cible (9) et le choix de la recherche selon le niveau du pilote (§ 10.5) ;
+- les ordres radio du joueur avec les répliques de Pacific Strike (§ 10.5).
+
+La valeur 5 diffère (fuite seule), et 1 n'est pas un simple emplacement vide (rôle non établi).
 
 ## 5. Rapport avec libRealSpace
 

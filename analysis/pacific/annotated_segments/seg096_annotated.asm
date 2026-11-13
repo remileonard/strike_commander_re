@@ -277,7 +277,7 @@ loc_3C9A7:
 		push	9
 		push	word_7CADA
 		push	large [bp+var_6]
-		call	sub_EA0E
+		call	Radio_SendMessage_EA0E
 		add	sp, 0Ah
 		jmp	short loc_3C9EF
 
@@ -299,7 +299,7 @@ loc_3C9D5:
 		push	0Ah
 		push	word_7CADA
 		push	large [bp+var_6]
-		call	sub_EA0E
+		call	Radio_SendMessage_EA0E
 		add	sp, 0Ah
 		push	si
 		push	cs

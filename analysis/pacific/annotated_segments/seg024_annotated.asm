@@ -72,7 +72,7 @@ loc_DB70:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 
 loc_DBB5:
@@ -103,7 +103,7 @@ loc_DBB5:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 		call	CRT_Rand
 		test	ax, 1
@@ -121,7 +121,7 @@ loc_DC0D:
 		push	bx
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 		les	bx, word ptr [bp+arg_0]
 		mov	byte ptr es:[bx+166h], 0
@@ -146,7 +146,7 @@ loc_DC35:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 		call	CRT_Rand
 		test	ax, 1
@@ -219,7 +219,7 @@ loc_DD0C:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 
 loc_DD2E:
@@ -236,7 +236,7 @@ loc_DD2E:
 		push	bx
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 		les	bx, word ptr [bp+arg_0]
 		mov	al, es:[bx+0B6h]
@@ -255,7 +255,7 @@ loc_DD66:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 
 loc_DD8B:
@@ -282,7 +282,7 @@ loc_DDA2:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 
 loc_DDC4:
@@ -322,7 +322,7 @@ loc_DDDB:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 
 loc_DE1E:
@@ -381,7 +381,7 @@ loc_DE6A:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 
 loc_DE7A:
@@ -398,7 +398,7 @@ loc_DE7A:
 		push	bx
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 
 loc_DEA3:
@@ -546,7 +546,7 @@ loc_DFEA:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 
 loc_DFFA:
@@ -687,7 +687,7 @@ loc_E07E:
 		push	ax
 		lea	ax, word ptr [bp+var_30]
 		push	ax
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	word ptr [bp+var_8], ax
 		cwd
@@ -698,7 +698,7 @@ loc_E07E:
 		push	ax
 		lea	ax, word ptr [bp+var_18]
 		push	ax
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	word ptr [bp+var_C+2], ax
 		cwd
@@ -770,7 +770,7 @@ loc_E185:
 		push	ax
 		lea	ax, word ptr [bp+var_30]
 		push	ax
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	[bp+var_4], ax
 		cwd
@@ -971,7 +971,23 @@ AI_LeaveFormation_E39C		endp
 
 ; Attributes: bp-based frame
 
-sub_E3CA		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Ordres radio du joueur aux ailiers (codes 100 à 110 du chunk ASKS de
+; PLAYER.IFF, file RadioQueue_RegisterMessage). Réponse envoyée au joueur
+; (Radio_SendMessage_EA0E forcé). 100 Request status : AI_StatusReportMessage_EDC7 (3 si
+; panique). 101, 102, 110 : réplique 0. 103 Break formation : en fuite 8 ; sans adversaire
+; actif (byte_776A0 = 0) 1 et AI_LeaveFormation_E39C ; état 4 ou 29 : cet état ; sans canon et
+; sans arme pour l'objectif : 5 ; sinon AI_LeaveFormation_E39C et 18 (byte_776BA) ou 1. 104
+; Form on me : en formation serrée ou en fuite : refus ; sinon 1 et AI_JoinFormation_E36E. 105
+; Attack target (cible désignée par le joueur, +95 → +14 de son objet) : en fuite 8 ; état 4
+; ou 29 ; cible au sol non amie : cible [499] = [497], [355] = 1, [309] = 3, 18 ; avion ennemi
+; : [499] = [501], [355] = 1, [309] = 3, 1 ; quitte la formation ; sinon 0. 106 Return to base
+; : accepté (8, AI_FleeHome_E8E5) si état 4 ou 29, désarmé ou panique ; sinon 0. 107 Help me :
+; en fuite 8 ; état 4 ou 29 ; sans canon 5 ; word_7CAE2 non nul : il devient la cible ([499],
+; [501], [309] = 3, [355] = 1, quitte la formation), réplique 0 ; sinon 14. 108 Begin radio
+; silence : [354] = 1 après la réplique 1. 109 End radio silence : 1 et [354] = 0.
+; ==============================================================================================
+AI_PlayerRadioCommand_E3CA		proc far
 
 var_1C		= word ptr -1Ch
 var_1A		= word ptr -1Ah
@@ -1035,13 +1051,13 @@ loc_E42B:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_E9FB
+		call	near ptr AI_DisciplineCheck_E9FB
 		add	sp, 4
 		mov	[bp+var_5], al
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EDC7
+		call	near ptr AI_StatusReportMessage_EDC7
 		add	sp, 4
 		mov	[bp+var_6], al
 		les	bx, word ptr [bp+arg_0]
@@ -1067,7 +1083,7 @@ loc_E479:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EF13
+		call	near ptr AI_IsPanicking_EF13
 		add	sp, 4
 		or	al, al
 		jnz	short loc_E48C
@@ -1095,7 +1111,7 @@ loc_E4AB:
 		push	bx
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 		les	bx, word ptr [bp+arg_0]
 		mov	byte ptr es:[bx+162h], 1
@@ -1154,7 +1170,7 @@ loc_E537:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EE6F
+		call	near ptr AI_HasGunAmmo_EE6F
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -1162,7 +1178,7 @@ loc_E537:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EE87
+		call	near ptr AI_HasWeaponForObjective_EE87
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -1189,7 +1205,7 @@ loc_E583:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EF13
+		call	near ptr AI_IsPanicking_EF13
 		add	sp, 4
 		or	al, al
 		jnz	short loc_E596
@@ -1202,7 +1218,7 @@ loc_E596:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 		jmp	loc_E48C
 
@@ -1237,7 +1253,7 @@ loc_E5DE:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EF13
+		call	near ptr AI_IsPanicking_EF13
 		add	sp, 4
 		or	al, al
 		jz	short loc_E605
@@ -1248,7 +1264,7 @@ loc_E5DE:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 		jmp	short loc_E5D3
 
@@ -1299,7 +1315,7 @@ loc_E658:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 		jmp	loc_E8BA
 
@@ -1307,7 +1323,7 @@ loc_E668:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EF13
+		call	near ptr AI_IsPanicking_EF13
 		add	sp, 4
 		or	al, al
 		jz	short loc_E684
@@ -1447,7 +1463,7 @@ loc_E7AD:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EE6F
+		call	near ptr AI_HasGunAmmo_EE6F
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -1455,7 +1471,7 @@ loc_E7AD:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EE87
+		call	near ptr AI_HasWeaponForObjective_EE87
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -1465,7 +1481,7 @@ loc_E7DD:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EF13
+		call	near ptr AI_IsPanicking_EF13
 		add	sp, 4
 		or	al, al
 		jnz	short loc_E7F0
@@ -1506,7 +1522,7 @@ loc_E82A:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EE6F
+		call	near ptr AI_HasGunAmmo_EE6F
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -1570,7 +1586,7 @@ loc_E8BA:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 
 loc_E8CD:
@@ -1578,9 +1594,9 @@ loc_E8CD:
 		pop	si
 		leave
 		retf
-sub_E3CA		endp
+AI_PlayerRadioCommand_E3CA		endp
 
-; START OF FUNCTION CHUNK FOR sub_E3CA
+; START OF FUNCTION CHUNK FOR AI_PlayerRadioCommand_E3CA
 off_E8D1	dw offset loc_E479
 		dw offset loc_E8B6
 		dw offset loc_E8B6
@@ -1591,7 +1607,7 @@ off_E8D1	dw offset loc_E479
 		dw offset loc_E803
 		dw offset loc_E496
 		dw offset loc_E4C8
-; END OF FUNCTION CHUNK FOR sub_E3CA
+; END OF FUNCTION CHUNK FOR AI_PlayerRadioCommand_E3CA
 
 ; ----------------------------------------------------------------------
 
@@ -1701,7 +1717,11 @@ AI_FleeHome_E8E5		endp
 
 ; Attributes: bp-based frame
 
-sub_E9FB		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. [entité+356] = 1 et renvoie 1 : toujours discipliné (à comparer à
+; AI_MoraleDisciplineCheck_CA93 de STRIKE).
+; ==============================================================================================
+AI_DisciplineCheck_E9FB		proc far
 
 arg_0		= word ptr  6
 
@@ -1712,13 +1732,18 @@ arg_0		= word ptr  6
 		mov	al, es:[bx+164h]
 		pop	bp
 		retf
-sub_E9FB		endp
+AI_DisciplineCheck_E9FB		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_EA0E		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-13. Envoie la réplique n au destinataire. Non forcée (dernier
+; argument 0) : rien en silence radio ([entité+354]) ni si sub_EB59 refuse. Répliques 9 et 10
+; remplacées au hasard pour certaines voix (octet +109 = 33, 34 ou 35).
+; ==============================================================================================
+Radio_SendMessage_EA0E		proc far
 
 var_6		= byte ptr -6
 var_4		= word ptr -4
@@ -1862,9 +1887,9 @@ loc_EB2E:
 loc_EB37:
 		leave
 		retf
-sub_EA0E		endp
+Radio_SendMessage_EA0E		endp
 
-; START OF FUNCTION CHUNK FOR sub_EA0E
+; START OF FUNCTION CHUNK FOR Radio_SendMessage_EA0E
 off_EB39	dw offset loc_EAB3
 		dw offset loc_EAB3
 		dw offset loc_EAB3
@@ -1881,7 +1906,7 @@ off_EB49	dw offset loc_EA8E
 		dw offset loc_EA9A
 		dw offset loc_EAA0
 		dw offset loc_EAA0
-; END OF FUNCTION CHUNK FOR sub_EA0E
+; END OF FUNCTION CHUNK FOR Radio_SendMessage_EA0E
 
 ; ----------------------------------------------------------------------
 
@@ -2099,7 +2124,7 @@ loc_ECED:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EE87
+		call	near ptr AI_HasWeaponForObjective_EE87
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -2107,7 +2132,7 @@ loc_ECED:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EE6F
+		call	near ptr AI_HasGunAmmo_EE6F
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -2120,7 +2145,7 @@ loc_ED3E:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EFF3
+		call	near ptr AI_FuelPercent_EFF3
 		add	sp, 4
 		movsx	eax, ax
 		mov	[bp+var_A], eax
@@ -2144,7 +2169,7 @@ loc_ED5B:
 		push	word ptr [bp+arg_0+2]
 		push	bx
 		push	cs
-		call	near ptr sub_EA0E
+		call	near ptr Radio_SendMessage_EA0E
 		add	sp, 0Ah
 		les	bx, word ptr [bp+arg_0]
 		mov	byte ptr es:[bx+168h], 1
@@ -2188,7 +2213,12 @@ AI_ComputeMorale_EC40		endp
 
 ; Attributes: bp-based frame
 
-sub_EDC7		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Réplique d'état, la dernière condition vraie l'emporte : 2 (A-OK), 6 si
+; panique, 29 si sérieusement endommagé, 30 sans arme pour l'objectif, 5 sans munitions de
+; canon, 4 si carburant < 55 % ([entité+360] = 1), 8 en fuite.
+; ==============================================================================================
+AI_StatusReportMessage_EDC7		proc far
 
 var_6		= word ptr -6
 var_4		= word ptr -4
@@ -2202,7 +2232,7 @@ arg_0		= dword ptr  6
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EF13
+		call	near ptr AI_IsPanicking_EF13
 		add	sp, 4
 		or	al, al
 		jz	short loc_EDE5
@@ -2227,7 +2257,7 @@ loc_EE0B:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EE87
+		call	near ptr AI_HasWeaponForObjective_EE87
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -2238,7 +2268,7 @@ loc_EE21:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EE6F
+		call	near ptr AI_HasGunAmmo_EE6F
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -2249,7 +2279,7 @@ loc_EE37:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_EFF3
+		call	near ptr AI_FuelPercent_EFF3
 		add	sp, 4
 		cmp	ax, 37h
 		jge	short loc_EE4C
@@ -2271,13 +2301,16 @@ loc_EE6A:
 		mov	al, [bp+var_2]
 		leave
 		retf
-sub_EDC7		endp
+AI_StatusReportMessage_EDC7		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_EE6F		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. WeaponStation_FindLoadedCompatible(emport, masque 64).
+; ==============================================================================================
+AI_HasGunAmmo_EE6F		proc far
 
 arg_0		= word ptr  6
 
@@ -2290,13 +2323,17 @@ arg_0		= word ptr  6
 		add	sp, 6
 		pop	bp
 		retf
-sub_EE6F		endp
+AI_HasGunAmmo_EE6F		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_EE87		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. 1 sauf si l'avion n'est pas un chasseur (rôle JINF ≠ 3), que la cible
+; d'objectif [entité+291] est au sol et qu'il n'a aucune arme des masques 31 et 32.
+; ==============================================================================================
+AI_HasWeaponForObjective_EE87		proc far
 
 var_6		= word ptr -6
 var_4		= word ptr -4
@@ -2352,13 +2389,17 @@ loc_EF0E:
 		mov	al, [bp+var_1]
 		leave
 		retf
-sub_EE87		endp
+AI_HasWeaponForObjective_EE87		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_EF13		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. 1 si moral 5, adversaires actifs (byte_776B9) et
+; AI_DisciplineCheck_E9FB = 0 ; cette dernière rend toujours 1, donc renvoie toujours 0.
+; ==============================================================================================
+AI_IsPanicking_EF13		proc far
 
 var_1		= byte ptr -1
 arg_0		= dword ptr  6
@@ -2377,7 +2418,7 @@ arg_0		= dword ptr  6
 		jz	short loc_EF48
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_E9FB
+		call	near ptr AI_DisciplineCheck_E9FB
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -2388,7 +2429,7 @@ loc_EF48:
 		mov	al, [bp+var_1]
 		leave
 		retf
-sub_EF13		endp
+AI_IsPanicking_EF13		endp
 
 ; ----------------------------------------------------------------------
 
@@ -2486,7 +2527,10 @@ sub_EF65		endp
 
 ; Attributes: bp-based frame
 
-sub_EFF3		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. 100 × carburant (+138 de l'avion) / capacité (+134).
+; ==============================================================================================
+AI_FuelPercent_EFF3		proc far
 
 var_4		= dword ptr -4
 arg_0		= word ptr  6
@@ -2511,13 +2555,25 @@ arg_0		= word ptr  6
 		mov	ax, word ptr [bp+var_4]
 		leave
 		retf
-sub_EFF3		endp
+AI_FuelPercent_EFF3		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_F02F		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13 (calculs du milieu lus en survol). Formation serrée pilotée directement
+; : s'accroche quand l'écart de cap entre mon nez et celui du chef est < 15°. Poste = champ
+; formation du PART de l'avion (mots +51, +53, +55 de l'enregistrement,
+; Expr_Node_Accessor_546E4 puis +33h), tourné par l'orientation du chef (sub_5A629) et ajouté
+; à la position du chef. Tampon de 32 relevés [entité+342] (positions et orientations du chef,
+; un relevé toutes les 32 unités de temps, compteur [entité+346], indice [entité+350]).
+; Orientation de l'avion = moyenne des 32 orientations (Matrix_OrthonormalizeKeepRow1_59429,
+; méthode +64 de l'objet monde) ; vitesse = moyenne des 32 directions × pas du chef, corrigée
+; vers le poste, gain de rattrapage borné à 20 (50 si loin, > 750 m, et derrière) × dt
+; (méthode +84) ; puis méthode +100. Renvoie accroché.
+; ==============================================================================================
+Formation_TightFollowKinematic_F02F		proc far
 
 var_D4		= dword ptr -0D4h
 var_D0		= dword ptr -0D0h
@@ -2672,7 +2728,7 @@ arg_2		= word ptr  8
 		lea	ax, word ptr [bp+var_80]
 		push	ax
 		push	60EDh
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	[bp+var_14], ax
 		cwd
@@ -2751,7 +2807,7 @@ loc_F1A0:
 		push	ax
 		lea	ax, word ptr [bp+var_5C]
 		push	ax
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		mov	[bp+var_32], ax
 		cwd
@@ -3401,13 +3457,22 @@ loc_FA78:
 		pop	si
 		leave
 		retf
-sub_F02F		endp
+Formation_TightFollowKinematic_F02F		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_FA7E		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Formation serrée, appelée par Goal_FollowLeader_C93E. Permise si déjà
+; accrochée ([entité+353]) ou si l'objet monde n'est pas déjà tenu (octet +94 = 0). Chef
+; détruit : effacé. Si permise, en formation [entité+357], mon avion intact, chef en vol et
+; pas de recherche de cible ([entité+495] = 0) : accroché =
+; Formation_TightFollowKinematic_F02F. Accroché et pas de comportement en cours :
+; Goal_FormationFlight_D2AC. Décroché : tampon [entité+342] libéré (sub_3C0). [entité+353] =
+; accroché ; octet +94 de l'objet monde = accroché si permise.
+; ==============================================================================================
+Formation_UpdateTight_FA7E		proc far
 
 var_2		= byte ptr -2
 var_1		= byte ptr -1
@@ -3489,7 +3554,7 @@ loc_FAF7:
 		push	[bp+arg_2]
 		push	bx
 		push	cs
-		call	near ptr sub_F02F
+		call	near ptr Formation_TightFollowKinematic_F02F
 		add	sp, 4
 		mov	[bp+var_1], al
 
@@ -3501,7 +3566,7 @@ loc_FB40:
 		jnz	short loc_FB5D
 		push	[bp+arg_2]
 		push	bx
-		call	sub_D2AC
+		call	Goal_FormationFlight_D2AC
 		add	sp, 4
 
 loc_FB5D:
@@ -3536,7 +3601,7 @@ loc_FBAE:
 		pop	si
 		leave
 		retf
-sub_FA7E		endp
+Formation_UpdateTight_FA7E		endp
 
 ; ----------------------------------------------------------------------
 

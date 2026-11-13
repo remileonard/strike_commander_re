@@ -267,7 +267,7 @@ loc_C560:
 		push	ax
 		push	[bp+arg_6]
 		push	large [bp+arg_0]
-		call	sub_EA0E
+		call	Radio_SendMessage_EA0E
 		add	sp, 0Ah
 		jmp	loc_C6C2
 
@@ -784,7 +784,7 @@ loc_C95A:
 
 loc_C9A0:
 		push	large [bp+arg_0]
-		call	sub_FA7E
+		call	Formation_UpdateTight_FA7E
 		add	sp, 4
 		les	bx, word ptr [bp+arg_0]
 		mov	al, es:[bx+161h]
@@ -803,7 +803,7 @@ loc_C9D3:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_D2AC
+		call	near ptr Goal_FormationFlight_D2AC
 
 loc_C9DC:
 		add	sp, 4
@@ -1705,7 +1705,18 @@ Goal_WanderRandom_D001		endp
 
 ; Attributes: bp-based frame
 
-sub_D2AC		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Vol vers le chef [entité+305] (GOAL 8). Comportement en cours : sa
+; méthode +12. Chef détruit : effacé. N = nez du chef (méthode +60 de son objet, ligne +12).
+; Hauteur du chef au-dessus du sol (sol sous le joueur dword_776A2 si le chef est le joueur,
+; sinon Ground_HeightUnderPoint_3664D) > 333 m (cmp 14D00h) : nœud de formation [entité+204]
+; (méthode +8) avec le chef, le poste [entité+310] (posé par l'ordre 180, défaut (300, 0, 0) m
+; dans sub_84CE8) dont la 1re composante prend le signe du côté où se trouve l'avion
+; (Math_HeadingDelta_A41D(N, moi − chef) < 0 → −|a|), et 2 s. Sinon (chef bas, au décollage) :
+; nœud de navigation [entité+192] vers la position du chef + 1000 m d'altitude, vitesse N ×
+; 200 + vitesse du chef.
+; ==============================================================================================
+Goal_FormationFlight_D2AC		proc far
 
 var_78		= dword ptr -78h
 var_74		= dword ptr -74h
@@ -1905,7 +1916,7 @@ loc_D453:
 		push	ax
 		lea	ax, word ptr [bp+var_3C]
 		push	ax
-		call	sub_A41D
+		call	Math_HeadingDelta_A41D
 		add	sp, 4
 		or	ax, ax
 		jge	short loc_D4AB
@@ -2002,7 +2013,7 @@ loc_D5E0:
 		pop	si
 		leave
 		retf
-sub_D2AC		endp
+Goal_FormationFlight_D2AC		endp
 
 ; ----------------------------------------------------------------------
 
