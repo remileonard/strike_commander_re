@@ -294,6 +294,7 @@ strike_commander_re/
 │   │                                  ; PACIFIC_MISSION_PRLH-M1.html : 1re mission (carte, objets, scènes, scripts, victoire,
 │   │                                  écarts de libRealSpace) — tools/ps_mission_dump.py, tools/ps_mission_map.py
 │   │                                  ; DEBUG_A_TRAITER.md : points à traiter pour déboguer Pacific Strike dans libRealSpace
+│   │                                  ; OUTILS_MISSION.md : outils du rapport de mission (ps_mission_dump.py, ps_mission_map.py)
 │   ├── wings/                       analyse de WINGS_OF.EXE (Wings of Glory, --exe wings) : README.md, noms repris de
 │   │                                  PACIFIC, STRIKE et OPTEST (match_functions.py), annotated_segments/ ;
 │   │                                  WINGS_OF_GLORY.html = version illustrée (archives, déroulement, GLORY.EXE, terrain, missions)
@@ -398,6 +399,8 @@ strike_commander_re/
 └── tools/
     ├── exe_paths.py                 chemins par exécutable ; tous les outils ci-dessous
     │                                  prennent --exe optest (défaut strike)
+    ├── ps_mission_dump.py           mission de Pacific Strike → texte et JSON (zones, points, objets, scènes, programmes) ;
+    │                                  ps_mission_map.py : cartes PNG (terrain, zones, objets, trajets) — analysis/pacific/OUTILS_MISSION.md
     ├── ps_conv_dump.py              conversations de Pacific Strike (CONV.PAK compressé) → texte ; pkware_dcl.py :
     │                                  décompression PKWARE DCL (entrées de marque 3 des PAK de PACIFIC.DAT, via sc_data)
     ├── conv_dump.py                 lecteur des scripts de conversation (CONV.PAK) → texte ;
