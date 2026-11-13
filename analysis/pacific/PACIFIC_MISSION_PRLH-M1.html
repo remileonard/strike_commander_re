@@ -776,18 +776,7 @@ par le programme 9. Cas le plus courant (le joueur va au Nevada dès le décolla
 <p>À ajouter : instruction 130 = chercher la scène de la zone n, « égal » si elle est active (octet 0 du chunk
 <code>SCNE</code>, mis à 1 par <code>OP_ACTIVATE_SCENE</code>, à 0 par <code>OP_DEACTIVATE_SCENE</code>), « pas égal » sinon.</p>
 
-<h3 class="bug">9.2 Activation d'une scène jouée une seule fois</h3>
-<p><code>SCMissionScene::activate</code> sort tout de suite si <code>has_been_activated</code> est posé. Dans le jeu,
-<code>Scene_TriggerActivation_54AB2</code> fait apparaître les objets manquants et lance le script d'activation à
-<b>chaque</b> changement de scène (§ 4). Effets :</p>
-<ul>
-<li>programme 4 : au premier passage dans la zone 0 (au début), 280 n'est pas posé, rien ne se passe ; au retour du joueur
-le jeu fait apparaître les VAL n°5 et 6, libRealSpace jamais. La variable 21 n'atteint pas 3 : la tour ne dit jamais
-« Wildcats, return to base and land. » ;</li>
-<li>programme 14 : la branche « deuxième entrée » (n°30 ou 31 selon la variable 0) n'est jamais jouée.</li>
-</ul>
-
-<h3 class="bug">9.3 Position d'un objet activé par <code>OP_ACTIVATE_OBJ</code></h3>
+<h3 class="bug">9.2 Position d'un objet activé par <code>OP_ACTIVATE_OBJ</code></h3>
 <p><code>SCMissionActors::activateTarget</code> ajoute au décalage d'un objet placé dans une zone la position du
 <b>premier <code>SPOT</code> de cette zone</b>, et le centre de la zone seulement s'il n'y en a pas. Dans
 <code>STRIKE.EXE</code>, la position d'un <code>PART</code> est décalage + centre de la zone (<code>AreaRelPos_ToWorld_50EEB</code>
@@ -797,23 +786,23 @@ sur <code>part+0x1D</code>) ; l'équivalent de <code>PACIFIC.EXE</code>
 <code>SPOT</code> de la zone est le 4 : ils apparaissent 1600 m plus à l'est et 2000 m plus haut, par exemple n°29 en
 (14500, 4000, 35400) au lieu de (12900, 2000, 35400).</p>
 
-<h3>9.4 Ordre des scripts de sortie en fin de mission</h3>
+<h3>9.3 Ordre des scripts de sortie en fin de mission</h3>
 <p><code>SCMission::finishScenes</code> lance la scène globale puis la scène courante ; le jeu fait l'inverse
 (<code>sub_BE97E</code>, § 7). Sans effet dans <code>PRLH-M1</code> : les scènes 1 à 3 n'ont pas de script de sortie.</p>
 
-<h3>9.5 Fin de mission</h3>
+<h3>9.4 Fin de mission</h3>
 <p>Dans libRealSpace, la mission se termine à l'atterrissage (<code>setExitCode(1)</code>) ou par la touche de fin de mission
 (<code>SCStrike</code> : code 2 si l'avion est écrasé, 1 sinon). <code>OP_SET_MESSAGE</code> 20, 21 et 22 ne terminent la
 mission que pour un acteur <code>STRIBASE</code> (<code>SCMissionActorsStrikeBase::setMessage</code>) ; il n'y en a pas dans
 <code>PRLH-M1</code>, ces messages y sont des messages radio de la tour et du Nevada. Ce qui termine la mission dans
 <code>PACIFIC.EXE</code> (destruction du joueur, éjection, atterrissage ailleurs qu'à Ewa) reste à lire.</p>
 
-<h3>9.6 Numéros des objets du terrain</h3>
+<h3>9.5 Numéros des objets du terrain</h3>
 <p>Les objets du terrain reçoivent <code>actor_id</code> = nombre d'acteurs créés, soit 47, 48… dans cette mission. Le
 numéro 47 est aussi celui de blue10 (rang 46). Une instruction qui désigne l'objet n°47 (aucune dans <code>PRLH-M1</code>)
 peut trouver l'objet du terrain.</p>
 
-<h3>9.7 À suivre au débogueur</h3>
+<h3>9.6 À suivre au débogueur</h3>
 <div class="tablewrap"><table>
 <tr><th>Quoi</th><th>Où regarder</th><th>Valeur attendue (jeu)</th></tr>
 <tr><td>variable 3</td><td>programme 2</td><td>65 → 66 après 60 s ; 67 quand un VAL n°1, 2 ou 3 abattu porte la variable 1 à 2 ; 69 à l'arrivée au Nevada si la vague n'était pas lancée, sinon 68 puis 69 après 40 s</td></tr>

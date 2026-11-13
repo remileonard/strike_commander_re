@@ -13,14 +13,13 @@ a été lue), l'effet sur `PRLH-M1`, et ce qu'il faut regarder au débogueur. Ri
 |---|---|---|---|
 | 1 | Avions placés dans une zone, simulés avant leur activation | VAL n°2 détruit au chargement, variable 1 faussée | haute |
 | 2 | `OP_IS_SCENE_ACTIVE` absent de `PSProg` | torpilleurs n°30 et 31 jamais créés : mission impossible à gagner dans le cas courant | haute |
-| 3 | Activation d'une scène jouée une seule fois | VAL n°5 et 6 jamais créés, message de la tour « return to base » jamais joué | haute |
-| 4 | Messages radio jamais affichés en Pacific Strike | aucun message radio (tour, Nevada, ailiers) | haute |
-| 5 | Plancher de la zone 0 au-dessus de la piste | la scène 1 peut ne s'activer qu'au décollage | à vérifier |
-| 6 | `activateTarget` place l'objet sur le premier `SPOT` de la zone | torpilleurs n°29 à 32 décalés | moyenne |
-| 7 | Ordre des scripts de sortie en fin de mission | aucun dans PRLH-M1 | basse |
-| 8 | Fin de mission | à lire dans PACIFIC.EXE | ouvert |
-| 9 | Numéros des objets du terrain | aucun dans PRLH-M1 | basse |
-| 10 | Profil ou fichier objet introuvable | silence ou plantage | à vérifier |
+| 3 | Messages radio jamais affichés en Pacific Strike | aucun message radio (tour, Nevada, ailiers) | haute |
+| 4 | Plancher de la zone 0 au-dessus de la piste | la scène 1 peut ne s'activer qu'au décollage | à vérifier |
+| 5 | `activateTarget` place l'objet sur le premier `SPOT` de la zone | torpilleurs n°29 à 32 décalés | moyenne |
+| 6 | Ordre des scripts de sortie en fin de mission | aucun dans PRLH-M1 | basse |
+| 7 | Fin de mission | à lire dans PACIFIC.EXE | ouvert |
+| 8 | Numéros des objets du terrain | aucun dans PRLH-M1 | basse |
+| 9 | Profil ou fichier objet introuvable | silence ou plantage | à vérifier |
 
 ---
 
@@ -126,32 +125,7 @@ abattu, puis plus rien. La variable 0 reste à 3 ; il en faut 6 : le drapeau 401
 
 ---
 
-## 3. Activation d'une scène jouée une seule fois
-
-**Constat.** `SCMissionScene::activate` sort tout de suite si `has_been_activated` est posé.
-
-**Dans le jeu.** `Scene_DetectAndActivateChange_54BCF` appelle `Scene_TriggerActivation_54AB2` à chaque changement de
-scène courante ; cette fonction fait apparaître les objets manquants (`Scene_EnsureUnitsSpawned_549E4`) puis lance le
-script d'activation, sans test de première fois :
-```
-Scene_TriggerActivation_54AB2:
-    call    near ptr Scene_EnsureUnitsSpawned_549E4
-    push    large 0
-    push    large [si+8]
-    ...
-    call    near ptr Expr_VM_ExecuteSingleInstruction_530DB
-```
-
-**Effets.**
-- Programme 4 (activation de la scène 1, la base) : au premier passage le drapeau 280 n'est pas posé ; au retour du
-  joueur, le jeu crée les VAL n°5 et 6, libRealSpace jamais. La variable 21 n'atteint pas 3 : la tour ne joue jamais
-  son message 21, « Wildcats, return to base and land. ».
-- Programme 14 (activation de la scène 2, le Nevada) : la branche de la deuxième entrée (torpilleur n°30 ou 31 selon
-  la variable 0) n'est jamais jouée.
-
----
-
-## 4. Messages radio jamais affichés en Pacific Strike
+## 3. Messages radio jamais affichés en Pacific Strike
 
 **Constat.** `SCMissionActors::setMessage` ajoute le message à `mission->radio_messages`. Seul
 `SCCockpit::RenderCommMessages` l'affiche, joue la voix et le retire de la liste ; il est appelé par
@@ -167,7 +141,7 @@ ailiers.
 
 ---
 
-## 5. Plancher de la zone 0 au-dessus de la piste
+## 4. Plancher de la zone 0 au-dessus de la piste
 
 **Constat.** `AREA::contains` teste d'abord l'altitude :
 ```cpp
@@ -186,7 +160,7 @@ ni l'altitude exacte de l'avion au sol dans le jeu.
 
 ---
 
-## 6. `activateTarget` place l'objet sur le premier `SPOT` de la zone
+## 5. `activateTarget` place l'objet sur le premier `SPOT` de la zone
 
 **Constat.** `SCMissionActors::activateTarget` ajoute au décalage la position du **premier `SPOT` de la zone** de
 l'objet, et le centre de la zone seulement si la zone n'a pas de `SPOT`. `SCMissionScene::activate` ajoute, lui, le
@@ -209,7 +183,7 @@ Le point 1 s'y ajoute : l'objet a déjà volé avant l'activation.
 
 ---
 
-## 7. Ordre des scripts de sortie en fin de mission
+## 6. Ordre des scripts de sortie en fin de mission
 
 **Constat.** `SCMission::finishScenes` lance la scène globale, puis la scène courante.
 
@@ -228,7 +202,7 @@ script de sortie de la scène courante écrit une variable que lit celui de la s
 
 ---
 
-## 8. Fin de mission
+## 7. Fin de mission
 
 **Constat.** libRealSpace termine la mission à l'atterrissage (`setExitCode(1)` dans `SCMission::update`) ou par la
 touche de fin de mission (`SCStrike` : 2 si l'avion est écrasé, 1 sinon). `OP_SET_MESSAGE` 20, 21 et 22 ne terminent
@@ -240,7 +214,7 @@ ailleurs qu'à la base) reste à lire.
 
 ---
 
-## 9. Numéros des objets du terrain
+## 8. Numéros des objets du terrain
 
 **Constat.** `PSMission::loadMission` donne aux objets du terrain `actor_id` = nombre d'acteurs déjà créés : 47, 48…
 dans PRLH-M1. Le numéro 47 est aussi celui de l'objet `PART` blue10 (rang 46). Une instruction qui vise l'objet n°47
@@ -248,7 +222,7 @@ peut trouver l'objet du terrain. Aucune dans PRLH-M1.
 
 ---
 
-## 10. Profil ou fichier objet introuvable
+## 9. Profil ou fichier objet introuvable
 
 **Constat.**
 - `SCMissionActors::onMissionUpdate` sort avant le script de mise à jour si `profile == nullptr`
