@@ -23,7 +23,7 @@ a été lue), l'effet sur `PRLH-M1`, et ce qu'il faut regarder au débogueur. Ri
 | 10 | `OP_ATTACK_RANDOM_ENEMY_OF_TYPE` : choix de la cible et valeur rendue | JESTER ne passe pas à `OP_SET_OBJ_FOLLOW_ALLY 36` | haute |
 | 11 | Choix des armes par l'IA lié aux numéros d'armes de Strike Commander | canon correct ; roquettes, bombes, torpilles et napalm mal reconnus | conception |
 | 12 | `GOAL` 7, 8 et 9 de Pacific Strike ignorés, `GOAL` 5 différent | JESTER ne suit pas son chef par ses `GOAL` | haute |
-| 13 | Scènes activées au chargement d'après `is_active` | programme 14 (Nevada) joué au chargement : torpilleurs n°27 et 28 tout de suite, chronologie sautée | haute |
+| 13 | Scènes activées au chargement d'après `is_active` | à vérifier : la copie du 2026-11-11 fait comme le jeu ; la logique décrite jouerait le programme 14 au chargement | à vérifier |
 
 ---
 
@@ -369,6 +369,11 @@ OP_ACTIVATE_OBJ 28
 puis variable 3 = 69 (chronologie du programme 2 sautée), variable 6 = 88, variable 280 = 1 (appels du Nevada coupés).
 Le programme 1 (scène globale) remet la variable 3 à 65 et la variable 280 à 0 : l'état de départ dépend de l'ordre des
 deux. À l'entrée réelle du joueur au Nevada, rien n'est relancé.
+
+**Copie de libRealSpace lue ici (commit `0d90be5` du 2026-11-11).** `SCMission::startScenes` fait déjà comme le jeu :
+la scène globale (première scène sans zone) et la scène du joueur (`SCMission::findSceneAt`) reçoivent
+`MissionEventSceneActivated` ; les autres, seulement quand le joueur entre dans leur zone. `is_active` n'y sert que de
+condition dans `findSceneAt`. Si le code actuel suit la logique décrite plus haut, c'est cette version qu'il faut retrouver.
 
 **Piste.** Au chargement, activer la scène globale et la scène du joueur seulement. Pour ne pas relancer l'activation
 à une nouvelle entrée, `MISN_SCEN::has_been_activated` existe déjà (`SCMissionScene::activate`), distinct de
