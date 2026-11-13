@@ -8,7 +8,9 @@ Ouvre PACIFIC.DAT (rien n'est écrit) et affiche, pour la mission choisie :
   la carte les liens tirés de ses scripts (points SPOT de navigation, objets visés) ;
 - les scènes (clic : zone et objets surlignés), les zones et points, les programmes (avec qui les lance), les
   variables (programmes qui les écrivent et qui les lisent), la mission (messages, LOAD, TEAM).
-Dans les scripts, un objet, un point, un programme ou une variable se clique.
+Dans les scripts, un objet, un point, un programme ou une variable se clique. Les scripts s'affichent en
+pseudo-code (if / else / goto, blocs indentés ; ps_mission_data.pseudo_code) ou en désassemblage (une instruction
+par ligne, avec son octet de départ) : choix « Scripts » de la barre du haut.
 
 Carte : molette = zoom autour du pointeur, glisser = déplacer, clic = choisir, double-clic = recentrer sur la
 mission. Barre du bas : position sous le pointeur (x, z, altitude du sol) en repère libRealSpace, en mètres
@@ -113,9 +115,15 @@ class Viewer:
         top = ttk.Frame(self.root, padding=4)
         top.pack(side=tk.TOP, fill=tk.X)
         ttk.Label(top, text="Mission :").pack(side=tk.LEFT)
+        self.code_mode = tk.StringVar(value="pseudo")
+        self.current_program = None
         self.mission_box = ttk.Combobox(top, state="readonly", width=34)
         self.mission_box.pack(side=tk.LEFT, padx=4)
         self.mission_box.bind("<<ComboboxSelected>>", self.on_mission_chosen)
+        ttk.Label(top, text="   Scripts :").pack(side=tk.LEFT)
+        ttk.Radiobutton(top, text="pseudo-code", value="pseudo", variable=self.code_mode, command=self.refresh_code).pack(side=tk.LEFT)
+        ttk.Radiobutton(top, text="désassemblage", value="brut", variable=self.code_mode, command=self.refresh_code).pack(side=tk.LEFT)
+        ttk.Label(top, text="   ").pack(side=tk.LEFT)
         for key, text in LAYERS:
             var = tk.BooleanVar(value=key != "etiquettes")
             self.layer_vars[key] = var
@@ -286,8 +294,31 @@ class Viewer:
         if number >= len(programs):
             self.put(text, "  (aucun)\n", "gris")
             return
+        if self.code_mode.get() == "pseudo":
+            for depth, segs in data.pseudo_code(self.mission, number, owner):
+                self.put(text, "    " * depth)
+                for value, kind, target in segs:
+                    if kind is None:
+                        self.put(text, value)
+                    else:
+                        self.put_link(text, value, kind, target)
+                self.put(text, "\n")
+            return
         for instruction in programs[number]:
             self.put_instruction(text, instruction, owner)
+
+    def refresh_code(self):
+        """Réécrit les textes ouverts dans le mode choisi (pseudo-code ou désassemblage)."""
+        if self.mission is None:
+            return
+        tab = self.tabs.index(self.tabs.select())
+        if self.selected is not None:
+            self.show_object(self.objects_by_number[self.selected])
+        if self.selected_scene is not None:
+            self.select_scene(self.selected_scene, False)
+        if self.current_program is not None:
+            self.show_program(self.current_program)
+        self.tabs.select(tab)
 
     # ------------------------------------------------------------------ archive et mission
 
@@ -325,6 +356,7 @@ class Viewer:
             self.objects_by_number[obj["numéro"]] = obj
         self.selected = None
         self.selected_scene = None
+        self.current_program = None
         self.fill_object_list()
         self.fill_scenes()
         self.fill_zones()
@@ -498,7 +530,7 @@ class Viewer:
         if chosen:
             self.select_scene(int(chosen[0]))
 
-    def select_scene(self, rank):
+    def select_scene(self, rank, center=True):
         scene = self.mission["scènes"][rank]
         self.selected_scene = rank
         if self.scene_list.exists(str(rank)) and self.scene_list.selection() != (str(rank),):
@@ -527,7 +559,7 @@ class Viewer:
             self.put_program(t, number, None)
         self.text_end(t)
         zone = scene["zone"]
-        if zone < len(self.mission["zones"]):
+        if center and zone < len(self.mission["zones"]):
             ref = self.mission["zones"][zone]["ref"]
             self.cx = ref[0]
             self.cz = ref[2]
@@ -541,6 +573,7 @@ class Viewer:
     def show_program(self, number):
         if number >= len(self.mission["programmes"]):
             return
+        self.current_program = number
         self.tabs.select(3)
         self.prog_list.selection_clear(0, tk.END)
         self.prog_list.selection_set(number)

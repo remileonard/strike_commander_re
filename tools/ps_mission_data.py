@@ -323,3 +323,324 @@ def links(obj, programs):
                     if target != obj["numéro"]:
                         objects.append({"numéro": target, "instruction": op_name, "programme": number})
     return {"points": spots, "objets": objects}
+
+
+# ---------------------------------------------------------------------- pseudo-code
+
+# Sens des instructions d'après PSProg / SCProg de libRealSpace : la comparaison se lit dans l'ordre du nom
+# (OP_CMP_WORK_WITH_VALUE n : W comparé à n), OP_TEST_FLAG pose « égal » si la variable est non nulle,
+# OP_IS_SCENE_ACTIVE pose « égal » si la scène de la zone est active, OP_EXECUTE_CALL saute à l'étiquette égale à W.
+BRANCH_RELATION = {
+    72: "==",
+    73: "!=",
+    74: "<",
+    75: ">",
+    76: "<=",
+    77: ">=",
+}
+NEGATION = {
+    "==": "!=",
+    "!=": "==",
+    "<": ">=",
+    ">": "<=",
+    "<=": ">",
+    ">=": "<",
+}
+COMPARE_OPS = {64, 65, 66, 67, 68, 69, 130, 146, 147, 152}
+WORK_UPDATE = {
+    32: ("+=", "valeur"),
+    33: ("+=", "variable"),
+    36: ("-=", "valeur"),
+    37: ("-=", "variable"),
+    40: ("|=", "valeur"),
+    41: ("|=", "variable"),
+    42: ("&=", "valeur"),
+    43: ("&=", "variable"),
+    44: ("^=", "valeur"),
+    45: ("^=", "variable"),
+    46: ("*=", "valeur"),
+    47: ("*=", "variable"),
+    48: ("/=", "valeur"),
+    49: ("/=", "variable"),
+}
+
+
+def seg_text(text):
+    return (text, None, None)
+
+
+def seg_var(number):
+    return ("var[%d]" % number, "variable", number)
+
+
+def seg_object(mission, number):
+    for obj in mission["objets"]:
+        if obj["numéro"] == number:
+            return ("n°%d %s" % (number, obj["nom"]), "objet", number)
+    return ("n°%d" % number, "objet", number)
+
+
+def seg_spot(number):
+    return ("SPOT %d" % number, "point", number)
+
+
+def call_segments(mission, op, name, args, owner):
+    """OP_NOM(arguments) avec les objets, points et programmes désignés."""
+    spot_args = SPOT_ARGS.get(op, []) + LOCAL_SPOT_ARGS.get(op, []) + TARGET_SPOT_ARGS.get(op, [])
+    object_args = list(OBJECT_ARGS.get(op, []))
+    if op in (153, 154):
+        object_args = [0]
+    if op == 157:
+        object_args = [0, 1]
+    segs = [seg_text(name + "(")]
+    for rank, value in enumerate(args):
+        if rank:
+            segs.append(seg_text(", "))
+        if rank in object_args:
+            if value == 255:
+                segs.append(seg_text("soi"))
+            else:
+                segs.append(seg_object(mission, value))
+        elif rank in spot_args and value < len(mission["points"]):
+            segs.append(seg_spot(value))
+        else:
+            segs.append(seg_text(str(value)))
+    segs.append(seg_text(")"))
+    return segs
+
+
+def statement(mission, instruction, owner):
+    """Une instruction sans saut → liste de segments (texte, type de lien, valeur) ; None = rien à écrire."""
+    start, op, name, args = instruction
+    a = args[0] if args else 0
+    if op == 0 and a == 0:
+        return None
+    if op == 1:
+        return [seg_text("return;")]
+    if op == 2:
+        return [seg_text("appeler "), ("programme %d" % a, "programme", a), seg_text(";")]
+    if op == 16:
+        return [seg_text("W = %d;" % a)]
+    if op == 17:
+        return [seg_text("W = "), seg_var(a), seg_text(";")]
+    if op == 18:
+        return [seg_text("échanger(W, "), seg_var(a), seg_text(");")]
+    if op == 19:
+        return [seg_text("W = résultat;")]
+    if op in WORK_UPDATE:
+        symbol, kind = WORK_UPDATE[op]
+        if kind == "valeur":
+            return [seg_text("W %s %d;" % (symbol, a))]
+        return [seg_text("W %s " % symbol), seg_var(a), seg_text(";")]
+    if op == 35:
+        return [seg_var(a), seg_text(" += W;")]
+    if op == 39:
+        return [seg_var(a), seg_text(" -= W;")]
+    if op == 80:
+        return [seg_var(a), seg_text(" = W;")]
+    if op == 81:
+        return [seg_var(a), seg_text(" = résultat;")]
+    if op == 82:
+        return [seg_var(a), seg_text(" = 1;")]
+    if op == 83:
+        return [seg_var(a), seg_text(" = 0;")]
+    if op == 85:
+        return [seg_var(a), seg_text(" += 1;")]
+    if op == 86:
+        return [seg_var(a), seg_text(" -= 1;")]
+    segs = call_segments(mission, op, name, args, owner)
+    segs.append(seg_text(";"))
+    return segs
+
+
+def compare_state(mission, instruction):
+    """État laissé par une instruction de comparaison : (A, B) pour une relation, ou un booléen pour « égal »."""
+    start, op, name, args = instruction
+    a = args[0] if args else 0
+    if op == 64:
+        return {"type": "relation", "a": [seg_text("W")], "b": [seg_text(str(a))]}
+    if op == 65:
+        return {"type": "relation", "a": [seg_text(str(a))], "b": [seg_text("W")]}
+    if op == 66:
+        return {"type": "relation", "a": [seg_text("W")], "b": [seg_var(a)]}
+    if op == 67:
+        return {"type": "relation", "a": [seg_var(a)], "b": [seg_text("W")]}
+    if op == 68:
+        return {"type": "relation", "a": [seg_text("résultat")], "b": [seg_text(str(a))]}
+    if op == 69:
+        return {"type": "égal", "vrai": [seg_var(a), seg_text(" != 0")], "faux": [seg_var(a), seg_text(" == 0")]}
+    if op == 130:
+        call = [seg_text("scène_active(zone %d)" % a)]
+        return {"type": "égal", "vrai": call, "faux": [seg_text("!")] + call}
+    call = call_segments(mission, op, name, args, None)
+    return {"type": "égal", "vrai": call, "faux": [seg_text("!")] + call}
+
+
+def branch_condition(state, op):
+    """Condition du saut op (72 à 77) selon l'état de comparaison : {"type", ...} négociable."""
+    relation = BRANCH_RELATION[op]
+    if state is None:
+        return {"type": "texte", "segs": [seg_text("bit « %s » de la dernière comparaison" % relation)], "neg": False}
+    if state["type"] == "relation":
+        return {"type": "relation", "a": state["a"], "op": relation, "b": state["b"]}
+    if relation == "==":
+        return {"type": "pair", "segs": state["vrai"], "autre": state["faux"]}
+    if relation == "!=":
+        return {"type": "pair", "segs": state["faux"], "autre": state["vrai"]}
+    return {"type": "texte", "segs": [seg_text("bit « %s » après ")] + state["vrai"], "neg": False}
+
+
+def negate(cond):
+    if cond["type"] == "relation":
+        return {"type": "relation", "a": cond["a"], "op": NEGATION[cond["op"]], "b": cond["b"]}
+    if cond["type"] == "pair":
+        return {"type": "pair", "segs": cond["autre"], "autre": cond["segs"]}
+    return {"type": "texte", "segs": cond["segs"], "neg": not cond["neg"]}
+
+
+def condition_segments(cond):
+    if cond["type"] == "relation":
+        return cond["a"] + [seg_text(" %s " % cond["op"])] + cond["b"]
+    if cond["type"] == "pair":
+        return cond["segs"]
+    if cond["neg"]:
+        return [seg_text("!(")] + cond["segs"] + [seg_text(")")]
+    return cond["segs"]
+
+
+def linear_items(mission, program, owner):
+    """Instructions → éléments : étiquette, saut conditionnel, saut, instruction. Les comparaisons sont fondues dans
+    les sauts qui les suivent ; l'état de comparaison est oublié à chaque étiquette (on peut y arriver d'ailleurs)."""
+    items = []
+    state = None
+    for instruction in program:
+        start, op, name, args = instruction
+        a = args[0] if args else 0
+        if op == 8:
+            items.append({"t": "étiquette", "n": a})
+            state = None
+        elif op in COMPARE_OPS:
+            state = compare_state(mission, instruction)
+        elif op in BRANCH_RELATION:
+            items.append({"t": "si", "cond": branch_condition(state, op), "n": a})
+        elif op == 70:
+            items.append({"t": "si", "cond": {"type": "pair", "segs": [seg_text("ordre_en_cours")], "autre": [seg_text("!ordre_en_cours")]}, "n": a})
+        elif op == 71:
+            items.append({"t": "si", "cond": {"type": "pair", "segs": [seg_text("!ordre_en_cours")], "autre": [seg_text("ordre_en_cours")]}, "n": a})
+        elif op == 78:
+            items.append({"t": "aller", "n": a})
+        elif op == 79:
+            items.append({"t": "instr", "segs": [seg_text("goto L(W);   // étiquette égale à W")]})
+        else:
+            segs = statement(mission, instruction, owner)
+            if segs is not None:
+                items.append({"t": "instr", "segs": segs})
+    return items
+
+
+def find_label(seq, number, start):
+    for k in range(start, len(seq)):
+        if seq[k]["t"] == "étiquette" and seq[k]["n"] == number:
+            return k
+    return None
+
+
+def has_label(seq):
+    for item in seq:
+        if item["t"] == "étiquette":
+            return True
+    return False
+
+
+def structure(seq, refs, keep_all):
+    """Saut conditionnel vers une étiquette plus loin, sans étiquette entre les deux → bloc si ; bloc terminé par un
+    saut vers une seconde étiquette plus loin → si / sinon (seulement si la première étiquette n'a pas d'autre appel)."""
+    out = []
+    i = 0
+    while i < len(seq):
+        item = seq[i]
+        if item["t"] == "si":
+            j = find_label(seq, item["n"], i + 1)
+            if j is not None and j > i + 1 and not has_label(seq[i + 1:j]):
+                body = seq[i + 1:j]
+                last = body[-1]
+                if last["t"] == "aller" and refs.get(item["n"], 0) == 1 and not keep_all:
+                    k = find_label(seq, last["n"], j + 1)
+                    if k is not None and k > j + 1 and not has_label(seq[j + 1:k]):
+                        refs[item["n"]] -= 1
+                        refs[last["n"]] -= 1
+                        out.append({"t": "bloc", "cond": negate(item["cond"]), "alors": structure(body[:-1], refs, keep_all), "sinon": structure(seq[j + 1:k], refs, keep_all)})
+                        i = k
+                        continue
+                refs[item["n"]] -= 1
+                out.append({"t": "bloc", "cond": negate(item["cond"]), "alors": structure(body, refs, keep_all), "sinon": None})
+                i = j
+                continue
+        out.append(item)
+        i += 1
+    return out
+
+
+def render(nodes, refs, keep_all, depth, lines):
+    for node in nodes:
+        if node["t"] == "étiquette":
+            if keep_all or refs.get(node["n"], 0) > 0:
+                lines.append((max(depth - 1, 0), [seg_text("L%d:" % node["n"])]))
+        elif node["t"] == "instr":
+            lines.append((depth, node["segs"]))
+        elif node["t"] == "aller":
+            lines.append((depth, [seg_text("goto L%d;" % node["n"])]))
+        elif node["t"] == "si":
+            lines.append((depth, [seg_text("if (")] + condition_segments(node["cond"]) + [seg_text(") goto L%d;" % node["n"])]))
+        elif node["t"] == "bloc":
+            lines.append((depth, [seg_text("if (")] + condition_segments(node["cond"]) + [seg_text(") {")]))
+            render(node["alors"], refs, keep_all, depth + 1, lines)
+            if node["sinon"] is not None:
+                lines.append((depth, [seg_text("} else {")]))
+                render(node["sinon"], refs, keep_all, depth + 1, lines)
+            lines.append((depth, [seg_text("}")]))
+
+
+def pseudo_code(mission, number, owner=None):
+    """Programme number → lignes (profondeur, segments). Un segment = (texte, type de lien ou None, valeur).
+    W = registre de travail ; var[n] = variable n (mot en dessous de 256, bit au-delà) ; L65 = étiquette 65.
+    Les étiquettes ne sont écrites que si un saut y mène encore ; toutes le sont si le programme fait
+    OP_EXECUTE_CALL (saut calculé : n'importe quelle étiquette peut être visée)."""
+    program = mission["programmes"][number]
+    keep_all = any(op == 79 for start, op, name, args in program)
+    items = linear_items(mission, program, owner)
+    refs = {}
+    for item in items:
+        if item["t"] in ("si", "aller"):
+            refs[item["n"]] = refs.get(item["n"], 0) + 1
+    nodes = structure(items, refs, keep_all)
+    lines = []
+    render(nodes, refs, keep_all, 1, lines)
+    return lines
+
+
+def pseudo_text(mission, number, indent="    "):
+    out = []
+    for depth, segs in pseudo_code(mission, number):
+        out.append(indent * depth + "".join(s[0] for s in segs))
+    return "\n".join(out)
+
+
+def main():
+    import argparse
+    ap = argparse.ArgumentParser(description="Pseudo-code des programmes d'une mission de Pacific Strike.")
+    ap.add_argument("archive", help="PACIFIC.DAT")
+    ap.add_argument("mission")
+    ap.add_argument("programme", nargs="?", type=int, help="un seul programme (sinon tous)")
+    args = ap.parse_args()
+    archive = Archive(args.archive)
+    m = describe(archive, args.mission)
+    numbers = [args.programme] if args.programme is not None else range(len(m["programmes"]))
+    for number in numbers:
+        print("programme %d" % number)
+        print(pseudo_text(m, number))
+        print()
+
+
+if __name__ == "__main__":
+    main()

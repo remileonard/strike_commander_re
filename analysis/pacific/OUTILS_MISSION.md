@@ -293,6 +293,77 @@ Classe et `KIND` d'un objet : FORM de classe sous `REAL/OBJT` et premier octet d
 `OBJECTS\<nom>.IFF`. Un objet placé par rapport au joueur (`placement` non nul) n'est pas dessiné : sa position dépend
 de l'avion du joueur.
 
+### Pseudo-code des scripts
+
+Choix **Scripts : pseudo-code / désassemblage** de la barre du haut ; il s'applique aux onglets Objet, Scènes et
+Programmes. En ligne de commande :
+
+```
+python3 tools/ps_mission_data.py PACIFIC.DAT PRLH-M1        (tous les programmes)
+python3 tools/ps_mission_data.py PACIFIC.DAT PRLH-M1 14     (le programme 14)
+```
+
+Notation :
+
+| Écrit | Sens |
+|---|---|
+| `W` | registre de travail du script |
+| `var[n]` | variable n (mot en dessous de 256, bit à partir de 256) |
+| `L65:` | étiquette 65 (`OP_SET_LABEL 65`) |
+| `goto L90;` | `OP_BRANCH 90`, ou saut conditionnel resté tel quel |
+| `goto L(W);` | `OP_EXECUTE_CALL` : saut à l'étiquette égale à `W` |
+| `ordre_en_cours` | état de l'ordre en cours, testé par `OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS` et `OP_GOTO_IF_CURRENT_COMMAND_DONE` |
+| `scène_active(zone n)` | `OP_IS_SCENE_ACTIVE n` |
+| `appeler programme n;` | `OP_EXEC_SUB_PROG n` |
+| `return;` | `OP_EXIT_PROG` |
+| `OP_NOM(arguments);` | toute autre instruction, arguments objet (`n°23 BB`), point (`SPOT 4`) ou nombre |
+
+Règles de traduction (sens des instructions d'après `SCProg` et `PSProg` de libRealSpace) :
+1. Une comparaison se fond dans le saut qui la suit. `OP_CMP_WORK_WITH_VALUE n` puis `OP_BRANCH_IF_LESS L` devient
+   `if (W < n) goto L;` : la comparaison se lit dans l'ordre du nom de l'instruction (`W` comparé à `n`).
+   `OP_TEST_FLAG v` puis `OP_BRANCH_IF_EQUAL L` devient `if (var[v] != 0) goto L;` (« égal » = variable non nulle).
+   Une comparaison qui n'est suivie d'aucun saut n'est pas écrite (elle ne change que l'état de comparaison).
+2. L'état de comparaison est oublié à chaque étiquette : un saut juste après une étiquette s'écrit avec le bit de la
+   dernière comparaison, sans relation.
+3. `if (c) goto L; A… L:` avec `L` plus loin et aucune étiquette entre les deux devient `if (!c) { A… }`.
+4. Si le bloc `A…` finit par `goto M;` vers une étiquette `M` plus loin, sans étiquette entre `L` et `M`, et si aucun
+   autre saut ne mène à `L` : `if (!c) { A… } else { B… }`.
+5. Une étiquette n'est écrite que si un saut y mène encore. Dans un programme qui fait `OP_EXECUTE_CALL`, toutes les
+   étiquettes restent écrites : le saut est calculé, n'importe laquelle peut être visée.
+6. Les blocs s'emboîtent : les règles 3 et 4 s'appliquent aussi à l'intérieur d'un bloc.
+
+Le pseudo-code ne simplifie rien d'autre : `W = 66; var[6] = W;` reste en deux lignes, car `W` garde sa valeur pour
+la suite du programme.
+
+Exemple, programme 14 de PRLH-M1 (activation de la scène 2) :
+
+```
+    var[666] = 1;
+    W = 66;
+    var[6] = W;
+    var[280] = 1;
+    W = var[3];
+    if (W <= 67) {
+        OP_ACTIVATE_OBJ(n°27 KATE);
+        OP_ACTIVATE_OBJ(n°28 KATETORP);
+        W = 69;
+        var[3] = W;
+        W = 88;
+        var[6] = W;
+        return;
+    }
+    W = var[0];
+    if (W != 3) {
+        if (W == 2) goto L67;
+        return;
+    }
+    OP_ACTIVATE_OBJ(n°31 KATETORP);
+L67:
+    OP_ACTIVATE_OBJ(n°30 KATETORP);
+```
+
+Essai : les 2 918 programmes des 51 missions de `PACIFIC.DAT` se traduisent sans erreur.
+
 ### Limites
 
 - Les positions dessinées sont celles du fichier (décalage + centre de la zone) : pas de simulation.

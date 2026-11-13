@@ -402,7 +402,8 @@ strike_commander_re/
     ├── ps_mission_dump.py           mission de Pacific Strike → texte et JSON (zones, points, objets, scènes, programmes) ;
     │                                  ps_mission_map.py : cartes PNG (terrain, zones, objets, trajets) — analysis/pacific/OUTILS_MISSION.md
     │                                  ; ps_mission_viewer.py : visionneuse Tkinter autonome des 51 missions (carte, scripts cliquables,
-    │                                  scènes, programmes, variables) ; ps_mission_data.py : sa lecture
+    │                                  scènes, programmes, variables) ; ps_mission_data.py : sa lecture, et le pseudo-code des
+    │                                  programmes (if / else / goto, blocs indentés)
     ├── ps_conv_dump.py              conversations de Pacific Strike (CONV.PAK compressé) → texte ; pkware_dcl.py :
     │                                  décompression PKWARE DCL (entrées de marque 3 des PAK de PACIFIC.DAT, via sc_data)
     ├── conv_dump.py                 lecteur des scripts de conversation (CONV.PAK) → texte ;
