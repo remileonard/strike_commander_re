@@ -126,8 +126,11 @@ def libRS(c0, c1, c2):
     return [c0 / 256.0, c2 / 256.0, -c1 / 256.0]
 
 
-def read_mission(archive, name):
-    data, index = sc_data.tre_index(archive)
+def read_mission(archive, name, tre=None):
+    """tre : (data, index) de sc_data.tre_index déjà lu, pour ne pas relire l'archive à chaque mission."""
+    if tre is None:
+        tre = sc_data.tre_index(archive)
+    data, index = tre
     off, size = index["DATA/MISSIONS/%s.IFF" % name.upper()]
     m = data[off:off + size]
     chunks = []
@@ -245,8 +248,8 @@ def parse_programs(body):
     return programs
 
 
-def load(archive, name):
-    chunks = read_mission(archive, name)
+def load(archive, name, tre=None):
+    chunks = read_mission(archive, name, tre)
     areas = parse_areas(first(chunks, "/MISN/AREA"))
     cast_body = first(chunks, "/MISN/CAST")
     cast = [cast_body[k:k + 8].split(b"\0")[0].decode("latin1") for k in range(0, len(cast_body) - len(cast_body) % 9, 9)]

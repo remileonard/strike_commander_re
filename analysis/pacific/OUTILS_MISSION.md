@@ -8,6 +8,8 @@ Rédigé le 2026-11-13. Ces outils ont servi à produire `PACIFIC_MISSION_PRLH-M
 | `tools/ps_mission_dump.py` | lit un fichier de mission et désassemble ses programmes | texte, et JSON avec `--json` |
 | `tools/ps_mission_map.py` | dessine la mission sur le terrain | 3 images PNG |
 | `tools/conv_doc_images.py --embarquer` | intègre les images dans une page HTML (outil existant) | la page modifiée sur place |
+| `tools/ps_mission_viewer.py` | application autonome (Tkinter) : carte et scripts de n'importe quelle mission | fenêtre (§ 4) |
+| `tools/ps_mission_data.py` | lecture commune à la visionneuse : archive, terrain, renvois entre objets, scènes, programmes et variables | — |
 
 Dépendances : Python 3, `numpy` et `PIL` (cartes seulement), police DejaVu (`/usr/share/fonts/truetype/dejavu/`) ;
 modules du dépôt `sc_data`, `object_render`, `pkware_dcl`, `terrain_map`, `tri_map`.
@@ -217,7 +219,90 @@ dans une colonne à gauche, avec un trait de rappel.
 
 ---
 
-## 4. Limites connues
+## 4. `tools/ps_mission_viewer.py` : visionneuse des missions
+
+Application autonome (fenêtre Tkinter, ni serveur ni navigateur). Elle ouvre `PACIFIC.DAT` en lecture seule et
+montre n'importe laquelle des 51 missions.
+
+### Lancer
+
+```
+python3 tools/ps_mission_viewer.py PACIFIC.DAT
+python3 tools/ps_mission_viewer.py PACIFIC.DAT --mission MDWY-M1
+python3 tools/ps_mission_viewer.py
+```
+
+Sans argument, `PACIFIC.DAT` se choisit par le menu **Fichier → Ouvrir PACIFIC.DAT…**. Mission par défaut : `PRLH-M1`.
+
+Dépendances : `tkinter` (fourni avec Python sous Windows et macOS ; sous Linux, paquet `python3-tk`), `numpy`,
+`PIL` avec `ImageTk` (sous Linux, paquet `python3-pil.imagetk`). Fichiers du dossier `tools/` utilisés :
+`ps_mission_data.py`, `ps_mission_dump.py`, `sc_data.py`, `object_render.py`, `pkware_dcl.py`, `terrain_map.py`,
+`tri_map.py`. Essayé avec Python 3.12 sous Linux.
+
+### La fenêtre
+
+| Zone | Contenu |
+|---|---|
+| barre du haut | choix de la mission (« nom — titre »), calques : relief, pistes, zones, points `SPOT`, objets, étiquettes, liens des scripts, objets jamais activés |
+| liste de gauche | les objets, une ligne par objet : numéro, objet, `CAST`, camp |
+| carte | terrain, pistes, zones, points, objets |
+| onglet **Objet** | champs du `PART`, sol sous l'objet, ce qui l'active, ses 4 scripts désassemblés |
+| onglet **Scènes** | une ligne par scène ; une scène choisie : ses objets (rang → numéro) et ses 3 scripts ; sa zone et ses objets sont surlignés sur la carte |
+| onglet **Zones et points** | zones (forme, centre, valeurs) ; points `SPOT` avec position et emplois dans les programmes |
+| onglet **Programmes** | un programme : qui le lance (objet et rôle du script, scène, `OP_EXEC_SUB_PROG`) et son désassemblage |
+| onglet **Variables** | pour chaque variable : programmes qui l'écrivent, programmes qui la lisent |
+| onglet **Mission** | nom, monde, terrain, musique, messages `MSGS`, objets de `LOAD`, équipe `TEAM` |
+| barre du bas | sous le pointeur : x, z, altitude du sol (sans lissage), échelle |
+
+Dans les textes, les renvois soulignés se cliquent : un objet (le choisit et centre la carte), un point (centre la
+carte), un programme, une variable, une scène.
+
+### Commandes de la carte
+
+| Geste | Effet |
+|---|---|
+| molette | zoom autour du pointeur |
+| glisser | déplacer |
+| clic | choisir l'objet le plus proche (14 pixels au plus) |
+| double-clic | revenir à la vue de toute la mission |
+
+### Dessin
+
+| Élément | Dessin |
+|---|---|
+| zone | cercle (`C`, `S`) ou rectangle (`B`) en tirets, étiquette « zone n « nom » — scène k » |
+| point `SPOT` | losange blanc ; un point employé seulement dans le repère d'un objet (`OP_SPAWN_EFFECT_ON_OBJ`, `OP_FIRE_AT_SPOT` point de départ, `OP_LAUNCH_FROM_OBJ`) n'est pas dessiné |
+| objet de classe `JETP` | triangle orienté selon le cap |
+| objet de classe `SHIP` ou `CARR` | flèche orientée selon le cap |
+| objet sans fichier objet (pistes `RWAY*`) | trait |
+| autre objet | carré |
+| couleur | rouge = camp 255, bleu = camp 1, gris = autre camp |
+| objet cité par aucune scène ni `OP_ACTIVATE_OBJ` | contour seul (calque « Objets jamais activés ») |
+| joueur | cercle jaune |
+| objet choisi | cercle jaune épais et son nom |
+| liens de l'objet choisi | traits blancs en tirets vers les points de navigation de ses scripts, dans l'ordre ; flèches orange vers les objets visés |
+
+Liens tirés des scripts (en suivant `OP_EXEC_SUB_PROG`) :
+- points : `OP_SET_OBJ_TAKE_OFF`, `OP_SET_OBJ_LAND` (deux points), `OP_SET_OBJ_FLY_TO_WP`, `OP_DIST_TO_SPOT` ;
+- objets : `OP_ACTIVATE_OBJ`, `OP_DEACTIVATE_OBJ`, `OP_IS_TARGET_ALIVE`, `OP_INSTANT_DESTROY_TARGET`,
+  `OP_DIST_TO_TARGET`, `OP_IS_TARGET_ACTIVE`, `OP_SET_OBJ_DESTROY_TARGET`, `OP_SET_OBJ_DEFEND_TARGET`,
+  `OP_SET_OBJ_FOLLOW_ALLY`, `OP_SET_OBJ_DESTROY_TARGET_B`, `OP_JOIN_PLAYER_TEAM`, `OP_LEAVE_PLAYER_TEAM`,
+  `OP_PACIFY_TARGET` (255 = l'objet lui-même, pas de lien).
+
+Classe et `KIND` d'un objet : FORM de classe sous `REAL/OBJT` et premier octet du chunk `KIND` de
+`OBJECTS\<nom>.IFF`. Un objet placé par rapport au joueur (`placement` non nul) n'est pas dessiné : sa position dépend
+de l'avion du joueur.
+
+### Limites
+
+- Les positions dessinées sont celles du fichier (décalage + centre de la zone) : pas de simulation.
+- Une instruction de variable compte comme « écriture » ou « lecture » d'après son nom ; `OP_ADD_1_TO_FLAG` et les
+  autres opérations sur une variable comptent pour les deux.
+- Le relief est lissé pour la lecture (comme les cartes du § 3) ; la barre du bas donne l'altitude sans lissage.
+
+---
+
+## 5. Limites connues
 
 - Les noms d'instructions propres à Pacific Strike sont ceux du `README.md` de Pacific et de `PSProg` ; ceux marqués
   d'un astérisque dans la documentation sont des noms proposés.
