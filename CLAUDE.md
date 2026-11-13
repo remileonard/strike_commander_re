@@ -293,6 +293,7 @@ strike_commander_re/
 │   │                                  FORM DYNM, modèle de vol, PSEntity / PSPlane prévus ; tools/ps_physics_figures.py)
 │   │                                  ; PACIFIC_MISSION_PRLH-M1.html : 1re mission (carte, objets, scènes, scripts, victoire,
 │   │                                  écarts de libRealSpace) — tools/ps_mission_dump.py, tools/ps_mission_map.py
+│   │                                  ; DEBUG_A_TRAITER.md : points à traiter pour déboguer Pacific Strike dans libRealSpace
 │   ├── wings/                       analyse de WINGS_OF.EXE (Wings of Glory, --exe wings) : README.md, noms repris de
 │   │                                  PACIFIC, STRIKE et OPTEST (match_functions.py), annotated_segments/ ;
 │   │                                  WINGS_OF_GLORY.html = version illustrée (archives, déroulement, GLORY.EXE, terrain, missions)
