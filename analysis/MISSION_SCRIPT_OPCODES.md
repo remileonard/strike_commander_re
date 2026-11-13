@@ -1213,8 +1213,8 @@ instructions absentes de l'enum ont un nom proposé dans le même style, marqué
 | 84 | `OP_TOGGLE_FLAG`\* | FLAG[n] ^= 1 |
 | 85 | `OP_ADD_1_TO_FLAG` | FLAG[n] += 1 |
 | 86 | `OP_REMOVE_1_TO_FLAG` | FLAG[n] −= 1 |
-| 128 | `OP_ACTIVATE_SCENE` | objet ou scène de mission ; non relu ici |
-| 129 | `OP_DEACTIVATE_SCENE` | objet ou scène de mission ; non relu ici |
+| 128 | `OP_ENABLE_SCENE` | `is_enabled` de la scène de la zone n = 1 (`mov byte ptr [si], 1`, `loc_517A4`) ; ne lance pas l'activation |
+| 129 | `OP_DISABLE_SCENE` | `is_enabled` de la scène de la zone n = 0 (`mov byte ptr [si], 0`, `loc_517DC`) |
 | 144 | `OP_ACTIVATE_OBJ` | activation de l'objet de mission n (`PartEntry_ResolveSpawnPositionAndActivate_51EDC`, plus haut) |
 | 145 | `OP_DEACTIVATE_OBJ` | désactivation de l'objet n (`PartEntry_Deactivate_5242A`, plus haut) |
 | 146 | `OP_IF_TARGET_IN_AREA` | objet ou scène de mission ; non relu ici |

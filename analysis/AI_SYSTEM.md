@@ -1330,8 +1330,8 @@ est le **registre de travail (work register)**.
 | `82`/`83` | `OP_SET_FLAG_TO_TRUE`/`_FALSE` | `drapeau[idx] = 1` / `= 0` — confirmé |
 | *(84)* | *(bascule de drapeau, `^= 1`)* | Pas d'entrée dédiée côté `libRealSpace` |
 | `85`/`86` | `OP_ADD_1_TO_FLAG`/`OP_REMOVE_1_TO_FLAG` | Incrémente/décrémente `drapeau[idx]` en place — confirmé |
-| **`128`/`129`** | **`OP_ACTIVATE_SCENE`/`OP_DEACTIVATE_SCENE`** | Résout un nœud nommé et pose/efface son drapeau — **corrige ma lecture générique** (« set/clear drapeau de nœud ») : c'est spécifiquement l'activation/désactivation d'une **scène** (chunk `SCNE`, cf. `DATA_MODEL.md`) |
-| *(130)* | *(test de scène active)* | Pas d'entrée dédiée côté `libRealSpace` |
+| **`128`/`129`** | **`OP_ENABLE_SCENE`/`OP_DISABLE_SCENE`** | Résout un nœud nommé et pose/efface son drapeau — **corrige ma lecture générique** (« set/clear drapeau de nœud ») : c'est le drapeau `is_enabled` d'une **scène** (chunk `SCNE`, cf. `DATA_MODEL.md`) : la scène devient jouable ou non ; l'activation (entrée du joueur) n'est pas lancée par l'instruction |
+| *(130)* | *(`OP_IS_SCENE_ENABLED`, nom proposé : teste `is_enabled`)* | Pas d'entrée dédiée côté `libRealSpace` |
 | **`144`** | **`OP_ACTIVATE_OBJ`** | Résout un nœud puis appelle `PartEntry_ResolveSpawnPositionAndActivate_51EDC` — **confirme et précise** la découverte du spawn de formation : c'est l'activation d'un objet/formation, pas un « spawn cluster » générique |
 | *(145)* | *(`Expr_Node_ClearDirtyAndNotify`)* | Pas d'entrée dédiée côté `libRealSpace` |
 | **`146`** | **`OP_IF_TARGET_IN_AREA`** | Teste le bit 0 du champ `+0x39` d'un nœud résolu — **résout le sens exact** de ce bit de drapeau |

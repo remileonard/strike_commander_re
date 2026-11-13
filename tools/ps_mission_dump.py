@@ -6,7 +6,7 @@ programmes, avec les règles de PACIFIC.EXE (analysis/pacific/README.md § 6.4 �
   Commander) ;
 - SPOT : 14 octets, mot zone (65535 = aucune) puis 3 × int32 24.8, décalage depuis le point de la zone ;
 - CAST : noms de 9 octets ; PART : 62 octets (IMPL_MISSION_PART.md § 1), scripts sur 2 octets (règle 7) ;
-- SCNE : en-tête de 24 octets (actif, zone, 3 scripts, octet 9, cap, 3 int32), puis mots = rangs dans PART ;
+- SCNE : en-tête de 24 octets (enabled, zone, 3 scripts, octet 9, cap, 3 int32), puis mots = rangs dans PART ;
 - PROG : programme n après le n-ième mot nul ; instruction = numéro, argument, jusqu'à 3 × (9, argument) ;
   22 instructions de drapeau : octet haut du numéro puis 5 (règles 2, 4, 5).
 Repère libRealSpace : x = c0, y = c2 (altitude), z = −c1, en mètres.
@@ -80,8 +80,8 @@ NAMES = {
     85: "OP_ADD_1_TO_FLAG",
     86: "OP_REMOVE_1_TO_FLAG",
     112: "OP_ORDER_FRIENDLY_OF_TYPE",
-    128: "OP_ACTIVATE_SCENE",
-    129: "OP_DEACTIVATE_SCENE",
+    128: "OP_ENABLE_SCENE",
+    129: "OP_DISABLE_SCENE",
     130: "OP_IS_SCENE_ENABLED",
     144: "OP_ACTIVATE_OBJ",
     145: "OP_DEACTIVATE_OBJ",
@@ -210,7 +210,7 @@ def parse_scenes(bodies):
         count = (len(body) - 24) // 2
         scenes.append({
             "rang": len(scenes),
-            "actif": body[0],
+            "enabled": body[0],
             "zone": struct.unpack_from("<H", body, 1)[0],
             "scripts": list(struct.unpack_from("<3H", body, 3)),
             "arrivée": body[9],

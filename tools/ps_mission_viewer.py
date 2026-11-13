@@ -616,7 +616,7 @@ class Viewer:
         t = self.text_scene
         self.text_begin(t)
         self.put(t, "Scène %d\n" % rank, "titre")
-        self.put(t, "  actif (octet 0) %d, arrivée %d, cap %d, point (%.0f, %.0f, %.0f)\n" % (scene["actif"], scene["arrivée"], scene["cap_arrivée"], *scene["point_arrivée"]))
+        self.put(t, "  enabled %d, arrivée %d, cap %d, point (%.0f, %.0f, %.0f)\n" % (scene["enabled"], scene["arrivée"], scene["cap_arrivée"], *scene["point_arrivée"]))
         self.put(t, "\nObjets (rang → numéro)\n", "titre")
         for obj_rank in scene["objets"]:
             if obj_rank < len(self.mission["objets"]):

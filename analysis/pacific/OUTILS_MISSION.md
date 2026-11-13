@@ -92,7 +92,7 @@ Champs de `PART` rendus :
 | 48-53 | `formation` | 3 mots |
 | 54-61 | `scripts` | 4 mots : activation, mise à jour, destruction, début de mission (65535 = aucun) |
 
-Champs de `SCNE` rendus : `actif` (octet 0), `zone` (octets 1-2), `scripts` (activation, mise à jour, sortie),
+Champs de `SCNE` rendus : `enabled` (1er octet, `is_enabled`), `zone` (octets 1-2), `scripts` (activation, mise à jour, sortie),
 `arrivée` (octet 9), `cap_arrivée`, `point_arrivée` (3 × int32 ÷ 256), `objets` (mots = **rangs** dans `PART`).
 Le rôle de l'arrivée n'a pas été relu.
 
@@ -333,7 +333,7 @@ Notation :
 | `goto LABEL_90;` | `OP_BRANCH 90`, ou saut conditionnel resté tel quel |
 | `goto LABEL(WORK);` | `OP_EXECUTE_CALL` : saut à l'étiquette égale à `WORK` |
 | `ordre_en_cours` | état de l'ordre en cours, testé par `OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS` et `OP_GOTO_IF_CURRENT_COMMAND_DONE` |
-| `scène_autorisée(zone n)` | `OP_IS_SCENE_ENABLED n` : la scène de la zone n est autorisée (octet 0 ; pas « le joueur y est ») |
+| `scène_enabled(zone n)` | `OP_IS_SCENE_ENABLED n` : `is_enabled` de la scène de la zone n (scène jouable ; pas « le joueur y est ») |
 | `appeler programme n;` | `OP_EXEC_SUB_PROG n` |
 | `return;` | `OP_EXIT_PROG` |
 | `OP_NOM(arguments);` | toute autre instruction, arguments objet (`n°23 BB`), point (`SPOT 4`) ou nombre |

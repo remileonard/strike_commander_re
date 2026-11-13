@@ -1487,7 +1487,7 @@ comptage). L'**index d'une zone = son rang dans le chunk** (à partir de 0) ;
 - `HOME` : index de la zone de la base de départ (`si+0x58`) ;
 - opcodes de script `0x80` / `0x81` / `0x82` (`Expr_VM_Interpreter_51106`) : prennent un index
   de zone et retrouvent la scène rattachée (`Scene_FindByArea_532AD`) ; `0x80` met son
-  `is_active` à 1, `0x82` le teste, `0x81` non détaillé.
+  `is_enabled` à 1, `0x82` le teste, `0x81` non détaillé.
 
 ##### `SPOT` → points rattachés à une zone — `Mission_LoadSpotList_AA6C9` (seg457)
 
@@ -1616,7 +1616,7 @@ Layout confirmé (croisé avec le code + `MISSIONS\MISN-1A.IFF`) :
 
 | Off. disque | Taille | Champ | Résolution moteur | → record (0x27 o) |
 |---|---|---|---|---|
-| `0x00` | u8 | `is_active` | copié tel quel | `+0x00` |
+| `0x00` | u8 | `is_enabled` (ex-`is_active`) | copié tel quel | `+0x00` |
 | `0x01` | u16 | `area_id` (index dans `AREA` ; `-1` ou hors liste = pas de zone : la 1re telle scène est la scène globale) | `PtrList_GetAt_53034(ctx+0x1A, area_id)` | `+0x04` (handle 32 b) |
 | `0x03` | i16 | 1er script : quand la scène devient courante, après l'apparition de ses objets (ref `PROG`, `-1` = aucun ; `Scene_TriggerActivation_531CD`) | `Expr_LookupNamedValue_51E4A(ctx+0x40, …)` | `+0x08` (far ptr) |
 | `0x05` | i16 | 2e script : **à chaque image**, pour la scène globale et la scène courante (`MAIN_GAME_TICK` → `Scene_RunUpdateScript_531F2`) | idem | `+0x0C` |

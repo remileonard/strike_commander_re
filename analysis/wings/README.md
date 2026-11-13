@@ -706,8 +706,8 @@ Noms : ceux de Strike Commander (`MISSION_SCRIPT_OPCODES.md`) quand l'effet est 
 | 84 | `OP_TOGGLE_FLAG` | variable n inversée (29D14h) |
 | 85 | `OP_ADD_1_TO_FLAG` | variable n += 1 |
 | 86 | `OP_REMOVE_1_TO_FLAG` | variable n −= 1 |
-| 128 | `OP_ACTIVATE_SCENE` | zone n (`[mission+34h]`, 10D5Ch), puis son entrée dans `[mission+74h]` (10FDCh) : octet d'état = 1 |
-| 129 | `OP_DEACTIVATE_SCENE` | même entrée : octet d'état = 0 |
+| 128 | `OP_ENABLE_SCENE` | zone n (`[mission+34h]`, 10D5Ch), puis son entrée dans `[mission+74h]` (10FDCh) : octet d'état = 1 |
+| 129 | `OP_DISABLE_SCENE` | même entrée : octet d'état = 0 |
 | 130 | `OP_IS_SCENE_ACTIVE`\* | bit « égal » = octet d'état de la même entrée ≠ 0 |
 | 136 | `OP_OBJ_136`\* | objet n → fonction 0FAF0h (rôle non établi) |
 | 137 | `OP_OBJ_137`\* | registre = 43E44h(objet n) (rôle non établi ; 0 si l'objet n'existe pas) |

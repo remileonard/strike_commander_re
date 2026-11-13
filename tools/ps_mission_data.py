@@ -406,7 +406,7 @@ def links(obj, programs):
 
 # Sens des instructions d'après PSProg / SCProg de libRealSpace : la comparaison se lit dans l'ordre du nom
 # (OP_CMP_WORK_WITH_VALUE n : WORK comparé à n), OP_TEST_FLAG pose « égal » si la variable est non nulle,
-# OP_IS_SCENE_ENABLED pose « égal » si la scène de la zone est autorisée (octet 0, pas « joueur présent »), OP_EXECUTE_CALL saute à l'étiquette égale à WORK.
+# OP_IS_SCENE_ENABLED pose « égal » si la scène de la zone est enabled (is_enabled, pas « joueur présent »), OP_EXECUTE_CALL saute à l'étiquette égale à WORK.
 BRANCH_RELATION = {
     72: "==",
     73: "!=",
@@ -622,7 +622,7 @@ def compare_state(mission, instruction):
     if op == 69:
         return {"type": "égal", "vrai": [seg_var(a), seg_text(" != 0")], "faux": [seg_var(a), seg_text(" == 0")]}
     if op == 130:
-        call = [seg_text("scène_autorisée(zone %d)" % a)]
+        call = [seg_text("scène_enabled(zone %d)" % a)]
         return {"type": "égal", "vrai": call, "faux": [seg_text("!")] + call}
     call = call_segments(mission, op, name, args, None)
     return {"type": "égal", "vrai": call, "faux": [seg_text("!")] + call}
