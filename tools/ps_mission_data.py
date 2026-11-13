@@ -328,8 +328,8 @@ def links(obj, programs):
 # ---------------------------------------------------------------------- pseudo-code
 
 # Sens des instructions d'après PSProg / SCProg de libRealSpace : la comparaison se lit dans l'ordre du nom
-# (OP_CMP_WORK_WITH_VALUE n : W comparé à n), OP_TEST_FLAG pose « égal » si la variable est non nulle,
-# OP_IS_SCENE_ACTIVE pose « égal » si la scène de la zone est active, OP_EXECUTE_CALL saute à l'étiquette égale à W.
+# (OP_CMP_WORK_WITH_VALUE n : WORK comparé à n), OP_TEST_FLAG pose « égal » si la variable est non nulle,
+# OP_IS_SCENE_ACTIVE pose « égal » si la scène de la zone est active, OP_EXECUTE_CALL saute à l'étiquette égale à WORK.
 BRANCH_RELATION = {
     72: "==",
     73: "!=",
@@ -420,24 +420,24 @@ def statement(mission, instruction, owner):
     if op == 2:
         return [seg_text("appeler "), ("programme %d" % a, "programme", a), seg_text(";")]
     if op == 16:
-        return [seg_text("W = %d;" % a)]
+        return [seg_text("WORK = %d;" % a)]
     if op == 17:
-        return [seg_text("W = "), seg_var(a), seg_text(";")]
+        return [seg_text("WORK = "), seg_var(a), seg_text(";")]
     if op == 18:
-        return [seg_text("échanger(W, "), seg_var(a), seg_text(");")]
+        return [seg_text("échanger(WORK, "), seg_var(a), seg_text(");")]
     if op == 19:
-        return [seg_text("W = résultat;")]
+        return [seg_text("WORK = résultat;")]
     if op in WORK_UPDATE:
         symbol, kind = WORK_UPDATE[op]
         if kind == "valeur":
-            return [seg_text("W %s %d;" % (symbol, a))]
-        return [seg_text("W %s " % symbol), seg_var(a), seg_text(";")]
+            return [seg_text("WORK %s %d;" % (symbol, a))]
+        return [seg_text("WORK %s " % symbol), seg_var(a), seg_text(";")]
     if op == 35:
-        return [seg_var(a), seg_text(" += W;")]
+        return [seg_var(a), seg_text(" += WORK;")]
     if op == 39:
-        return [seg_var(a), seg_text(" -= W;")]
+        return [seg_var(a), seg_text(" -= WORK;")]
     if op == 80:
-        return [seg_var(a), seg_text(" = W;")]
+        return [seg_var(a), seg_text(" = WORK;")]
     if op == 81:
         return [seg_var(a), seg_text(" = résultat;")]
     if op == 82:
@@ -458,13 +458,13 @@ def compare_state(mission, instruction):
     start, op, name, args = instruction
     a = args[0] if args else 0
     if op == 64:
-        return {"type": "relation", "a": [seg_text("W")], "b": [seg_text(str(a))]}
+        return {"type": "relation", "a": [seg_text("WORK")], "b": [seg_text(str(a))]}
     if op == 65:
-        return {"type": "relation", "a": [seg_text(str(a))], "b": [seg_text("W")]}
+        return {"type": "relation", "a": [seg_text(str(a))], "b": [seg_text("WORK")]}
     if op == 66:
-        return {"type": "relation", "a": [seg_text("W")], "b": [seg_var(a)]}
+        return {"type": "relation", "a": [seg_text("WORK")], "b": [seg_var(a)]}
     if op == 67:
-        return {"type": "relation", "a": [seg_var(a)], "b": [seg_text("W")]}
+        return {"type": "relation", "a": [seg_var(a)], "b": [seg_text("WORK")]}
     if op == 68:
         return {"type": "relation", "a": [seg_text("résultat")], "b": [seg_text(str(a))]}
     if op == 69:
@@ -530,7 +530,7 @@ def linear_items(mission, program, owner):
         elif op == 78:
             items.append({"t": "aller", "n": a})
         elif op == 79:
-            items.append({"t": "instr", "segs": [seg_text("goto L(W);   // étiquette égale à W")]})
+            items.append({"t": "instr", "segs": [seg_text("goto L(WORK);   // étiquette égale à WORK")]})
         else:
             segs = statement(mission, instruction, owner)
             if segs is not None:
@@ -603,7 +603,7 @@ def render(nodes, refs, keep_all, depth, lines):
 
 def pseudo_code(mission, number, owner=None):
     """Programme number → lignes (profondeur, segments). Un segment = (texte, type de lien ou None, valeur).
-    W = registre de travail ; var[n] = variable n (mot en dessous de 256, bit au-delà) ; L65 = étiquette 65.
+    WORK = registre de travail ; var[n] = variable n (mot en dessous de 256, bit au-delà) ; L65 = étiquette 65.
     Les étiquettes ne sont écrites que si un saut y mène encore ; toutes le sont si le programme fait
     OP_EXECUTE_CALL (saut calculé : n'importe quelle étiquette peut être visée)."""
     program = mission["programmes"][number]

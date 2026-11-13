@@ -307,11 +307,11 @@ Notation :
 
 | Écrit | Sens |
 |---|---|
-| `W` | registre de travail du script |
+| `WORK` | registre de travail du script |
 | `var[n]` | variable n (mot en dessous de 256, bit à partir de 256) |
 | `L65:` | étiquette 65 (`OP_SET_LABEL 65`) |
 | `goto L90;` | `OP_BRANCH 90`, ou saut conditionnel resté tel quel |
-| `goto L(W);` | `OP_EXECUTE_CALL` : saut à l'étiquette égale à `W` |
+| `goto L(WORK);` | `OP_EXECUTE_CALL` : saut à l'étiquette égale à `WORK` |
 | `ordre_en_cours` | état de l'ordre en cours, testé par `OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS` et `OP_GOTO_IF_CURRENT_COMMAND_DONE` |
 | `scène_active(zone n)` | `OP_IS_SCENE_ACTIVE n` |
 | `appeler programme n;` | `OP_EXEC_SUB_PROG n` |
@@ -320,7 +320,7 @@ Notation :
 
 Règles de traduction (sens des instructions d'après `SCProg` et `PSProg` de libRealSpace) :
 1. Une comparaison se fond dans le saut qui la suit. `OP_CMP_WORK_WITH_VALUE n` puis `OP_BRANCH_IF_LESS L` devient
-   `if (W < n) goto L;` : la comparaison se lit dans l'ordre du nom de l'instruction (`W` comparé à `n`).
+   `if (WORK < n) goto L;` : la comparaison se lit dans l'ordre du nom de l'instruction (`WORK` comparé à `n`).
    `OP_TEST_FLAG v` puis `OP_BRANCH_IF_EQUAL L` devient `if (var[v] != 0) goto L;` (« égal » = variable non nulle).
    Une comparaison qui n'est suivie d'aucun saut n'est pas écrite (elle ne change que l'état de comparaison).
 2. L'état de comparaison est oublié à chaque étiquette : un saut juste après une étiquette s'écrit avec le bit de la
@@ -332,29 +332,29 @@ Règles de traduction (sens des instructions d'après `SCProg` et `PSProg` de li
    étiquettes restent écrites : le saut est calculé, n'importe laquelle peut être visée.
 6. Les blocs s'emboîtent : les règles 3 et 4 s'appliquent aussi à l'intérieur d'un bloc.
 
-Le pseudo-code ne simplifie rien d'autre : `W = 66; var[6] = W;` reste en deux lignes, car `W` garde sa valeur pour
+Le pseudo-code ne simplifie rien d'autre : `WORK = 66; var[6] = WORK;` reste en deux lignes, car `WORK` garde sa valeur pour
 la suite du programme.
 
 Exemple, programme 14 de PRLH-M1 (activation de la scène 2) :
 
 ```
     var[666] = 1;
-    W = 66;
-    var[6] = W;
+    WORK = 66;
+    var[6] = WORK;
     var[280] = 1;
-    W = var[3];
-    if (W <= 67) {
+    WORK = var[3];
+    if (WORK <= 67) {
         OP_ACTIVATE_OBJ(n°27 KATE);
         OP_ACTIVATE_OBJ(n°28 KATETORP);
-        W = 69;
-        var[3] = W;
-        W = 88;
-        var[6] = W;
+        WORK = 69;
+        var[3] = WORK;
+        WORK = 88;
+        var[6] = WORK;
         return;
     }
-    W = var[0];
-    if (W != 3) {
-        if (W == 2) goto L67;
+    WORK = var[0];
+    if (WORK != 3) {
+        if (WORK == 2) goto L67;
         return;
     }
     OP_ACTIVATE_OBJ(n°31 KATETORP);
