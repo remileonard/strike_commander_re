@@ -176,7 +176,7 @@ n°27 et 28 (programme 10). Échelle : 5 km.</figcaption></figure>
 <tr><td class="num">2</td><td>.</td><td class="mono">(−3000, 0, 23000)</td><td class="num">8500</td><td>3</td></tr>
 </table></div>
 <p>Les zones 0 et 2 se chevauchent (17 727 m entre les centres, 18 500 m de rayons cumulés). Dans le chevauchement, c'est
-la scène 1 qui est retenue : la scène courante est la première scène active dont la zone contient le joueur
+la scène 1 qui est retenue : la scène courante est la première scène autorisée dont la zone contient le joueur
 (<code>Scene_FindMatchingByAreaContainment_54B1B</code>, même règle dans <code>SCMission::findSceneAt</code>).</p>
 
 <h3>Points (<code>SPOT</code>)</h3>
@@ -549,12 +549,12 @@ OP_SET_LABEL 1
 OP_ACTIVATE_OBJ 29
 OP_EXIT_PROG 0
 OP_SET_LABEL 2
-OP_IS_SCENE_ACTIVE 1
+OP_IS_SCENE_ENABLED 1
 OP_BRANCH_IF_NOT_EQUAL 90
 OP_ACTIVATE_OBJ 30
 OP_EXIT_PROG 0
 OP_SET_LABEL 3
-OP_IS_SCENE_ACTIVE 1
+OP_IS_SCENE_ENABLED 1
 OP_BRANCH_IF_NOT_EQUAL 90
 OP_ACTIVATE_OBJ 31
 OP_EXIT_PROG 0
@@ -566,9 +566,10 @@ OP_SET_LABEL 6
 OP_SET_FLAG_TO_TRUE 401
 OP_SET_LABEL 0
 OP_SET_LABEL 90</pre>
-<p><code>OP_IS_SCENE_ACTIVE</code>* (instruction 130 de <code>Expr_VM_Interpreter_51F24</code>, nom proposé) : cherche la scène
-de la zone donnée (<code>PtrList_GetAt_54919</code>, <code>Scene_FindByArea_54B92</code>) et pose le bit « égal » si l'octet 0
-de la scène est non nul ; cet octet est mis à 1 par <code>OP_ACTIVATE_SCENE</code> (instruction 128). Toutes les scènes de
+<p><code>OP_IS_SCENE_ENABLED</code>* (instruction 130 de <code>Expr_VM_Interpreter_51F24</code>, nom proposé) : cherche la scène
+de la zone donnée (<code>PtrList_GetAt_54919</code>, <code>Scene_FindByArea_54B92</code>) et pose le bit « égal » si la scène est <b>autorisée</b> (octet 0 non nul ; mis à 1 par <code>OP_ACTIVATE_SCENE</code>, 128, et à 0 par <code>OP_DEACTIVATE_SCENE</code>, 129).
+Ce n'est pas l'état <b>activée</b> (joueur présent dans la scène, octet +1, posé par <code>Scene_EnsureUnitsSpawned_549E4</code> à l'entrée et effacé par
+<code>Scene_LeaveMarkUnits_54A5F</code> à la sortie), qu'aucune instruction de script trouvée ne lit. Seule une scène autorisée peut être activée. Toutes les scènes de
 <code>PRLH-M1</code> ont cet octet à 1 dans le fichier, et aucun programme de la mission n'emploie 128 ou 129 : dans le jeu,
 le test réussit et les n°30 et 31 apparaissent.</p>
 <pre class="tpl">loc_5275F:                                   ; instruction 130
@@ -762,7 +763,7 @@ script de scène (programme 2).</li>
 <p>Écarts relevés entre le code de libRealSpace et <code>PACIFIC.EXE</code> (ou <code>STRIKE.EXE</code> quand c'est
 indiqué), avec leur effet sur <code>PRLH-M1</code>.</p>
 
-<h3 class="bug">9.1 <code>OP_IS_SCENE_ACTIVE</code> (130) absent de <code>PSProg</code> : dans le cas courant, la mission ne peut pas être gagnée</h3>
+<h3 class="bug">9.1 <code>OP_IS_SCENE_ENABLED</code> (130) absent de <code>PSProg</code> : dans le cas courant, la mission ne peut pas être gagnée</h3>
 <p>L'instruction est ignorée ; le bit de comparaison garde sa valeur de départ (<code>PROG_CMP_UNSET</code>, posée par le
 constructeur de <code>SCProg</code>), donc <code>OP_BRANCH_IF_NOT_EQUAL 90</code> saute : les n°30 et 31 n'apparaissent pas
 par le programme 9. Cas le plus courant (le joueur va au Nevada dès le décollage) :</p>

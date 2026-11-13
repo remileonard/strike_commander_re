@@ -12,7 +12,7 @@ a été lue), l'effet sur `PRLH-M1`, et ce qu'il faut regarder au débogueur. Ri
 | N° | Point | Effet sur PRLH-M1 | Gravité |
 |---|---|---|---|
 | 1 | Avions placés dans une zone, simulés avant leur activation | VAL n°2 détruit au chargement, variable 1 faussée | haute |
-| 2 | `OP_IS_SCENE_ACTIVE` absent de `PSProg` | torpilleurs n°30 et 31 jamais créés : mission impossible à gagner dans le cas courant | haute |
+| 2 | `OP_IS_SCENE_ENABLED` absent de `PSProg` | torpilleurs n°30 et 31 jamais créés : mission impossible à gagner dans le cas courant | haute |
 | 3 | Messages radio jamais affichés en Pacific Strike | aucun message radio (tour, Nevada, ailiers) | haute |
 | 4 | Plancher de la zone 0 au-dessus de la piste | la scène 1 peut ne s'activer qu'au décollage | à vérifier |
 | 5 | `activateTarget` place l'objet sur le premier `SPOT` de la zone | torpilleurs n°29 à 32 décalés | moyenne |
@@ -88,26 +88,35 @@ lui aussi l'objet du monde à cette étape (relu seulement pour le test du drape
 
 ---
 
-## 2. `OP_IS_SCENE_ACTIVE` absent de `PSProg`
+## 2. `OP_IS_SCENE_ENABLED` absent de `PSProg`
+
+**Deux états d'une scène, à ne pas confondre** (vocabulaire de ces documents) :
+- **autorisée** : octet 0 de la scène, lu dans le fichier (1er octet du `SCNE`), mis à 1 par `OP_ACTIVATE_SCENE`
+  (128) et à 0 par `OP_DEACTIVATE_SCENE` (129). Seule une scène autorisée peut devenir la scène courante
+  (`Scene_FindMatchingByAreaContainment_54B1B`). C'est ce que teste `OP_IS_SCENE_ENABLED` (130).
+- **activée** : le joueur est dans la scène. Octet +1, mis à 1 par `Scene_EnsureUnitsSpawned_549E4` quand le joueur
+  entre (création des objets de la scène, script d'activation) et à 0 par `Scene_LeaveMarkUnits_54A5F` quand il
+  sort. Aucune instruction de script trouvée ne le lit.
+
+Les noms `OP_ACTIVATE_SCENE` et `OP_DEACTIVATE_SCENE` sont ceux de libRealSpace ; ils changent l'état « autorisée ».
 
 **Constat.** L'instruction 130 n'a pas de méthode dans `PSProg` : `SCProg::execute` l'ignore sans message. Le bit de
 comparaison garde sa valeur de départ (`PROG_CMP_UNSET`, posée par le constructeur de `SCProg`), donc
 `OP_BRANCH_IF_NOT_EQUAL 90` saute toujours. Programme 9 (destruction d'un torpilleur) :
 ```
 OP_SET_LABEL 2
-OP_IS_SCENE_ACTIVE 1
+OP_IS_SCENE_ENABLED 1
 OP_BRANCH_IF_NOT_EQUAL 90
 OP_ACTIVATE_OBJ 30
 OP_EXIT_PROG 0
 OP_SET_LABEL 3
-OP_IS_SCENE_ACTIVE 1
+OP_IS_SCENE_ENABLED 1
 OP_BRANCH_IF_NOT_EQUAL 90
 OP_ACTIVATE_OBJ 31
 ```
 
 **Dans le jeu.** `Expr_VM_Interpreter_51F24`, instruction 130 : efface le bit « égal », cherche la scène de la zone
-donnée (`PtrList_GetAt_54919`, `Scene_FindByArea_54B92`) et pose « égal » si l'octet 0 de la scène est non nul. Cet
-octet est mis à 1 par `OP_ACTIVATE_SCENE` (instruction 128). Dans PRLH-M1, toutes les scènes l'ont à 1 dans le
+donnée (`PtrList_GetAt_54919`, `Scene_FindByArea_54B92`) et pose « égal » si la scène est autorisée (octet 0 non nul). Dans PRLH-M1, toutes les scènes l'ont à 1 dans le
 fichier : le test réussit.
 ```
 loc_5275F:
@@ -341,7 +350,7 @@ joueur. Dans le jeu, il suit donc le joueur par le 7 tant qu'il est en formation
   comme dans le jeu (`Expr_LookupNamedValue_530A7` : `cmp [si], dx` / `jbe` → pointeur nul).
 - `OP_TEST_FLAG` pose « égal » si la variable est non nulle, dans `PSProg::opTestFlag` comme dans le jeu
   (`Expr_VM_Interpreter_51F24`, instruction 69 : `cmp word ptr [bp+var_8], 0` / `jz`).
-- Choix de la scène courante : première scène active dont la zone contient le joueur, dans
+- Choix de la scène courante : première scène autorisée dont la zone contient le joueur, dans
   `SCMission::findSceneAt` comme dans `Scene_FindMatchingByAreaContainment_54B1B`.
 - `OP_SET_WAIT_FOR_SECONDS` dans un script d'acteur : minuteur de l'acteur, réglé au premier passage puis décompté à
   chaque image (`SCProg::opSetWaitForSeconds`).

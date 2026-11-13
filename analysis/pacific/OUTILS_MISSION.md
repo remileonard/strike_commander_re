@@ -113,7 +113,7 @@ Règles de lecture de PACIFIC.EXE (`README.md` § 6) :
 
 Chaque instruction est rendue avec son octet de départ dans le chunk, son numéro, son nom et ses arguments. Les noms
 viennent de `SCenums.h` de libRealSpace et des noms proposés de `MISSION_SCRIPT_OPCODES.md` et du `README.md` de
-Pacific (130 = `OP_IS_SCENE_ACTIVE`) ; une instruction sans nom s'écrit `OP_<numéro>`.
+Pacific (130 = `OP_IS_SCENE_ENABLED`) ; une instruction sans nom s'écrit `OP_<numéro>`.
 
 ### Format JSON
 
@@ -333,7 +333,7 @@ Notation :
 | `goto LABEL_90;` | `OP_BRANCH 90`, ou saut conditionnel resté tel quel |
 | `goto LABEL(WORK);` | `OP_EXECUTE_CALL` : saut à l'étiquette égale à `WORK` |
 | `ordre_en_cours` | état de l'ordre en cours, testé par `OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS` et `OP_GOTO_IF_CURRENT_COMMAND_DONE` |
-| `scène_active(zone n)` | `OP_IS_SCENE_ACTIVE n` |
+| `scène_autorisée(zone n)` | `OP_IS_SCENE_ENABLED n` : la scène de la zone n est autorisée (octet 0 ; pas « le joueur y est ») |
 | `appeler programme n;` | `OP_EXEC_SUB_PROG n` |
 | `return;` | `OP_EXIT_PROG` |
 | `OP_NOM(arguments);` | toute autre instruction, arguments objet (`n°23 BB`), point (`SPOT 4`) ou nombre |
