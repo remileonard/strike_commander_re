@@ -330,7 +330,7 @@ Détail du jeu : `README.md` § 10.
 réaction au moral de Strike Commander (`SCAIBrain::moraleReaction`), qui demande l'ordre `OP_SET_OBJ_FOLLOW_ALLY`
 pour reconnaître l'ailier du joueur (point 10).
 
-**Effet sur PRLH-M1.** La liste de JESTER est `5 7 2 8 4 3 9 1` : son allié par défaut (champ du `PART`) est l'objet n° 36, le
+**Effet sur PRLH-M1.** La liste de JESTER est `5 7 2 4 8 3 9 1` : son allié par défaut (champ du `PART`) est l'objet n° 36, le
 joueur. Dans le jeu, il suit donc le joueur par le 7 tant qu'il est en formation, avant même l'ordre du programme 16 ; dans libRealSpace, seul l'ordre du script peut le faire suivre.
 
 ---
