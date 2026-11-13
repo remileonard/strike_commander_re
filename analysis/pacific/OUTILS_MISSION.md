@@ -246,7 +246,7 @@ Dépendances : `tkinter` (fourni avec Python sous Windows et macOS ; sous Linux,
 | barre du haut | choix de la mission (« nom — titre »), calques : relief, pistes, zones, points `SPOT`, objets, étiquettes, liens des scripts, objets jamais activés |
 | liste de gauche | les objets, une ligne par objet : numéro, objet, `CAST`, camp |
 | carte | terrain, pistes, zones, points, objets |
-| onglet **Objet** | champs du `PART`, sol sous l'objet, ce qui l'active, ses 4 scripts désassemblés |
+| onglet **Objet** | vue 3D du modèle (boutons ◀ ▶ : tourner de 45°), champs du `PART`, sol sous l'objet, profil `INTEL` (messages radio ; `GOAL`, `MVRS`, `ATRB` si le profil a un FORM `_AI_`), ce qui l'active, ses 4 scripts |
 | onglet **Scènes** | une ligne par scène ; une scène choisie : ses objets (rang → numéro) et ses 3 scripts ; sa zone et ses objets sont surlignés sur la carte |
 | onglet **Zones et points** | zones (forme, centre, valeurs) ; points `SPOT` avec position et emplois dans les programmes |
 | onglet **Programmes** | un programme : qui le lance (objet et rôle du script, scène, `OP_EXEC_SUB_PROG`) et son désassemblage |
@@ -292,6 +292,33 @@ Liens tirés des scripts (en suivant `OP_EXEC_SUB_PROG`) :
 Classe et `KIND` d'un objet : FORM de classe sous `REAL/OBJT` et premier octet du chunk `KIND` de
 `OBJECTS\<nom>.IFF`. Un objet placé par rapport au joueur (`placement` non nul) n'est pas dessiné : sa position dépend
 de l'avion du joueur.
+
+### Vue 3D et profil d'IA
+
+**Vue 3D.** Modèle de `OBJECTS\<nom>.IFF`, niveau de détail 0, vu à 20° au-dessus, depuis le cap choisi (35° au
+départ, ± 45° par bouton). Lecture du format de Pacific : `tools/ps_object_render.py` (constaté sur les données, pas
+relu dans PACIFIC.EXE) ; dessin : `tools/object_render.py` (règles de Strike Commander, lumière de `MISSION.IFF` de
+Strike Commander). Palette : `PALETTE\PALETTE.IFF` de `PACIFIC.DAT`. Les textures sont dessinées ; le brouillard non.
+Un objet sans fichier (pistes `RWAY*`) n'a pas de vue. Essai : les 82 noms d'objets des 51 missions se dessinent.
+
+**Profil d'IA** (FORM `_AI_` de `INTEL\<CAST>.IFF`) :
+
+| Chunk | Affichage |
+|---|---|
+| `GOAL` | les valeurs dans l'ordre du fichier, chacune avec son rôle au chargement dans PACIFIC.EXE (`PilotProfile_LoadFromPROF_843EA`) : 1 et 9 posent un octet de l'entité sans prendre d'emplacement ; 2 à 8 choisissent un gestionnaire ; 6 n'en a pas (erreur 32776) |
+| `MVRS` | les paires (numéro de manœuvre, valeur signée) telles qu'elles sont dans le fichier ; leur sens n'a été relu que dans STRIKE.EXE (`AI_SYSTEM.md` § 3) |
+| `ATRB` | les octets du fichier, avec leur rang ; rôle non relu dans PACIFIC.EXE |
+
+Gestionnaires de `GOAL` (table de données à l'adresse 76B10 de PACIFIC.EXE) :
+
+| Valeur | Fonction |
+|---|---|
+| 2 | `Goal_ExecuteObjective_C9E4` (ordre en cours du script) |
+| 3 | fonction pas encore nommée (`sub_D001`) |
+| 4 | fonction pas encore nommée (`sub_B968`) |
+| 5 | fonction pas encore nommée (`sub_B712`, nom proposé `Goal_MoraleCheck_B712`) : toutes les 5 secondes au plus, une valeur calculée par une autre fonction pas encore nommée (`sub_EC40`) ; si elle vaut 5, une chance sur 36 d'envoyer le message radio 8 ; rend toujours 0 |
+| 7 | fonction pas encore nommée (`sub_C91C`) |
+| 8 | fonction pas encore nommée (`sub_C93E`) |
 
 ### Pseudo-code des scripts
 

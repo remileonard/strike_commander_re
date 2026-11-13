@@ -49,8 +49,10 @@ def read_texture(body, animated):
 class PSModel(orr.Model):
     """Même interface que object_render.Model, lue dans le format de Pacific Strike."""
 
-    def __init__(self, path):
-        data = open(path, "rb").read()
+    def __init__(self, path, data=None):
+        """path : fichier objet ; data : son contenu déjà lu (alors path ne sert pas)."""
+        if data is None:
+            data = open(path, "rb").read()
         self.vertices = []
         self.faces = []
         self.levels = []

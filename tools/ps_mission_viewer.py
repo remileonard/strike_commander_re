@@ -4,7 +4,8 @@
 Ouvre PACIFIC.DAT (rien n'est écrit) et affiche, pour la mission choisie :
 - la carte : relief du terrain, pistes, zones AREA, points SPOT, objets PART (couleur = camp, forme = classe de
   l'objet), objets jamais activés par la mission en contour seul ;
-- l'objet choisi (clic sur la carte ou dans la liste) : ses champs, ce qui l'active, ses 4 scripts désassemblés, et sur
+- l'objet choisi (clic sur la carte ou dans la liste) : une vue 3D de son modèle (tools/ps_object_render.py), ses
+  champs, son profil INTEL (messages radio, et GOAL, MVRS, ATRB pour une IA), ce qui l'active, ses 4 scripts, et sur
   la carte les liens tirés de ses scripts (points SPOT de navigation, objets visés) ;
 - les scènes (clic : zone et objets surlignés), les zones et points, les programmes (avec qui les lance), les
   variables (programmes qui les écrivent et qui les lisent), la mission (messages, LOAD, TEAM).
@@ -116,6 +117,9 @@ class Viewer:
         top.pack(side=tk.TOP, fill=tk.X)
         ttk.Label(top, text="Mission :").pack(side=tk.LEFT)
         self.code_mode = tk.StringVar(value="pseudo")
+        self.render_yaw = 35
+        self.render_cache = {}
+        self.render_photo = None
         self.current_owner_program = None
         self.current_program = None
         self.mission_box = ttk.Combobox(top, state="readonly", width=34)
@@ -485,6 +489,7 @@ class Viewer:
         t = self.text_object
         self.text_begin(t)
         self.put(t, "%s  (rang %d dans PART)\n" % (self.object_label(obj["numéro"]), obj["rang"]), "titre")
+        self.put_render(t, obj)
         rows = [
             ("CAST", obj["cast"]),
             ("objet", obj["nom"]),
@@ -533,6 +538,7 @@ class Viewer:
             for key in sorted(profile["messages"]):
                 self.put(t, "  message %3d  " % key, "gris")
                 self.put(t, "%s\n" % profile["messages"][key])
+            self.put_ai(t, profile)
         for slot, number in enumerate(obj["scripts"]):
             self.put(t, "\n%s : " % data.SCRIPT_SLOTS[slot], "titre")
             if number == 65535:
@@ -542,6 +548,60 @@ class Viewer:
             self.put(t, "\n")
             self.put_program(t, number, obj["numéro"])
         self.text_end(t)
+
+    def put_render(self, t, obj):
+        """Vue de l'objet (niveau de détail 0) et deux boutons pour tourner autour de 45°."""
+        key = (obj["nom"], self.render_yaw)
+        if key not in self.render_cache:
+            image = self.archive.render_object(obj["nom"], self.render_yaw, 20.0)
+            if image is not None:
+                image = image.resize((480, 300), Image.NEAREST)
+            self.render_cache[key] = image
+        image = self.render_cache[key]
+        if image is None:
+            self.put(t, "  (pas de modèle 3D dans OBJECTS\\%s.IFF)\n" % obj["nom"], "gris")
+            return
+        self.render_photo = ImageTk.PhotoImage(image)
+        t.image_create(tk.END, image=self.render_photo, padx=4, pady=4)
+        self.put(t, "\n  ")
+        t.window_create(tk.END, window=ttk.Button(t, text="◀ 45°", width=6, command=self.turn_left))
+        self.put(t, "  vue du cap %d, 20° au-dessus  " % (self.render_yaw % 360), "gris")
+        t.window_create(tk.END, window=ttk.Button(t, text="45° ▶", width=6, command=self.turn_right))
+        self.put(t, "\n")
+
+    def turn_left(self):
+        self.turn(-45)
+
+    def turn_right(self):
+        self.turn(45)
+
+    def turn(self, step):
+        self.render_yaw = (self.render_yaw + step) % 360
+        if self.selected is not None:
+            self.show_object(self.objects_by_number[self.selected])
+
+    def put_ai(self, t, profile):
+        """Chunks _AI_ du profil : GOAL (rôle de chaque valeur dans PACIFIC.EXE), MVRS (paires telles quelles), ATRB."""
+        ai = profile.get("ia")
+        if not ai:
+            self.put(t, "  pas de FORM _AI_ dans le profil\n", "gris")
+            return
+        if "GOAL" in ai:
+            self.put(t, "\n  GOAL", "titre")
+            self.put(t, "  (dans l'ordre du fichier)\n", "gris")
+            for rank, value in enumerate(ai["GOAL"]):
+                self.put(t, "    %d. %3d  " % (rank + 1, value))
+                self.put(t, "%s\n" % data.GOAL_ROLES.get(value, "valeur hors de la table du chargeur"), "gris")
+        if "MVRS" in ai:
+            self.put(t, "\n  MVRS", "titre")
+            self.put(t, "  (numéro de manœuvre, valeur signée ; sens relu dans STRIKE.EXE seulement, AI_SYSTEM.md § 3)\n", "gris")
+            for ident, value in ai["MVRS"]:
+                self.put(t, "    manœuvre %3d   valeur %3d\n" % (ident, value))
+        if "ATRB" in ai:
+            self.put(t, "\n  ATRB", "titre")
+            self.put(t, "  (octets du fichier)\n", "gris")
+            for rank, value in enumerate(ai["ATRB"]):
+                self.put(t, "    octet %2d   %3d\n" % (rank, value))
 
     def on_scene_select(self, event):
         chosen = self.scene_list.selection()

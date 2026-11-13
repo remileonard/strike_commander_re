@@ -139,7 +139,11 @@ class Shading:
     """Palette, gammes RANG et éclairage (WRLD/LGHT, DATA_MODEL.md §6.8ter)."""
 
     def __init__(self, palette_path, ambient_weight, light_weight, light_dir):
-        self.rgb, self.rang = read_palette(palette_path)
+        """palette_path : chemin de PALETTE.IFF, ou couple (palette, gammes RANG) déjà lu."""
+        if isinstance(palette_path, tuple):
+            self.rgb, self.rang = palette_path
+        else:
+            self.rgb, self.rang = read_palette(palette_path)
         total = ambient_weight + light_weight
         self.ambient = ambient_weight * 255 // total
         self.share = light_weight * 255 // total

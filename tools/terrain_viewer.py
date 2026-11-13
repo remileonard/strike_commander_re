@@ -57,7 +57,11 @@ def read_palette(path):
     """DATA\\PALETTE.IFF (DATA_MODEL.html, « La palette ») : chunk PALT = 4 octets puis
     256 × (R, V, B) sur 0..63 ; chunk RANG = uint16 nombre, puis 13 octets par couleur de base
     (uint16 première teinte, uint16 nombre de teintes, uint16 décalage de brouillard, …)."""
-    t = open(path, "rb").read()
+    return read_palette_data(open(path, "rb").read())
+
+
+def read_palette_data(t):
+    """Même lecture que read_palette, sur le contenu du fichier déjà en mémoire."""
     pal = None
     rang = []
     p = 12

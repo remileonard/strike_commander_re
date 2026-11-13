@@ -17,6 +17,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np  # noqa: E402
 
 import object_render as orr  # noqa: E402
+import ps_object_render as por  # noqa: E402
+import terrain_viewer as tv  # noqa: E402
 import pkware_dcl  # noqa: E402
 import ps_mission_dump as pmd  # noqa: E402
 import sc_data  # noqa: E402
@@ -74,6 +76,26 @@ SCENE_SLOTS = [
 ]
 
 
+def struct_error():
+    import struct
+    return struct.error
+
+
+# Chunk GOAL lu par PilotProfile_LoadFromPROF_843EA de PACIFIC.EXE : 1 et 9 posent un octet de l'entité, sans
+# emplacement ; 2 à 8 choisissent un gestionnaire (fonction pas encore nommée en 84AA0, table de données 76B10).
+GOAL_ROLES = {
+    1: "pose l'octet [entité+505] à 1, pas d'emplacement",
+    2: "Goal_ExecuteObjective_C9E4 (exécute l'ordre en cours du script)",
+    3: "fonction pas encore nommée (sub_D001)",
+    4: "fonction pas encore nommée (sub_B968)",
+    5: "fonction pas encore nommée (sub_B712, nom proposé Goal_MoraleCheck_B712)",
+    6: "aucun gestionnaire : erreur 32776",
+    7: "fonction pas encore nommée (sub_C91C)",
+    8: "fonction pas encore nommée (sub_C93E)",
+    9: "pose l'octet [entité+359] à 1, pas d'emplacement",
+}
+
+
 class Archive:
     def __init__(self, path):
         self.path = path
@@ -82,6 +104,8 @@ class Archive:
         self.terrains = {}
         self.classes = {}
         self.profiles = {}
+        self.models = {}
+        self.shading = None
         self.lock = threading.Lock()
 
     def entry(self, key):
@@ -135,6 +159,16 @@ class Archive:
                     found["nom"] = names[0].decode("latin1")
                     if len(names) > 1:
                         found["indicatif"] = names[1].decode("latin1")
+                elif where == "/PROF/_AI_" and tag in ("GOAL", "ATRB"):
+                    found.setdefault("ia", {})[tag] = list(chunk)
+                elif where == "/PROF/_AI_" and tag == "MVRS":
+                    pairs = []
+                    for k in range(0, size - size % 2, 2):
+                        value = chunk[k + 1]
+                        if value >= 128:
+                            value -= 256
+                        pairs.append((chunk[k], value))
+                    found.setdefault("ia", {})["MVRS"] = pairs
                 elif where == "/PROF/RADI" and tag == "MSGS":
                     k = 0
                     while k < len(chunk):
@@ -145,6 +179,34 @@ class Archive:
                         k = end + 1
         self.profiles[cast] = found
         return found
+
+    def render_object(self, name, yaw, pitch):
+        """Image (PIL, 320 × 200) de OBJECTS\\<nom>.IFF vue du cap yaw et de la hauteur pitch (degrés), niveau de
+        détail 0, avec tools/ps_object_render.py (format de Pacific) et tools/object_render.py (règles de dessin de
+        Strike Commander). None si l'objet n'a pas de modèle."""
+        key = "DATA/OBJECTS/%s.IFF" % name.upper()
+        if key not in self.index:
+            return None
+        if name not in self.models:
+            try:
+                model = por.PSModel(None, self.entry(key))
+            except (ValueError, IndexError, KeyError, struct_error()):
+                model = None
+            if model is not None and (not model.vertices or not model.faces):
+                model = None
+            self.models[name] = model
+        model = self.models[name]
+        if model is None:
+            return None
+        if self.shading is None:
+            palette = tv.read_palette_data(self.entry("DATA/PALETTE/PALETTE.IFF"))
+            self.shading = orr.Shading(palette, 3, 5, (-10.0, -25.0, 100.0))
+        camera = orr.Camera(model.centre, yaw, pitch, model.radius * 2.6, 277.0)
+        canvas = orr.render(model, self.shading, camera, 0, 0)
+        rows = orr.to_rgb(canvas, self.shading, 1)
+        flat = bytes(v for row in rows for px in row for v in px)
+        from PIL import Image
+        return Image.frombytes("RGB", (orr.WIDTH, orr.HEIGHT), flat)
 
     def object_class(self, name):
         """FORM de classe de OBJECTS\\<nom>.IFF (JETP, SHIP, GRND…) et octet du chunk KIND."""
