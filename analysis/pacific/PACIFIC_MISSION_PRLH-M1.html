@@ -90,6 +90,8 @@ ol.steps li::before { content: counter(s); font-family: var(--font-mono); font-w
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 p code, li code { overflow-wrap: anywhere; }
+table.objs th, table.objs td { white-space: nowrap; padding: 5px 7px; font-size: 13px; }
+table.objs td:last-child { white-space: normal; min-width: 120px; }
 </style>
 </head>
 <body>
@@ -188,68 +190,90 @@ la scène 1 qui est retenue : la scène courante est la première scène active 
 <tr><td class="num">4</td><td>1</td><td class="mono">(7500, 2000, 35900)</td><td>« defend USS Nevada »</td></tr>
 <tr><td class="num">5</td><td>—</td><td class="mono">(12900, 0, 46400)</td><td>1<sup>re</sup> destination du Nevada</td></tr>
 <tr><td class="num">6</td><td>—</td><td class="mono">(15900, 0, 51900)</td><td>2<sup>e</sup> destination du Nevada</td></tr>
-<tr><td class="num">7 à 13</td><td>—</td><td>petits décalages (−3 à 11 m, −150 à 100 m)</td><td>arguments de <code>OP_FIRE_AT_SPOT</code> (points pris dans le repère de l'objet)</td></tr>
+<tr><td class="num">7</td><td>—</td><td class="mono">(11, 0, 11)</td><td>second argument de <code>OP_SET_OBJ_FLY_TO_WP</code> du Nevada (programme 15) ; rôle non relu</td></tr>
+<tr><td class="num">8</td><td>—</td><td class="mono">(0, −8, −3)</td><td><code>SPOT</code> de départ de <code>OP_FIRE_AT_SPOT</code> (programme 11)</td></tr>
+<tr><td class="num">9</td><td>—</td><td class="mono">(0, −25, −150)</td><td><code>SPOT</code> visé de <code>OP_FIRE_AT_SPOT</code> (programme 11)</td></tr>
+<tr><td class="num">10</td><td>—</td><td class="mono">(5, 12, 100)</td><td><code>SPOT</code> de départ de <code>OP_FIRE_AT_SPOT</code> (programmes 12 et 13)</td></tr>
+<tr><td class="num">11</td><td>—</td><td class="mono">(5, 9, −100)</td><td><code>SPOT</code> de départ de <code>OP_FIRE_AT_SPOT</code> (programmes 12 et 13)</td></tr>
+<tr><td class="num">12</td><td>—</td><td class="mono">(−3, 14, −50)</td><td><code>SPOT</code> de départ de <code>OP_FIRE_AT_SPOT</code> (programme 13)</td></tr>
+<tr><td class="num">13</td><td>—</td><td class="mono">(0, −100, 0)</td><td><code>SPOT</code> visé de <code>OP_FIRE_AT_SPOT</code> (programmes 12 et 13)</td></tr>
 </table></div>
 </article>
 
 <!-- 3 -->
 <article class="card" id="entites">
   <header><span class="id">3</span><h2>Les objets</h2></header>
-<p>Colonnes « scripts » : numéro du programme lancé à l'activation, à chaque mise à jour, à la destruction, au début de
-la mission (— = 65535, aucun). « Activé par » : la scène qui le cite, ou l'instruction <code>OP_ACTIVATE_OBJ</code> d'un
+<p>Une ligne par objet. Colonnes Act. (activation), MàJ (mise à jour), Destr. (destruction), Début : numéro du programme lancé à l'activation, à chaque mise à jour, à la destruction, au début de
+la mission (— = 65535, aucun). Allié : numéro de l'objet suivi (— = 255). Vit. : vitesse du fichier. « Activé par » : la scène qui le cite, ou l'instruction <code>OP_ACTIVATE_OBJ</code> d'un
 programme. Positions = décalage + centre de la zone pour les objets placés dans une zone.</p>
 
 <h3>Japonais (camp 255)</h3>
-<div class="tablewrap"><table>
-<tr><th>N°</th><th>Rang</th><th>Objet</th><th>Position</th><th>Cap, vitesse</th><th>Scripts</th><th>Activé par</th></tr>
-<tr><td class="num">1</td><td class="num">0</td><td>VAL (JAP-V)</td><td class="mono">(−15150, 3672, 33350)</td><td>90, 75</td><td>— 63 7 —</td><td>scène 1</td></tr>
-<tr><td class="num">2</td><td class="num">1</td><td>VAL</td><td class="mono">(−14130, 272, 36105)</td><td>90, 150</td><td>11 33 7 —</td><td>scène 1</td></tr>
-<tr><td class="num">3</td><td class="num">2</td><td>VAL</td><td class="mono">(−24250, 3672, 36700)</td><td>90, 75</td><td>— 33 7 —</td><td>aucune scène ni instruction de la mission</td></tr>
-<tr><td class="num">4</td><td class="num">3</td><td>VAL</td><td class="mono">(−24750, 3122, 36500)</td><td>90, 75</td><td>— 33 — —</td><td>aucune scène ni instruction de la mission</td></tr>
-<tr><td class="num">5</td><td class="num">4</td><td>VAL</td><td class="mono">(−13750, 3672, 35200)</td><td>180, 75</td><td>— 33 8 —</td><td>programme 4</td></tr>
-<tr><td class="num">6</td><td class="num">5</td><td>VAL</td><td class="mono">(−13950, 2122, 35200)</td><td>180, 75</td><td>— 31 8 —</td><td>programme 4</td></tr>
-<tr><td class="num">27</td><td class="num">26</td><td>KATE</td><td class="mono">(12900, 2000, 35400)</td><td>180, 70</td><td>— 10 9 —</td><td>programmes 2 et 14</td></tr>
-<tr><td class="num">28</td><td class="num">27</td><td>KATETORP</td><td class="mono">(13100, 1000, 35900)</td><td>180, 70</td><td>— 10 9 —</td><td>programmes 2 et 14</td></tr>
-<tr><td class="num">29</td><td class="num">28</td><td>KATE (zone 1)</td><td class="mono">(12900, 2000, 35400)</td><td>270, 70</td><td>— 10 9 —</td><td>programme 9</td></tr>
-<tr><td class="num">30</td><td class="num">29</td><td>KATETORP (zone 1)</td><td class="mono">(12900, 1000, 35100)</td><td>270, 70</td><td>— 10 9 —</td><td>programmes 9 et 14</td></tr>
-<tr><td class="num">31</td><td class="num">30</td><td>KATETORP (zone 1)</td><td class="mono">(12900, 1000, 34800)</td><td>270, 70</td><td>— 10 9 —</td><td>programmes 9 et 14</td></tr>
-<tr><td class="num">32</td><td class="num">31</td><td>KATETORP (zone 1)</td><td class="mono">(12900, 1000, 35400)</td><td>270, 70</td><td>— 10 9 —</td><td>programme 9</td></tr>
-<tr><td class="num">33 à 35</td><td class="num">32 à 34</td><td>KATE (zone 1)</td><td class="mono">(12900, 2000, 35100 à 34500)</td><td>270, 70</td><td>— 10 9 —</td><td>aucune scène ni instruction de la mission</td></tr>
+<div class="tablewrap"><table class="objs">
+<tr><th>N°</th><th>Rang</th><th>Objet</th><th>CAST</th><th>Zone</th><th>x</th><th>y</th><th>z</th><th>Cap</th><th>Vit.</th><th>Allié</th><th>Act.</th><th>MàJ</th><th>Destr.</th><th>Début</th><th>Activé par</th></tr>
+<tr><td class="num">1</td><td class="num">0</td><td>VAL</td><td>JAP-V</td><td>0</td><td class="mono">−15150</td><td class="mono">3672</td><td class="mono">33350</td><td>90</td><td>75</td><td>—</td><td>—</td><td>63</td><td>7</td><td>—</td><td>scène 1</td></tr>
+<tr><td class="num">2</td><td class="num">1</td><td>VAL</td><td>JAP-V</td><td>0</td><td class="mono">−14130</td><td class="mono">272</td><td class="mono">36105</td><td>90</td><td>150</td><td>—</td><td>11</td><td>33</td><td>7</td><td>—</td><td>scène 1</td></tr>
+<tr><td class="num">3</td><td class="num">2</td><td>VAL</td><td>JAP-V</td><td>0</td><td class="mono">−24250</td><td class="mono">3672</td><td class="mono">36700</td><td>90</td><td>75</td><td>—</td><td>—</td><td>33</td><td>7</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">4</td><td class="num">3</td><td>VAL</td><td>JAP-V</td><td>0</td><td class="mono">−24750</td><td class="mono">3122</td><td class="mono">36500</td><td>90</td><td>75</td><td>—</td><td>—</td><td>33</td><td>—</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">5</td><td class="num">4</td><td>VAL</td><td>JAP-V</td><td>0</td><td class="mono">−13750</td><td class="mono">3672</td><td class="mono">35200</td><td>180</td><td>75</td><td>—</td><td>—</td><td>33</td><td>8</td><td>—</td><td>programme 4</td></tr>
+<tr><td class="num">6</td><td class="num">5</td><td>VAL</td><td>JAP-V</td><td>0</td><td class="mono">−13950</td><td class="mono">2122</td><td class="mono">35200</td><td>180</td><td>75</td><td>—</td><td>—</td><td>31</td><td>8</td><td>—</td><td>programme 4</td></tr>
+<tr><td class="num">27</td><td class="num">26</td><td>KATE</td><td>JAP-V</td><td>—</td><td class="mono">12900</td><td class="mono">2000</td><td class="mono">35400</td><td>180</td><td>70</td><td>—</td><td>—</td><td>10</td><td>9</td><td>—</td><td>programme 2, programme 14</td></tr>
+<tr><td class="num">28</td><td class="num">27</td><td>KATETORP</td><td>JAP-V</td><td>—</td><td class="mono">13100</td><td class="mono">1000</td><td class="mono">35900</td><td>180</td><td>70</td><td>—</td><td>—</td><td>10</td><td>9</td><td>—</td><td>programme 2, programme 14</td></tr>
+<tr><td class="num">29</td><td class="num">28</td><td>KATE</td><td>JAP-V</td><td>1</td><td class="mono">12900</td><td class="mono">2000</td><td class="mono">35400</td><td>270</td><td>70</td><td>—</td><td>—</td><td>10</td><td>9</td><td>—</td><td>programme 9</td></tr>
+<tr><td class="num">30</td><td class="num">29</td><td>KATETORP</td><td>JAP-V</td><td>1</td><td class="mono">12900</td><td class="mono">1000</td><td class="mono">35100</td><td>270</td><td>70</td><td>—</td><td>—</td><td>10</td><td>9</td><td>—</td><td>programme 9, programme 14</td></tr>
+<tr><td class="num">31</td><td class="num">30</td><td>KATETORP</td><td>JAP-V</td><td>1</td><td class="mono">12900</td><td class="mono">1000</td><td class="mono">34800</td><td>270</td><td>70</td><td>—</td><td>—</td><td>10</td><td>9</td><td>—</td><td>programme 9, programme 14</td></tr>
+<tr><td class="num">32</td><td class="num">31</td><td>KATETORP</td><td>JAP-V</td><td>1</td><td class="mono">12900</td><td class="mono">1000</td><td class="mono">35400</td><td>270</td><td>70</td><td>—</td><td>—</td><td>10</td><td>9</td><td>—</td><td>programme 9</td></tr>
+<tr><td class="num">33</td><td class="num">32</td><td>KATE</td><td>JAP-V</td><td>1</td><td class="mono">12900</td><td class="mono">2000</td><td class="mono">35100</td><td>270</td><td>70</td><td>—</td><td>—</td><td>10</td><td>9</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">34</td><td class="num">33</td><td>KATE</td><td>JAP-V</td><td>1</td><td class="mono">12900</td><td class="mono">2000</td><td class="mono">34800</td><td>270</td><td>70</td><td>—</td><td>—</td><td>10</td><td>9</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">35</td><td class="num">34</td><td>KATE</td><td>JAP-V</td><td>1</td><td class="mono">12900</td><td class="mono">2000</td><td class="mono">34500</td><td>270</td><td>70</td><td>—</td><td>—</td><td>10</td><td>9</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
 </table></div>
 
-<h3>Ewa Field (camp 1, tous dans la zone 0)</h3>
-<div class="tablewrap"><table>
-<tr><th>N°</th><th>Rang</th><th>Objet</th><th>Position</th><th>Scripts</th><th>Activé par</th></tr>
-<tr><td class="num">7, 8, 9</td><td class="num">6, 7, 8</td><td>RWAYS, RWAYM1, RWAYN (pistes)</td><td class="mono">x = −13950, z = 36670 / 36585 / 36510</td><td>RWAYM1 : mise à jour 17</td><td>aucune scène ni instruction de la mission</td></tr>
-<tr><td class="num">10</td><td class="num">9</td><td>RADIOTW (XMIT-EWA, tour radio)</td><td class="mono">(−14750, 122, 35300)</td><td>— 5 6 —</td><td>scène 1</td></tr>
-<tr><td class="num">11, 12</td><td class="num">11, 12</td><td>HANGAR</td><td class="mono">x = −14100</td><td>destruction 18</td><td>scène 1</td></tr>
-<tr><td class="num">13</td><td class="num">13</td><td>HANGAR2</td><td class="mono">(−14150, 122, 36000)</td><td>destruction 18</td><td>aucune (rang 13 absent de la liste de la scène 1)</td></tr>
-<tr><td class="num">14, 15</td><td class="num">14, 15</td><td>HANGAR2</td><td class="mono">x = −14150</td><td>destruction 18</td><td>scène 1</td></tr>
-<tr><td class="num">16</td><td class="num">16</td><td>GENER</td><td class="mono">(−13100, 122, 36400)</td><td>destruction 19</td><td>scène 1</td></tr>
-<tr><td class="num">17</td><td class="num">17</td><td>GENERX2</td><td class="mono">(−13100, 122, 35900)</td><td>destruction 18</td><td>scène 1</td></tr>
-<tr><td class="num">18, 19, 20</td><td class="num">18, 19, 20</td><td>GREYTANK</td><td class="mono">x = −14100</td><td>destruction 19</td><td>scène 1</td></tr>
-<tr><td class="num">21</td><td class="num">10</td><td>USFLAG</td><td class="mono">(−13750, 122, 36600)</td><td>destruction 18</td><td>scène 1</td></tr>
-<tr><td class="num">22</td><td class="num">21</td><td>50CLBASE</td><td class="mono">(−13250, 122, 36050)</td><td>destruction 19</td><td>scène 1</td></tr>
+<h3>Ewa Field (camp 1)</h3>
+<div class="tablewrap"><table class="objs">
+<tr><th>N°</th><th>Rang</th><th>Objet</th><th>CAST</th><th>Zone</th><th>x</th><th>y</th><th>z</th><th>Cap</th><th>Vit.</th><th>Allié</th><th>Act.</th><th>MàJ</th><th>Destr.</th><th>Début</th><th>Activé par</th></tr>
+<tr><td class="num">7</td><td class="num">6</td><td>RWAYS</td><td>NULL</td><td>0</td><td class="mono">−13950</td><td class="mono">122</td><td class="mono">36670</td><td>0</td><td>0</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">8</td><td class="num">7</td><td>RWAYM1</td><td>NULL</td><td>0</td><td class="mono">−13950</td><td class="mono">122</td><td class="mono">36585</td><td>0</td><td>0</td><td>—</td><td>—</td><td>17</td><td>—</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">9</td><td class="num">8</td><td>RWAYN</td><td>NULL</td><td>0</td><td class="mono">−13950</td><td class="mono">122</td><td class="mono">36510</td><td>0</td><td>0</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">10</td><td class="num">9</td><td>RADIOTW</td><td>XMIT-EWA</td><td>0</td><td class="mono">−14750</td><td class="mono">122</td><td class="mono">35300</td><td>0</td><td>0</td><td>—</td><td>—</td><td>5</td><td>6</td><td>—</td><td>scène 1</td></tr>
+<tr><td class="num">11</td><td class="num">11</td><td>HANGAR</td><td>NULL</td><td>0</td><td class="mono">−14100</td><td class="mono">122</td><td class="mono">36700</td><td>0</td><td>0</td><td>—</td><td>—</td><td>—</td><td>18</td><td>—</td><td>scène 1</td></tr>
+<tr><td class="num">12</td><td class="num">12</td><td>HANGAR</td><td>NULL</td><td>0</td><td class="mono">−14100</td><td class="mono">122</td><td class="mono">36400</td><td>0</td><td>0</td><td>—</td><td>—</td><td>—</td><td>18</td><td>—</td><td>scène 1</td></tr>
+<tr><td class="num">13</td><td class="num">13</td><td>HANGAR2</td><td>NULL</td><td>0</td><td class="mono">−14150</td><td class="mono">122</td><td class="mono">36000</td><td>0</td><td>0</td><td>—</td><td>—</td><td>—</td><td>18</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">14</td><td class="num">14</td><td>HANGAR2</td><td>NULL</td><td>0</td><td class="mono">−14150</td><td class="mono">122</td><td class="mono">35700</td><td>0</td><td>0</td><td>—</td><td>—</td><td>—</td><td>18</td><td>—</td><td>scène 1</td></tr>
+<tr><td class="num">15</td><td class="num">15</td><td>HANGAR2</td><td>NULL</td><td>0</td><td class="mono">−14150</td><td class="mono">122</td><td class="mono">35400</td><td>0</td><td>0</td><td>—</td><td>—</td><td>—</td><td>18</td><td>—</td><td>scène 1</td></tr>
+<tr><td class="num">16</td><td class="num">16</td><td>GENER</td><td>NULL</td><td>0</td><td class="mono">−13100</td><td class="mono">122</td><td class="mono">36400</td><td>180</td><td>0</td><td>—</td><td>—</td><td>—</td><td>19</td><td>—</td><td>scène 1</td></tr>
+<tr><td class="num">17</td><td class="num">17</td><td>GENERX2</td><td>NULL</td><td>0</td><td class="mono">−13100</td><td class="mono">122</td><td class="mono">35900</td><td>180</td><td>0</td><td>—</td><td>—</td><td>—</td><td>18</td><td>—</td><td>scène 1</td></tr>
+<tr><td class="num">18</td><td class="num">18</td><td>GREYTANK</td><td>NULL</td><td>0</td><td class="mono">−14100</td><td class="mono">122</td><td class="mono">36150</td><td>90</td><td>0</td><td>—</td><td>—</td><td>—</td><td>19</td><td>—</td><td>scène 1</td></tr>
+<tr><td class="num">19</td><td class="num">19</td><td>GREYTANK</td><td>NULL</td><td>0</td><td class="mono">−14100</td><td class="mono">122</td><td class="mono">36050</td><td>90</td><td>0</td><td>—</td><td>—</td><td>—</td><td>19</td><td>—</td><td>scène 1</td></tr>
+<tr><td class="num">20</td><td class="num">20</td><td>GREYTANK</td><td>NULL</td><td>0</td><td class="mono">−14100</td><td class="mono">122</td><td class="mono">35950</td><td>90</td><td>0</td><td>—</td><td>—</td><td>—</td><td>19</td><td>—</td><td>scène 1</td></tr>
+<tr><td class="num">21</td><td class="num">10</td><td>USFLAG</td><td>NULL</td><td>0</td><td class="mono">−13750</td><td class="mono">122</td><td class="mono">36600</td><td>90</td><td>0</td><td>—</td><td>—</td><td>—</td><td>18</td><td>—</td><td>scène 1</td></tr>
+<tr><td class="num">22</td><td class="num">21</td><td>50CLBASE</td><td>NULL</td><td>0</td><td class="mono">−13250</td><td class="mono">122</td><td class="mono">36050</td><td>90</td><td>0</td><td>—</td><td>—</td><td>—</td><td>19</td><td>—</td><td>scène 1</td></tr>
 </table></div>
 
 <h3>Navires (camp 1)</h3>
-<div class="tablewrap"><table>
-<tr><th>N°</th><th>Rang</th><th>Objet</th><th>Position</th><th>Cap, vitesse</th><th>Scripts</th><th>Activé par</th></tr>
-<tr><td class="num">23</td><td class="num">22</td><td>BB (BB-NEV, le Nevada)</td><td class="mono">(4900, 0, 31900)</td><td>135, 11</td><td>— 15 42 —</td><td>scène 0 (globale)</td></tr>
-<tr><td class="num">24</td><td class="num">23</td><td>BB (BB-CAL), zone 2</td><td class="mono">(−1800, 0, 24800)</td><td>180, 0</td><td>13 — — —</td><td>scène 3</td></tr>
-<tr><td class="num">25</td><td class="num">24</td><td>BB (BB-TENN), zone 2</td><td class="mono">(−4000, 0, 27000)</td><td>180, 0</td><td>12 — — —</td><td>scènes 2 et 3</td></tr>
-<tr><td class="num">26</td><td class="num">25</td><td>DD, zone 2</td><td class="mono">(1400, 0, 24000)</td><td>180, 0</td><td>12 — — —</td><td>scène 3</td></tr>
+<div class="tablewrap"><table class="objs">
+<tr><th>N°</th><th>Rang</th><th>Objet</th><th>CAST</th><th>Zone</th><th>x</th><th>y</th><th>z</th><th>Cap</th><th>Vit.</th><th>Allié</th><th>Act.</th><th>MàJ</th><th>Destr.</th><th>Début</th><th>Activé par</th></tr>
+<tr><td class="num">23</td><td class="num">22</td><td>BB</td><td>BB-NEV</td><td>—</td><td class="mono">4900</td><td class="mono">0</td><td class="mono">31900</td><td>135</td><td>11</td><td>—</td><td>—</td><td>15</td><td>42</td><td>—</td><td>scène 0</td></tr>
+<tr><td class="num">24</td><td class="num">23</td><td>BB</td><td>BB-CAL</td><td>2</td><td class="mono">−1800</td><td class="mono">0</td><td class="mono">24800</td><td>180</td><td>0</td><td>—</td><td>13</td><td>—</td><td>—</td><td>—</td><td>scène 3</td></tr>
+<tr><td class="num">25</td><td class="num">24</td><td>BB</td><td>BB-TENN</td><td>2</td><td class="mono">−4000</td><td class="mono">0</td><td class="mono">27000</td><td>180</td><td>0</td><td>—</td><td>12</td><td>—</td><td>—</td><td>—</td><td>scène 2, scène 3</td></tr>
+<tr><td class="num">26</td><td class="num">25</td><td>DD</td><td>NULL</td><td>2</td><td class="mono">1400</td><td class="mono">0</td><td class="mono">24000</td><td>180</td><td>0</td><td>—</td><td>12</td><td>—</td><td>—</td><td>—</td><td>scène 3</td></tr>
 </table></div>
 
 <h3>Avions américains (camp 1, F4F3)</h3>
-<div class="tablewrap"><table>
-<tr><th>N°</th><th>Rang</th><th>Pilote (CAST)</th><th>Position</th><th>Vitesse</th><th>Allié</th><th>Scripts</th><th>Activé par</th></tr>
-<tr><td class="num">36</td><td class="num">35</td><td>PLAYER</td><td class="mono">(−13900, 123, 36730)</td><td class="num">0</td><td>—</td><td>— — — 0</td><td>le joueur</td></tr>
-<tr><td class="num">37</td><td class="num">36</td><td>JESTER</td><td class="mono">(−13890, 172, 36550)</td><td class="num">75</td><td>36</td><td>27 16 35 —</td><td>scène 0</td></tr>
-<tr><td class="num">38</td><td class="num">37</td><td>blue1</td><td class="mono">(−13955, 121, 36645)</td><td class="num">0</td><td>36</td><td>27 16 35 —</td><td>aucune scène ni instruction de la mission</td></tr>
-<tr><td class="num">39</td><td class="num">38</td><td>blue10</td><td class="mono">(−13930, 122, 36685)</td><td class="num">0</td><td>36</td><td>27 16 35 —</td><td>aucune scène ni instruction de la mission</td></tr>
-<tr><td class="num">40 à 47</td><td class="num">39 à 46</td><td>blue2, blue4 à blue10</td><td class="mono">x ≈ −13960, y = 200 à 520, z = 37700 à 40900</td><td class="num">180</td><td>36, 40, 42, 44, 46</td><td>27 — 36/37 —</td><td>aucune scène ni instruction de la mission</td></tr>
+<div class="tablewrap"><table class="objs">
+<tr><th>N°</th><th>Rang</th><th>Objet</th><th>CAST</th><th>Zone</th><th>x</th><th>y</th><th>z</th><th>Cap</th><th>Vit.</th><th>Allié</th><th>Act.</th><th>MàJ</th><th>Destr.</th><th>Début</th><th>Activé par</th></tr>
+<tr><td class="num">36</td><td class="num">35</td><td>F4F3</td><td>PLAYER</td><td>—</td><td class="mono">−13900</td><td class="mono">123</td><td class="mono">36730</td><td>0</td><td>0</td><td>—</td><td>—</td><td>—</td><td>—</td><td>0</td><td>le joueur</td></tr>
+<tr><td class="num">37</td><td class="num">36</td><td>F4F3</td><td>JESTER</td><td>—</td><td class="mono">−13890</td><td class="mono">172</td><td class="mono">36550</td><td>0</td><td>75</td><td>36</td><td>27</td><td>16</td><td>35</td><td>—</td><td>scène 0</td></tr>
+<tr><td class="num">38</td><td class="num">37</td><td>F4F3</td><td>blue1</td><td>—</td><td class="mono">−13955</td><td class="mono">121</td><td class="mono">36645</td><td>0</td><td>0</td><td>36</td><td>27</td><td>16</td><td>35</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">39</td><td class="num">38</td><td>F4F3</td><td>blue10</td><td>—</td><td class="mono">−13930</td><td class="mono">122</td><td class="mono">36685</td><td>0</td><td>0</td><td>36</td><td>27</td><td>16</td><td>35</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">40</td><td class="num">39</td><td>F4F3</td><td>blue2</td><td>—</td><td class="mono">−13950</td><td class="mono">200</td><td class="mono">37700</td><td>0</td><td>180</td><td>36</td><td>27</td><td>—</td><td>36</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">41</td><td class="num">40</td><td>F4F3</td><td>blue4</td><td>—</td><td class="mono">−13970</td><td class="mono">220</td><td class="mono">37900</td><td>0</td><td>180</td><td>40</td><td>27</td><td>—</td><td>36</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">42</td><td class="num">41</td><td>F4F3</td><td>blue5</td><td>—</td><td class="mono">−13950</td><td class="mono">300</td><td class="mono">38700</td><td>0</td><td>180</td><td>36</td><td>27</td><td>—</td><td>36</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">43</td><td class="num">42</td><td>F4F3</td><td>blue6</td><td>—</td><td class="mono">−13970</td><td class="mono">320</td><td class="mono">38900</td><td>0</td><td>180</td><td>42</td><td>27</td><td>—</td><td>36</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">44</td><td class="num">43</td><td>F4F3</td><td>blue7</td><td>—</td><td class="mono">−13950</td><td class="mono">400</td><td class="mono">39700</td><td>0</td><td>180</td><td>36</td><td>27</td><td>—</td><td>37</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">45</td><td class="num">44</td><td>F4F3</td><td>blue8</td><td>—</td><td class="mono">−13970</td><td class="mono">420</td><td class="mono">39900</td><td>0</td><td>180</td><td>44</td><td>27</td><td>—</td><td>37</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">46</td><td class="num">45</td><td>F4F3</td><td>blue9</td><td>—</td><td class="mono">−13950</td><td class="mono">500</td><td class="mono">40700</td><td>0</td><td>180</td><td>36</td><td>27</td><td>—</td><td>37</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
+<tr><td class="num">47</td><td class="num">46</td><td>F4F3</td><td>blue10</td><td>—</td><td class="mono">−13970</td><td class="mono">520</td><td class="mono">40900</td><td>0</td><td>180</td><td>46</td><td>27</td><td>—</td><td>37</td><td>—</td><td>aucun (note ci-dessous)</td></tr>
 </table></div>
+
 <div class="note"><p>« Aucune scène ni instruction de la mission » est un relevé des listes des scènes et des
 <code>OP_ACTIVATE_OBJ</code> des 64 programmes de <code>PRLH-M1</code>. Je n'ai pas cherché dans <code>PACIFIC.EXE</code> un
 autre moyen de faire apparaître ces objets (équipe <code>TEAM</code>, campagne) : leur sort dans le jeu original n'est pas établi.</p></div>
@@ -262,11 +286,36 @@ autre moyen de faire apparaître ces objets (équipe <code>TEAM</code>, campagne
 qu'elle est courante), sortie (quand le joueur la quitte, et en fin de mission). La scène sans zone est la <b>scène globale</b> :
 activée au chargement, mise à jour à chaque image, avant la recherche de la scène courante.</p>
 <div class="tablewrap"><table>
-<tr><th>Scène</th><th>Zone</th><th>Activation</th><th>Mise à jour</th><th>Sortie</th><th>Objets (rangs → n°)</th></tr>
-<tr><td class="num">0</td><td>aucune (globale)</td><td class="num">1</td><td class="num">2</td><td class="num">3</td><td>35 → PLAYER, 36 → JESTER n°37, 22 → Nevada n°23</td></tr>
-<tr><td class="num">1</td><td>0 airfield</td><td class="num">4</td><td>—</td><td>—</td><td>9 → RADIOTW n°10 ; 11, 12, 14, 15 → hangars ; 16 à 21 → GENER, GENERX2, GREYTANK, 50CLBASE ; 10 → USFLAG n°21 ; 0, 1 → VAL n°1 et 2</td></tr>
-<tr><td class="num">2</td><td>1 Nevada</td><td class="num">14</td><td>—</td><td>—</td><td>24 → BB-TENN n°25</td></tr>
-<tr><td class="num">3</td><td>2 « . »</td><td>—</td><td>—</td><td>—</td><td>23, 24, 25 → BB-CAL n°24, BB-TENN n°25, DD n°26</td></tr>
+<tr><th>Scène</th><th>Zone</th><th>Activation</th><th>Mise à jour</th><th>Sortie</th></tr>
+<tr><td class="num">0</td><td>aucune (globale)</td><td class="num">1</td><td class="num">2</td><td class="num">3</td></tr>
+<tr><td class="num">1</td><td>0 airfield</td><td class="num">4</td><td>—</td><td>—</td></tr>
+<tr><td class="num">2</td><td>1 Nevada</td><td class="num">14</td><td>—</td><td>—</td></tr>
+<tr><td class="num">3</td><td>2 « . »</td><td>—</td><td>—</td><td>—</td></tr>
+</table></div>
+<p>Objets cités par chaque scène (une ligne par objet ; la liste du fichier donne le rang dans <code>PART</code>) :</p>
+<div class="tablewrap"><table>
+<tr><th>Scène</th><th>Rang</th><th>N°</th><th>Objet</th><th>CAST</th></tr>
+<tr><td class="num">0</td><td class="num">35</td><td class="num">36</td><td>F4F3</td><td>PLAYER</td></tr>
+<tr><td class="num">0</td><td class="num">36</td><td class="num">37</td><td>F4F3</td><td>JESTER</td></tr>
+<tr><td class="num">0</td><td class="num">22</td><td class="num">23</td><td>BB</td><td>BB-NEV</td></tr>
+<tr><td class="num">1</td><td class="num">9</td><td class="num">10</td><td>RADIOTW</td><td>XMIT-EWA</td></tr>
+<tr><td class="num">1</td><td class="num">11</td><td class="num">11</td><td>HANGAR</td><td>NULL</td></tr>
+<tr><td class="num">1</td><td class="num">12</td><td class="num">12</td><td>HANGAR</td><td>NULL</td></tr>
+<tr><td class="num">1</td><td class="num">14</td><td class="num">14</td><td>HANGAR2</td><td>NULL</td></tr>
+<tr><td class="num">1</td><td class="num">15</td><td class="num">15</td><td>HANGAR2</td><td>NULL</td></tr>
+<tr><td class="num">1</td><td class="num">16</td><td class="num">16</td><td>GENER</td><td>NULL</td></tr>
+<tr><td class="num">1</td><td class="num">17</td><td class="num">17</td><td>GENERX2</td><td>NULL</td></tr>
+<tr><td class="num">1</td><td class="num">18</td><td class="num">18</td><td>GREYTANK</td><td>NULL</td></tr>
+<tr><td class="num">1</td><td class="num">19</td><td class="num">19</td><td>GREYTANK</td><td>NULL</td></tr>
+<tr><td class="num">1</td><td class="num">20</td><td class="num">20</td><td>GREYTANK</td><td>NULL</td></tr>
+<tr><td class="num">1</td><td class="num">21</td><td class="num">22</td><td>50CLBASE</td><td>NULL</td></tr>
+<tr><td class="num">1</td><td class="num">10</td><td class="num">21</td><td>USFLAG</td><td>NULL</td></tr>
+<tr><td class="num">1</td><td class="num">0</td><td class="num">1</td><td>VAL</td><td>JAP-V</td></tr>
+<tr><td class="num">1</td><td class="num">1</td><td class="num">2</td><td>VAL</td><td>JAP-V</td></tr>
+<tr><td class="num">2</td><td class="num">24</td><td class="num">25</td><td>BB</td><td>BB-TENN</td></tr>
+<tr><td class="num">3</td><td class="num">23</td><td class="num">24</td><td>BB</td><td>BB-CAL</td></tr>
+<tr><td class="num">3</td><td class="num">24</td><td class="num">25</td><td>BB</td><td>BB-TENN</td></tr>
+<tr><td class="num">3</td><td class="num">25</td><td class="num">26</td><td>DD</td><td>NULL</td></tr>
 </table></div>
 <p>La scène 1 a aussi un point d'arrivée (−13900, 1122, 38730), cap 0 ; son rôle n'a pas été relu ici.</p>
 <p>Dans <code>PACIFIC.EXE</code>, le changement de scène est fait par <code>Scene_DetectAndActivateChange_54BCF</code> :
@@ -364,8 +413,12 @@ effacés.</p>
 <tr><td class="num">280</td><td>le joueur est entré dans la zone du Nevada</td><td>14</td><td>4, 15</td></tr>
 <tr><td class="num">320</td><td>message d'alerte de la tour joué</td><td>5</td><td>5</td></tr>
 <tr><td class="num">666</td><td>le joueur est entré dans la zone du Nevada</td><td>14</td><td>5</td></tr>
-<tr><td class="num">401, 440, 441</td><td>résultats (§ 7)</td><td>1, 3, 9</td><td>15 ; conversations</td></tr>
-<tr><td class="num">5, 255, 667</td><td>initialisées ; pas relues par les programmes que cite la mission</td><td>1</td><td>—</td></tr>
+<tr><td class="num">401</td><td>mission réussie (§ 7)</td><td>1, 3, 9</td><td>15 ; conversations</td></tr>
+<tr><td class="num">440</td><td>dégâts de la base (§ 7)</td><td>1, 3</td><td>conversations</td></tr>
+<tr><td class="num">441</td><td>bonus VAL (§ 7)</td><td>1, 3</td><td>conversations</td></tr>
+<tr><td class="num">5</td><td>initialisée ; pas relue par les programmes que cite la mission</td><td>1</td><td>—</td></tr>
+<tr><td class="num">255</td><td>initialisée ; pas relue par les programmes que cite la mission</td><td>1</td><td>—</td></tr>
+<tr><td class="num">667</td><td>initialisée ; pas relue par les programmes que cite la mission</td><td>1</td><td>—</td></tr>
 </table></div>
 
 <h3>6.2 Ewa Field attaquée</h3>

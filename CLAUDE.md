@@ -105,6 +105,11 @@ contenir un script, le script va dans un bloc sous le tableau. Noms : ceux de li
 existent, sinon les noms proposés des tables de référence (`GAMEFLOW_SYSTEM.md` § 5.2,
 `CONV_SYSTEM.md` § 2, `MISSION_SCRIPT_OPCODES.md`, conditions `REQU` au § 4.2 de GAMEFLOW).
 
+**9 bis. Tableaux : une ligne par entité.** Un objet, un point, une variable, une scène = une ligne
+avec son propre numéro. Jamais de lignes regroupées (« 40 à 47 », « 11, 12 », « 33 à 35 ») ni de liste
+d'objets dans une cellule : si une scène cite plusieurs objets, un second tableau donne une ligne par
+couple (scène, objet). *(Demande de Rémi du 2026-11-13 sur PACIFIC_MISSION_PRLH-M1.html.)*
+
 **10. Corriger libRealSpace dans ses propres classes, réflexe n° 1.**
 Une proposition pour libRealSpace se fait **d'abord sous forme de modifications des classes et fonctions
 qui existent déjà** (`RSMission::parseMISN_AREA`, `SCMission::getAreaID`, `SCSmokeSet`…), en gardant
