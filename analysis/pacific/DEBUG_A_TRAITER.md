@@ -23,6 +23,7 @@ a été lue), l'effet sur `PRLH-M1`, et ce qu'il faut regarder au débogueur. Ri
 | 10 | `OP_ATTACK_RANDOM_ENEMY_OF_TYPE` : choix de la cible et valeur rendue | JESTER ne passe pas à `OP_SET_OBJ_FOLLOW_ALLY 36` | haute |
 | 11 | Choix des armes par l'IA lié aux numéros d'armes de Strike Commander | canon correct ; roquettes, bombes, torpilles et napalm mal reconnus | conception |
 | 12 | `GOAL` 7, 8 et 9 de Pacific Strike ignorés, `GOAL` 5 différent | JESTER ne suit pas son chef par ses `GOAL` | haute |
+| 13 | Scènes activées au chargement d'après `is_active` | programme 14 (Nevada) joué au chargement : torpilleurs n°27 et 28 tout de suite, chronologie sautée | haute |
 
 ---
 
@@ -341,6 +342,37 @@ pour reconnaître l'ailier du joueur (point 10).
 
 **Effet sur PRLH-M1.** La liste de JESTER est `5 7 2 4 8 3 9 1` : son allié par défaut (champ du `PART`) est l'objet n° 36, le
 joueur. Dans le jeu, il suit donc le joueur par le 7 tant qu'il est en formation, avant même l'ordre du programme 16 ; dans libRealSpace, seul l'ordre du script peut le faire suivre.
+
+---
+
+## 13. Scènes activées au chargement d'après `is_active`
+
+**Logique actuelle de libRealSpace (décrite par Rémi, 2026-11-13).** Au chargement, le programme d'activation est
+lancé pour toutes les scènes dont `is_active` vaut 1 dans le fichier. À l'entrée du joueur, si `is_active` vaut 0,
+il passe à 1 et le programme d'activation est lancé ; `is_active` reste à 1 pour ne pas relancer l'activation.
+
+**Dans le jeu** (`MissionScenario_LoadFromIFF_BD743` ; même chose dans STRIKE.EXE, `MissionScenario_LoadMainRecord_A8331`,
+voir `IMPL_MISSION_AREAS.md`) : au chargement, seules deux scènes sont activées.
+1. La scène globale (`Scene_FindByArea_54B92` avec une zone nulle, puis `Scene_TriggerActivation_54AB2`).
+2. La scène où se trouve le joueur au départ (`Scene_DetectAndActivateChange_54BCF` avec sa position).
+
+Les autres scènes ne sont activées que quand le joueur entre dans leur zone (`MAIN_GAME_TICK_54FD2`). `is_active` ne
+lance rien : seule une scène dont `is_active` vaut 1 peut devenir la scène du joueur
+(`Scene_FindMatchingByAreaContainment_54B1B`). Il n'est changé que par `OP_ACTIVATE_SCENE` et `OP_DEACTIVATE_SCENE`.
+
+**Effet sur PRLH-M1.** Les 4 scènes ont `is_active` à 1 dans le fichier. Le programme 14 (activation du Nevada)
+tournerait donc au chargement :
+```
+OP_ACTIVATE_OBJ 27
+OP_ACTIVATE_OBJ 28
+```
+puis variable 3 = 69 (chronologie du programme 2 sautée), variable 6 = 88, variable 280 = 1 (appels du Nevada coupés).
+Le programme 1 (scène globale) remet la variable 3 à 65 et la variable 280 à 0 : l'état de départ dépend de l'ordre des
+deux. À l'entrée réelle du joueur au Nevada, rien n'est relancé.
+
+**Piste.** Au chargement, activer la scène globale et la scène du joueur seulement. Pour ne pas relancer l'activation
+à une nouvelle entrée, `MISN_SCEN::has_been_activated` existe déjà (`SCMissionScene::activate`), distinct de
+`is_active`.
 
 ---
 
