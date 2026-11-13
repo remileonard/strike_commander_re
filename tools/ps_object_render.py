@@ -7,8 +7,9 @@ Format constaté sur les données (OBJECTS\\CORSAIR.IFF), PAS relu dans PACIFIC.
                MAPS = 16 octets par face texturée (mot face, mot texture, 3 × (mot u, mot v)) ;
   - FORM QUAD : FACE = 10 octets (type, couleur, 4 × mot sommet) ; MAPS = 20 octets (face, texture, 4 × (u, v)) ;
   - FORM LINE : FACE = 6 octets (type, couleur, 2 × mot sommet) ; non dessinés ici ;
-  - FORM DETA : LVLn = u32 distance, puis numéros de face ; faces numérotées triangles, puis quadrilatères,
-    puis traits ; les listes ne se recouvrent pas (chaque niveau est un modèle complet) ;
+  - FORM DETA : LVLn = u32 distance, puis numéros de face ; faces numérotées dans l'ordre des FORM du fichier
+    (traits, puis triangles, puis quadrilatères sur le F4F3), la lettre de forme de chaque numéro est dans ATTR ;
+    les listes ne se recouvrent pas (chaque niveau est un modèle complet) ;
   - FORM TXMS : TXMP = nom (8 octets), largeur, hauteur (mots), un mot (2B50h partout), puis un flux PKWARE
     DCL de largeur × (hauteur ÷ 2) octets : une ligne sur deux, chaque ligne dessinée deux fois. TXMA (animée) :
     nom, largeur, hauteur, nombre d'images, 4 octets, puis le flux ; seule la 1re image est décodée ici ;
@@ -94,26 +95,49 @@ class PSModel(orr.Model):
                 levels.append((int(tag[3]), distance, list(struct.unpack_from("<%dH" % count, body, 4))))
             elif tag == "ATTR":
                 for k in range(0, size - size % 9, 9):
-                    attr[struct.unpack_from("<H", body, k)[0]] = body[k + 4]
+                    number = struct.unpack_from("<H", body, k)[0]
+                    attr[number] = (chr(body[k + 2]), body[k + 4])
             elif tag in ("TXMP", "TXMA"):
                 self.textures.append(read_texture(body, tag == "TXMA"))
-        # Numéro de face du fichier -> triangles du modèle.
+        # Numéro de face du fichier -> triangles du modèle. Constat (2026-11-13, F4F3) : les faces sont numérotées
+        # dans l'ordre des FORM du fichier (LINE, puis TRIS, puis QUAD) ; chaque enregistrement ATTR donne la
+        # lettre de forme de son numéro (L, T, Q). On prend la forme dans ATTR ; sans ATTR, l'ordre traits,
+        # triangles, quadrilatères.
+        if not attr:
+            for k in range(lines):
+                attr[k] = ("L", 0)
+            for k in range(len(tris)):
+                attr[lines + k] = ("T", 0)
+            for k in range(len(quads)):
+                attr[lines + len(tris) + k] = ("Q", 0)
         mapping = {}
-        for k, (kind, colour, a, b, c) in enumerate(tris):
-            mapping[k] = [len(self.faces)]
-            self.faces.append((kind, a, b, c, colour, 0, 0, attr.get(k, 0)))
-            if k in tri_maps:
-                tex, uv = tri_maps[k]
-                self.uv[len(self.faces) - 1] = (tex, uv)
-        for k, (kind, colour, a, b, c, d) in enumerate(quads):
-            number = len(tris) + k
-            mapping[number] = [len(self.faces), len(self.faces) + 1]
-            self.faces.append((kind, a, b, c, colour, 0, 0, attr.get(number, 0)))
-            self.faces.append((kind, a, c, d, colour, 0, 0, attr.get(number, 0)))
-            if k in quad_maps:
-                tex, uv = quad_maps[k]
-                self.uv[len(self.faces) - 2] = (tex, (uv[0], uv[1], uv[2], uv[3], uv[4], uv[5]))
-                self.uv[len(self.faces) - 1] = (tex, (uv[0], uv[1], uv[4], uv[5], uv[6], uv[7]))
+        rank = {
+            "T": 0,
+            "Q": 0,
+            "L": 0,
+        }
+        for number in sorted(attr):
+            shape, flag = attr[number]
+            if shape not in rank:
+                continue
+            k = rank[shape]
+            rank[shape] += 1
+            if shape == "T" and k < len(tris):
+                kind, colour, a, b, c = tris[k]
+                mapping[number] = [len(self.faces)]
+                self.faces.append((kind, a, b, c, colour, 0, 0, flag))
+                if k in tri_maps:
+                    tex, uv = tri_maps[k]
+                    self.uv[len(self.faces) - 1] = (tex, uv)
+            elif shape == "Q" and k < len(quads):
+                kind, colour, a, b, c, d = quads[k]
+                mapping[number] = [len(self.faces), len(self.faces) + 1]
+                self.faces.append((kind, a, b, c, colour, 0, 0, flag))
+                self.faces.append((kind, a, c, d, colour, 0, 0, flag))
+                if k in quad_maps:
+                    tex, uv = quad_maps[k]
+                    self.uv[len(self.faces) - 2] = (tex, (uv[0], uv[1], uv[2], uv[3], uv[4], uv[5]))
+                    self.uv[len(self.faces) - 1] = (tex, (uv[0], uv[1], uv[4], uv[5], uv[6], uv[7]))
         for lod, distance, numbers in sorted(levels):
             faces = []
             for n in numbers:

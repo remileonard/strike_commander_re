@@ -837,7 +837,7 @@ dans PACIFIC.EXE.** Le `FORM JETP` (vol, armes, dégâts) a les mêmes chunks qu
 | `FORM QUAD` / `FACE` | 10 octets par quadrilatère : type, couleur, 4 × mot sommet |
 | `FORM QUAD` / `MAPS` | 20 octets : mot face, mot texture, 4 × (mot u, mot v) |
 | `FORM LINE` / `FACE` | 6 octets par trait : type, couleur, 2 × mot sommet |
-| `FORM DETA` / `LVLn` | u32 distance, puis numéros de face (triangles, puis quadrilatères, puis traits) ; les listes ne se recouvrent pas : chaque niveau est un modèle complet |
+| `FORM DETA` / `LVLn` | u32 distance, puis numéros de face ; les faces sont numérotées dans l'ordre des FORM du fichier (traits, puis triangles, puis quadrilatères : constat sur `CORSAIR`, `F4F3`, `VAL`, `BB`), et `ATTR` donne la lettre de forme de chaque numéro ; les listes ne se recouvrent pas : chaque niveau est un modèle complet. Corrigé le 2026-11-13 : la version précédente disait « triangles, puis quadrilatères, puis traits », ce qui décalait toutes les faces du nombre de traits |
 | `ATTR` | 9 octets par face : mot numéro, lettre de forme (`T`, `Q`, `L`), masque du niveau de détail (1, 2, 4), octet 4 = 0 ou 1, 4 octets à 0 |
 | `FORM TXMS` / `TXMP` | nom (8 octets), largeur, hauteur, un mot (11 088 partout), puis un flux PKWARE DCL de largeur × (hauteur ÷ 2) octets : **une ligne sur deux, chaque ligne affichée deux fois** |
 | `FORM TXMS` / `TXMA` | texture animée (`COPROP`, l'hélice) : nom, largeur, hauteur, nombre d'images, 4 octets, puis le flux |

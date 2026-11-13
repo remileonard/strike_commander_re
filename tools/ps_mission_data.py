@@ -81,21 +81,6 @@ def struct_error():
     return struct.error
 
 
-# Chunk GOAL lu par PilotProfile_LoadFromPROF_843EA de PACIFIC.EXE : 1 et 9 posent un octet de l'entité, sans
-# emplacement ; 2 à 8 choisissent un gestionnaire (fonction pas encore nommée en 84AA0, table de données 76B10).
-GOAL_ROLES = {
-    1: "pose l'octet [entité+505] à 1, pas d'emplacement",
-    2: "Goal_ExecuteObjective_C9E4 (exécute l'ordre en cours du script)",
-    3: "fonction pas encore nommée (sub_D001)",
-    4: "fonction pas encore nommée (sub_B968)",
-    5: "fonction pas encore nommée (sub_B712, nom proposé Goal_MoraleCheck_B712)",
-    6: "aucun gestionnaire : erreur 32776",
-    7: "fonction pas encore nommée (sub_C91C)",
-    8: "fonction pas encore nommée (sub_C93E)",
-    9: "pose l'octet [entité+359] à 1, pas d'emplacement",
-}
-
-
 class Archive:
     def __init__(self, path):
         self.path = path

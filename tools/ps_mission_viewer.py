@@ -590,8 +590,7 @@ class Viewer:
             self.put(t, "\n  GOAL", "titre")
             self.put(t, "  (dans l'ordre du fichier)\n", "gris")
             for rank, value in enumerate(ai["GOAL"]):
-                self.put(t, "    %d. %3d  " % (rank + 1, value))
-                self.put(t, "%s\n" % data.GOAL_ROLES.get(value, "valeur hors de la table du chargeur"), "gris")
+                self.put(t, "    %d. %3d\n" % (rank + 1, value))
         if "MVRS" in ai:
             self.put(t, "\n  MVRS", "titre")
             self.put(t, "  (numéro de manœuvre, valeur signée ; sens relu dans STRIKE.EXE seulement, AI_SYSTEM.md § 3)\n", "gris")

@@ -298,27 +298,20 @@ de l'avion du joueur.
 **Vue 3D.** Modèle de `OBJECTS\<nom>.IFF`, niveau de détail 0, vu à 20° au-dessus, depuis le cap choisi (35° au
 départ, ± 45° par bouton). Lecture du format de Pacific : `tools/ps_object_render.py` (constaté sur les données, pas
 relu dans PACIFIC.EXE) ; dessin : `tools/object_render.py` (règles de Strike Commander, lumière de `MISSION.IFF` de
-Strike Commander). Palette : `PALETTE\PALETTE.IFF` de `PACIFIC.DAT`. Les textures sont dessinées ; le brouillard non.
+Strike Commander). Palette : `PALETTE\PALETTE.IFF` de `PACIFIC.DAT`. Les textures sont dessinées ; le brouillard non ;
+une texture animée (`TXMA`, l'hélice) n'est dessinée qu'avec sa première image.
+Numérotation des faces (corrigée le 2026-11-13) : dans l'ordre des FORM du fichier, traits, puis triangles, puis
+quadrilatères ; la forme de chaque numéro est lue dans `ATTR`. La première version prenait les triangles d'abord : les
+listes `LVL` étaient décalées du nombre de traits, d'où des faces manquantes (aile gauche du F4F3, hélice).
 Un objet sans fichier (pistes `RWAY*`) n'a pas de vue. Essai : les 82 noms d'objets des 51 missions se dessinent.
 
 **Profil d'IA** (FORM `_AI_` de `INTEL\<CAST>.IFF`) :
 
 | Chunk | Affichage |
 |---|---|
-| `GOAL` | les valeurs dans l'ordre du fichier, chacune avec son rôle au chargement dans PACIFIC.EXE (`PilotProfile_LoadFromPROF_843EA`) : 1 et 9 posent un octet de l'entité sans prendre d'emplacement ; 2 à 8 choisissent un gestionnaire ; 6 n'en a pas (erreur 32776) |
+| `GOAL` | les valeurs, dans l'ordre du fichier |
 | `MVRS` | les paires (numéro de manœuvre, valeur signée) telles qu'elles sont dans le fichier ; leur sens n'a été relu que dans STRIKE.EXE (`AI_SYSTEM.md` § 3) |
 | `ATRB` | les octets du fichier, avec leur rang ; rôle non relu dans PACIFIC.EXE |
-
-Gestionnaires de `GOAL` (table de données à l'adresse 76B10 de PACIFIC.EXE) :
-
-| Valeur | Fonction |
-|---|---|
-| 2 | `Goal_ExecuteObjective_C9E4` (ordre en cours du script) |
-| 3 | fonction pas encore nommée (`sub_D001`) |
-| 4 | fonction pas encore nommée (`sub_B968`) |
-| 5 | fonction pas encore nommée (`sub_B712`, nom proposé `Goal_MoraleCheck_B712`) : toutes les 5 secondes au plus, une valeur calculée par une autre fonction pas encore nommée (`sub_EC40`) ; si elle vaut 5, une chance sur 36 d'envoyer le message radio 8 ; rend toujours 0 |
-| 7 | fonction pas encore nommée (`sub_C91C`) |
-| 8 | fonction pas encore nommée (`sub_C93E`) |
 
 ### Pseudo-code des scripts
 
