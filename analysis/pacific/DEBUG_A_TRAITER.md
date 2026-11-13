@@ -20,6 +20,7 @@ a été lue), l'effet sur `PRLH-M1`, et ce qu'il faut regarder au débogueur. Ri
 | 7 | Fin de mission | à lire dans PACIFIC.EXE | ouvert |
 | 8 | Numéros des objets du terrain | aucun dans PRLH-M1 | basse |
 | 9 | Profil ou fichier objet introuvable | silence ou plantage | à vérifier |
+| 10 | `OP_ATTACK_RANDOM_ENEMY_OF_TYPE` : choix de la cible et valeur rendue | JESTER ne passe pas à `OP_SET_OBJ_FOLLOW_ALLY 36` | haute |
 
 ---
 
@@ -232,6 +233,32 @@ peut trouver l'objet du terrain. Aucune dans PRLH-M1.
   n'est pas trouvé (journal `PSMission: objet <n> <nom> sans fichier objet`) fait planter l'activation de sa scène.
 
 **Au débogueur.** Rechercher ces deux messages dans le journal du chargement.
+
+---
+
+## 10. `OP_ATTACK_RANDOM_ENEMY_OF_TYPE` : choix de la cible et valeur rendue
+
+**Décision de Rémi (2026-11-13)** : comportement voulu pour libRealSpace, choisi sans comparaison avec PACIFIC.EXE.
+
+- L'instruction **rend faux** (ordre terminé, `task_state = 0`) quand elle ne trouve pas de cible.
+- Elle ne cherche ses cibles que **parmi les avions actifs et visibles par l'IA**. Les objets pas encore activés ne
+  sont pas attaquables et ne doivent pas être choisis.
+
+**Code concerné** : `PSProg::opAttackRandomEnemyOfType`, `PSProg::randomEnemyOfKind` (cible tirée une fois puis
+gardée dans `PSMission::random_targets` jusqu'à sa destruction) et `PSProg::pickRandomOfKind` (aujourd'hui : objets
+non détruits du type demandé, actifs ou joueur ; le camp n'est testé que pour un objet qui a un avion).
+
+**Effet sur PRLH-M1.** Programme 16 (mise à jour de JESTER, blue1 et blue10 n°39) :
+```
+OP_ATTACK_RANDOM_ENEMY_OF_TYPE 3
+OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS 90
+OP_ATTACK_RANDOM_ENEMY_OF_TYPE 2
+OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS 90
+OP_SET_OBJ_FOLLOW_ALLY 36
+```
+L'ailier n'atteint `OP_SET_OBJ_FOLLOW_ALLY 36` (suivre le joueur) que si les deux attaques rendent faux. Tant qu'il
+n'y passe pas, `SCAIBrain::moraleReaction` (goal 5) ne le voit pas comme l'ailier du joueur : `leaderActor()` est nul
+quand l'ordre en cours n'est pas `OP_SET_OBJ_FOLLOW_ALLY`.
 
 ---
 
