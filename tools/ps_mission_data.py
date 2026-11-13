@@ -81,6 +81,7 @@ class Archive:
         self.data, self.index = self.tre
         self.terrains = {}
         self.classes = {}
+        self.profiles = {}
         self.lock = threading.Lock()
 
     def entry(self, key):
@@ -116,6 +117,34 @@ class Archive:
             if name not in self.terrains:
                 self.terrains[name] = Terrain(self.entry("DATA/TERRAIN/%s.ZIP" % name))
             return self.terrains[name]
+
+    def profile(self, cast):
+        """Profil INTEL\\<cast>.IFF : chunk RADI/INFO (mot, nom, indicatif) et RADI/MSGS (octet numéro, texte
+        terminé par 0, répétés). None si le fichier est absent."""
+        if cast in self.profiles:
+            return self.profiles[cast]
+        found = None
+        key = "DATA/INTEL/%s.IFF" % cast.upper()
+        if key in self.index:
+            body = self.entry(key)
+            found = {"fichier": "INTEL\\%s.IFF" % cast.upper(), "nom": "", "indicatif": "", "messages": {}}
+            for where, tag, pos, size in orr.iff_chunks(body, 0, len(body)):
+                chunk = body[pos:pos + size]
+                if where == "/PROF/RADI" and tag == "INFO" and size > 2:
+                    names = chunk[2:].split(b"\0")
+                    found["nom"] = names[0].decode("latin1")
+                    if len(names) > 1:
+                        found["indicatif"] = names[1].decode("latin1")
+                elif where == "/PROF/RADI" and tag == "MSGS":
+                    k = 0
+                    while k < len(chunk):
+                        end = chunk.find(b"\0", k + 1)
+                        if end < 0:
+                            end = len(chunk)
+                        found["messages"][chunk[k]] = chunk[k + 1:end].decode("latin1")
+                        k = end + 1
+        self.profiles[cast] = found
+        return found
 
     def object_class(self, name):
         """FORM de classe de OBJECTS\\<nom>.IFF (JETP, SHIP, GRND…) et octet du chunk KIND."""
@@ -254,6 +283,7 @@ def describe(archive, name):
         form, kind = archive.object_class(obj["nom"])
         obj["classe"] = form
         obj["kind"] = kind
+        obj["profil"] = archive.profile(obj["cast"])
     for scene in m["scènes"]:
         for slot, number in enumerate(scene["scripts"]):
             if number < len(programs):
@@ -409,7 +439,80 @@ def call_segments(mission, op, name, args, owner):
     return segs
 
 
-def statement(mission, instruction, owner):
+def owners_of(mission, number):
+    """Qui peut jouer le programme : objets (numéro) et scènes, en remontant les OP_EXEC_SUB_PROG."""
+    objects = []
+    scenes = False
+    seen = set()
+    todo = [number]
+    while todo:
+        n = todo.pop()
+        if n in seen:
+            continue
+        seen.add(n)
+        for who in mission["lancé_par"].get(n, []):
+            if who["type"] == "objet" and who["numéro"] not in objects:
+                objects.append(who["numéro"])
+            elif who["type"] == "scène":
+                scenes = True
+            elif who["type"] == "programme":
+                todo.append(who["numéro"])
+    return objects, scenes
+
+
+def message_texts(mission, message, owner, number):
+    """Textes possibles de OP_SET_MESSAGE message : (qui, texte). Le joueur et les scripts de scène (joués avec
+    le joueur comme acteur dans libRealSpace) prennent le chunk MSGS de la mission ; un autre objet, le message de
+    même numéro dans le chunk RADI/MSGS de son profil (SCMissionActors::setMessage)."""
+    if owner is not None:
+        owners = [owner]
+        scenes = False
+    else:
+        owners, scenes = owners_of(mission, number)
+    out = []
+    player_done = False
+    for numero in owners:
+        obj = None
+        for candidate in mission["objets"]:
+            if candidate["numéro"] == numero:
+                obj = candidate
+                break
+        if obj is None:
+            continue
+        if obj["cast"] == "PLAYER":
+            scenes = True
+            continue
+        profile = obj.get("profil")
+        who = obj["cast"]
+        if profile is None:
+            text = "(profil absent)"
+        else:
+            text = profile["messages"].get(message, "(pas de message %d dans %s)" % (message, profile["fichier"]))
+        entry = (who, text)
+        if entry not in out:
+            out.append(entry)
+    if scenes and not player_done:
+        if message < len(mission["messages"]):
+            out.append(("mission", mission["messages"][message].replace("\n", " ")))
+        else:
+            out.append(("mission", "(pas de message %d dans MSGS)" % message))
+    return out
+
+
+def message_comment(mission, message, owner, number):
+    texts = message_texts(mission, message, owner, number)
+    if not texts:
+        return []
+    parts = []
+    for who, text in texts:
+        if len(texts) > 1:
+            parts.append("%s : « %s »" % (who, text))
+        else:
+            parts.append("« %s »" % text)
+    return [("   // " + " ; ".join(parts), "commentaire", None)]
+
+
+def statement(mission, instruction, owner, number=None):
     """Une instruction sans saut → liste de segments (texte, type de lien, valeur) ; None = rien à écrire."""
     start, op, name, args = instruction
     a = args[0] if args else 0
@@ -450,6 +553,8 @@ def statement(mission, instruction, owner):
         return [seg_var(a), seg_text(" -= 1;")]
     segs = call_segments(mission, op, name, args, owner)
     segs.append(seg_text(";"))
+    if op == 171 and number is not None:
+        segs += message_comment(mission, a, owner, number)
     return segs
 
 
@@ -508,7 +613,7 @@ def condition_segments(cond):
     return cond["segs"]
 
 
-def linear_items(mission, program, owner):
+def linear_items(mission, program, owner, number=None):
     """Instructions → éléments : étiquette, saut conditionnel, saut, instruction. Les comparaisons sont fondues dans
     les sauts qui les suivent ; l'état de comparaison est oublié à chaque étiquette (on peut y arriver d'ailleurs)."""
     items = []
@@ -530,9 +635,9 @@ def linear_items(mission, program, owner):
         elif op == 78:
             items.append({"t": "aller", "n": a})
         elif op == 79:
-            items.append({"t": "instr", "segs": [seg_text("goto L(WORK);   // étiquette égale à WORK")]})
+            items.append({"t": "instr", "segs": [seg_text("goto LABEL(WORK);   // étiquette égale à WORK")]})
         else:
-            segs = statement(mission, instruction, owner)
+            segs = statement(mission, instruction, owner, number)
             if segs is not None:
                 items.append({"t": "instr", "segs": segs})
     return items
@@ -585,13 +690,13 @@ def render(nodes, refs, keep_all, depth, lines):
     for node in nodes:
         if node["t"] == "étiquette":
             if keep_all or refs.get(node["n"], 0) > 0:
-                lines.append((max(depth - 1, 0), [seg_text("L%d:" % node["n"])]))
+                lines.append((max(depth - 1, 0), [seg_text("LABEL_%d:" % node["n"])]))
         elif node["t"] == "instr":
             lines.append((depth, node["segs"]))
         elif node["t"] == "aller":
-            lines.append((depth, [seg_text("goto L%d;" % node["n"])]))
+            lines.append((depth, [seg_text("goto LABEL_%d;" % node["n"])]))
         elif node["t"] == "si":
-            lines.append((depth, [seg_text("if (")] + condition_segments(node["cond"]) + [seg_text(") goto L%d;" % node["n"])]))
+            lines.append((depth, [seg_text("if (")] + condition_segments(node["cond"]) + [seg_text(") goto LABEL_%d;" % node["n"])]))
         elif node["t"] == "bloc":
             lines.append((depth, [seg_text("if (")] + condition_segments(node["cond"]) + [seg_text(") {")]))
             render(node["alors"], refs, keep_all, depth + 1, lines)
@@ -603,12 +708,12 @@ def render(nodes, refs, keep_all, depth, lines):
 
 def pseudo_code(mission, number, owner=None):
     """Programme number → lignes (profondeur, segments). Un segment = (texte, type de lien ou None, valeur).
-    WORK = registre de travail ; var[n] = variable n (mot en dessous de 256, bit au-delà) ; L65 = étiquette 65.
+    WORK = registre de travail ; var[n] = variable n (mot en dessous de 256, bit au-delà) ; LABEL_65 = étiquette 65.
     Les étiquettes ne sont écrites que si un saut y mène encore ; toutes le sont si le programme fait
     OP_EXECUTE_CALL (saut calculé : n'importe quelle étiquette peut être visée)."""
     program = mission["programmes"][number]
     keep_all = any(op == 79 for start, op, name, args in program)
-    items = linear_items(mission, program, owner)
+    items = linear_items(mission, program, owner, number)
     refs = {}
     for item in items:
         if item["t"] in ("si", "aller"):

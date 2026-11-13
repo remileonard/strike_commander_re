@@ -116,6 +116,7 @@ class Viewer:
         top.pack(side=tk.TOP, fill=tk.X)
         ttk.Label(top, text="Mission :").pack(side=tk.LEFT)
         self.code_mode = tk.StringVar(value="pseudo")
+        self.current_owner_program = None
         self.current_program = None
         self.mission_box = ttk.Combobox(top, state="readonly", width=34)
         self.mission_box.pack(side=tk.LEFT, padx=4)
@@ -287,6 +288,9 @@ class Viewer:
                 self.put(text, " (SPOT)", "gris")
             else:
                 self.put(text, str(value))
+        if op == 171 and args and self.current_owner_program is not None:
+            for value, kind, target in data.message_comment(self.mission, args[0], owner, self.current_owner_program):
+                self.put(text, value, "gris")
         self.put(text, "\n")
 
     def put_program(self, text, number, owner):
@@ -294,12 +298,15 @@ class Viewer:
         if number >= len(programs):
             self.put(text, "  (aucun)\n", "gris")
             return
+        self.current_owner_program = number
         if self.code_mode.get() == "pseudo":
             for depth, segs in data.pseudo_code(self.mission, number, owner):
                 self.put(text, "    " * depth)
                 for value, kind, target in segs:
                     if kind is None:
                         self.put(text, value)
+                    elif kind == "commentaire":
+                        self.put(text, value, "gris")
                     else:
                         self.put_link(text, value, kind, target)
                 self.put(text, "\n")
@@ -515,6 +522,17 @@ class Viewer:
             self.put(t, "\n")
         else:
             self.put(t, "aucune scène ni instruction de la mission\n")
+        profile = obj.get("profil")
+        self.put(t, "\nprofil : ", "titre")
+        if profile is None:
+            self.put(t, "INTEL\\%s.IFF absent\n" % obj["cast"], "gris")
+        else:
+            self.put(t, "%s  (%s, indicatif %s)\n" % (profile["fichier"], profile["nom"], profile["indicatif"]))
+            if obj["cast"] == "PLAYER":
+                self.put(t, "  OP_SET_MESSAGE du joueur : chunk MSGS de la mission (onglet Mission)\n", "gris")
+            for key in sorted(profile["messages"]):
+                self.put(t, "  message %3d  " % key, "gris")
+                self.put(t, "%s\n" % profile["messages"][key])
         for slot, number in enumerate(obj["scripts"]):
             self.put(t, "\n%s : " % data.SCRIPT_SLOTS[slot], "titre")
             if number == 65535:

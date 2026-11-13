@@ -309,9 +309,9 @@ Notation :
 |---|---|
 | `WORK` | registre de travail du script |
 | `var[n]` | variable n (mot en dessous de 256, bit à partir de 256) |
-| `L65:` | étiquette 65 (`OP_SET_LABEL 65`) |
-| `goto L90;` | `OP_BRANCH 90`, ou saut conditionnel resté tel quel |
-| `goto L(WORK);` | `OP_EXECUTE_CALL` : saut à l'étiquette égale à `WORK` |
+| `LABEL_65:` | étiquette 65 (`OP_SET_LABEL 65`) |
+| `goto LABEL_90;` | `OP_BRANCH 90`, ou saut conditionnel resté tel quel |
+| `goto LABEL(WORK);` | `OP_EXECUTE_CALL` : saut à l'étiquette égale à `WORK` |
 | `ordre_en_cours` | état de l'ordre en cours, testé par `OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS` et `OP_GOTO_IF_CURRENT_COMMAND_DONE` |
 | `scène_active(zone n)` | `OP_IS_SCENE_ACTIVE n` |
 | `appeler programme n;` | `OP_EXEC_SUB_PROG n` |
@@ -319,15 +319,15 @@ Notation :
 | `OP_NOM(arguments);` | toute autre instruction, arguments objet (`n°23 BB`), point (`SPOT 4`) ou nombre |
 
 Règles de traduction (sens des instructions d'après `SCProg` et `PSProg` de libRealSpace) :
-1. Une comparaison se fond dans le saut qui la suit. `OP_CMP_WORK_WITH_VALUE n` puis `OP_BRANCH_IF_LESS L` devient
-   `if (WORK < n) goto L;` : la comparaison se lit dans l'ordre du nom de l'instruction (`WORK` comparé à `n`).
-   `OP_TEST_FLAG v` puis `OP_BRANCH_IF_EQUAL L` devient `if (var[v] != 0) goto L;` (« égal » = variable non nulle).
+1. Une comparaison se fond dans le saut qui la suit. `OP_CMP_WORK_WITH_VALUE n` puis `OP_BRANCH_IF_LESS x` devient
+   `if (WORK < n) goto LABEL_x;` : la comparaison se lit dans l'ordre du nom de l'instruction (`WORK` comparé à `n`).
+   `OP_TEST_FLAG v` puis `OP_BRANCH_IF_EQUAL x` devient `if (var[v] != 0) goto LABEL_x;` (« égal » = variable non nulle).
    Une comparaison qui n'est suivie d'aucun saut n'est pas écrite (elle ne change que l'état de comparaison).
 2. L'état de comparaison est oublié à chaque étiquette : un saut juste après une étiquette s'écrit avec le bit de la
    dernière comparaison, sans relation.
-3. `if (c) goto L; A… L:` avec `L` plus loin et aucune étiquette entre les deux devient `if (!c) { A… }`.
-4. Si le bloc `A…` finit par `goto M;` vers une étiquette `M` plus loin, sans étiquette entre `L` et `M`, et si aucun
-   autre saut ne mène à `L` : `if (!c) { A… } else { B… }`.
+3. `if (c) goto LABEL_x; A… LABEL_x:` avec `LABEL_x` plus loin et aucune étiquette entre les deux devient `if (!c) { A… }`.
+4. Si le bloc `A…` finit par `goto M;` vers une étiquette `LABEL_y` plus loin, sans étiquette entre `LABEL_x` et `LABEL_y`, et si
+   aucun autre saut ne mène à `LABEL_x` : `if (!c) { A… } else { B… }`.
 5. Une étiquette n'est écrite que si un saut y mène encore. Dans un programme qui fait `OP_EXECUTE_CALL`, toutes les
    étiquettes restent écrites : le saut est calculé, n'importe laquelle peut être visée.
 6. Les blocs s'emboîtent : les règles 3 et 4 s'appliquent aussi à l'intérieur d'un bloc.
@@ -354,13 +354,28 @@ Exemple, programme 14 de PRLH-M1 (activation de la scène 2) :
     }
     WORK = var[0];
     if (WORK != 3) {
-        if (WORK == 2) goto L67;
+        if (WORK == 2) goto LABEL_67;
         return;
     }
     OP_ACTIVATE_OBJ(n°31 KATETORP);
-L67:
+LABEL_67:
     OP_ACTIVATE_OBJ(n°30 KATETORP);
 ```
+
+Textes des messages. Chaque `OP_SET_MESSAGE n` est suivi, en commentaire gris (pseudo-code et désassemblage), du
+texte que libRealSpace afficherait :
+- objet autre que le joueur : message n du chunk `RADI/MSGS` de son profil `INTEL\<CAST>.IFF`
+  (`SCMissionActors::setMessage`) ;
+- joueur, et scripts de scène (joués avec le joueur comme acteur dans libRealSpace) : texte n du chunk `MSGS` de la
+  mission (`SCMissionActorsPlayer::setMessage`) ;
+- programme affiché seul (onglet Programmes) : un texte par objet qui peut le jouer, en remontant
+  `OP_EXEC_SUB_PROG` ;
+- message absent : « (pas de message n dans INTEL\<CAST>.IFF) ». Exemple, PRLH-M1 : le programme 42 (destruction du
+  Nevada) demande le message 21, absent de `INTEL\BB-NEV.IFF`.
+
+Cette correspondance est celle de libRealSpace ; ce que fait `OP_SET_MESSAGE` dans PACIFIC.EXE (méthode de l'objet
+appelée par `MissionScript_CallNativeHandler_53B0B`) n'a pas été lu. L'onglet Objet donne aussi le profil
+complet : fichier, nom, indicatif, et tous ses messages, un par ligne.
 
 Essai : les 2 918 programmes des 51 missions de `PACIFIC.DAT` se traduisent sans erreur.
 
