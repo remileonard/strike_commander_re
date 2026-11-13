@@ -422,13 +422,15 @@ sub_365C6		endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far. LUE 2026-11-05. Hauteur du sol sous un point, ponts compris : (sortie, monde, position,
-; objet, drapeau). Altitude du terrain (Terrain_HeightSample, [monde+0BFh]) ; puis pour
-; chacune des [monde+0B3h] surfaces d'atterrissage (liste de mots en [monde+0B5h], boîte en
-; +0Ah de chaque objet, Camera_FrustumBoundsTest) contenant le point : si le terrain n'est pas
-; plus haut que le point, ou drapeau ≠ 0, ou variable 668 posée -> [monde+207h] = 1 et hauteur
-; de la surface (sub_32021) ; sinon [monde+207h] = 0 et hauteur du terrain. Origine de la
-; liste des surfaces non lue.
+; far. LUE 2026-11-05, CORRIGÉE 2026-11-13. Hauteur du sol sous un point : (sortie, monde,
+; position, objet, drapeau). Altitude du terrain (Terrain_HeightSample, [monde+191]) ; puis
+; pour chacun des [monde+179] blocs de la liste en [monde+181] (au plus 4, ajoutés par
+; sub_365C6, remplis par sub_3631A qui gère tuiles de terrain et brouillard) dont la boîte
+; (+10) contient le point : si le terrain est plus haut que le point, ou drapeau ≠ 0, ou
+; variable 668 posée → [monde+519] = 1 et hauteur lue dans le bloc (sub_32021, grille du bloc)
+; ; sinon [monde+519] = 0 et hauteur du terrain. CE N'EST PAS LE PONT DU PORTE-AVIONS
+; (correction : le résumé du 2026-11-05 parlait de « surfaces d'atterrissage, ponts compris »)
+; : le pont vient du contact avec le navire (Aircraft_ContactWithObject_3CA69).
 ; ==============================================================================================
 Ground_HeightUnderPoint_3664D		proc far
 

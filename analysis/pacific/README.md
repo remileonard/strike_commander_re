@@ -981,8 +981,10 @@ que quand le flux vient de l'arrière.
 
 **6. Le tick** (`PhysicsTicks_4A8F4`) garde l'ordre de Strike Commander et ajoute :
 
-- **porte-avions** : pour le joueur, si la variable 667 de la table commune (§ 2.1) est posée et que sa vitesse est
-  sous 20 m/s, il est mis au sol et le niveau du sol vient de `dword_776A2` (120 m s'il est sous 10 m) ;
+- **départ d'un aérodrome** (variable 667 de la table commune, § 2.1, posée seulement par `PRLH-M1`) : pour le
+  joueur, sous 20 m/s, il est mis au sol et le niveau du sol vient de `dword_776A2` (120 m s'il est sous 10 m). Sans
+  cette variable, le seuil de décollage ajoute la hauteur du pont (33 m, chunk `CARD`) : voir `IMPL_PORTE_AVIONS.md` ;
+  le nom « porte-avions » donné ici le 2026-11-05 était faux (corrigé le 2026-11-13) ;
 - **commandes** : les touches posent les bits des drapeaux (aérofreins, volets avec un son, train, compteur à 3
   positions), chacune bloquée si l'organe est détruit ;
 - **première image** : train sorti si l'avion est à l'arrêt, sinon manette au cran 4 ;
@@ -1034,7 +1036,7 @@ dans `SCPlane` et remplacées par `SCJetpPlane`. Ce que chaque méthode de `PSPl
 | `computeDrag` | part de l'incidence au-delà de (calage + 1) réduite selon l'option de difficulté |
 | `processInput` | consigne d'incidence directe (`α_max × manche`, ÷ 2 en poussant) au lieu de la loi de charge ; roulage au manche sous 25 m/s au lieu de 40 |
 | `updateVelocity` | vitesse plafonnée à 2 × Vref |
-| `checkStatus` | au sol : nez ramené vers 10° (roulette de queue) ; porte-avions (variable 667, niveau du sol propre) |
+| `checkStatus` | au sol : nez ramené vers 10° (roulette de queue) ; départ d'un aérodrome (variable 667) ; pont du porte-avions (`IMPL_PORTE_AVIONS.md`) |
 
 Ce que la classe aura besoin de connaître (trouvé le 2026-11-05) :
 
@@ -1053,11 +1055,12 @@ Ce que la classe aura besoin de connaître (trouvé le 2026-11-05) :
 
 - **la hauteur sous le joueur** (`dword_776A2`) : recalculée à chaque image (`Player_UpdateFrameState_2362F`) par
   `Ground_HeightUnderPoint_3664D`, la même fonction qui donne le sol des autres avions dans le tick. Elle part de
-  l'altitude du terrain, puis parcourt une liste de **surfaces d'atterrissage** rangée dans le monde : si l'avion est
-  dans la boîte d'une de ces surfaces, elle rend la hauteur de la surface (le pont) au lieu du terrain, et marque
-  « sur une surface ». C'est donc la hauteur du pont quand le joueur est au-dessus d'un porte-avions. Non lu : qui
-  remplit la liste des surfaces, le calcul de la hauteur de surface (`sub_32021`), et le rôle des variables 667
-  et 668 de la table commune qui interviennent dans ces tests.
+  l'altitude du terrain, puis parcourt une liste d'au plus 4 blocs rangée dans le monde (ajoutés par `sub_365C6`,
+  remplis par `sub_3631A`, qui gère les tuiles de terrain et le brouillard) : si l'avion est dans la boîte d'un bloc,
+  elle rend la hauteur lue dans la grille du bloc (`sub_32021`).
+  **Correction du 2026-11-13** : cette liste n'est pas le pont du porte-avions, contrairement à ce qu'écrivait ce
+  paragraphe. Le pont vient du contact de l'avion avec le navire (`Aircraft_ContactWithObject_3CA69`, chunk `CARD`) :
+  voir `IMPL_PORTE_AVIONS.md`. La variable 667 n'est posée que par `PRLH-M1` (départ d'un aérodrome à terre).
 
 Le code sera écrit après la relecture de cette section (fichiers complets de libRealSpace modifiés, comme pour les
 missions).

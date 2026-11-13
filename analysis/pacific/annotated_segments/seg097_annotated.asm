@@ -10,7 +10,18 @@ loc_3CA65:
 
 ; Attributes: bp-based frame
 
-sub_3CA69		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-13. Contact d'un avion (arg 2) avec un objet (arg 3). Objet de
+; type 23 (méthode +52 ; le porte-avions) : hauteur = dword_7CDE6 (1er champ de CARD, 33 m) ;
+; le calcul hauteur + garde au sol (Aircraft_GroundClearance_3DF89) − 2 m est fait puis écrasé
+; par 2100h (33 m exactement). Si c'est le joueur : SetReference16(6646h, objet). Si
+; l'altitude de l'avion est sous 33 m : altitude = sol sous le point
+; (Ground_HeightUnderPoint_3664D) + 33 m. Avion « au sol » ([dynamique+32] = 1), train sorti
+; noté dans byte_78EB9 ; renvoie 0 (pas d'écrasement). Objet TERRAIN : autre branche (vitesse
+; > 20 m/s, sol + garde, byte_776BC = 1), non détaillée. Appelant non tracé (méthode de
+; contact).
+; ==============================================================================================
+Aircraft_ContactWithObject_3CA69		proc far
 
 var_78		= dword ptr -78h
 var_6E		= dword ptr -6Eh
@@ -618,7 +629,7 @@ loc_3D015:
 		pop	si
 		leave
 		retf
-sub_3CA69		endp
+Aircraft_ContactWithObject_3CA69		endp
 
 ; ----------------------------------------------------------------------
 

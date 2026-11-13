@@ -15,7 +15,7 @@ stru_747E0	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_74800	proc far
-		jmp	sub_B0E70
+		jmp	CarrierDeck_LoadCARD_B0E70
 sub_74800	endp
 
 ; ----------------------------------------------------------------------

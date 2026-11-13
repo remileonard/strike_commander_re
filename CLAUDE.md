@@ -345,6 +345,8 @@ strike_commander_re/
 │   │                                  acteur porté par l'objet : émission, mise à jour, drawBillboard) — tools/smoke_ref/
 │   ├── IMPL_MISSION_AREAS.md        à porter : zones AREA (formes, test d'appartenance) et scènes SCNE (scène globale,
 │   │                                  scène courante, ordre des 3 scripts) — fichiers RSMission / SCMission / SCMissionScene modifiés
+│   ├── pacific/IMPL_PORTE_AVIONS.md proposition : départ et posé sur le pont du porte-avions (chunk CARD, contact avec le navire,
+│   │                                  PSEntity / SCPlane::groundLevelAt / PSPlane / PSMission) — à valider avant le code
 │   ├── IMPL_MISSION_PART.md         à porter : objets de mission PART (champs nommés, lecture exacte, vitesse initiale et départ
 │   │                                  au sol, camp, allié par défaut = chef, poste en formation, repère du joueur ; chunks LOAD, CACH et SPOT) — RSMission, SCMission, SCProg…
 │   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,

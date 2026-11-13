@@ -6257,7 +6257,7 @@
   "sub_3664D": {
     "new_name": "Ground_HeightUnderPoint_3664D",
     "segment": "seg086",
-    "summary": "far. LUE 2026-11-05. Hauteur du sol sous un point, ponts compris : (sortie, monde, position, objet, drapeau). Altitude du terrain (Terrain_HeightSample, [monde+0BFh]) ; puis pour chacune des [monde+0B3h] surfaces d'atterrissage (liste de mots en [monde+0B5h], boîte en +0Ah de chaque objet, Camera_FrustumBoundsTest) contenant le point : si le terrain n'est pas plus haut que le point, ou drapeau ≠ 0, ou variable 668 posée -> [monde+207h] = 1 et hauteur de la surface (sub_32021) ; sinon [monde+207h] = 0 et hauteur du terrain. Origine de la liste des surfaces non lue."
+    "summary": "far. LUE 2026-11-05, CORRIGÉE 2026-11-13. Hauteur du sol sous un point : (sortie, monde, position, objet, drapeau). Altitude du terrain (Terrain_HeightSample, [monde+191]) ; puis pour chacun des [monde+179] blocs de la liste en [monde+181] (au plus 4, ajoutés par sub_365C6, remplis par sub_3631A qui gère tuiles de terrain et brouillard) dont la boîte (+10) contient le point : si le terrain est plus haut que le point, ou drapeau ≠ 0, ou variable 668 posée → [monde+519] = 1 et hauteur lue dans le bloc (sub_32021, grille du bloc) ; sinon [monde+519] = 0 et hauteur du terrain. CE N'EST PAS LE PONT DU PORTE-AVIONS (correction : le résumé du 2026-11-05 parlait de « surfaces d'atterrissage, ponts compris ») : le pont vient du contact avec le navire (Aircraft_ContactWithObject_3CA69)."
   },
   "sub_2362F": {
     "new_name": "Player_UpdateFrameState_2362F",
@@ -6693,5 +6693,15 @@
     "new_name": "PilotProfile_LoadATRB_11CC8",
     "segment": "seg027",
     "summary": "far. LUE 2026-11-13 (fin). Lit les 10 octets d'ATRB vers le profil (+154, +156, +155, +157, +153, +158, +159, +160, +161, +162 ; le 10e borné à 3) ; niveau [profil+152] = 2 si l'octet 5 (+153) > 12, 1 si > 6, sinon 0. Avec le profil à l'entité +26 (sub_84340), ce niveau est [entité+178], qui choisit la recherche de cible de Targeting_AcquireTarget_FF8B."
+  },
+  "sub_3CA69": {
+    "new_name": "Aircraft_ContactWithObject_3CA69",
+    "segment": "seg097",
+    "summary": "far. LUE EN PARTIE 2026-11-13. Contact d'un avion (arg 2) avec un objet (arg 3). Objet de type 23 (méthode +52 ; le porte-avions) : hauteur = dword_7CDE6 (1er champ de CARD, 33 m) ; le calcul hauteur + garde au sol (Aircraft_GroundClearance_3DF89) − 2 m est fait puis écrasé par 2100h (33 m exactement). Si c'est le joueur : SetReference16(6646h, objet). Si l'altitude de l'avion est sous 33 m : altitude = sol sous le point (Ground_HeightUnderPoint_3664D) + 33 m. Avion « au sol » ([dynamique+32] = 1), train sorti noté dans byte_78EB9 ; renvoie 0 (pas d'écrasement). Objet TERRAIN : autre branche (vitesse > 20 m/s, sol + garde, byte_776BC = 1), non détaillée. Appelant non tracé (méthode de contact)."
+  },
+  "sub_B0E70": {
+    "new_name": "CarrierDeck_LoadCARD_B0E70",
+    "segment": "ovr320",
+    "summary": "far. LUE 2026-11-13. Lecteur du chunk CARD d'un objet CARR : 8 i32 en 24.8 rangés dans des variables globales dword_7CDE6, 7CDEA, 7CDEE, 7CDF2, 7CDF6, 7CDFA, 7CDFE, 7CE02 (le dernier porte-avions chargé l'emporte ; les 4 fichiers de PACIFIC.DAT ont les mêmes valeurs : 33, 5, 0, −60, 33, 0, −80, 33 m). Absent : erreur 49273. dword_7CDE6 = hauteur du pont (Aircraft_ContactWithObject_3CA69, PhysicsTicks_4A8F4) ; 7CDEE..7CDF6 = point (0, −60, 33) lu par sub_B169C (ovr321) et ovr322 ; les autres rangés, rôle non établi."
   }
 }

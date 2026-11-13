@@ -6,7 +6,15 @@ ovr320		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_B0E70		proc far
+; ==============================================================================================
+; far. LUE 2026-11-13. Lecteur du chunk CARD d'un objet CARR : 8 i32 en 24.8 rangés dans des
+; variables globales dword_7CDE6, 7CDEA, 7CDEE, 7CDF2, 7CDF6, 7CDFA, 7CDFE, 7CE02 (le dernier
+; porte-avions chargé l'emporte ; les 4 fichiers de PACIFIC.DAT ont les mêmes valeurs : 33, 5,
+; 0, −60, 33, 0, −80, 33 m). Absent : erreur 49273. dword_7CDE6 = hauteur du pont
+; (Aircraft_ContactWithObject_3CA69, PhysicsTicks_4A8F4) ; 7CDEE..7CDF6 = point (0, −60, 33)
+; lu par sub_B169C (ovr321) et ovr322 ; les autres rangés, rôle non établi.
+; ==============================================================================================
+CarrierDeck_LoadCARD_B0E70		proc far
 
 arg_0		= dword ptr  6
 arg_4		= word ptr  0Ah
@@ -93,7 +101,7 @@ loc_B0F1C:
 		pop	si
 		pop	bp
 		retf
-sub_B0E70		endp
+CarrierDeck_LoadCARD_B0E70		endp
 
 ; ----------------------------------------------------------------------
 
