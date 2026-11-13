@@ -21,6 +21,7 @@ a été lue), l'effet sur `PRLH-M1`, et ce qu'il faut regarder au débogueur. Ri
 | 8 | Numéros des objets du terrain | aucun dans PRLH-M1 | basse |
 | 9 | Profil ou fichier objet introuvable | silence ou plantage | à vérifier |
 | 10 | `OP_ATTACK_RANDOM_ENEMY_OF_TYPE` : choix de la cible et valeur rendue | JESTER ne passe pas à `OP_SET_OBJ_FOLLOW_ALLY 36` | haute |
+| 11 | Choix des armes par l'IA lié aux numéros d'armes de Strike Commander | canon correct ; roquettes, bombes, torpilles et napalm mal reconnus | conception |
 
 ---
 
@@ -259,6 +260,54 @@ OP_SET_OBJ_FOLLOW_ALLY 36
 L'ailier n'atteint `OP_SET_OBJ_FOLLOW_ALLY 36` (suivre le joueur) que si les deux attaques rendent faux. Tant qu'il
 n'y passe pas, `SCAIBrain::moraleReaction` (goal 5) ne le voit pas comme l'ailier du joueur : `leaderActor()` est nul
 quand l'ordre en cours n'est pas `OP_SET_OBJ_FOLLOW_ALLY`.
+
+---
+
+## 11. Choix des armes par l'IA lié aux numéros d'armes de Strike Commander
+
+**Constat.** L'IA (`SCAIBrain`) reconnaît les armes d'un avion par un masque de bits construit sur les numéros
+d'armes de Strike Commander (`weapon_ids` de `SCenums.h`) :
+```cpp
+uint16_t SCAIBrain::loadedWeaponMask() {
+    uint16_t mask = 0;
+    for (auto weap : owner->plane->weaps_load) {
+        ...
+        int weapon_id = weap->objct->wdat->weapon_id;
+        if (weapon_id >= 1) {
+            mask |= (1 << (weapon_id - 1));
+        }
+    }
+    return mask;
+}
+```
+Les tests portent ensuite sur ces bits : 2048 = canon (`ID_20MM`), 1 et 3 = missiles infrarouges (`ID_AIM9M`,
+`ID_AIM9J`), 1792 = missiles à longue portée ; `SCAIBrain::selectGroundWeapon` cherche `ID_AGM65D`, `ID_GBU15`,
+`ID_MK20`, `ID_MK82`, `ID_DURANDAL`, `ID_LAU3`. `SCPilot::Fire(masque, cible)` retrouve le point d'emport par le même
+numéro.
+
+Pour que cela marche en Pacific Strike, `PSEntity::parseREAL_OBJT_MISS_WDAT` lit le numéro d'arme de Pacific
+(`ps_weapon_id`) et range à sa place un numéro de Strike Commander dans `wdat->weapon_id` :
+
+| Arme de Pacific Strike | Numéro de Strike Commander donné |
+|---|---|
+| canon | `ID_20MM` |
+| bombe de 100 lb | `ID_MK82` |
+| bombe de 500 lb | `ID_MK82` |
+| bombe de 1000 lb | `ID_MK82` |
+| torpille | `ID_MK82` |
+| napalm | `ID_MK82` |
+| roquette | `ID_AIM9J` |
+
+**Effets.** Le canon est reconnu (vérifié sur PRLH-M1 : emport `F4F3E` de JESTER = 450 × `50CAL`, objet `TRCR`, numéro
+d'arme 7 → `ID_20MM` ; portée du canon `range_gun` = 1800 m dans `INTEL\INTEL.IFF`). Les autres armes ne le sont pas
+avec leur vrai sens : une roquette passe pour un missile air-air infrarouge, et bombes, torpilles et napalm sont
+confondus.
+
+**Piste (Rémi, 2026-11-13).** Le masque d'armes doit être porté par **l'avion**, qui sait quelles armes il emporte
+(`SCPlane` pour Strike Commander, `PSPlane` pour Pacific Strike, chacun avec ses propres numéros). L'IA n'a qu'à
+demander à l'avion qu'elle pilote s'il a une arme pour tirer sur sa cible (air ou sol, portée), sans connaître les
+numéros d'armes d'un jeu. La traduction vers `ID_20MM` / `ID_MK82` / `ID_AIM9J` dans `PSEntity` n'aurait alors plus
+lieu d'être.
 
 ---
 
