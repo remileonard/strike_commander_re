@@ -673,11 +673,11 @@ loc_19EC8:				; CODE XREF: UI_ContainerLifecycle+33j
 loc_19ED1:				; CODE XREF: UI_ContainerLifecycle+38j
 		push	0
 		push	6
-		call	Weapon_HUDBox_TimerCaseJ_5A95E
+		call	SoundFX_Stop_5A95E
 		add	sp, 4
 		push	0
 		push	7
-		call	Weapon_HUDBox_TimerCaseJ_5A95E
+		call	SoundFX_Stop_5A95E
 		add	sp, 4
 		push	di
 		push	si

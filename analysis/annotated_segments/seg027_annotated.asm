@@ -294,7 +294,7 @@ loc_1BBD3:
 		push	ax
 		lea	ax, [bp-21Ah]
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 
 loc_1BBF1:
@@ -303,7 +303,7 @@ loc_1BBF1:
 		push	ax
 		lea	ax, [bp-226h]
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 		mov	eax, [bp-226h]
 		sub	[bp-21Ah], eax
@@ -315,7 +315,7 @@ loc_1BBF1:
 		push	ax
 		lea	ax, [bp-21Ah]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	eax, [bp-21Ah]
 		mov	[bp-20h], eax
@@ -390,7 +390,7 @@ loc_1BCF1:
 		push	ss
 		lea	ax, [bp-96h]
 		push	ax
-		call	AI_ApplyAngleBetweenVectors_57C3A
+		call	Matrix_NosePitchAngle_57C3A
 		add	sp, 6
 		mov	eax, [bp-96h]
 		mov	[bp-86h], eax

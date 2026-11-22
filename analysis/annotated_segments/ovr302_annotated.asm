@@ -381,7 +381,7 @@ Debris_LoadAndSpawnFromRecord_9B8E0	endp
 ; ==============================================================================================
 ; far, aucun appel externe visible (26 lignes).
 ; ==============================================================================================
-Debris_Helper3_9BA29	proc far		; CODE XREF: VROOMM_StubThunk_6BFFAJ Debris_LoadFieldMix_9BA85+25p
+Debris_Helper3_9BA29	proc far		; CODE XREF: VROOMM_StubThunk_6BFFAJ Object_LoadCommonChunks_9BA85+25p
 
 arg_0		= dword	ptr  6
 
@@ -414,10 +414,35 @@ Debris_Helper3_9BA29	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 420 lignes, NON DÉTAILLÉE — combine
-; ResourceRecord_SeekAndRead_64743/ReadFieldGroupB_64A54 répétés.
+; far, LUE 2026-10-12. LECTEUR DES CHUNKS COMMUNS D'UN OBJET (ex-Debris_LoadFieldMix ; via
+; VROOMM_StubThunk_6BFFF, appelé par les lecteurs de classe d'IFF_LoadModelMain : ORNT/RNWY
+; via IFF_LoadAngleParam, EXPL via Explosion_LoadFromIFF_4BCD5, etc.). Alloue d'abord un sous-
+; objet de 23 o (objet+8 ; +0x10 = 0x5DC00 = 1500,0). Chunks cherchés par tag dans le niveau
+; courant (tous facultatifs) : DAMG uint16 → +6 (points de dégâts ; 65535 → +3 = 1
+; indestructible ; absent → 10) ; TRGT uint16 → +0x11 (octet bas) ; SIGN 3× uint8 →
+; +0x12/+0x13/+0x14 (absent → 0) ; EXPL 12 o bruts → +0x19 (far ptr) = {char[8] modèle
+; d'explosion, int16 rayon (m), int16 dégâts max} ; DEBR uint16 → +0x1D (nombre de débris à
+; créer) puis (taille−2)/26 enregistrements de 26 o → +0x1F nombre, +0x21 tableau = {char[8]
+; modèle, 3× int16 dispersion de position, 3× int16 vitesse de base, 3× int16 dispersion de
+; vitesse} ; DEST taille/14 enregistrements de 14 o → +0x25 nombre, +0x27 tableau = {char[8]
+; modèle, 3× int16 décalage} ; CHLD taille/32 enregistrements de 32 o (sous-objets attachés :
+; char[8] nom, 3× int32 24.8 position, 3× int32 angles → Matrix_BuildFullOrientation_575B2) →
+; +0x0F nombre, +0x0D tableau de records mémoire de 0x39 o. Consommateurs :
+; Object_SpawnDestructionEffects_3863A (EXPL/DEBR/DEST), Debris_SpawnFromDebrList_3844F
+; (DEBR). Détail : DATA_MODEL.md §6.1. | COMPLÉMENT 2026-10-12 (consommateurs) : TRGT (+0x11)
+; = TYPE DE CIBLE : 0 aucun, 1 avion, 2 cible au sol, 4 leurre (Targeting_FilterByWeaponType
+; garde 1 et 4 ; GroundAttack_CanEngage_77000 exige 2 ; MissileBody_GuidanceTick_42A4E relève
+; le point visé si > 1). SIGN : octet 1 (+0x12) = signature IR sans référence
+; (Aircraft_ComputeSeekerSignature_3E2F1), recopiée instance +0x28 ; octet 2 (+0x13) =
+; signature radar, chercheur 4 (AIM-120, SA-2, SA-6 ; Debris_GetSubpartAttrib) ; octet 3
+; (+0x14) = signature du chercheur 3 (aucune arme), instance +0x29. CHLD : les 3 angles (int32
+; 24.8, degrés) sont appliqués dans l'ordre axe X, Y, Z de l'objet
+; (Matrix_BuildFullOrientation_575B2) = tangage (autour de l'envergure), roulis (autour du
+; nez), cap (autour de la verticale). DEBR : vitesses en m/s (posées par la méthode +0x50 =
+; vitesse de la dynamique). DAMG (+6) sert aussi aux dégâts de choc
+; (WorldObject_CollisionDamage_38210).
 ; ==============================================================================================
-Debris_LoadFieldMix_9BA85	proc far		; CODE XREF: VROOMM_StubThunk_6BFFFJ
+Object_LoadCommonChunks_9BA85	proc far		; CODE XREF: VROOMM_StubThunk_6BFFFJ
 
 var_2A		= word ptr -2Ah
 var_22		= dword	ptr -22h
@@ -498,11 +523,11 @@ loc_9BAEA:
 		jmp	short loc_9BB11
 ; ���������������������������������������������������������������������������
 
-loc_9BB0B:				; CODE XREF: Debris_LoadFieldMix_9BA85+47j
+loc_9BB0B:				; CODE XREF: Object_LoadCommonChunks_9BA85+47j
 		mov	dx, word ptr [bp+var_4+2]
 		mov	ax, word ptr [bp+var_4]
 
-loc_9BB11:				; CODE XREF: Debris_LoadFieldMix_9BA85+84j
+loc_9BB11:				; CODE XREF: Object_LoadCommonChunks_9BA85+84j
 		les	bx, [bp+arg_0]
 		mov	es:[bx+0Ah], dx
 		mov	es:[bx+8], ax
@@ -532,12 +557,12 @@ loc_9BB32:
 		jmp	short loc_9BB56
 ; ���������������������������������������������������������������������������
 
-loc_9BB4D:				; CODE XREF: Debris_LoadFieldMix_9BA85+AAj
+loc_9BB4D:				; CODE XREF: Object_LoadCommonChunks_9BA85+AAj
 		les	bx, [bp+arg_0]
 		mov	word ptr es:[bx+6], 0Ah
 
-loc_9BB56:				; CODE XREF: Debris_LoadFieldMix_9BA85+BFj
-					; Debris_LoadFieldMix_9BA85+C6j
+loc_9BB56:				; CODE XREF: Object_LoadCommonChunks_9BA85+BFj
+					; Object_LoadCommonChunks_9BA85+C6j
 		push	0
 		push	large 54475254h
 		push	si
@@ -553,13 +578,13 @@ loc_9BB56:				; CODE XREF: Debris_LoadFieldMix_9BA85+BFj
 		jmp	short loc_9BB83
 ; ���������������������������������������������������������������������������
 
-loc_9BB7B:				; CODE XREF: Debris_LoadFieldMix_9BA85+E4j
+loc_9BB7B:				; CODE XREF: Object_LoadCommonChunks_9BA85+E4j
 		les	bx, [bp+arg_0]
 
 loc_9BB7E:
 		mov	byte ptr es:[bx+11h], 0
 
-loc_9BB83:				; CODE XREF: Debris_LoadFieldMix_9BA85+F4j
+loc_9BB83:				; CODE XREF: Object_LoadCommonChunks_9BA85+F4j
 		push	0
 
 loc_9BB85:
@@ -603,13 +628,13 @@ loc_9BBC2:
 		jmp	short loc_9BBD6
 ; ���������������������������������������������������������������������������
 
-loc_9BBC4:				; CODE XREF: Debris_LoadFieldMix_9BA85:loc_9BB96j
+loc_9BBC4:				; CODE XREF: Object_LoadCommonChunks_9BA85:loc_9BB96j
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+12h], 0
 		mov	byte ptr es:[bx+13h], 0
 		mov	byte ptr es:[bx+14h], 0
 
-loc_9BBD6:				; CODE XREF: Debris_LoadFieldMix_9BA85:loc_9BBC2j
+loc_9BBD6:				; CODE XREF: Object_LoadCommonChunks_9BA85:loc_9BBC2j
 		push	0
 		push	large 4C505845h
 		push	si
@@ -635,8 +660,8 @@ loc_9BBD6:				; CODE XREF: Debris_LoadFieldMix_9BA85:loc_9BBC2j
 		call	ResourceRecord_ReadFieldGroupA_64A19
 		add	sp, 0Ah
 
-loc_9BC23:				; CODE XREF: Debris_LoadFieldMix_9BA85+164j
-					; Debris_LoadFieldMix_9BA85+18Bj
+loc_9BC23:				; CODE XREF: Object_LoadCommonChunks_9BA85+164j
+					; Object_LoadCommonChunks_9BA85+18Bj
 		push	0
 		push	large 52424544h
 		push	si
@@ -692,8 +717,8 @@ loc_9BCA3:
 		call	ResourceRecord_ReadFieldGroupA_64A19
 		add	sp, 0Ah
 
-loc_9BCAC:				; CODE XREF: Debris_LoadFieldMix_9BA85+1B1j
-					; Debris_LoadFieldMix_9BA85+20Aj
+loc_9BCAC:				; CODE XREF: Object_LoadCommonChunks_9BA85+1B1j
+					; Object_LoadCommonChunks_9BA85+20Aj
 		push	0
 
 loc_9BCAE:
@@ -739,8 +764,8 @@ loc_9BCE1:
 		call	ResourceRecord_ReadFieldGroupA_64A19
 		add	sp, 0Ah
 
-loc_9BD23:				; CODE XREF: Debris_LoadFieldMix_9BA85+23Aj
-					; Debris_LoadFieldMix_9BA85+281j
+loc_9BD23:				; CODE XREF: Object_LoadCommonChunks_9BA85+23Aj
+					; Object_LoadCommonChunks_9BA85+281j
 		push	0
 		push	large 444C4843h
 		push	si
@@ -753,7 +778,7 @@ loc_9BD31:
 		jmp	loc_9BDE5
 ; ���������������������������������������������������������������������������
 
-loc_9BD3B:				; CODE XREF: Debris_LoadFieldMix_9BA85+2B1j
+loc_9BD3B:				; CODE XREF: Object_LoadCommonChunks_9BA85+2B1j
 		mov	eax, [si+72h]
 		mov	ebx, 20h ; ' '
 		cdq
@@ -774,7 +799,7 @@ loc_9BD3B:				; CODE XREF: Debris_LoadFieldMix_9BA85+2B1j
 		jmp	short loc_9BDD9
 ; ���������������������������������������������������������������������������
 
-loc_9BD7D:				; CODE XREF: Debris_LoadFieldMix_9BA85:loc_9BDE3j
+loc_9BD7D:				; CODE XREF: Object_LoadCommonChunks_9BA85:loc_9BDE3j
 		push	large 20h ; ' '
 		push	ss
 
@@ -819,7 +844,7 @@ loc_9BDD3:
 		add	di, 39h	; '9'
 		inc	[bp+var_A]
 
-loc_9BDD9:				; CODE XREF: Debris_LoadFieldMix_9BA85+2F6j
+loc_9BDD9:				; CODE XREF: Object_LoadCommonChunks_9BA85+2F6j
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+0Fh]
 
@@ -829,14 +854,14 @@ loc_9BDE0:
 loc_9BDE3:
 		jg	short loc_9BD7D
 
-loc_9BDE5:				; CODE XREF: Debris_LoadFieldMix_9BA85+2B3j
+loc_9BDE5:				; CODE XREF: Object_LoadCommonChunks_9BA85+2B3j
 		pop	di
 
 loc_9BDE6:
 		pop	si
 		leave
 		retf
-Debris_LoadFieldMix_9BA85	endp
+Object_LoadCommonChunks_9BA85	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -844,9 +869,15 @@ Debris_LoadFieldMix_9BA85	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ReadFieldGroupC_64A7E/ReadFieldGroupB_64A54/ReadFinalField_64B51 (117 lignes).
+; far, LUE 2026-10-12. CHUNK EXTE du niveau OBJT (après la classe, via VROOMM_StubThunk_6C004)
+; : int32 24.8 → sous-objet (+8)+0x10 = RAYON DE L'OBJET (m ; défaut 1500 posé par
+; Object_LoadCommonChunks_9BA85) recopié dans l'instance +0x20 (Debris_BodyAttachToSubpart :
+; taille angulaire vue par AI_IncomingThreatWarning, relèvement du point visé /8 pour une
+; cible au sol) ; uint16 n ; uint8 → +0x16 : ≠ 0 → l'instance démarre avec +4 bit 1
+; (collisions actives) ; puis n volumes (Exte_LoadVolume_9BFB0 : 'S' sphère, 'B' boîte, 'L'
+; nom seul) chaînés en liste (+0/+4, nombre +0x14).
 ; ==============================================================================================
-Debris_LoadFieldMixB_9BDE9	proc far		; CODE XREF: VROOMM_StubThunk_6C004J
+Object_LoadExteChunk_9BDE9	proc far		; CODE XREF: VROOMM_StubThunk_6C004J
 
 var_6		= dword	ptr -6
 var_2		= word ptr -2
@@ -875,7 +906,7 @@ arg_4		= word ptr  0Ah
 		jmp	loc_9BEC9
 ; ���������������������������������������������������������������������������
 
-loc_9BE1C:				; CODE XREF: Debris_LoadFieldMixB_9BDE9+2Ej
+loc_9BE1C:				; CODE XREF: Object_LoadExteChunk_9BDE9+2Ej
 		push	si
 		call	ResourceRecord_ReadFieldGroupC_64A7E
 		push	dx
@@ -902,7 +933,7 @@ loc_9BE24:
 		jmp	short loc_9BEC4
 ; ���������������������������������������������������������������������������
 
-loc_9BE59:				; CODE XREF: Debris_LoadFieldMixB_9BDE9+DEj
+loc_9BE59:				; CODE XREF: Object_LoadExteChunk_9BDE9+DEj
 		push	si
 		call	VROOMM_StubThunk_6C04A
 		pop	cx
@@ -933,7 +964,7 @@ loc_9BE94:
 		jmp	short loc_9BEC3
 ; ���������������������������������������������������������������������������
 
-loc_9BE99:				; CODE XREF: Debris_LoadFieldMixB_9BDE9+97j
+loc_9BE99:				; CODE XREF: Object_LoadExteChunk_9BDE9+97j
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+8]
 
@@ -949,20 +980,20 @@ loc_9BEA0:
 		mov	es:[bx+4], dx
 		jmp	short $+2
 
-loc_9BEC3:				; CODE XREF: Debris_LoadFieldMixB_9BDE9+82j
-					; Debris_LoadFieldMixB_9BDE9+AEj
+loc_9BEC3:				; CODE XREF: Object_LoadExteChunk_9BDE9+82j
+					; Object_LoadExteChunk_9BDE9+AEj
 		inc	di
 
-loc_9BEC4:				; CODE XREF: Debris_LoadFieldMixB_9BDE9+6Ej
+loc_9BEC4:				; CODE XREF: Object_LoadExteChunk_9BDE9+6Ej
 		cmp	di, [bp+var_2]
 		jl	short loc_9BE59
 
-loc_9BEC9:				; CODE XREF: Debris_LoadFieldMixB_9BDE9+30j
+loc_9BEC9:				; CODE XREF: Object_LoadExteChunk_9BDE9+30j
 		pop	di
 		pop	si
 		leave
 		retf
-Debris_LoadFieldMixB_9BDE9	endp
+Object_LoadExteChunk_9BDE9	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

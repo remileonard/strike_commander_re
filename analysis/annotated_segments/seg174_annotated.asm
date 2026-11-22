@@ -8,14 +8,20 @@ seg174		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 457 lignes, NON DÉTAILLÉE — même motif que Render_DrawTextString_61CD2 (seg173) :
-; copie un descripteur de contexte (6 mots) et prend un pointeur far vers une chaîne (arg_6),
-; avec vérification de capacité de buffer (comparaison contre [si+4]). Référencée par
-; sub_1450B, sub_14795 et Widget_ConstructWithBuffer/GlyphObject_ConstructWithBuffer (seg162).
-; Probable variante mesure-sans-dessiner ou dessin avec contrôle de capacité — identité exacte
-; vis-à-vis de Render_DrawTextString_61CD2 non vérifiée. Candidat pour session dédiée.
+; far. DESSIN D'UNE IMAGE (forme RealSpace, format des segments de ligne) à la position
+; (arg_2, arg_4), avec découpe sur le rectangle de la fenêtre. Pour chaque segment : lodsw = n
+; (0 = fin de l'image), lodsw = x, lodsw = y (ajoutés à la position) ; n pair : n/2 pixels
+; recopiés tels quels (shr cx, 1 / rep movsw / rep movsb) ; n impair : blocs de n/2 pixels en
+; tout, chaque bloc commence par un octet c (lodsb / shr al, 1) : c pair → c/2 pixels recopiés
+; (rep movsw / rep movsb), c impair → c/2 fois l'octet suivant (rep stosw / rep stosb).
+; Écriture directe dans la mémoire d'écran : ni XOR ni couleur transparente testée ; la
+; transparence vient du format (seuls les pixels des segments sont écrits), et une image
+; dessinée après une autre la recouvre là où leurs segments se chevauchent.
+; Ex-'Render_MeasureOrDrawTextString' (nom faux), renommée 2026-10-23 après lecture de la
+; boucle de pixels (version OPTEST, code identique). Lecteur Python équivalent :
+; tools/sc_data.py image_spans/draw_image.
 ; ==============================================================================================
-Render_MeasureOrDrawTextString_61F52	proc far		; CODE XREF: UI_RenderFormattedText+17BP
+Shape_DrawSpans_61F52	proc far		; CODE XREF: UI_RenderFormattedText+17BP
 					; Text_TypewriterFrame+78P ...
 
 var_152		= word ptr -152h
@@ -55,11 +61,11 @@ arg_A		= word ptr  10h
 		jb	short loc_61F7F
 		jnz	short loc_61F82
 
-loc_61F7F:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+29j
+loc_61F7F:				; CODE XREF: Shape_DrawSpans_61F52+29j
 		jmp	loc_6203E
 ; ���������������������������������������������������������������������������
 
-loc_61F82:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+2Bj
+loc_61F82:				; CODE XREF: Shape_DrawSpans_61F52+2Bj
 		mov	ax, ds
 
 loc_61F84:
@@ -113,7 +119,7 @@ loc_61FD0:
 loc_61FD3:
 		cmp	ax, [bp+var_C]
 
-loc_61FD6:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+79j
+loc_61FD6:				; CODE XREF: Shape_DrawSpans_61F52+79j
 		jl	short loc_62045
 
 loc_61FD8:
@@ -123,15 +129,15 @@ loc_61FD8:
 loc_61FDE:
 		cmp	ax, [bp+var_8]
 
-loc_61FE1:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+6Ej
+loc_61FE1:				; CODE XREF: Shape_DrawSpans_61F52+6Ej
 		jg	short loc_62045
 
 loc_61FE3:
 		mov	dx, ds
 		add	si, 8
 
-loc_61FE8:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+BFj
-					; Render_MeasureOrDrawTextString_61F52+D7j ...
+loc_61FE8:				; CODE XREF: Shape_DrawSpans_61F52+BFj
+					; Shape_DrawSpans_61F52+D7j ...
 		lodsw
 		or	ax, ax
 		jz	short loc_6204B
@@ -157,11 +163,11 @@ loc_61FF0:
 		jmp	short loc_61FE8
 ; ���������������������������������������������������������������������������
 
-loc_62013:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+B5j
+loc_62013:				; CODE XREF: Shape_DrawSpans_61F52+B5j
 		mov	bx, cx
 
-loc_62015:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+D5j
-					; Render_MeasureOrDrawTextString_61F52+E8j
+loc_62015:				; CODE XREF: Shape_DrawSpans_61F52+D5j
+					; Shape_DrawSpans_61F52+E8j
 		lodsb
 		shr	al, 1
 		cbw
@@ -176,7 +182,7 @@ loc_62015:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+D5j
 		jmp	short loc_61FE8
 ; ���������������������������������������������������������������������������
 
-loc_6202B:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+C9j
+loc_6202B:				; CODE XREF: Shape_DrawSpans_61F52+C9j
 		sub	bx, ax
 		lodsb
 		mov	ah, al
@@ -193,8 +199,8 @@ loc_62036:
 		jmp	short loc_61FE8
 ; ���������������������������������������������������������������������������
 
-loc_6203E:				; CODE XREF: Render_MeasureOrDrawTextString_61F52:loc_61F7Fj
-					; Render_MeasureOrDrawTextString_61F52:loc_6204Bj
+loc_6203E:				; CODE XREF: Shape_DrawSpans_61F52:loc_61F7Fj
+					; Shape_DrawSpans_61F52:loc_6204Bj
 		pop	ds
 		pop	di
 		pop	si
@@ -207,18 +213,18 @@ loc_62043:
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_62045:				; CODE XREF: Render_MeasureOrDrawTextString_61F52:loc_61FD6j
-					; Render_MeasureOrDrawTextString_61F52:loc_61FE1j
+loc_62045:				; CODE XREF: Shape_DrawSpans_61F52:loc_61FD6j
+					; Shape_DrawSpans_61F52:loc_61FE1j
 		add	si, 8
 
-loc_62048:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+157j
-					; Render_MeasureOrDrawTextString_61F52+161j ...
+loc_62048:				; CODE XREF: Shape_DrawSpans_61F52+157j
+					; Shape_DrawSpans_61F52+161j ...
 		lodsw
 
 loc_62049:
 		shr	ax, 1
 
-loc_6204B:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+99j
+loc_6204B:				; CODE XREF: Shape_DrawSpans_61F52+99j
 		jz	short loc_6203E
 
 loc_6204D:
@@ -265,7 +271,7 @@ loc_62087:
 		add	di, ax
 		add	dx, ax
 
-loc_62096:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+13Aj
+loc_62096:				; CODE XREF: Shape_DrawSpans_61F52+13Aj
 		add	dx, cx
 		dec	dx
 		sub	dx, bx
@@ -279,7 +285,7 @@ loc_62096:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+13Aj
 		jmp	short loc_62048
 ; ���������������������������������������������������������������������������
 
-loc_620AB:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+149j
+loc_620AB:				; CODE XREF: Shape_DrawSpans_61F52+149j
 		shr	cx, 1
 		rep movsw
 		adc	cx, cx
@@ -287,13 +293,13 @@ loc_620AB:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+149j
 		jmp	short loc_62048
 ; ���������������������������������������������������������������������������
 
-loc_620B5:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+10Cj
-					; Render_MeasureOrDrawTextString_61F52+111j ...
+loc_620B5:				; CODE XREF: Shape_DrawSpans_61F52+10Cj
+					; Shape_DrawSpans_61F52+111j ...
 		add	si, cx
 		jmp	short loc_62048
 ; ���������������������������������������������������������������������������
 
-loc_620B9:				; CODE XREF: Render_MeasureOrDrawTextString_61F52:loc_6204Fj
+loc_620B9:				; CODE XREF: Shape_DrawSpans_61F52:loc_6204Fj
 		lodsw
 		add	ax, [bp+arg_2]
 		mov	dx, ax
@@ -345,8 +351,8 @@ loc_620EF:
 		jg	short loc_62139
 		mov	bx, cx
 
-loc_620FB:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+1BBj
-					; Render_MeasureOrDrawTextString_61F52+1CFj
+loc_620FB:				; CODE XREF: Shape_DrawSpans_61F52+1BBj
+					; Shape_DrawSpans_61F52+1CFj
 		lodsb
 		shr	al, 1
 		cbw
@@ -363,7 +369,7 @@ loc_62103:
 		jmp	loc_62048
 ; ���������������������������������������������������������������������������
 
-loc_62112:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+1AFj
+loc_62112:				; CODE XREF: Shape_DrawSpans_61F52+1AFj
 		sub	bx, ax
 		lodsb
 		mov	ah, al
@@ -376,8 +382,8 @@ loc_62112:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+1AFj
 		jmp	loc_62048
 ; ���������������������������������������������������������������������������
 
-loc_62126:				; CODE XREF: Render_MeasureOrDrawTextString_61F52:loc_620C6j
-					; Render_MeasureOrDrawTextString_61F52+179j ...
+loc_62126:				; CODE XREF: Shape_DrawSpans_61F52:loc_620C6j
+					; Shape_DrawSpans_61F52+179j ...
 		lodsb
 		add	si, 1
 		shr	al, 1
@@ -388,14 +394,14 @@ loc_62126:				; CODE XREF: Render_MeasureOrDrawTextString_61F52:loc_620C6j
 loc_62131:
 		dec	si
 
-loc_62132:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+1DBj
+loc_62132:				; CODE XREF: Shape_DrawSpans_61F52+1DBj
 		sub	cx, ax
 		jnz	short loc_62126
 		jmp	loc_62048
 ; ���������������������������������������������������������������������������
 
-loc_62139:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+1A0j
-					; Render_MeasureOrDrawTextString_61F52+1A5j
+loc_62139:				; CODE XREF: Shape_DrawSpans_61F52+1A0j
+					; Shape_DrawSpans_61F52+1A5j
 		mov	[bp+var_2], ax
 		mov	bx, cx
 		push	cx
@@ -407,8 +413,8 @@ loc_62141:
 		pop	es
 		lea	di, [bp+var_152]
 
-loc_62147:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+207j
-					; Render_MeasureOrDrawTextString_61F52+21Aj
+loc_62147:				; CODE XREF: Shape_DrawSpans_61F52+207j
+					; Shape_DrawSpans_61F52+21Aj
 		lodsb
 		shr	al, 1
 		cbw
@@ -425,7 +431,7 @@ loc_62153:
 		jmp	short loc_6216E
 ; ���������������������������������������������������������������������������
 
-loc_6215D:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+1FBj
+loc_6215D:				; CODE XREF: Shape_DrawSpans_61F52+1FBj
 		sub	bx, ax
 		lodsb
 		mov	ah, al
@@ -436,7 +442,7 @@ loc_6215D:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+1FBj
 		or	bx, bx
 		jnz	short loc_62147
 
-loc_6216E:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+209j
+loc_6216E:				; CODE XREF: Shape_DrawSpans_61F52+209j
 		pop	di
 		pop	es
 		pop	cx
@@ -454,13 +460,13 @@ loc_62181:
 		sub	si, dx
 		sub	di, dx
 
-loc_62187:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+22Dj
+loc_62187:				; CODE XREF: Shape_DrawSpans_61F52+22Dj
 		cmp	[bp+var_2], 0
 		jle	short loc_62193
 		sub	cx, [bp+var_2]
 		mov	ax, [bp+var_2]
 
-loc_62193:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+239j
+loc_62193:				; CODE XREF: Shape_DrawSpans_61F52+239j
 		shr	cx, 1
 		rep movsw
 		adc	cx, cx
@@ -471,6 +477,6 @@ loc_62193:				; CODE XREF: Render_MeasureOrDrawTextString_61F52+239j
 
 loc_6219F:
 		jmp	loc_62048
-Render_MeasureOrDrawTextString_61F52	endp
+Shape_DrawSpans_61F52	endp
 
 seg174		ends

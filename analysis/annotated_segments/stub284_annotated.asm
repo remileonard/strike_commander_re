@@ -34,7 +34,7 @@ VROOMM_StubThunk_6BB50	endp
 ; ==============================================================================================
 VROOMM_StubThunk_6BB55	proc far		; CODE XREF: seg060:loc_2C93DP
 					; PlayerComponent_LoadListAndCompute_A6B09+3CP
-		jmp	AircraftComponent_ConstructAndCalibrate_96917
+		jmp	PolyAppearance_CreateInstance_96917
 VROOMM_StubThunk_6BB55	endp
 
 

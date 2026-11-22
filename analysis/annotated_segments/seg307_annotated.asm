@@ -19,7 +19,7 @@ stru_6C300	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:off_6A886o
 ; d'overlay actuellement charge en memoire. fileoff=2C1B0h, codesize=114h, nentries=3.
 ; ==============================================================================================
 VROOMM_StubThunk_6C320	proc far
-		jmp	TimedTrigger_NotifySingleListener_9DD30
+		jmp	Aircraft_SetChildVisible_9DD30
 VROOMM_StubThunk_6C320	endp
 
 
@@ -32,7 +32,7 @@ VROOMM_StubThunk_6C320	endp
 ; d'overlay actuellement charge en memoire. fileoff=2C1B0h, codesize=114h, nentries=3.
 ; ==============================================================================================
 VROOMM_StubThunk_6C325	proc far		; CODE XREF: Camera_ConstructWithHandle_9D610:loc_9D760P
-		jmp	TimedTrigger_NotifyConditional_9DD81
+		jmp	Aircraft_InitSpecialChild_9DD81
 VROOMM_StubThunk_6C325	endp
 
 
@@ -45,7 +45,7 @@ VROOMM_StubThunk_6C325	endp
 ; d'overlay actuellement charge en memoire. fileoff=2C1B0h, codesize=114h, nentries=3.
 ; ==============================================================================================
 VROOMM_StubThunk_6C32A	proc far		; CODE XREF: Camera_ConstructWithHandle_9D610+143P
-		jmp	TimedTrigger_ReleaseIfInactive_9DDCF
+		jmp	Aircraft_InitGearChildren_9DDCF
 VROOMM_StubThunk_6C32A	endp
 
 seg307		ends

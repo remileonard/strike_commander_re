@@ -11,7 +11,7 @@ seg058		segment	byte public 'CODE' use16
 ; far,12L — accesseur identité (retourne arg_0) : getter trivial (probable accès direct à une
 ; valeur wrapper).
 ; ==============================================================================================
-Value_IdAccessor	proc far		; CODE XREF: ListItem_ConstructThreeParams+9p ListItem_ConstructVector3D+Ap
+Value_IdAccessor	proc far		; CODE XREF: Light_Construct_2B0F2+9p ListItem_ConstructVector3D+Ap
 
 arg_0		= word ptr  6
 
@@ -30,11 +30,11 @@ Value_IdAccessor	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,55L — construit un élément avec 3 valeurs 32-bit (arg_4/8/C) et un flag, appelle
-; sub_55E65 (probable formatage type sprintf) : construction d'un élément de liste avec 3
-; paramètres numériques formatés.
+; far, LUE 2026-10-14. CONSTRUIT UNE LUMIÈRE (17 o) : +0 drapeau normaliser, +1 vecteur
+; direction (3 dd, normalisé par Vector_NormalizeInPlace_5593A si drapeau ≠ 0), +0Dh poids.
+; Ex-'ListItem_ConstructThreeParams'.
 ; ==============================================================================================
-ListItem_ConstructThreeParams	proc far		; CODE XREF: ListItem_ConstructComplex:loc_2B342p
+Light_Construct_2B0F2	proc far		; CODE XREF: LightSet_AddLight_2B2DB:loc_2B342p
 
 var_E		= dword	ptr -0Eh
 var_A		= dword	ptr -0Ah
@@ -79,16 +79,16 @@ loc_2B131:
 		mov	ax, si
 		inc	ax
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 
-loc_2B141:				; CODE XREF: ListItem_ConstructThreeParams+43j
+loc_2B141:				; CODE XREF: Light_Construct_2B0F2+43j
 		mov	ax, [bp+arg_2]
 		mov	[si+0Dh], ax
 		pop	si
 		pop	bp
 		retf
-ListItem_ConstructThreeParams	endp
+Light_Construct_2B0F2	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -134,7 +134,7 @@ loc_2B16F:
 		mov	ax, si
 		inc	ax
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 
 loc_2B187:				; CODE XREF: ListItem_ConstructVector3D+31j
@@ -152,10 +152,10 @@ ListItem_ConstructVector3D	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,20L — initialise un champ (+6=1, +7=0) puis appelle sub_2B228(100) : initialisation
-; d'une barre de progression à 100%.
+; far, LUE 2026-10-14. JEU DE LUMIÈRES — initialisation : +6 = 1, poids ambiant 0, intensité
+; 100 %. Appelée par seg112. Ex-'ProgressBar_InitFull'.
 ; ==============================================================================================
-ProgressBar_InitFull	proc far		; CODE XREF: seg112:0CC4P
+LightSet_Init_2B191	proc far		; CODE XREF: seg112:0CC4P
 
 arg_0		= word ptr  6
 
@@ -169,12 +169,12 @@ arg_0		= word ptr  6
 		push	si
 		nop
 		push	cs
-		call	near ptr ProgressBar_PercentToFixed
+		call	near ptr LightSet_SetIntensityPercent_2B228
 		add	sp, 4
 		pop	si
 		pop	bp
 		retf
-ProgressBar_InitFull	endp
+LightSet_Init_2B191	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -278,11 +278,11 @@ Collection_Destruct	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,34L — convertit un pourcentage (borné à 100) en valeur fixed-point 8-bit (×256/100),
-; stockée à +9 : calcul de remplissage d'une barre de progression (%→pixels).
+; far, LUE 2026-10-14. JEU DE LUMIÈRES — intensité globale +9 = pourcentage × 256 ÷ 100, ou
+; 256 (1,0) au-delà de 100. Ex-'ProgressBar_PercentToFixed'.
 ; ==============================================================================================
-ProgressBar_PercentToFixed	proc far		; CODE XREF: ProgressBar_InitFull+15p
-					; MissionLoader_LoadPosition_A7A10:loc_A7A78P
+LightSet_SetIntensityPercent_2B228	proc far		; CODE XREF: LightSet_Init_2B191+15p
+					; World_LoadLGHTChunk_A7A10:loc_A7A78P
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -300,7 +300,7 @@ loc_2B22F:
 		jmp	short loc_2B24C
 ; ���������������������������������������������������������������������������
 
-loc_2B23E:				; CODE XREF: ProgressBar_PercentToFixed+Dj
+loc_2B23E:				; CODE XREF: LightSet_SetIntensityPercent_2B228+Dj
 		mov	ax, dx
 		shl	ax, 8
 
@@ -310,11 +310,11 @@ loc_2B243:
 		idiv	bx
 		mov	[si+9],	ax
 
-loc_2B24C:				; CODE XREF: ProgressBar_PercentToFixed+14j
+loc_2B24C:				; CODE XREF: LightSet_SetIntensityPercent_2B228+14j
 		pop	si
 		pop	bp
 		retf
-ProgressBar_PercentToFixed	endp
+LightSet_SetIntensityPercent_2B228	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -322,10 +322,10 @@ ProgressBar_PercentToFixed	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,22L — stocke une valeur (+7) puis appelle sub_2B49F (recalcul) : mise à jour de la
-; valeur affichée d'une barre de progression.
+; far, LUE 2026-10-14. JEU DE LUMIÈRES — fixe le poids ambiant (+7) puis recalcule les parts
+; (LightSet_RecomputeShares_2B49F). Ex-'ProgressBar_UpdateValue'.
 ; ==============================================================================================
-ProgressBar_UpdateValue	proc far		; CODE XREF: MissionLoader_LoadPosition_A7A10+31P
+LightSet_SetAmbientWeight_2B24F	proc far		; CODE XREF: World_LoadLGHTChunk_A7A10+31P
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -339,14 +339,14 @@ arg_2		= word ptr  8
 		push	si
 		nop
 		push	cs
-		call	near ptr ProgressBar_WeightedSum
+		call	near ptr LightSet_RecomputeShares_2B49F
 		pop	cx
 
 loc_2B263:
 		pop	si
 		pop	bp
 		retf
-ProgressBar_UpdateValue	endp
+LightSet_SetAmbientWeight_2B24F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -354,11 +354,11 @@ ProgressBar_UpdateValue	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,73L — construit un élément numérique (type 0x1786, valeur arg_2), l'ajoute à la liste
-; (sub_5F57F) ; compte les éléments (sub_5F6D5) et court-circuite si ≤1 : ajout d'un élément
-; numéroté à une liste avec limite.
+; far, LUE 2026-10-14. AJOUTE la lumière à la liste du jeu de lumières (nœud 6 o), met +6 à 0
+; si la liste a plus d'une lumière ou si le drapeau de la lumière est nul, puis recalcule les
+; parts (LightSet_RecomputeShares_2B49F). Ex-'ListItem_AddNumberedLimited'.
 ; ==============================================================================================
-ListItem_AddNumberedLimited	proc far		; CODE XREF: ListItem_ConstructComplex+79p
+LightSet_InsertLight_2B266	proc far		; CODE XREF: LightSet_AddLight_2B2DB+79p
 					; seg058:02DCp
 
 var_4		= word ptr -4
@@ -391,10 +391,10 @@ loc_2B26C:
 		jmp	short loc_2B29E
 ; ���������������������������������������������������������������������������
 
-loc_2B29C:				; CODE XREF: ListItem_AddNumberedLimited+1Dj
+loc_2B29C:				; CODE XREF: LightSet_InsertLight_2B266+1Dj
 		mov	ax, di
 
-loc_2B29E:				; CODE XREF: ListItem_AddNumberedLimited+34j
+loc_2B29E:				; CODE XREF: LightSet_InsertLight_2B266+34j
 		mov	[bp+var_2], ax
 		push	ax
 		push	si
@@ -417,20 +417,20 @@ loc_2B29E:				; CODE XREF: ListItem_AddNumberedLimited+34j
 		or	al, al
 		jz	short loc_2B2D0
 
-loc_2B2CC:				; CODE XREF: ListItem_AddNumberedLimited+54j
+loc_2B2CC:				; CODE XREF: LightSet_InsertLight_2B266+54j
 		mov	byte ptr [si+6], 0
 
-loc_2B2D0:				; CODE XREF: ListItem_AddNumberedLimited+64j
+loc_2B2D0:				; CODE XREF: LightSet_InsertLight_2B266+64j
 		push	si
 		nop
 		push	cs
-		call	near ptr ProgressBar_WeightedSum
+		call	near ptr LightSet_RecomputeShares_2B49F
 		pop	cx
 		pop	di
 		pop	si
 		leave
 		retf
-ListItem_AddNumberedLimited	endp
+LightSet_InsertLight_2B266	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -438,11 +438,10 @@ ListItem_AddNumberedLimited	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,85L — construit un élément complexe (17 octets : 3 valeurs 32-bit + 1 flag) :
-; construction d'un élément de liste multi-paramètres (probable ligne de
-; statistiques/résultats de mission).
+; far, LUE 2026-10-14. AJOUTE UNE LUMIÈRE au jeu de lumières (objet de 17 o via
+; Light_Construct_2B0F2, puis LightSet_InsertLight_2B266). Ex-'ListItem_ConstructComplex'.
 ; ==============================================================================================
-ListItem_ConstructComplex	proc far		; CODE XREF: MissionLoader_LoadPosition_A7A10+CFP
+LightSet_AddLight_2B2DB	proc far		; CODE XREF: World_LoadLGHTChunk_A7A10+CFP
 
 var_24		= dword	ptr -24h
 var_20		= dword	ptr -20h
@@ -506,27 +505,27 @@ loc_2B33D:
 		push	cs
 
 loc_2B342:
-		call	near ptr ListItem_ConstructThreeParams
+		call	near ptr Light_Construct_2B0F2
 		add	sp, 12h
 		mov	ax, di
 		jmp	short loc_2B34E
 ; ���������������������������������������������������������������������������
 
-loc_2B34C:				; CODE XREF: ListItem_ConstructComplex+3Bj
+loc_2B34C:				; CODE XREF: LightSet_AddLight_2B2DB+3Bj
 		mov	ax, di
 
-loc_2B34E:				; CODE XREF: ListItem_ConstructComplex+6Fj
+loc_2B34E:				; CODE XREF: LightSet_AddLight_2B2DB+6Fj
 		mov	[bp+var_2], ax
 		push	ax
 		push	si
 		push	cs
-		call	near ptr ListItem_AddNumberedLimited
+		call	near ptr LightSet_InsertLight_2B266
 		add	sp, 4
 		pop	di
 		pop	si
 		leave
 		retf
-ListItem_ConstructComplex	endp
+LightSet_AddLight_2B2DB	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp
@@ -575,7 +574,7 @@ loc_2B3B6:				; CODE XREF: seg058:02D2j
 		push	ax
 		push	si
 		push	cs
-		call	near ptr ListItem_AddNumberedLimited
+		call	near ptr LightSet_InsertLight_2B266
 		add	sp, 4
 		pop	di
 		pop	si
@@ -729,12 +728,13 @@ loc_2B49B:				; CODE XREF: seg058:03A6j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,93L — parcourt une liste, accumule une somme pondérée (poids ×valeur par élément, +9
-; comme diviseur commun) : calcul de moyenne/somme pondérée sur une liste (barre de
-; progression agrégée, ex: chargement multi-fichiers).
+; far, LUE 2026-10-14. JEU DE LUMIÈRES — total = poids ambiant (+7) + somme des poids des
+; lumières (+0Dh) ; part de chaque lumière (+0Fh) = poids × intensité (+9) ÷ total ; part
+; ambiante (+0Bh) = poids ambiant × intensité ÷ total ; total nul → parts à 0.
+; Ex-'ProgressBar_WeightedSum'.
 ; ==============================================================================================
-ProgressBar_WeightedSum	proc far		; CODE XREF: ProgressBar_UpdateValue+10p
-					; ListItem_AddNumberedLimited+6Dp
+LightSet_RecomputeShares_2B49F	proc far		; CODE XREF: LightSet_SetAmbientWeight_2B24F+10p
+					; LightSet_InsertLight_2B266+6Dp
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -750,12 +750,12 @@ arg_0		= word ptr  6
 		jmp	short loc_2B4BD
 ; ���������������������������������������������������������������������������
 
-loc_2B4B4:				; CODE XREF: ProgressBar_WeightedSum+2Dj
+loc_2B4B4:				; CODE XREF: LightSet_RecomputeShares_2B49F+2Dj
 		mov	bx, [bp+var_2]
 		mov	bx, [bx+4]
 		add	di, [bx+0Dh]
 
-loc_2B4BD:				; CODE XREF: ProgressBar_WeightedSum+13j
+loc_2B4BD:				; CODE XREF: LightSet_RecomputeShares_2B49F+13j
 		lea	ax, [bp+var_2]
 		push	ax
 		push	si
@@ -768,7 +768,7 @@ loc_2B4BD:				; CODE XREF: ProgressBar_WeightedSum+13j
 		jmp	short loc_2B4F8
 ; ���������������������������������������������������������������������������
 
-loc_2B4D4:				; CODE XREF: ProgressBar_WeightedSum+68j
+loc_2B4D4:				; CODE XREF: LightSet_RecomputeShares_2B49F+68j
 		mov	bx, [bp+var_2]
 		mov	cx, [bx+4]
 		mov	bx, cx
@@ -783,7 +783,7 @@ loc_2B4E1:
 		mov	bx, cx
 		mov	[bx+0Fh], ax
 
-loc_2B4F8:				; CODE XREF: ProgressBar_WeightedSum+33j
+loc_2B4F8:				; CODE XREF: LightSet_RecomputeShares_2B49F+33j
 		lea	ax, [bp+var_2]
 		push	ax
 		push	si
@@ -801,14 +801,14 @@ loc_2B4F8:				; CODE XREF: ProgressBar_WeightedSum+33j
 		jmp	short loc_2B546
 ; ���������������������������������������������������������������������������
 
-loc_2B525:				; CODE XREF: ProgressBar_WeightedSum+A0j
+loc_2B525:				; CODE XREF: LightSet_RecomputeShares_2B49F+A0j
 		mov	bx, [bp+var_2]
 		mov	bx, [bx+4]
 
 loc_2B52B:
 		mov	word ptr [bx+0Fh], 0
 
-loc_2B530:				; CODE XREF: ProgressBar_WeightedSum+31j
+loc_2B530:				; CODE XREF: LightSet_RecomputeShares_2B49F+31j
 		lea	ax, [bp+var_2]
 		push	ax
 		push	si
@@ -820,12 +820,12 @@ loc_2B530:				; CODE XREF: ProgressBar_WeightedSum+31j
 loc_2B541:
 		mov	word ptr [si+0Bh], 0
 
-loc_2B546:				; CODE XREF: ProgressBar_WeightedSum+84j
+loc_2B546:				; CODE XREF: LightSet_RecomputeShares_2B49F+84j
 		pop	di
 		pop	si
 		leave
 		retf
-ProgressBar_WeightedSum	endp
+LightSet_RecomputeShares_2B49F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -833,12 +833,16 @@ ProgressBar_WeightedSum	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,73L — calcule le produit scalaire de deux vecteurs 3D (di·bx), le compare à 0 : test
-; d'orientation de face (dot product normale·direction) pour éclairage ou backface culling —
-; utilisé par sub_29A7D (préparation de face triangulaire).
+; far, LUE 2026-10-14, corrigé le même jour. INTENSITÉ LUMINEUSE D'UNE FACE (ou d'un sommet)
+; de modèle 3D. Args : (jeu de lumières, vecteur A, vecteur B) ; appelée par
+; Mesh_FacePrepareIndirect et les méthodes d'éclairage des éléments de face (seg055) avec A =
+; vecteur passé par l'appelant de ces méthodes (origine non tracée) et B = normale de la face
+; lue dans les données du modèle. intensité = part ambiante (+0Bh) + (si A · B > 0) (A · B) ×
+; part de la PREMIÈRE lumière de la liste (+0Fh du 1er élément) ; bornée à 255. La direction
+; rangée dans les lumières n'est pas lue ici. Ex-'Render_FaceDotProductTest'.
 ; ==============================================================================================
-Render_FaceDotProductTest	proc far		; CODE XREF: Mesh_FacePrepareIndirect+E7P
-					; Mesh_FacePrepareIndirect+146P ...
+LightSet_FaceIntensity_2B54A	proc far		; CODE XREF: Face_LightFlat_29A7D+E7P
+					; Face_LightFlat_29A7D+146P ...
 
 var_14		= dword	ptr -14h
 var_10		= dword	ptr -10h
@@ -898,18 +902,18 @@ loc_2B565:
 		mov	ax, word ptr [bp+var_14+1]
 		add	[bp+var_2], ax
 
-loc_2B5C6:				; CODE XREF: Render_FaceDotProductTest+49j
+loc_2B5C6:				; CODE XREF: LightSet_FaceIntensity_2B54A+49j
 		cmp	[bp+var_2], 0FFh
 		jle	short loc_2B5D2
 		mov	[bp+var_2], 0FFh
 
-loc_2B5D2:				; CODE XREF: Render_FaceDotProductTest+81j
+loc_2B5D2:				; CODE XREF: LightSet_FaceIntensity_2B54A+81j
 		mov	al, byte ptr [bp+var_2]
 		pop	di
 		pop	si
 		leave
 		retf
-Render_FaceDotProductTest	endp
+LightSet_FaceIntensity_2B54A	endp
 
 ; ���������������������������������������������������������������������������
 

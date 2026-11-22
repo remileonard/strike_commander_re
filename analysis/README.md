@@ -32,7 +32,7 @@ Deux fonctions ont été mal caractérisées dans une session précédente sur l
 lecture ligne à ligne, corrigée depuis :
 - **`sub_3314`** : `Flight_PhysicsTick_JDYN` → **`Targeting_AcquireBestThreat`**
   (sélecteur de cible/menace générique, pas un tick physique)
-- **`sub_49C2E`** : `JDYN_PhysicsTickMain` → **`Guidance_HomingVelocityUpdate`**
+- **`sub_49C2E`** : `JDYN_PhysicsTickMain` → **`Autopilot_FlyToPointKinematic_49C2E`**
   (moteur de pilotage automatique/homing cinématique — écrit directement cap et vitesse
   sur l'objet, pas un intégrateur physique par force/masse)
 
@@ -427,7 +427,7 @@ suffixe pour recoupement avec strike.map et les futures sessions.
     plusieurs duplicats identifiés par l'overlay VROOMM (`sub_45C0D`,
     `sub_46164` sont des copies exactes de `Camera_InitAttachedWithTarget`).
 25. **Moteur HUD/viseur et gestion d'armement** (seg087-091) : deux fonctions
-    massives (`HUD_RenderSymbologyMain`, 1882L, et `HUD_RenderSymbologyAlt`,
+    massives (`WeaponSystem_LaunchFromStation_3E744`, 1882L, et `WeaponSystem_FrameUpdate_3F8C0`,
     2016L) forment le rendu de la symbologie du viseur ; complétées par la
     résolution des stations d'armement (hardpoints), le largage de
     contre-mesures chaff/flare (avec physique et audio 3D dédiés), et le
@@ -448,7 +448,7 @@ suffixe pour recoupement avec strike.map et les futures sessions.
 29. **Cœur complet du moteur physique de vol JDYN** (seg101-103) — *voir la
     section « Physique de l'avion — RÉSOLUE » en tête de fichier et
     `DATA_MODEL.md` §6.2 pour l'analyse à jour.* Tick = **`PhysicsTicks`**
-    (seg103, ~0x4A85B), PAS `Guidance_HomingVelocityUpdate_49C2E` (ex-mal-nommé
+    (seg103, ~0x4A85B), PAS `Autopilot_FlyToPointKinematic_49C2E_49C2E` (ex-mal-nommé
     `JDYN_PhysicsTickMain`, qui est le pilote automatique/homing). Bilan de
     forces en repère corps : poussée sur l'axe nez, **portance explicite**
     (`Aero_ComputeLiftAndSideForce`, `L = k·α_eff·q`), traînée
@@ -456,7 +456,7 @@ suffixe pour recoupement avec strike.map et les futures sessions.
     (`Physics_IntegratePosition`, transform corps→monde) ; asservissement
     d'attitude en `±2·√(q'·err)` (`Aero_ComputeForcesMain`) ; contrainte de
     hauteur sol (`Physics_ApplyGroundHeightConstraint`).
-    `Pilot_SteeringCommandToTarget` (`sub_49242`) = loi de guidage vers cible.
+    `JDYN_JumpToPoint_49242` (ex-`Pilot_SteeringCommandToTarget`) = saut instantané de l’avion vers un point, avec consommation du carburant du trajet (relu 2026-09-25 ; ce n’est pas une loi de guidage).
 30. **`flags_75` — bits confirmés par le porteur du projet** : bit0 = aérofrein
     sorti, bit2 = train d'atterrissage sorti (tous deux → traînée additionnelle
     `jdyn[0x37]`/`jdyn[0x3B]`) ; bit1 = volets sortis → ajoute `jdyn[0x4D]`
@@ -472,7 +472,7 @@ suffixe pour recoupement avec strike.map et les futures sessions.
 
 ## ⭐ Découverte majeure de cette session : VM à bytecode transversale (seg109-114+)
 
-En remontant `Player_MainUpdate` (`sub_13100`) et `HUD_RenderSymbologyMain`
+En remontant `Player_MainUpdate` (`sub_13100`) et `WeaponSystem_LaunchFromStation_3E744`
 (`sub_3E744`) pour la question ouverte de la physique du joueur, l'analyse de
 seg109-114 a mis au jour un **sous-système générique inattendu, partagé par
 au moins trois systèmes du jeu (HUD, IA de vol seg004, UI seg112-113)** :
@@ -487,18 +487,19 @@ au moins trois systèmes du jeu (HUD, IA de vol seg004, UI seg112-113)** :
   `Expr_Node_ForceRecompute_5247D`) en exécutant un bytecode associé
   (`Expr_VM_Execute_51E7E`) — motif classique de graphe de dépendances
   "façon tableur".
-- **`GeomNode_SumOffsetsUpChain_50EEB`** : cumule des offsets de position
-  (X/Y/Z) en remontant une chaîne de nœuds parents — calcul de position
-  résolue dans une hiérarchie d'attache.
+- **`AreaRelPos_ToWorld_50EEB`** (ex-`GeomNode_SumOffsetsUpChain`) : position
+  monde d'un point défini **relativement à une zone `AREA`** = décalage + point de
+  référence de la zone (un seul parent, pas de chaîne) — sert aux `SPOT` et aux
+  entrées `PART` (voir `DATA_MODEL.md`, chunks `AREA` / `SPOT`).
 - **Hiérarchie de formes de collision (`HitShape_*`)** : Sphere/Box/Radial2D
   avec stubs de tag de classe (motif vtable identique à seg109), pour tester
   si un point tombe dans une région.
 - **Preuves d'usage transversal, à confirmer par lecture approfondie** :
-  - `Player_ResolveAttachPointN_5305A` est appelée **directement par
+  - `Mission_GetSpotWorldPosition_5305A` est appelée **directement par
     `Player_MainUpdate`** (2 sites d'appel) — candidat pour la résolution de
     points d'attache/hardpoints de l'avion du joueur.
   - `HUD_ResolveNodePosition_547B1` est appelée **directement par
-    `HUD_RenderSymbologyMain`** — positionnement d'éléments de symbologie.
+    `WeaponSystem_LaunchFromStation_3E744`** — positionnement d'éléments de symbologie.
   - `AI_ResolveNodePosition_54274` est référencée **depuis seg004** (cœur IA
     de vol/combat) — résolution de position de référence pour l'IA.
   - `UIScreen_ConstructWidgetBinding_536F7` relie widgets et champs calculés,
@@ -615,25 +616,25 @@ callbacks temporisés matériels**, jusqu'ici invisible derrière les
 « fonctions `sub_603xx` non documentées » signalées dans les sessions
 précédentes (cluster séquenceur seg121-123) :
 
-- **`ModuleRegistry_HookTimerIRQ_5FCCA`** détourne le vecteur d'interruption
+- **`AIL_hook_timer_process_5FCCA`** détourne le vecteur d'interruption
   matérielle **IRQ0 (INT 8, minuteur)** : sauvegarde l'ancien vecteur, en
-  installe un nouveau pointant vers `ModuleRegistry_TimerISR_5FBBE`.
-- **`ModuleRegistry_ProgramPITFrequency_5FD3A`** reprogramme directement la
+  installe un nouveau pointant vers `AIL_API_timer_ISR_5FBBE`.
+- **`AIL_set_PIT_divisor_5FD3A`** reprogramme directement la
   puce **8253/8254 (PIT)** (ports 0x43/0x40) pour changer la cadence du
-  tic matériel — `ModuleRegistry_SetTickRateHz_5FD5D` convertit une
+  tic matériel — `AIL_set_PIT_period_5FD5D` convertit une
   fréquence en Hz vers le diviseur approprié.
-- **`ModuleRegistry_RegisterModule_5FF08`** / **`UnregisterModule_5FFBD`**
+- **`AIL_register_timer_5FF08`** / **`UnregisterModule_5FFBD`**
   gèrent une **table de 16 emplacements** ; chaque module enregistré fournit
   un pointeur de gestionnaire (far ptr) et une cadence. Au premier
   enregistrement, le système s'initialise et détourne IRQ0 ; au dernier
   désenregistrement, il restaure tout.
-- **`ModuleRegistry_TimerISR_5FBBE`** (le corps de l'ISR installée) : à
+- **`AIL_API_timer_ISR_5FBBE`** (le corps de l'ISR installée) : à
   chaque tic matériel, parcourt les 16 emplacements actifs, accumule le
   temps écoulé, et **appelle le gestionnaire enregistré** dès que le seuil
   configuré est atteint — avec garde de réentrance, pile privée, et un
   auto-test d'intégrité (chaîne magique "Test") qui déclenche un `int 3`
   (trap debugger) en cas de corruption détectée.
-- **`ModuleRegistry_DispatchTrampoline_5FBA6`** est le point d'entrée commun
+- **`AIL_call_driver_5FBA6`** est le point d'entrée commun
   d'une **vingtaine de « thunks d'opcode »** dispersés dans des dizaines de
   segments (dont les `sub_603xx` du cluster séquenceur, mais aussi des
   fonctions du `TextRenderer_InputFieldHandler`, seg124, et du cluster
@@ -643,15 +644,15 @@ précédentes (cluster séquenceur seg121-123) :
   enregistré — un **mécanisme de hook/plugin transparent**.
 
 **Ceci résout une question ouverte de longue date** : les fonctions
-`sub_603xx` appelées massivement par `Sequencer_AdvanceActiveSlot_59F1D`,
-`Sequencer_ProcessQueue_59FF5` et `Sequencer_ValidatePlacement_5A62A`
+`sub_603xx` appelées massivement par `Music_ChannelStopSequence_59F1D`,
+`Music_ChannelRegisterSequence_59FF5` et `Music_InstallTimbre_5A62A`
 (seg121-124) sont maintenant identifiées comme des **thunks d'opcode** vers
 ce même registre de modules — le séquenceur de contre-mesures/messages
 n'est donc probablement pas un système autonome mais un **module de plus
 enregistré dans ce framework temporisé générique**, aux côtés du
 `TextRenderer_InputFieldHandler` et d'autres consommateurs.
 
-**Non vérifié en détail** : `ModuleRegistry_TimerISR_5FBBE` (89 lignes) n'a
+**Non vérifié en détail** : `AIL_API_timer_ISR_5FBBE` (89 lignes) n'a
 été lue qu'une fois, sans trace exhaustive de chaque branche ; le cluster
 `sub_ABxxx` qui utilise aussi ce système reste à couvrir.
 
@@ -750,12 +751,12 @@ en bout (seule la consommation côté boucle de jeu reste à tracer).
 (Borland, cf. `github.com/NancySadkov/devroomm` déjà référencé pour
 seg000) : recherche et ouverture du fichier "strike.exe" (chaîne
 embarquée), lecture et interprétation d'en-tête MZ
-(`VROOMM_ComputeSizeFromHeader_689F1`, arithmétique standard
+(`VROOMM_ComputeSegmentSpan_689F1`, arithmétique standard
 pages/paragraphes), parcours de la table de relogement, déplacement de
 l'image en mémoire, et **patch direct de trampolines** — écriture
 d'instructions machine `JMP FAR` (0xEA) et `INT` (0xCD) à des offsets
-calculés dans l'image chargée (`VROOMM_PatchFarJumpTable_6887B`/`688D7`,
-`VROOMM_PatchIntTrampoline_688F5`) : c'est exactement le mécanisme par
+calculés dans l'image chargée (`VROOMM_EvictOldestBlock_6887B`/`688D7`,
+`VROOMM_PatchIntCallStub_688F5`) : c'est exactement le mécanisme par
 lequel VROOMM réécrit les points d'entrée des segments d'overlay pour les
 rediriger vers le gestionnaire d'overlay au lieu du code original. Toutes les fonctions du segment sont nommées `VROOMM_*` dans
 known_functions.json.
@@ -774,9 +775,9 @@ format IFF/ResourceRecord déjà documenté (seg193-194) :
   classes de base, initialisation de sous-objets composites (`sub_6CACA`
   et apparentés, motif déjà documenté en seg109), enregistrement dans un
   conteneur.
-- **`TimedTrigger_SpawnAndBindGeometry_9E289`** (419L) relie explicitement
+- **`WeaponSystem_ReleaseBomb_9E289`** (419L) relie explicitement
   ce cluster au système de trigger temporisé du seg109
-  (`Trigger_TimedRangedSpawnOnce_4F351`) : instanciation d'objet, référence
+  (`EjectSeat_TickReleaseObject_4F351`) : instanciation d'objet, référence
   faible (`SetReference`, `sub_3A44E`), ajout à liste membre — c'est très
   probablement **l'implémentation d'overlay réelle** vers laquelle
   pointaient les stubs fixes du seg109/seg430-431.
@@ -872,7 +873,7 @@ terrain (`Render_TerrainPipelineMain`, seg074).
 - Pilotes audio : roland, adlib, pas (Pro Audio Spectrum), fichiers
   `.adl`/`.rol`, « No mem for XMIDI state table. ».
 - Confirmation du tag de debug déjà noté : **« SCSCSCFY! »** retrouvé tel
-  quel (cf. `TextObject_CloseAndLog_5A856`, seg124).
+  quel (cf. `Music_ShutdownDriver_5A856`, seg124).
 - Chemins de données : `..\..\data\cockpits\`, `..\..\DATA\`,
   `..\..\data\airdens.tbl`, fichier de config `sc.cfg`.
 
@@ -935,14 +936,14 @@ créneaux temporisés du seg161 en dehors du séquenceur de contre-mesures
 (seg121-123) ?
 
 - **`AudioQueue_RegisterTickModule_AA810`** référence explicitement
-  `Interrupt_TimerISR_5940B` (seg121) via le mécanisme Stopwatch (seg207,
+  `Music_SequencerTickISR_5940B` (seg121) via le mécanisme Stopwatch (seg207,
   tag 5DC2h) — confirmant l'enregistrement direct dans le minuteur
   matériel.
-- **`AudioQueue_ActivateSlotOpcode_AB16F`** et
-  **`AudioQueue_DeactivateSlotOpcode_AB1AF`** appellent directement les
-  thunks d'opcode `ModuleRegistry_Opcode_AB_603D2`/`_AD_603D8` (seg161).
-- **`AudioQueue_ProcessSequencerSlots_AB1EF`** appelle
-  `Sequencer_AdvanceActiveSlot_59F1D` (seg123) — le séquenceur générique
+- **`Music_PauseChannels_AB16F`** et
+  **`Music_ResumeChannels_AB1AF`** appellent directement les
+  thunks d'opcode `AIL_stop_sequence_603D2`/`_AD_603D8` (seg161).
+- **`Music_StopWithFade_AB1EF`** appelle
+  `Music_ChannelStopSequence_59F1D` (seg123) — le séquenceur générique
   découvert dès le début de la traversée des segments de fin de fichier.
 - Le cluster combine massivement `IndexedRecordReader` (seg196) et
   `StreamReader` (seg190) pour lire des plages d'octets variables dans
@@ -986,8 +987,9 @@ future.
 identifiés, avec quelques ajouts :
 
 - **IA de combat** : `AI_ManeuverSolutionMain_781D0` (2373 lignes),
-  `MissionRecord_LoadEntityDatabase_7B035` (3103 lignes — la plus grosse
-  fonction de tout le fichier), calculs de solution de ciblage/guidage.
+  `Player_ShotDownSequence_7B035` (3103 lignes — la plus grosse
+  fonction de tout le fichier ; c'est en fait la séquence « avion du joueur
+  détruit », voir `MUSIC_SYSTEM.md` §5.4), calculs de solution de ciblage/guidage.
 - **Symboles HUD** : grande famille de constructeurs et de fonctions de
   rendu avec test de clipping caméra (`HUDSymbol_*`), incluant plusieurs
   familles de duplicats confirmés byte-pour-byte (motif VROOMM classique).
@@ -998,14 +1000,14 @@ identifiés, avec quelques ajouts :
 - **Terrain** : `Terrain_ComputeVisibilityAndAltitude_98CF0`,
   chargement de cartes d'élévation, gestion de tuiles.
 - **Débris/particules** : système complet de simulation physique de
-  débris (`Debris_ComputeTorque`, `Debris_SpawnOrchestrator`,
+  débris (`Debris_ComputeTorque`, `Object_SpawnDestructionEffects_3863A`,
   `Particle_ListFreeAll`).
 - **Caméra** : famille de constructeurs (`Camera_ConstructWithSecondaryTarget`,
   `Camera_ConstructAttachedWithTarget`, etc.).
 - **Chargeurs de ressources génériques** : famille de 7 grosses fonctions
   quasi identiques (`ResourceFile_LoadTypeA` à `G`, 470-1400 lignes
   chacune) pour différents types de fichiers.
-- **`Gauge_ComputeAndRenderNeedle_9D910`** (577 lignes), dernière fonction
+- **`Collision_OnTerrainContact_9D910`** (577 lignes), dernière fonction
   du fichier avant les tables de stubs suivantes, relie explicitement le
   terrain, une jauge d'instrument et la VM d'expression (`Expr_VM_Execute_51E7E`).
 
@@ -1026,11 +1028,11 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `Formation_GuidanceSolution_D081` | 944 | seg006 | Guidage de formation (followAlly) |
 | `AI_ComputeFireSolutionQuality_91DF` | 559 | seg004 | Solution de manœuvre/guidage |
 | `AI_GuidanceSolution_Major_702A` | 651 | seg003 | Guidage complexe (lead pursuit) |
-| `AI_ManeuverSolution_Major_6977` | 616 | seg003 | Solution de manœuvre/tir |
+| `AI_GunSnapAim_6977_6977` | 616 | seg003 | Solution de manœuvre/tir |
 | `AI_CombatDecision_Major_75F8` | 603 | seg003 | Décision de combat IA |
 | `Flight_PhysicsTick_JDYN_3314` | 1347 | seg001 | Tick physique de vol (JDYN) |
-| `AI_RollRateController_7B20` | 384 | seg003 | Contrôleur de roulis |
-| `AI_FlightControl_Cluster_7F34` | 245 | seg003 | Contrôle de vol IA |
+| `AI_PitchController_7B20_7B20` | 384 | seg003 | Contrôleur de roulis |
+| `AI_BankErrorCmd_7F34` | 245 | seg003 | Commande de roulis par écart, limite d'inclinaison du pilote |
 | `AI_BehaviorSelector_8D30` | 313 | seg004 | Sélection de comportement IA |
 | `AI_BehaviorStateMachine_9D05` | 353 | seg004 | Machine à états de comportement |
 | `Widget_MainHandler_1C6C6` | 297 | seg028 | Gestionnaire de widget composite |
@@ -1044,7 +1046,7 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `TextRenderer_Main_27477` | 1158 | seg048 | **Moteur de rendu de texte principal (la plus grosse fonction à ce jour)** |
 | `Cinematic_SplineCompute_242AE` | 940 | seg042 | Calcul de trajectoire/interpolation caméra scriptée |
 | `Render_TriangleRasterizer_26A60` | 570 | seg046 | Point d'entrée du rasterizer de triangle |
-| `Render_PlotPixelClippedColorMap_258A8` | 443 | seg044 | Primitive de dessin avec table de couleurs |
+| `Render_FillEllipseRemapped_258A8` | 443 | seg044 | Ellipse pleine, chaque pixel remplacé par table[pixel de l'écran] (disque des fumées, SMOKE_SYSTEM.md) |
 | `Kneeboard_RenderEntry_23593` | 265 | seg041 | Rendu à 20 cas des entrées du journal de mission |
 | `Cinematic_LoadCameraDef_23E7D` | 338 | seg041 | Chargement de définition de caméra scriptée |
 | `Mission_TriggerEvaluator_22F53` | 381 | seg040 | Évaluateur de déclencheur d'événement de mission |
@@ -1065,20 +1067,20 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `HUD_RenderSymbologyMain_3E744` | 1882 | seg087 | **Moteur de rendu de symbologie HUD/viseur principal** |
 | `Collision_ComputeConnectionVector_441DC` | 427 | seg094 | Calcul de vecteur de connexion entre objets |
 | `Camera_ChaseComputeMain_3D57E` | 437 | seg085 | Calcul complet de la caméra de poursuite |
-| `Audio3D_ComputeDistanceParams_41BEF` | 380 | seg089 | Paramètres audio 3D (distance, Doppler) |
+| `GuidedBombBody_SteerToTarget_41BEF` | 380 | seg089 | Loi de guidage de la bombe guidée (chunk GBMB), ex-`Audio3D_ComputeDistanceParams` |
 | `Collision_MainLoop_44F08` | 309 | seg094 | Boucle principale de test de collision |
 | `Effect_SpawnPeriodicAtAttach_43936` | 312 | seg092 | Génération probabiliste d'effet visuel |
 | `WeaponStation_ResolveStateA_40A33` | 397 | seg088 | Résolution de l'état des stations d'armement |
 | `Targeting_SelectAndPrioritize_43107` | 327 | seg091 | Sélecteur/verrouilleur de cible principal |
-| `JDYN_PhysicsTickMain_49C2E` | 1422 | seg103 | **⚠️ RENOMMÉE `Guidance_HomingVelocityUpdate` — voir CLAUDE.md, ce n'est pas un tick physique, lecture complète effectuée** |
+| `JDYN_PhysicsTickMain_49C2E` | 1422 | seg103 | **⚠️ RENOMMÉE `Autopilot_FlyToPointKinematic_49C2E` — voir CLAUDE.md, ce n'est pas un tick physique, lecture complète effectuée** |
 | `PhysicsTicks` | ~350 | seg103 (~0x4A85B) | **★ LU — LE tick de la dynamique avion (classe `JDYN`). Détection sol, reset caches aéro, manette gaz→poussée→`[si+0x28]`, conso carburant + flameout, volets/aérofrein/train, autopilote si `[si+0x68]≠0xFF`, sinon `Aero_SumLinearForces` (forces linéaires, repère corps) + `Aero_ControlOrchestrator` (moments) + intégrations. Détail : DATA_MODEL.md §6.2.** |
 | `Aero_ComputeForcesMain_4791E` | 649 | seg102 | **LU — solveur d'asservissement d'attitude : `moment = ±2·√(q'·err)` rate-limité, nul si err ≥ 56° (décrochage de contrôle)** |
 | `Aero_ComputeLiftAndSideForce_4812B` | 333 | seg103 | **LU — ex-`DetectControlSaturation` (nom trompeur) : GÉNÉRATEUR DE PORTANCE + force latérale. `L = jdyn[0x61]·k·α_eff·q·n̂(0,−v.c2,v.c1)`. `flags_75` bit6 = effet de bord (alerte départ)** |
-| `JDYN_HighLevelPhysicsCalc_4B09D` | 328 | seg103 | Calcul physique de haut niveau intégrant JDYN |
+| `JDYN_RollStickFromError_4B09D` | 328 | seg103 | Calcul physique de haut niveau intégrant JDYN |
 | `Aero_ComputeDragWithFeedback_48400` | 248 | seg103 | **LU — ex-`ComputeMomentsWithFeedback` : VECTEUR DE TRAÎNÉE `−v̂_corps·[q·(0x5D·α² + (0x5D≫3)·β² + drag_flags75)]`** |
 | `Aero_ComputeCoeffSaturating_4730F` | 234 | seg102 | Coefficient aérodynamique non-linéaire avec saturation |
 | `ChaseCamera_RenderEffect_4D1C9` | 450 | seg106 | Effet visuel lié à la caméra de poursuite |
-| `Aero_ComputeControlFlags75Bit5B_48862` | 375 | seg103 | Calcul contrôle dépendant de `flags_75` bit5 |
+| `Aero_ComputeAoACommand_48862_48862` | 375 | seg103 | Calcul contrôle dépendant de `flags_75` bit5 |
 | `ParticleEmitter_PeriodicUpdate_4C413` | 351 | seg106 | Mise à jour périodique d'émetteur de particules |
 | `FlightPhysics_TickCandidate_4F4EE` | 58 | seg109 | **RÉSOLU — tick des 3 classes `DYNM` simples (missile/bombe), PAS de l'avion (= `PhysicsTicks`). Divise par la masse via `vtable[0x10]`.** |
 | `UIScreen_StateMachineMain_4FBF1` | 645 | seg112 | Machine à états d'un écran/dialogue UI (formulaire numérique) |
@@ -1096,22 +1098,22 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `Expr_Node_ConstructAndAttach_53363` | 217 | seg114 | Construction/attachement de nœud |
 | `Expr_Node_EvaluateVisibility_53586` | 207 | seg114 | Évaluation de visibilité/portée d'un nœud |
 | `Expr_Node_AllocateTriple_543CA` | 166 | seg114 | Triple allocation (hors cluster identifié) |
-| `AI_ComputeApproachAngles_553CF` | 209 | seg116 | Calcul d'angles d'approche/manœuvre (IA) |
+| `Math_HeadingAngle_553CF` | 209 | seg116 | Calcul d'angles d'approche/manœuvre (IA) |
 | `Damage_ComputeMainHelper_56559` | 288 | seg116 | Calcul principal de propagation de dommages |
 | `Targeting_ComputeBearingElevation_55B1A` | 134 | seg116 | Gisement/élévation vers une cible |
-| `AI_ComputeGeometrySolution_57C67` | 143 | seg116 | Solution géométrique IA (cœur seg002) |
+| `Matrix_RollAngle_57C67` | 143 | seg116 | Solution géométrique IA (cœur seg002) |
 | `GeomHelper_QuadrantComputeLoop_UNRESOLVED` | 348 | seg116 | Calcul répété sur 4 quadrants/coins (adresse non résolue) |
-| `Parser_BuildHashIndex_588E8` | 123 | seg118 | Construction de table de hachage/dispatch |
+| `RenderList_RadixSortDescending_588E8` | 123 | seg118 | Tri par base de la liste de primitives, du plus loin au plus proche (SMOKE_SYSTEM.md § 5.2) |
 | `Render_DitheredLineMain_58B97` | 298 | seg119 | Tracé de ligne pointillée/dégradée (rendu 3D) |
-| `Interrupt_TimerDispatch_59436` | 234 | seg121 | Dispatch de l'ISR minuteur matériel (4 cas) |
-| `Interrupt_TimerCase_595C2` | 208 | seg121 | Cas du séquenceur piloté par le minuteur |
-| `Weapon_HUDBox_ComputeGeometry_58F42` | 143 | seg121 | Géométrie de boîte de ciblage HUD |
-| `Weapon_HUDBox_DrawElementC_590E0` | 190 | seg121 | Élément de dessin de boîte de ciblage HUD |
-| `Weapon_HUDBox_UpdateGeometryAndTimer_59B10` | 239 | seg122 | Mise à jour géométrie+minuterie de la boîte HUD |
-| `Weapon_HUDBox_MasterUpdate_59CFA` | 311 | seg122 | **Pilote principal du cluster HUD armement/séquenceur** |
-| `Sequencer_ProcessQueue_59FF5` | 135 | seg123 | Traitement de la file du séquenceur à créneaux |
-| `TextRenderer_InputFieldHandler_5A0F3` | 493 | seg124 | Gestionnaire de champ de saisie/édition de texte |
-| `TextRenderer_BuildInputWidget_UNRESOLVED` | 189 | seg124 | Constructeur de widget de saisie (adresse non résolue) |
+| `Music_SequencerTickDispatch_59436` | 234 | seg121 | Dispatch de l'ISR minuteur matériel (4 cas) |
+| `Music_TuneTransitionResolve_595C2` | 208 | seg121 | Cas du séquenceur piloté par le minuteur |
+| `Music_IsEnemyOnPlayerSix_58F42` | 143 | seg121 | Géométrie de boîte de ciblage HUD |
+| `Music_ScanNearbyEnemies_590E0` | 190 | seg121 | Élément de dessin de boîte de ciblage HUD |
+| `SoundFX_CheckFlyBy_59B10` | 239 | seg122 | Mise à jour géométrie+minuterie de la boîte HUD |
+| `SoundFX_Tick_59CFA` | 311 | seg122 | **Pilote principal du cluster HUD armement/séquenceur** |
+| `Music_ChannelRegisterSequence_59FF5` | 135 | seg123 | Traitement de la file du séquenceur à créneaux |
+| `Sound_LoadDriverAndTimbreCache_5A0F3` | 493 | seg124 | Gestionnaire de champ de saisie/édition de texte |
+| `Music_InstallXMITimbres_UNRESOLVED` | 189 | seg124 | Constructeur de widget de saisie (adresse non résolue) |
 | `TextObjectCluster_DestructAll_5ABD1` | 190 | seg125 | Destructeur global du cluster objets-texte |
 | `Registry_BuildOrUpdateEntry_5B036` | 219 | seg126 | Construction/mise à jour d'entrée de registre |
 | `Registry_MainOperation_5B26B` | 175 | seg126 | Opération principale de registre |
@@ -1129,11 +1131,11 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `DisplaySurface_CloneOrResize_5E89E` | 111 | seg151 | Clonage/redimensionnement de surface d'affichage |
 | `FontStyle_ApplyVariantA_UNRESOLVED` | 166 | seg153 | Application de style de police (adresse non résolue) |
 | `Runtime_FatalErrorHandler_5F700` | 75 | seg160 | **Gestionnaire d'erreur fatale/assertion, appelé depuis le pipeline terrain** |
-| `ModuleRegistry_TimerISR_5FBBE` | 89 | seg161 | **ISR du minuteur matériel — cœur du registre de modules** |
+| `AIL_API_timer_ISR_5FBBE` | 89 | seg161 | **ISR du minuteur matériel — cœur du registre de modules** |
 | `Widget_RenderComplexLayout_60BA6` | 331 | seg163 | Rendu de layout complexe de widget |
 | `GlyphObject_LayoutAndRenderAll_60E60` | 131 | seg163 | Layout/rendu de tous les glyphes d'un widget |
 | `Widget_UpdateLayoutAndBounds_60B1D` | 103 | seg163 | Mise à jour layout/bornes de widget |
-| `ModuleRegistry_ConfigureModuleExtended_60254` | 100 | seg161 | Configuration étendue d'un module enregistré |
+| `AIL_init_driver_60254` | 100 | seg161 | Configuration étendue d'un module enregistré |
 | `Render_DrawFilledEllipse_6106E` | 481 | seg167 | Tracé d'ellipse/cercle rempli |
 | `Render_DrawEllipseOutline_61612` | 454 | seg169 | Tracé de contour d'ellipse |
 | `Render_ClipAndDrawLine_613B0` | 428 | seg168 | Clipping et tracé de ligne |
@@ -1158,16 +1160,16 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `Keyboard_ProcessScanCode_66AC4` | ~180 | seg202 | **Traitement bas niveau des scan-codes clavier** |
 | `InputBinding_InitAndRegister_66E02` | 155 | seg203 | Enregistrement de liaison entrée-action |
 | `Mouse_EventCallback_68109` | 122 | seg210 | **Gestionnaire d'événement souris (callback int 33h)** |
-| `VROOMM_LocateAndValidate_68254` | 224 | seg212 | Localisation/validation du fichier exécutable |
-| `VROOMM_ReadHeader_6844A` | 88 | seg212 | Lecture d'en-tête MZ |
+| `VROOMM_OpenAndParseOverlayFile_68254` | 224 | seg212 | Localisation/validation du fichier exécutable |
+| `VROOMM_MatchPathPrefix_6844A` | 88 | seg212 | Lecture d'en-tête MZ |
 | `VROOMM_MainEntry_68B2F` | 80 | seg212 | Point d'entrée principal du chargeur |
-| `VROOMM_ApplyRelocationsMain_687E8` | 85 | seg212 | Application de la table de relogement |
+| `VROOMM_DemandLoadDispatch_687E8` | 85 | seg212 | Application de la table de relogement |
 | `VROOMM_FinalizeAndJump_UNRESOLVED` | 173 | seg212 | Finalisation du chargement (adresse non résolue) |
 | `Joystick_InterpolateCalibrationPercent_67CB8` | 138 | seg208 | Interpolation de calibration en pourcentage |
 | `Joystick_ApplyDeadzoneAndScaleB_679E2` | 136 | seg208 | Application de zone morte/échelle (axe B) |
 | `ConfigOption_ApplyAndDisplayB_6698F` | 131 | seg201 | Affichage d'option de configuration |
 | `Render_DrawTextString_61CD2` | 496 | seg173 | Rendu de chaîne de texte complète |
-| `Render_MeasureOrDrawTextString_61F52` | 457 | seg174 | Mesure/rendu de chaîne de texte (variante) |
+| `Shape_DrawSpans_61F52` | 457 | seg174 | dessin d'une image (segments de ligne, copie directe ; lu 2026-10-23) |
 | `Render_DrawHorizontalLineClipped_61B8E` | 201 | seg172 | Tracé de ligne horizontale clippée |
 | `PaletteScreen_BuildCustomGradient_A1626` | 537 | seg442 | Construction d'un dégradé de couleur personnalisé (22 entrées + courbe) |
 | `PaletteScreen_UpdateWidgetMain_A21AF` | 419 | seg442 | Point d'entrée principal de mise à jour du widget palette |
@@ -1180,13 +1182,13 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `PaletteScreen_DrawWidgetBorderB_A1E6D` | 268 | seg442 | Dessin de bordure de widget (variante) |
 | `GaugeWidget_DrawWithLabel_A4388` | 155 | seg445 | Dessin du widget jauge avec étiquette |
 | `PaletteScreen_AcquireOwnership_A1240` (rappel) | — | seg442 | Verrou d'exclusion mutuelle, appelé par ~50 fonctions du module |
-| `MissionText_LoadAndFormatFromIFF_A636C` | 392 | seg450 | **Chargement/formatage de texte de mission depuis IFF — probable dialogue/briefing** |
+| `SmokeSet_LoadFromIFF_A636C` | 392 | seg450 | **Lecteur du jeu de fumées (`FORM SMOK` : modèles de fumée et formes) — ex-« texte de mission », corrigé 2026-10-12** |
 | `PlayerComponent_LoadFieldsMassive_A5D18` | 239 | seg449 | Chargement massif de ~30 champs (propriétés visuelles/matériau) |
 | `PlayerComponent_LoadFieldsWithRetryF_A4BE1` | 132 | seg448 | Chargement combinant IFF et flux de fichier |
 | `PlayerComponentVariantAG_ConstructAndInit_A54C8` | 152 | seg448 | Plus grosse variante de constructeur du cluster |
-| `TextLabel_LoadFieldsExtended_A61D0` | 226 | seg450 | Chargement étendu de champs de texte IFF |
+| `SmokeSet_LoadSmokeModel_A61D0` | 226 | seg450 | Lecteur d'un modèle de fumée (`INFO`/`ANIM`/`SCRI`) — ex-« champs de texte », corrigé 2026-10-12 |
 | `MissionScenario_LoadMainRecord_A8331` | 775 | seg456 | **⭐ Plus grosse fonction du reste du fichier — chargement du bloc principal d'un scénario/mission** |
-| `MissionScenario_ResolveAndBindExpressions_A8F22` | 492 | seg456 | Résolution/liaison des expressions calculées d'un scénario |
+| `Mission_WriteResultReport_A8F22` | 492 | seg456 | Écriture du compte rendu de vol MISN2OP.IFF (ex-`MissionScenario_ResolveAndBindExpressions`) |
 | `MissionLoader_LoadEntitiesMain_A767F` | 239 | seg455 | **Chargement des entités de mission, lié à seg112** |
 | `MissionLoader_SpawnEntity_A7B1E` | 199 | seg455 | Spawn d'une entité de mission depuis les données chargées |
 | `MissionScenario_LoadFromIFF_A8C44` | 356 | seg456 | Chargement d'un scénario depuis le format IFF |
@@ -1195,7 +1197,7 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `AudioQueue_MainProcessEntry_ABBEF` | 254 | seg461 | Point d'entrée principal de traitement (dernière fonction du fichier) |
 | `AudioQueue_ReleaseAllSlots_AB2BD` | 188 | seg458 | Nettoyage complet de la file audio/message |
 | `MissionLoader_LoadFormation_A78F5` | 134 | seg455 | Chargement d'une formation d'unités de mission |
-| `MissionLoader_LoadPosition_A7A10` | 145 | seg455 | Chargement de coordonnées d'une entité de mission |
+| `World_LoadLGHTChunk_A7A10` | 145 | seg455 | Chargement de coordonnées d'une entité de mission |
 
 ## Prochaine étape
 
@@ -1214,3 +1216,62 @@ mathématique (seg115-117), les sous-systèmes mémoire paginée/typée
 (seg127-138), le runtime bas niveau (dépassement de pile, tas, exception
 matérielle, erreur fatale — seg137/154/160), et désormais le registre de
 modules à créneaux temporisés (seg161).
+
+## ⭐⭐⭐ Découverte majeure : le système musical — un programme AIL 2.0 (intégré le 2026-10-06)
+
+Travail d'une session dédiée (menée sur une copie plus ancienne du dépôt), intégré et corrigé le
+2026-10-06. Référence complète : **`analysis/MUSIC_SYSTEM.md`** (§9 = historique des corrections) et
+**`analysis/ADLIB_DRIVER.md`** ; sources publiques de la bibliothèque dans `analysis/ail_sources/`
+(`AIL.ASM`, `AIL.INC`, `XMIDI.ASM`, Miles Design 1991-1992), pilote réel dans
+`analysis/adlib_driver_source/`, `COMBAT.DAT` décodé dans `analysis/sample_dat_files/`.
+
+**Preuve d'identification** : le seg161 est `AIL.ASM` compilé, procédure par procédure dans l'ordre
+du source (`find_proc`, `call_driver`, `API_timer`, `init_DDA_arrays`, `hook_timer_process`…
+`AIL_register_timer`, `AIL_set_timer_frequency` — qui appelle `ul_divide(0xF4240, Hz)` comme le
+source —, `AIL_register_driver`, `AIL_init_driver`, `AIL_shutdown_driver`), puis un thunk par
+fonction pilote, `mov ax, N / jmp call_driver`, dont les `N` successifs (`0x78, 0x79, 0x86, 0x7A,
+0x7B, 0x85, 0x7C…0x84, 0x96…0x9F, 0xAA…0xC2`) suivent exactement l'ordre et les valeurs de `AIL.INC`.
+Tous renommés d'après les noms officiels (`AIL_register_sequence_60396`, `AIL_start_sequence_603CC`,
+`AIL_set_relative_volume_603F0`, `AIL_timbre_request_603AE`, `AIL_play_VOC_file_6034E`…).
+
+**Architecture** :
+- **Pilote** (`ADLIB.ADV`, `.ROL` pour Roland) : contient l'**interpréteur XMIDI** (shell `XMIDI.ASM`,
+  recherche de séquence `cmp word ptr [si], 4F46h` / `cmp word ptr [si+8], 4D58h`, 120 Hz) et la
+  partie voix OPL2 propre à cette version.
+- **Jeu, couche AIL** (seg123-124) : `Music_ChannelInit_59F87`, `Music_ChannelRegisterSequence_59FF5`,
+  `Music_ChannelStopSequence_59F1D`, `Music_InstallTimbre_5A62A`, `Music_LoadTimbreFromLibrary_5A577`,
+  `Music_InstallXMITimbres_UNRESOLVED`, `Sound_LoadDriverAndTimbreCache_5A0F3`, `Music_ShutdownDriver_5A856`.
+- **Jeu, logique musicale** (seg121, seg125, seg458) : `Music_RequestTune_5A984` (unique point de
+  changement de piste), `Music_CombatIntensitySelector_59302`, `Music_SelectTuneCandidate_5923A`,
+  tick `Music_SequencerTickISR_5940B` → `Music_TuneTransitionResolve_595C2` /
+  `Music_TuneTransitionCommit_5974D` (matrice de transitions de `combat.dat`, piste de transition sur un
+  second canal, reprise à un niveau), catalogue `AudioQueue_LoadTrackTable_AACA6` /
+  `AudioQueue_LoadTransitionTable_AAFA0`. Le cluster `AudioQueue_*` joue aussi le son numérisé (VOC).
+- **Déclencheurs corrigés** : piste `0x13` depuis l'éjection (`AI_EjectDecision_50FF`, pas une alerte
+  missile) ; ponctuations `0x10/0x11/0x12` quand le joueur détruit un objet, selon sa catégorie ;
+  intensité de combat probablement liée aux dégâts du joueur (`word_722E6`).
+
+
+## ⭐⭐ Découverte majeure : les fumées, et la liste de primitives commune triée par base (2026-10-28)
+
+Détail : `SMOKE_SYSTEM.md` (version illustrée `SMOKE_SYSTEM.html`).
+
+- **Jeu de fumées** : le chunk `SMOK` du `FORM WRLD` nomme `OBJECTS\SMOKESET.IFF` (`World_LoadSmokeSet_A7CA1`
+  → `SmokeSet_LoadFromIFF_A636C`) : 9 modèles (chunks `INFO` de 25 octets, `ANIM`), 5 formes RealSpace, 120
+  particules au plus. Le « type de fumée » d'un objet est le rang d'un modèle dans `FORM TYPE`.
+- **Liste de primitives commune.** `ParticleEmitter_ProximityTest` était en fait la projection d'une
+  particule (`Particle_ProjectToScreen_4C1EE`) ; les particules visibles entrent dans la liste
+  `dword_724AE`, la même que les faces des objets et le terrain. Les noms `Widget_RefreshTextConditional`,
+  `Parser_BuildHashIndex_588E8` et `Collection_NotifyAllDestroy` étaient faux : le paramètre `53FAh` est
+  l'adresse de cette liste (`0x6D0B0 + 0x53FA = word_724AA`). `RenderList_RadixSortDescending_588E8`
+  trie par base la clé à +2 (profondeur), 8 passes de 4 bits (`shr eax, cl` / `and ax, 0Fh`), paniers
+  rassemblés de 15 à 0 (`mov cx, 0Fh` … `dec cx`) : du plus loin au plus proche ; `RenderList_DrawAll_2AD65`
+  appelle la méthode 0 de chaque élément (`call dword ptr [bx]`) : algorithme du peintre pour tout le décor.
+- **Tables de teinte** = chunk `FADE` de `PALETTE\PALFADE.IFF` (44 tables de 256 octets) : l'objet palette
+  global commence à `word_724CA`, et ses champs +94 / +98, remplis par `Palette_LoadFadeTables_989B8`, sont
+  `dword_72528` / `byte_7252C`, lus par `Particle_Draw_4C7ED`.
+- **Traînée de chute** : `Aircraft_OnDestroyed_9D770` recopie le 8e champ du chunk `JINF` (modèle +0x58,
+  `mov al, es:[bx+58h]` / `mov [si+54h], al`) dans le type de fumée de la traînée avant de l'allumer :
+  modèle 6 (fumée noire et boules de feu) au lieu du modèle 3 du chunk `SMOK`.
+- **Données CD** : chunks `SHAP` et texture `TXMA` compressés (`LZ`, `uint32` taille, LZW des PAK) ; même
+  contenu que la disquette une fois décompressé. Le STRIKE.EXE disquette lu ici ne les décompresse pas.

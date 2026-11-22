@@ -123,7 +123,7 @@ ProgBuffer_FindSubProgramByIndex_50E94	endp
 ; far, enveloppe bornée de Str_SeekNthEntryByte : retourne un pointeur nul si l'index dépasse
 ; le compteur en tête de structure.
 ; ==============================================================================================
-Str_GetNthEntry_50EC8	proc far		; CODE XREF: Expr_ResolveStringEntry_7F5D5:loc_7F61EP
+Str_GetNthEntry_50EC8	proc far		; CODE XREF: NavMap_SetObjective_7F5D5:loc_7F61EP
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -159,12 +159,17 @@ Str_GetNthEntry_50EC8	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, cumule 3 champs dword (+0x22/+0x26/+0x2A, probable position X/Y/Z) en remontant une
-; chaîne de pointeurs (parents successifs), alloue (sub_658, 0Ch) ou réutilise un buffer
-; résultat. Cœur du calcul de position résolue d'un nœud dans sa hiérarchie — utilisé
-; largement dans tout le cluster seg109-117.
+; far, POSITION MONDE D'UNE POSITION RELATIVE À UNE ZONE AREA (ex-GeomNode_SumOffsetsUpChain :
+; il n'y a PAS de chaîne, un seul parent). Args : (dst near ptr ou 0, seg dst, far ptr rec).
+; rec = { +0 far ptr zone AREA, +4/+8/+0xC 3× i32 24.8 décalage }. Résultat = décalage +
+; zone[+0x22/+0x26/+0x2A] (point de référence de la zone) si le pointeur de zone est non nul
+; (cmp dword ptr es:[bx],0 / jz ; add [bp+var_10], es:[bx+22h]…), sinon décalage seul
+; (position absolue). Si dst = 0, alloue un buffer de 12 o (push 0Ch / CRT_Malloc16_Retry).
+; Utilisé pour les SPOT (Mission_GetSpotWorldPosition_5305A, records de 16 o) et pour la
+; position des entrées PART (Expr_Node_StoreResultVector_52C9C : rec = part+0x1D, zone en
+; +0x1D, décalage en +0x21).
 ; ==============================================================================================
-GeomNode_SumOffsetsUpChain_50EEB	proc far		; CODE XREF: Lexer_ResolveConstantAlt+5BP
+AreaRelPos_ToWorld_50EEB	proc far		; CODE XREF: Lexer_ResolveConstantAlt+5BP
 					; PartEntry_ResolveSpawnPositionAndActivate_51EDC+325p ...
 
 var_10		= dword	ptr -10h
@@ -210,7 +215,7 @@ loc_50F21:
 		mov	eax, es:[bx+2Ah]
 		add	[bp+var_8], eax
 
-loc_50F46:				; CODE XREF: GeomNode_SumOffsetsUpChain_50EEB+3Bj
+loc_50F46:				; CODE XREF: AreaRelPos_ToWorld_50EEB+3Bj
 		mov	si, [bp+arg_0]
 		or	si, si
 		jz	short loc_50F51
@@ -218,13 +223,13 @@ loc_50F46:				; CODE XREF: GeomNode_SumOffsetsUpChain_50EEB+3Bj
 		jmp	short loc_50F5B
 ; ���������������������������������������������������������������������������
 
-loc_50F51:				; CODE XREF: GeomNode_SumOffsetsUpChain_50EEB+60j
+loc_50F51:				; CODE XREF: AreaRelPos_ToWorld_50EEB+60j
 		push	0Ch
 		call	CRT_Malloc16_Retry
 		pop	cx
 		mov	si, ax
 
-loc_50F5B:				; CODE XREF: GeomNode_SumOffsetsUpChain_50EEB+64j
+loc_50F5B:				; CODE XREF: AreaRelPos_ToWorld_50EEB+64j
 		or	ax, ax
 		jz	short loc_50F7A
 		mov	eax, [bp+var_10]
@@ -237,16 +242,16 @@ loc_50F5B:				; CODE XREF: GeomNode_SumOffsetsUpChain_50EEB+64j
 		jmp	short loc_50F7C
 ; ���������������������������������������������������������������������������
 
-loc_50F7A:				; CODE XREF: GeomNode_SumOffsetsUpChain_50EEB+72j
+loc_50F7A:				; CODE XREF: AreaRelPos_ToWorld_50EEB+72j
 		mov	ax, si
 
-loc_50F7C:				; CODE XREF: GeomNode_SumOffsetsUpChain_50EEB+8Dj
+loc_50F7C:				; CODE XREF: AreaRelPos_ToWorld_50EEB+8Dj
 		mov	dx, [bp+arg_2]
 		mov	ax, [bp+arg_0]
 		pop	si
 		leave
 		retf
-GeomNode_SumOffsetsUpChain_50EEB	endp
+AreaRelPos_ToWorld_50EEB	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -537,12 +542,29 @@ Expr_VM_ReadVarOrOverride_510CC	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 1877 lignes, NON DÉTAILLÉE EN PROFONDEUR — DÉCOUVERTE MAJEURE : machine virtuelle à
-; bytecode complète, switch à 209 cas (jump table off_51CA8), lit les instructions via
-; Expr_VM_ReadNextToken_50F85. Gère une pile de valeurs (Expr_VM_Push/Pop) et des appels de
-; fonctions natives (Expr_VM_CallNativeFunction_52513). Sous-jacente au système de nœuds à
-; valeurs calculées utilisé par le HUD (sub_3E744/sub_547B1), l'IA (seg004/seg054274) et l'UI
-; (sub_4FBF1 et alentours). PRIORITÉ ABSOLUE pour une session dédiée.
+; ⚠️ far, 1877 lignes, LUE EN PARTIE 2026-10-22 (instructions 00h–56h relues cas par cas ;
+; 80h–98h, D0h et le détail des ordres natifs A0h–C0h restent à lire). Machine virtuelle à
+; bytecode, switch à 209 cas (jump table off_51CA8), instruction lue par
+; Expr_VM_ReadNextToken_50F85 (octet d'opcode, octet d'argument, 2ᵉ argument si l'octet
+; suivant vaut 09h). Sert aux scripts PROG des missions et au système de nœuds à valeurs
+; calculées (HUD, IA, UI). État : acc [instr+0Ch], résultat du dernier ordre natif [+0Eh]
+; (MissionScript_CallNativeHandler_52513), drapeaux de comparaison [+16h] (1 inférieur, 2
+; égal, 4 supérieur). FLAG[n] = tableau du chunk FLAG (mission word_706A0 +48h nombre, +4Ah
+; pointeur ; hors bornes : lu 0, écriture ignorée). STAT[n] = mission+0A1h (n < 8), écrit dans
+; misn2op.iff par Mission_WriteResultReport_A8F22. 00h/01h retour (Expr_VM_PopValue_51096) ;
+; 02h appel du programme n, 03h du programme acc (Expr_VM_PushValue_51033 →
+; Expr_LookupNamedValue_51E4A) ; 04h arrêt ; 08h étiquette ; 0Fh code de sortie byte_706AF = n
+; ; 10h acc=n ; 11h acc=FLAG[n] ; 12h échange acc/FLAG[n] ; 13h acc=résultat natif ; 14h
+; STAT[n]=acc ; 15h acc=hasard 0..n ; 20h/21h acc+=n/FLAG[n] ; 22h FLAG[n]+=n ; 23h
+; FLAG[n]+=acc ; 24h/25h acc-=n/FLAG[n] ; 26h FLAG[n]-=n ; 27h FLAG[n]-=acc ; 28h/29h or ;
+; 2Ah/2Bh and ; 2Ch/2Dh xor ; 2Eh/2Fh mul ; 30h/31h div ; 40h acc?n ; 41h n?acc ; 42h
+; acc?FLAG[n] ; 43h FLAG[n]?acc ; 44h natif?n ; 45h FLAG[n]?1 ; 46h/47h saut si natif ≠0/=0 ;
+; 48h = ; 49h ≠ ; 4Ah < ; 4Bh > ; 4Ch ≤ ; 4Dh ≥ ; 4Eh toujours ; 4Fh saut à l'étiquette acc
+; (sauts : recherche en avant, Expr_VM_FindCaseToken_50FDB) ; 50h FLAG[n]=acc ; 51h
+; FLAG[n]=natif ; 52h/53h =1/=0 ; 54h ^=1 ; 55h/56h ++/--. Opcodes absents de la table
+; (05h–07h, 09h–0Eh, 16h–1Fh, 32h–3Fh, 57h–7Fh…) : rien. Tableau complet :
+; MISSION_SCRIPT_OPCODES.md « Instructions de base du bytecode PROG » ; outil
+; tools/mission_prog.py.
 ; ==============================================================================================
 Expr_VM_Interpreter_51106	proc far		; CODE XREF: Expr_VM_ExecuteSingleInstruction_51E7E+58p
 
@@ -1647,7 +1669,7 @@ loc_51733:				; CODE XREF: Expr_VM_Interpreter_51106+28j
 		push	ax
 		nop
 		push	cs
-		call	near ptr GeomNode_SumAndCount_53034
+		call	near ptr PtrList_GetAt_53034
 		add	sp, 4
 		mov	word ptr [bp+var_C+2], dx
 		mov	word ptr [bp+var_C], ax
@@ -1658,7 +1680,7 @@ loc_51733:				; CODE XREF: Expr_VM_Interpreter_51106+28j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Expr_Node_Accessor_532AD
+		call	near ptr Scene_FindByArea_532AD
 		add	sp, 6
 		mov	si, ax
 		cmp	byte ptr [si], 0
@@ -1678,7 +1700,7 @@ loc_51772:				; CODE XREF: Expr_VM_Interpreter_51106+28j
 		push	ax
 		nop
 		push	cs
-		call	near ptr GeomNode_SumAndCount_53034
+		call	near ptr PtrList_GetAt_53034
 		add	sp, 4
 		mov	word ptr [bp+var_C+2], dx
 		mov	word ptr [bp+var_C], ax
@@ -1689,7 +1711,7 @@ loc_51772:				; CODE XREF: Expr_VM_Interpreter_51106+28j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Expr_Node_Accessor_532AD
+		call	near ptr Scene_FindByArea_532AD
 		add	sp, 6
 		mov	si, ax
 		or	si, si
@@ -1712,7 +1734,7 @@ loc_517AA:				; CODE XREF: Expr_VM_Interpreter_51106+28j
 		push	ax
 		nop
 		push	cs
-		call	near ptr GeomNode_SumAndCount_53034
+		call	near ptr PtrList_GetAt_53034
 		add	sp, 4
 		mov	word ptr [bp+var_C+2], dx
 		mov	word ptr [bp+var_C], ax
@@ -1723,7 +1745,7 @@ loc_517AA:				; CODE XREF: Expr_VM_Interpreter_51106+28j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Expr_Node_Accessor_532AD
+		call	near ptr Scene_FindByArea_532AD
 		add	sp, 6
 		mov	si, ax
 		or	si, si
@@ -1788,7 +1810,7 @@ loc_51822:				; CODE XREF: Expr_VM_Interpreter_51106+717j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Expr_Node_ClearDirtyAndNotify_5242A
+		call	near ptr PartEntry_Deactivate_5242A
 		jmp	loc_51B41
 ; ���������������������������������������������������������������������������
 
@@ -1992,7 +2014,7 @@ loc_5199C:				; CODE XREF: Expr_VM_Interpreter_51106+891j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		push	large dword ptr	[di+12h]
 		push	ss
@@ -2616,10 +2638,24 @@ Expr_VM_ExecuteSingleInstruction_51E7E	endp
 ; 85 octets que MissionObject_ResetState/LoadAndResolveNames. CALCULE une position de
 ; formation en combinant plusieurs points nommes ponderes (+0x21, +0x25, +0x29, mis a
 ; l'echelle et accumules), via Formation_ComputeGeometryHelper_56D43 et
-; AI_ComputeApproachAngles_553CF. PUIS, si le controleur (+0x52) est encore NUL, appelle
+; Math_HeadingAngle_553CF. PUIS, si le controleur (+0x52) est encore NUL, appelle
 ; AIAircraft_SpawnAndConditionalLoadProfile_53363 avec cette position, et assigne le resultat
 ; via SetReference — RESOUT LA QUESTION OUVERTE DU CONTROLEUR : c'est une entite avion/pilote
-; IA complete, la meme classe que toute la documentation MVRS/ATRB/GOAL (voir AI_SYSTEM.md).
+; IA complete, la meme classe que toute la documentation MVRS/ATRB/GOAL (voir AI_SYSTEM.md). |
+; COMPLÉMENT 2026-10-12 : VITESSE INITIALE (+0x2F, int16) en MÈTRES PAR SECONDE :
+; AIAircraft_SpawnAndConditionalLoadProfile_53363 fait nez × vitesse × dword_7045E (dt) puis
+; la méthode +0x48 de l'instance (loc_3D0F9) multiplie par dword_70462 (= 1/dt) : la dynamique
+; reçoit vitesse m/s. 3e NOM (PART +0x12, string[8]) : s'il n'est pas vide,
+; WeaponSys_LoadFromFile_9EFBE(système d'armes de l'instance +0x5A, nom) = EMPORT IMPOSÉ :
+; OBJECTS\<nom>.IFF dont la racine est un FORM WEAP. CAMP (+0x31) → instance +0x50 (écrase
+; l'ALGN du modèle). Avion de vitesse nulle : dynamique +0x20 = 1 (au sol) et JDYN +0x75 |= 4
+; (train sorti). | 2026-10-30 : ALLIE PAR DEFAUT (+0x32, octet 46 du PART) :
+; Expr_LookupNamedValue_52DDB puis ordre natif 179 (push 0B3h / call dword ptr [bx+88h]) ;
+; dans Goal_SetObjective_A307, le cas 179 range l'allie comme chef (SetReference sur +0x145,
+; meme champ que OP_SET_OBJ_FOLLOW_ALLY) et efface +0x149, sans ecrire l'ordre en cours +0x11D
+; ni le poste +0x14A..+0x152 : l'objet n'est pas mis a suivre son allie a l'activation. Puis
+; compteurs de camp (word_706A7 camp 255, word_706A3 camp 1) et
+; Shared_TriggerExprInstruction_5247D.
 ; ==============================================================================================
 PartEntry_ResolveSpawnPositionAndActivate_51EDC	proc far		; CODE XREF: Expr_VM_Interpreter_51106+6FBp
 					; Scene_EnsureUnitsSpawned_530FF+6Bp
@@ -2771,7 +2807,7 @@ loc_51F65:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+84j
 		push	ss
 		lea	ax, [bp+var_1E]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+2Dh]
@@ -2936,7 +2972,7 @@ loc_521F0:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+86j
 		lea	ax, [bp+var_A0]
 		push	ax
 		push	cs
-		call	near ptr GeomNode_SumOffsetsUpChain_50EEB
+		call	near ptr AreaRelPos_ToWorld_50EEB
 		add	sp, 8
 		mov	eax, [bp+var_A0]
 		mov	[bp+var_94], eax
@@ -2974,7 +3010,7 @@ loc_52244:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+312j
 		add	sp, 4
 		lea	ax, [bp+var_C4]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+2Fh]
@@ -2986,7 +3022,7 @@ loc_52244:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+312j
 		push	bx
 		nop
 		push	cs
-		call	near ptr Expr_LookupBuiltinFuncDesc_52C5F
+		call	near ptr Mission_GetCastName_52C5F
 		add	sp, 4
 		push	dx
 		push	ax
@@ -3175,10 +3211,18 @@ PartEntry_ResolveSpawnPositionAndActivate_51EDC	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, efface le bit dirty d'un nœud (+0x39), décrémente des compteurs globaux
-; (word_706A3/706A7) selon son état antérieur, notifie via Expr_Node_NotifyChange_53337.
+; far, RELUE 2026-10-15. Ex-'Expr_Node_ClearDirtyAndNotify' (2026-10-03). DESACTIVATION D'UN
+; OBJET DE MISSION : opcode de script 0x91 (Expr_VM_Interpreter_51106), inverse de 0x90
+; (PartEntry_ResolveSpawnPositionAndActivate_51EDC). Si l'objet a une instance (+0x52) : (1)
+; si le bit 1 de +0x39 est nul (shl 0Eh / sar 0Fh), decremente le compteur d'objets actifs de
+; son camp (+0x31 : 0xFF -> word_706A7, 1 -> word_706A3 ; lus par Goal_IsComplete pour l'ordre
+; 0xA9) ; (2) MissionObject_RemoveInstanceFromWorld_53337 : l'instance est RETIREE du monde et
+; DETRUITE (destructeur slot +0x18), sans explosion ni debris. Dans tous les cas : bit 0
+; (actif) de +0x39 efface. Le champ +0x52 n'est pas remis a zero ici. Exemple MISN-1A : le
+; C-130 se desactive (0x91 8) apres son atterrissage. NB : l'opcode 0xBE n'est PAS une
+; desactivation.
 ; ==============================================================================================
-Expr_Node_ClearDirtyAndNotify_5242A	proc far		; CODE XREF: Expr_VM_Interpreter_51106+720p
+PartEntry_Deactivate_5242A	proc far		; CODE XREF: Expr_VM_Interpreter_51106+720p
 					; Expr_Node_UpdateAndPropagate_52AC6+133p ...
 
 arg_0		= dword	ptr  6
@@ -3199,28 +3243,28 @@ arg_0		= dword	ptr  6
 		jmp	short loc_52460
 ; ���������������������������������������������������������������������������
 
-loc_52452:				; CODE XREF: Expr_Node_ClearDirtyAndNotify_5242A+20j
+loc_52452:				; CODE XREF: PartEntry_Deactivate_5242A+20j
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+31h], 1
 		jnz	short loc_52460
 		dec	word_706A3
 
-loc_52460:				; CODE XREF: Expr_Node_ClearDirtyAndNotify_5242A+19j
-					; Expr_Node_ClearDirtyAndNotify_5242A+26j ...
+loc_52460:				; CODE XREF: PartEntry_Deactivate_5242A+19j
+					; PartEntry_Deactivate_5242A+26j ...
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+52h]
 		push	word_706A0
 		nop
 		push	cs
-		call	near ptr Expr_Node_NotifyChange_53337
+		call	near ptr MissionObject_RemoveInstanceFromWorld_53337
 		add	sp, 4
 
-loc_52473:				; CODE XREF: Expr_Node_ClearDirtyAndNotify_5242A+Bj
+loc_52473:				; CODE XREF: PartEntry_Deactivate_5242A+Bj
 		les	bx, [bp+arg_0]
 		and	byte ptr es:[bx+39h], 0FEh
 		pop	bp
 		retf
-Expr_Node_ClearDirtyAndNotify_5242A	endp
+PartEntry_Deactivate_5242A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -3485,7 +3529,7 @@ loc_5257A:				; DATA XREF: seg114:off_52A88o
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_56]
 		mov	[bp+var_4A], eax
@@ -3515,7 +3559,7 @@ loc_525B5:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_62]
 		mov	[bp+var_4A], eax
@@ -3547,7 +3591,7 @@ loc_525F3:
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_DA]
 		mov	[bp+var_CE], eax
@@ -3567,7 +3611,7 @@ loc_525F3:
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_6E]
 		mov	[bp+var_4A], eax
@@ -3588,7 +3632,7 @@ loc_5265A:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_DA]
 		mov	[bp+var_CE], eax
@@ -3608,7 +3652,7 @@ loc_5265A:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_7A]
 		mov	[bp+var_4A], eax
@@ -3634,7 +3678,7 @@ loc_526C6:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 		push	ax
 		nop
 		push	cs
-		call	near ptr GeomNode_SumAndCount_53034
+		call	near ptr PtrList_GetAt_53034
 		add	sp, 4
 		mov	word ptr [bp+var_3A+2],	dx
 		mov	word ptr [bp+var_3A], ax
@@ -3676,7 +3720,7 @@ loc_5270B:				; CODE XREF: MissionScript_CallNativeHandler_52513+1F3j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_E6]
 		mov	[bp+var_DA], eax
@@ -3833,7 +3877,7 @@ loc_528B1:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_9E]
 		mov	[bp+var_4A], eax
@@ -3958,7 +4002,7 @@ loc_529BA:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_C2]
 		mov	[bp+var_4A], eax
@@ -4248,7 +4292,7 @@ loc_52BF2:
 		jz	short loc_52C5B
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr Expr_Node_ClearDirtyAndNotify_5242A
+		call	near ptr PartEntry_Deactivate_5242A
 		jmp	loc_52AF5
 ; ���������������������������������������������������������������������������
 
@@ -4307,10 +4351,17 @@ Expr_Node_UpdateAndPropagate_52AC6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, table lookup bornée par index (octet +0x1B) dans une table de descripteurs de fonctions
-; natives (base word_706A0+0x30, stride 9 octets) — alimente Expr_VM_CallNativeFunction.
+; far, NOM CAST D'UN OBJET DE MISSION (ex-Expr_LookupBuiltinFuncDesc : aucun rapport avec des
+; fonctions natives). Arg : far ptr entrée PART (85 o). Renvoie &CAST[entrée+0x1B] (far ptr
+; vers le nom de 9 o) ou NULL si l'index ≥ nombre de noms : mov al, es:[bx+1Bh] / cmp
+; [bx+2Eh], dx / jbe → NULL ; sinon imul ax, 9 / add bx, [bx+30h] (liste CAST =
+; word_706A0+0x2E : [+0] nombre, [+2] far ptr). Appelants :
+; PartEntry_ResolveSpawnPositionAndActivate_51EDC (nom passé à
+; AIAircraft_SpawnAndConditionalLoadProfile_53363 → PLAYER / NETWORK / IA + profil
+; INTEL\<nom>.IFF), Expr_Node_LookupAndConvert_52D69, écriture du chunk KILL de MISN2OP.IFF.
+; Format CAST : DATA_MODEL.md.
 ; ==============================================================================================
-Expr_LookupBuiltinFuncDesc_52C5F	proc far		; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+3C0p
+Mission_GetCastName_52C5F	proc far		; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+3C0p
 					; Expr_Node_LookupAndConvert_52D69+1Cp ...
 
 var_4		= dword	ptr -4
@@ -4335,12 +4386,12 @@ arg_0		= dword	ptr  6
 		mov	word ptr [bp+var_4], bx
 		jmp	short $+2
 
-loc_52C94:				; CODE XREF: Expr_LookupBuiltinFuncDesc_52C5F+20j
+loc_52C94:				; CODE XREF: Mission_GetCastName_52C5F+20j
 		mov	dx, word ptr [bp+var_4+2]
 		mov	ax, word ptr [bp+var_4]
 		leave
 		retf
-Expr_LookupBuiltinFuncDesc_52C5F	endp
+Mission_GetCastName_52C5F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -4349,7 +4400,7 @@ Expr_LookupBuiltinFuncDesc_52C5F	endp
 
 ; ==============================================================================================
 ; far, alloue (sub_658) ou réutilise un buffer, y stocke un vecteur 3D résolu via
-; GeomNode_SumOffsetsUpChain_50EEB.
+; AreaRelPos_ToWorld_50EEB.
 ; ==============================================================================================
 Expr_Node_StoreResultVector_52C9C	proc far		; CODE XREF: Compiler_EmitByTokenType+90P
 					; Compiler_EmitByTokenType+12FP ...
@@ -4406,7 +4457,7 @@ loc_52CE9:				; CODE XREF: Expr_Node_StoreResultVector_52C9C+Dj
 		push	ax
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr GeomNode_SumOffsetsUpChain_50EEB
+		call	near ptr AreaRelPos_ToWorld_50EEB
 		add	sp, 8
 
 loc_52CFE:				; CODE XREF: Expr_Node_StoreResultVector_52C9C:loc_52CE7j
@@ -4488,7 +4539,7 @@ Expr_Node_HasChildError_52D1D	endp
 ; d'enregistrement par index.
 ; ==============================================================================================
 Expr_LookupTableEntry85B_52D45	proc far		; CODE XREF: Scene_EnsureUnitsSpawned_530FF+26p
-					; Expr_Node_GetCachedValueB_5317A+22p ...
+					; Scene_LeaveMarkUnits_5317A+22p ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -4524,11 +4575,11 @@ Expr_LookupTableEntry85B_52D45	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine Expr_LookupBuiltinFuncDesc_52C5F avec un appel externe (sub_2E3C) —
+; far, combine Mission_GetCastName_52C5F avec un appel externe (sub_2E3C) —
 ; conversion/formatage d'une valeur de fonction native.
 ; ==============================================================================================
 Expr_Node_LookupAndConvert_52D69	proc far		; CODE XREF: MissionScenario_ConvertFieldValue_A8B8F+10P
-					; MissionScenario_ResolveAndBindExpressions_A8F22+36CP
+					; Mission_WriteResultReport_A8F22+36CP
 
 var_10		= dword	ptr -10h
 var_C		= dword	ptr -0Ch
@@ -4552,7 +4603,7 @@ arg_2		= dword	ptr  8
 loc_52D80:				; CODE XREF: Expr_Node_LookupAndConvert_52D69+68j
 		push	large [bp+var_4]
 		push	cs
-		call	near ptr Expr_LookupBuiltinFuncDesc_52C5F
+		call	near ptr Mission_GetCastName_52C5F
 		add	sp, 4
 		mov	word ptr [bp+var_C+2], dx
 		mov	word ptr [bp+var_C], ax
@@ -4662,8 +4713,8 @@ Expr_LookupNamedValue_52DDB	endp
 ; far, accesseur/mutateur de champ de nœud, utilisé par plusieurs constructeurs d'écran UI
 ; (sub_53A94/sub_53D92/sub_54274).
 ; ==============================================================================================
-Expr_Node_Accessor_52E17	proc far		; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+98p
-					; Combat_TeamOpposedCheckAndDispatch_53A94+F4p ...
+Expr_Node_Accessor_52E17	proc far		; CODE XREF: World_OnObjectDestroyed_53A94+98p
+					; World_OnObjectDestroyed_53A94+F4p ...
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -4844,8 +4895,21 @@ HitShape_ClassStub_ReturnConst53h_52F08:				; DATA XREF: seg339:off_707A1o
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, référencée via vtable, test de collision boîte (AABB) : 6 comparaisons de bornes le
-; long de X/Y/Z (centre +0x22/+0x26/+0x2A, demi-extents +0x2E/+0x32/+0x36/+0x3A/+0x3E).
+; far, méthode +4 (« le point est-il dans la zone ? ») de la forme 'B' (boîte) du chunk AREA
+; de MISN (vtable seg339:off_70799, tag 'B' = HitShape_ClassStub_ReturnConst42h_52F8B). Args :
+; (far ptr zone, near ptr point = 3× i32 24.8, composantes asm c0/c1/c2, c2 = altitude). Boîte
+; alignée sur les axes, étendues ASYMÉTRIQUES, PAS des demi-extents autour d'un centre : c0 :
+; [+0x22] − [+0x32] ≤ p.c0 ≤ [+0x22] + [+0x2E] ; c1 : [+0x26] − [+0x3A] ≤ p.c1 ≤ [+0x26] +
+; [+0x36] ; altitude c2 : [+0x2A] ≤ p.c2 ≤ [+0x2A] + [+0x3E] ([+0x2A] = PLANCHER, [+0x3E] =
+; hauteur). Bornes incluses. Renvoie 1 dedans, 0 dehors. Preuve : mov eax,es:[bx+22h] / add
+; eax,es:[bx+2Eh] / cmp eax,[si] / jge ; sub eax,es:[bx+32h] / cmp eax,[si] / jg → 0 ;
+; altitude : add eax,es:[bx+3Eh] / cmp eax,[si+8] / jl → 0 puis mov eax,[si+8] / cmp
+; eax,es:[bx+2Ah] / jl → 0. Champs lus par ExprSlot_ReleaseAndLoadExtended_A9565 dans l'ordre
+; +0x2E,+0x32,+0x36,+0x3A,+0x3E (disque 0x2D..0x3D de l'enregistrement AREA 'B', 65 o). En
+; repère libRealSpace (Y-up, mètres après ÷256) : +0x2E = étendue +X, +0x32 = −X, +0x36 = +Z,
+; +0x3A = −Z, +0x3E = hauteur le long de Y ; référence (+0x22, +0x26, +0x2A) = (X, Z, Y
+; plancher). Appelée via call dword ptr [bx+4] depuis
+; Scene_FindMatchingByAreaContainment_53236.
 ; ==============================================================================================
 HitShape_Box_ContainsPoint_52F0F:				; DATA XREF: seg339:off_7079Do
 		push	bp
@@ -4993,10 +5057,13 @@ loc_53031:				; CODE XREF: seg114:2158j seg114:21CDj
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelée par l'opcode VM +0x642 : combine GeomNode_SumOffsetsUpChain_50EEB avec une
-; allocation (sub_658).
+; far, ACCÈS À L'ÉLÉMENT i D'UNE LISTE DE POINTEURS FAR (ex-GeomNode_SumAndCount : ni somme ni
+; comptage). Args : (liste, i) ; liste = [+0] u16 nombre, [+2] near ptr tableau de far ptr (4
+; o). Renvoie liste[i], ou NULL si i ≥ nombre (cmp [si],dx / jbe), d'où area_id = −1 / 0xFFFF
+; = « pas de zone ». Sert à convertir un index AREA (liste MissionScenario+0x1A) en pointeur
+; de zone : SCNE, SPOT, PART, HOME, opcodes VM 0x80/0x81/0x82.
 ; ==============================================================================================
-GeomNode_SumAndCount_53034	proc far		; CODE XREF: Expr_VM_Interpreter_51106+642p
+PtrList_GetAt_53034	proc far		; CODE XREF: Expr_VM_Interpreter_51106+642p
 					; Expr_VM_Interpreter_51106+678p ...
 
 arg_0		= word ptr  6
@@ -5018,15 +5085,15 @@ arg_2		= word ptr  8
 		jmp	short loc_53057
 ; ���������������������������������������������������������������������������
 
-loc_53053:				; CODE XREF: GeomNode_SumAndCount_53034+Cj
+loc_53053:				; CODE XREF: PtrList_GetAt_53034+Cj
 		xor	dx, dx
 		xor	ax, ax
 
-loc_53057:				; CODE XREF: GeomNode_SumAndCount_53034+1Dj
+loc_53057:				; CODE XREF: PtrList_GetAt_53034+1Dj
 		pop	si
 		pop	bp
 		retf
-GeomNode_SumAndCount_53034	endp
+PtrList_GetAt_53034	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5034,13 +5101,16 @@ GeomNode_SumAndCount_53034	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, référencée DIRECTEMENT par Player_MainUpdate (sub_13100, deux sites d'appel) —
-; récupère la N-ième entrée d'une table (stride 16 octets) puis résout sa position via
-; GeomNode_SumOffsetsUpChain_50EEB. Hypothèse : résolution de position d'un point
-; d'attache/hardpoint de l'avion du joueur. À approfondir en lien avec la question ouverte de
-; la physique du joueur.
+; far, POSITION MONDE DU SPOT n (ex-Player_ResolveAttachPointN : rien à voir avec un point
+; d'attache du joueur). Args : (dst, seg dst, liste SPOT, n). Tous les appelants passent la
+; liste SPOT du scénario (word_706A0+0x1E ; add ax,1Eh avant l'appel). liste = [+0] u16
+; nombre, [+2] far ptr tableau de records de 16 o (shl bx,4). Si n ≥ nombre (cmp [si],cx /
+; jbe) : renvoie (0, 0, 0) — un 2e opérande absent (0xFFFF) donne donc l'origine du monde.
+; Sinon : AreaRelPos_ToWorld_50EEB(record) = décalage du spot + point de référence de sa zone
+; AREA. Appelants : ordres de mission via MissionScript_CallNativeHandler_52513 (0xA1, 0xA2…),
+; Player_MainUpdate, seg011, seg029. Format SPOT : DATA_MODEL.md.
 ; ==============================================================================================
-Player_ResolveAttachPointN_5305A	proc far		; CODE XREF: Player_MainUpdate+5FEP
+Mission_GetSpotWorldPosition_5305A	proc far		; CODE XREF: Player_MainUpdate+5FEP
 					; Player_MainUpdate+620P ...
 
 var_1C		= dword	ptr -1Ch
@@ -5075,11 +5145,11 @@ arg_6		= word ptr  0Ch
 		jmp	short loc_5308D
 ; ���������������������������������������������������������������������������
 
-loc_53089:				; CODE XREF: Player_ResolveAttachPointN_5305A+1Ej
+loc_53089:				; CODE XREF: Mission_GetSpotWorldPosition_5305A+1Ej
 		xor	dx, dx
 		xor	ax, ax
 
-loc_5308D:				; CODE XREF: Player_ResolveAttachPointN_5305A+2Dj
+loc_5308D:				; CODE XREF: Mission_GetSpotWorldPosition_5305A+2Dj
 		mov	word ptr [bp+var_4+2], dx
 		mov	word ptr [bp+var_4], ax
 		cmp	[bp+var_4], 0
@@ -5090,7 +5160,7 @@ loc_5308D:				; CODE XREF: Player_ResolveAttachPointN_5305A+2Dj
 		lea	ax, [bp+var_1C]
 		push	ax
 		push	cs
-		call	near ptr GeomNode_SumOffsetsUpChain_50EEB
+		call	near ptr AreaRelPos_ToWorld_50EEB
 		add	sp, 8
 		mov	eax, [bp+var_1C]
 		mov	[bp+var_10], eax
@@ -5099,7 +5169,7 @@ loc_5308D:				; CODE XREF: Player_ResolveAttachPointN_5305A+2Dj
 		mov	eax, [bp+var_14]
 		mov	[bp+var_8], eax
 
-loc_530C0:				; CODE XREF: Player_ResolveAttachPointN_5305A+3Ej
+loc_530C0:				; CODE XREF: Mission_GetSpotWorldPosition_5305A+3Ej
 		mov	si, [bp+arg_0]
 		or	si, si
 		jz	short loc_530CB
@@ -5107,7 +5177,7 @@ loc_530C0:				; CODE XREF: Player_ResolveAttachPointN_5305A+3Ej
 		jmp	short loc_530D5
 ; ���������������������������������������������������������������������������
 
-loc_530CB:				; CODE XREF: Player_ResolveAttachPointN_5305A+6Bj
+loc_530CB:				; CODE XREF: Mission_GetSpotWorldPosition_5305A+6Bj
 		push	0Ch
 		call	CRT_Malloc16_Retry
 		pop	cx
@@ -5115,7 +5185,7 @@ loc_530CB:				; CODE XREF: Player_ResolveAttachPointN_5305A+6Bj
 loc_530D3:
 		mov	si, ax
 
-loc_530D5:				; CODE XREF: Player_ResolveAttachPointN_5305A+6Fj
+loc_530D5:				; CODE XREF: Mission_GetSpotWorldPosition_5305A+6Fj
 		or	ax, ax
 		jz	short loc_530F4
 
@@ -5130,16 +5200,16 @@ loc_530D9:
 		jmp	short loc_530F6
 ; ���������������������������������������������������������������������������
 
-loc_530F4:				; CODE XREF: Player_ResolveAttachPointN_5305A+7Dj
+loc_530F4:				; CODE XREF: Mission_GetSpotWorldPosition_5305A+7Dj
 		mov	ax, si
 
-loc_530F6:				; CODE XREF: Player_ResolveAttachPointN_5305A+98j
+loc_530F6:				; CODE XREF: Mission_GetSpotWorldPosition_5305A+98j
 		mov	dx, [bp+arg_2]
 		mov	ax, [bp+arg_0]
 		pop	si
 		leave
 		retf
-Player_ResolveAttachPointN_5305A	endp
+Mission_GetSpotWorldPosition_5305A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5236,9 +5306,14 @@ Scene_EnsureUnitsSpawned_530FF	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, variante d'accesseur de valeur mise en cache (via Expr_LookupTableEntry85B_52D45).
+; far, lue intégralement. Pour chaque objet de la scène (liste du chunk SCNE,
+; Expr_LookupTableEntry85B_52D45) dont le 4e script PART (+0x4E) existe : bit 3 de +0x39 posé
+; (or byte ptr es:[bx+39h], 8). Puis record+1 = 0 (record+1 = 1 posé par
+; Scene_EnsureUnitsSpawned_530FF : la scène est la scène courante). Rôle du bit 3 non établi ;
+; Scene_EnsureUnitsSpawned_530FF l'efface sur les objets déjà présents.
+; Ex-'Expr_Node_GetCachedValueB' (corrigé 2026-10-30).
 ; ==============================================================================================
-Expr_Node_GetCachedValueB_5317A	proc far		; CODE XREF: Scene_TriggerMissionUpdateEvent_53211+9p
+Scene_LeaveMarkUnits_5317A	proc far		; CODE XREF: Scene_RunLeavingScript_53211+9p
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -5253,7 +5328,7 @@ arg_0		= word ptr  6
 		jmp	short loc_531C0
 ; ���������������������������������������������������������������������������
 
-loc_53189:				; CODE XREF: Expr_Node_GetCachedValueB_5317A+49j
+loc_53189:				; CODE XREF: Scene_LeaveMarkUnits_5317A+49j
 		mov	ax, di
 		shl	ax, 1
 		mov	bx, [si+16h]
@@ -5274,11 +5349,11 @@ loc_53189:				; CODE XREF: Expr_Node_GetCachedValueB_5317A+49j
 		jz	short loc_531BF
 		or	byte ptr es:[bx+39h], 8
 
-loc_531BF:				; CODE XREF: Expr_Node_GetCachedValueB_5317A+33j
-					; Expr_Node_GetCachedValueB_5317A+3Ej
+loc_531BF:				; CODE XREF: Scene_LeaveMarkUnits_5317A+33j
+					; Scene_LeaveMarkUnits_5317A+3Ej
 		inc	di
 
-loc_531C0:				; CODE XREF: Expr_Node_GetCachedValueB_5317A+Dj
+loc_531C0:				; CODE XREF: Scene_LeaveMarkUnits_5317A+Dj
 		cmp	[si+14h], di
 		jg	short loc_53189
 		mov	byte ptr [si+1], 0
@@ -5286,7 +5361,7 @@ loc_531C0:				; CODE XREF: Expr_Node_GetCachedValueB_5317A+Dj
 		pop	si
 		leave
 		retf
-Expr_Node_GetCachedValueB_5317A	endp
+Scene_LeaveMarkUnits_5317A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5335,13 +5410,14 @@ Scene_TriggerActivation_531CD	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 20 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Declenche le champ
-; +0xC d'une SceneRecord (on_leaving, confirme via DATA_MODEL.md) via
-; Expr_VM_ExecuteSingleInstruction. Appelee directement depuis MAIN_GAME_TICK_536F7 (pas
-; depuis Scene_DetectAndActivateChange), sur si->field_4E et si->field_50 -- contexte exact de
-; ces deux appels (avant/apres resolution de scene ?) pas encore completement elucide.
+; far, 20 lignes, lue intégralement. Lance le champ +12 d'un record de scène (octets 5 et 6 du
+; chunk SCNE : 2e script) par Expr_VM_ExecuteSingleInstruction_51E7E. Appelée deux fois à
+; CHAQUE image par MAIN_GAME_TICK : sur la scène globale (MissionScenario+78, avant la
+; détection de scène) puis sur la scène courante (MissionScenario+80, après
+; Scene_DetectAndActivateChange_532EA). C'est donc le script de mise à jour de la scène.
+; Ex-'Scene_TriggerLeavingEvent' (nom erroné, corrigé 2026-10-30 ; IMPL_MISSION_AREAS.md).
 ; ==============================================================================================
-Scene_TriggerLeavingEvent_531F2	proc far		; CODE XREF: MAIN_GAME_TICK+104p
+Scene_RunUpdateScript_531F2	proc far		; CODE XREF: MAIN_GAME_TICK+104p
 					; MAIN_GAME_TICK+164p
 
 arg_0		= word ptr  6
@@ -5361,7 +5437,7 @@ arg_0		= word ptr  6
 		pop	si
 		pop	bp
 		retf
-Scene_TriggerLeavingEvent_531F2	endp
+Scene_RunUpdateScript_531F2	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5369,18 +5445,18 @@ Scene_TriggerLeavingEvent_531F2	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 24 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Declenche le champ
-; +0x10 d'une SceneRecord (on_mission_update, confirme via DATA_MODEL.md) via
-; Expr_VM_ExecuteSingleInstruction — SANS AUCUNE GARDE interne. CORRIGE : appelee a la fois
-; depuis Scene_DetectAndActivateChange_532EA (uniquement si la scene active a change --
-; garantie supplementaire sur l'ancienne scene) ET depuis
-; MissionScenario_RecomputeFields_A9382 (SANS CONDITION, a CHAQUE FRAME, tant que +0x50 reste
-; non nul). CONSEQUENCE : 'on_mission_update' d'une scene tourne bien EN CONTINU, une fois par
-; frame tant que la scene reste active -- exactement comme celui de PART
-; (PartEntry_DispatchMissionUpdateTick_52E51), pas un evenement ponctuel comme initialement
-; suppose.
+; far, 24 lignes, lue intégralement. Appelle Scene_LeaveMarkUnits_5317A (record+1 = 0, drapeau
+; bit 3 sur les objets de la scène), puis lance le champ +16 du record de scène (octets 7 et 8
+; du chunk SCNE : 3e script) par Expr_VM_ExecuteSingleInstruction_51E7E. Appelée par
+; Scene_DetectAndActivateChange_532EA sur l'ANCIENNE scène quand la scène courante change, et
+; par MissionScenario_RecomputeFields_A9382 (une seule fois, en fin de mission) sur la scène
+; courante puis la scène globale. STRIKE_EXE_MAIN_LOOP lance aussi ce champ de la scène
+; globale en sortie de boucle. Dans MISN-1A, ce script de la scène globale écrit les variables
+; de résultat (STAT). C'est donc le script de sortie de scène et de fin de mission.
+; Ex-'Scene_TriggerMissionUpdateEvent' (nom erroné, corrigé 2026-10-30 ;
+; IMPL_MISSION_AREAS.md).
 ; ==============================================================================================
-Scene_TriggerMissionUpdateEvent_53211	proc far		; CODE XREF: Scene_DetectAndActivateChange_532EA+22p
+Scene_RunLeavingScript_53211	proc far		; CODE XREF: Scene_DetectAndActivateChange_532EA+22p
 					; MissionScenario_RecomputeFields_A9382+10P ...
 
 arg_0		= word ptr  6
@@ -5391,7 +5467,7 @@ arg_0		= word ptr  6
 		mov	si, [bp+arg_0]
 		push	si
 		push	cs
-		call	near ptr Expr_Node_GetCachedValueB_5317A
+		call	near ptr Scene_LeaveMarkUnits_5317A
 		pop	cx
 		push	large 0
 		push	large dword ptr	[si+10h]
@@ -5404,7 +5480,7 @@ arg_0		= word ptr  6
 		pop	si
 		pop	bp
 		retf
-Scene_TriggerMissionUpdateEvent_53211	endp
+Scene_RunLeavingScript_53211	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5507,9 +5583,13 @@ Scene_FindMatchingByAreaContainment_53236	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, accesseur générique de champ de nœud (rôle exact non détaillé).
+; far, lue intégralement. Renvoie le premier record de scène (pas de 39 octets) dont le
+; pointeur de zone (+4) est égal à la zone donnée, ou 0. Appelée avec une zone nulle par
+; MissionScenario_LoadMainRecord_A8331 pour trouver la scène globale (rangée en
+; MissionScenario+78, erreur 36889 si absente), et par les opcodes 0x80, 0x81 et 0x82 avec la
+; zone d'un index AREA. Ex-'Expr_Node_Accessor' (corrigé 2026-10-30).
 ; ==============================================================================================
-Expr_Node_Accessor_532AD	proc far		; CODE XREF: Expr_VM_Interpreter_51106+659p
+Scene_FindByArea_532AD	proc far		; CODE XREF: Expr_VM_Interpreter_51106+659p
 					; Expr_VM_Interpreter_51106+68Fp ...
 
 arg_0		= word ptr  6
@@ -5524,7 +5604,7 @@ arg_4		= word ptr  0Ah
 		jmp	short loc_532E1
 ; ���������������������������������������������������������������������������
 
-loc_532B8:				; CODE XREF: Expr_Node_Accessor_532AD+36j
+loc_532B8:				; CODE XREF: Scene_FindByArea_532AD+36j
 		mov	ax, cx
 		imul	ax, 27h
 		mov	bx, [si+2]
@@ -5548,22 +5628,22 @@ loc_532D8:
 		jmp	short loc_532E7
 ; ���������������������������������������������������������������������������
 
-loc_532E0:				; CODE XREF: Expr_Node_Accessor_532AD+1Ej
-					; Expr_Node_Accessor_532AD+23j
+loc_532E0:				; CODE XREF: Scene_FindByArea_532AD+1Ej
+					; Scene_FindByArea_532AD+23j
 		inc	cx
 
-loc_532E1:				; CODE XREF: Expr_Node_Accessor_532AD+9j
+loc_532E1:				; CODE XREF: Scene_FindByArea_532AD+9j
 		cmp	[si], cx
 		jg	short loc_532B8
 
 loc_532E5:
 		xor	ax, ax
 
-loc_532E7:				; CODE XREF: Expr_Node_Accessor_532AD+31j
+loc_532E7:				; CODE XREF: Scene_FindByArea_532AD+31j
 		pop	si
 		pop	bp
 		retf
-Expr_Node_Accessor_532AD	endp
+Scene_FindByArea_532AD	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5575,8 +5655,9 @@ Expr_Node_Accessor_532AD	endp
 ; 'MissionFormation_HandleGroupSelectionChange' etait errone — aucun rapport avec une
 ; formation). Appelle Scene_FindMatchingByAreaContainment_53236 pour resoudre la scene active
 ; courante ; si elle a change depuis le dernier appel (different du parametre previousScene),
-; desactive l'ancienne (sub_53211) et active la nouvelle via Scene_TriggerActivation_531CD, en
-; mettant a jour un traqueur global de 'scene courante' (word_706A0+0x52).
+; lance le script de sortie de l'ancienne (Scene_RunLeavingScript_53211) et active la nouvelle
+; via Scene_TriggerActivation_531CD, en mettant a jour un traqueur global de 'scene courante'
+; (word_706A0+0x52).
 ; ==============================================================================================
 Scene_DetectAndActivateChange_532EA	proc far		; CODE XREF: MAIN_GAME_TICK+151p
 					; MissionScenario_LoadMainRecord_A8331+69AP
@@ -5603,7 +5684,7 @@ arg_4		= word ptr  0Ah
 		jz	short loc_53310
 		push	di
 		push	cs
-		call	near ptr Scene_TriggerMissionUpdateEvent_53211
+		call	near ptr Scene_RunLeavingScript_53211
 		pop	cx
 
 loc_53310:				; CODE XREF: Scene_DetectAndActivateChange_532EA+1Ej
@@ -5641,9 +5722,11 @@ Scene_DetectAndActivateChange_532EA	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, notifie un changement de valeur de nœud (appel externe sub_223C5).
+; far, LUE 2026-10-15. WorldObjects_RemoveAndDelete_223C5(59C3h, instance arg_2) : retire du
+; monde et detruit l'instance d'un objet de mission. Appelee par PartEntry_Deactivate_5242A
+; (opcode 0x91). Ex-'MissionObject_RemoveInstanceFromWorld_53337'.
 ; ==============================================================================================
-Expr_Node_NotifyChange_53337	proc far		; CODE XREF: Expr_Node_ClearDirtyAndNotify_5242A+43p
+MissionObject_RemoveInstanceFromWorld_53337	proc far		; CODE XREF: PartEntry_Deactivate_5242A+43p
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -5653,11 +5736,11 @@ arg_2		= word ptr  8
 		mov	ax, [bp+arg_0]
 		push	[bp+arg_2]
 		push	59C3h
-		call	Container_Op_223C5
+		call	WorldObjects_RemoveAndDelete_223C5
 		add	sp, 4
 		pop	bp
 		retf
-Expr_Node_NotifyChange_53337	endp
+MissionObject_RemoveInstanceFromWorld_53337	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -6393,7 +6476,7 @@ loc_537F7:
 
 loc_537FA:
 		push	cs
-		call	near ptr Scene_TriggerLeavingEvent_531F2
+		call	near ptr Scene_RunUpdateScript_531F2
 		pop	cx
 
 loc_537FF:				; CODE XREF: MAIN_GAME_TICK+FEj
@@ -6440,7 +6523,7 @@ loc_5383D:				; CODE XREF: MAIN_GAME_TICK+127j
 		jz	short loc_5385F
 		push	word ptr [si+50h]
 		push	cs
-		call	near ptr Scene_TriggerLeavingEvent_531F2
+		call	near ptr Scene_RunUpdateScript_531F2
 		pop	cx
 
 loc_5385F:				; CODE XREF: MAIN_GAME_TICK+15Ej
@@ -6519,7 +6602,7 @@ loc_538A1:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+12Bj
 		mov	al, byte_706A2
 		mov	ah, 0
 		push	ax
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 		pop	cx
 		jmp	loc_53997
 ; ���������������������������������������������������������������������������
@@ -6742,7 +6825,7 @@ loc_53A7E:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+1D5j
 		call	VROOMM_StubThunk_6CE5B
 		pop	cx
 		push	1
-		call	Widget_Helper_5A9E6
+		call	Music_Stop_5A9E6
 		pop	cx
 		mov	al, byte_706AF
 		pop	di
@@ -6757,20 +6840,30 @@ STRIKE_EXE_MAIN_LOOP	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 476 lignes, NON DÉTAILLÉE — construit une arborescence de widgets/nœuds (dispatch
-; vtable, Expr_Node_Accessor_52E17 ×3, sub_3A40B pour ajout à liste membre, appelle
-; UIScreen_SetWidgetValue_50654 en fin). Candidat pour session dédiée. REMONTEE PARTIELLE (476
-; lignes, portion pertinente lue completement a la demande de Remi) : LE NOM PRECEDENT
-; ('UIScreen_BuildWidgetTree') ETAIT TROMPEUR - la portion lue ne construit aucun widget. Pose
-; byte_6E4BF=1 (source du declencheur du message de destruction 0x0D via
-; RadioFlags_ShiftHistory) quand deux entites (di, si) ont une valeur a +0x50 (meme champ deja
-; vu comme identifiant d'appartenance dans AI_MissileThreatTrigger_A) qui sont l'OPPOSE EXACTE
-; l'une de l'autre (var_4 == -var_6) - probable verification 'cible detruite appartient au
-; camp oppose', PAS un trait ATRB. Le reste de la fonction (les ~350 lignes precedentes) n'a
-; pas ete relu en detail.
+; Ex-'Combat_TeamOpposedCheckAndDispatch_53A94'. ⚠️ far, 476 lignes, NON DÉTAILLÉE — construit
+; une arborescence de widgets/nœuds (dispatch vtable, Expr_Node_Accessor_52E17 ×3, sub_3A40B
+; pour ajout à liste membre, appelle UIScreen_SetWidgetValue_50654 en fin). Candidat pour
+; session dédiée. REMONTEE PARTIELLE (476 lignes, portion pertinente lue completement a la
+; demande de Remi) : LE NOM PRECEDENT ('UIScreen_BuildWidgetTree') ETAIT TROMPEUR - la portion
+; lue ne construit aucun widget. Pose byte_6E4BF=1 (source du declencheur du message de
+; destruction 0x0D via RadioFlags_ShiftHistory) quand deux entites (di, si) ont une valeur a
+; +0x50 (meme champ deja vu comme identifiant d'appartenance dans AI_MissileThreatTrigger_A)
+; qui sont l'OPPOSE EXACTE l'une de l'autre (var_4 == -var_6) - probable verification 'cible
+; detruite appartient au camp oppose', PAS un trait ATRB. Le reste de la fonction (les ~350
+; lignes precedentes) n'a pas ete relu en detail. RELU 2026-10-06 (partie son et camps) :
+; GESTIONNAIRE DE DESTRUCTION D'UN OBJET (objet detruit, auteur), appele par
+; Object_SpawnDestructionEffects_3863A, Debris_SpawnOrchestratorVariant_9D770,
+; AI_EjectDecision_50FF et MissionRecord_LoadAndBuildWidgetTree_7D31A. var_2 = categorie de
+; l'objet detruit (vtable+0x34), var_6 / var_4 = camps ([+0x50]) de l'objet et de l'auteur,
+; var_7 = pilote ejecte. Musique (si le joueur n'est ni mort ni l'objet detruit, et pilote non
+; ejecte) : objet du camp adverse (0xFF) -> Music_OnObjectDestroyed_5AA49 ; s'il ne choisit
+; rien et que l'auteur est le joueur : ponctuation 0x10 (avion, categorie 6), 0x11 (defense
+; fixe ou objet au sol, 0x13/0x14), 0x12 (autre : categorie 1 = ORNT, decor oriente, ou 0x15 =
+; XMIT ; table word_53D7E = 1, 6, 0x13, 0x14, 0x15). Objet du camp du joueur (1) : 0x0E s'il
+; s'agit de l'objet designe par la mission (VROOMM_StubThunk_6CE2E(word_706A0)), sinon 0x0F.
 ; ==============================================================================================
-Combat_TeamOpposedCheckAndDispatch_53A94	proc far		; CODE XREF: AI_MissileThreatTrigger_A+13CP
-					; Debris_SpawnOrchestrator+7BP ...
+World_OnObjectDestroyed_53A94	proc far		; CODE XREF: AI_EjectDecision_50FF+13CP
+					; Object_SpawnDestructionEffects_3863A+7BP ...
 
 var_16		= word ptr -16h
 var_14		= word ptr -14h
@@ -6806,7 +6899,7 @@ arg_2		= word ptr  8
 		pop	cx
 		mov	di, ax
 
-loc_53ABF:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+20j
+loc_53ABF:				; CODE XREF: World_OnObjectDestroyed_53A94+20j
 		push	si
 		mov	bx, [si]
 		call	dword ptr [bx]
@@ -6820,10 +6913,10 @@ loc_53ABF:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+20j
 		jmp	short loc_53AD4
 ; ���������������������������������������������������������������������������
 
-loc_53AD2:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+33j
+loc_53AD2:				; CODE XREF: World_OnObjectDestroyed_53A94+33j
 		mov	al, 17h
 
-loc_53AD4:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+3Cj
+loc_53AD4:				; CODE XREF: World_OnObjectDestroyed_53A94+3Cj
 		mov	[bp+var_2], al
 		mov	[bp+var_4], 0
 		or	di, di
@@ -6841,8 +6934,8 @@ loc_53AE5:
 loc_53AE8:
 		mov	[bp+var_4], al
 
-loc_53AEB:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+49j
-					; Combat_TeamOpposedCheckAndDispatch_53A94:loc_53AE3j
+loc_53AEB:				; CODE XREF: World_OnObjectDestroyed_53A94+49j
+					; World_OnObjectDestroyed_53A94:loc_53AE3j
 		mov	[bp+var_6], 0
 
 loc_53AEF:
@@ -6859,8 +6952,8 @@ loc_53AF7:
 		mov	al, [si+50h]
 		mov	[bp+var_6], al
 
-loc_53AFF:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94:loc_53AF1j
-					; Combat_TeamOpposedCheckAndDispatch_53A94:loc_53AF7j
+loc_53AFF:				; CODE XREF: World_OnObjectDestroyed_53A94:loc_53AF1j
+					; World_OnObjectDestroyed_53A94:loc_53AF7j
 		mov	[bp+var_7], 0
 
 loc_53B03:
@@ -6877,7 +6970,7 @@ loc_53B03:
 		and	ax, 1
 		mov	[bp+var_7], al
 
-loc_53B23:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+73j
+loc_53B23:				; CODE XREF: World_OnObjectDestroyed_53A94+73j
 		push	si
 		mov	ax, word_706A0
 		add	ax, 34h	; '4'
@@ -6900,18 +6993,18 @@ loc_53B23:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+73j
 		jnz	short loc_53B5D
 		inc	word_706A9
 
-loc_53B5D:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+C3j
+loc_53B5D:				; CODE XREF: World_OnObjectDestroyed_53A94+C3j
 		les	bx, [bp+var_C]
 		cmp	byte ptr es:[bx+31h], 1
 		jnz	short loc_53B6B
 		inc	word_706A5
 
-loc_53B6B:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+BCj
-					; Combat_TeamOpposedCheckAndDispatch_53A94+D1j
+loc_53B6B:				; CODE XREF: World_OnObjectDestroyed_53A94+BCj
+					; World_OnObjectDestroyed_53A94+D1j
 		les	bx, [bp+var_C]
 		or	byte ptr es:[bx+39h], 2
 
-loc_53B73:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+A9j
+loc_53B73:				; CODE XREF: World_OnObjectDestroyed_53A94+A9j
 		mov	[bp+var_10], 0
 		or	di, di
 		jz	short loc_53B94
@@ -6925,7 +7018,7 @@ loc_53B73:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+A9j
 		mov	word ptr [bp+var_10+2],	dx
 		mov	word ptr [bp+var_10], ax
 
-loc_53B94:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+E9j
+loc_53B94:				; CODE XREF: World_OnObjectDestroyed_53A94+E9j
 		cmp	[bp+var_10], 0
 		jnz	short loc_53BC2
 		cmp	[bp+var_2], 6
@@ -6937,7 +7030,7 @@ loc_53B94:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+E9j
 		jmp	short loc_53BC2
 ; ���������������������������������������������������������������������������
 
-loc_53BAD:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+112j
+loc_53BAD:				; CODE XREF: World_OnObjectDestroyed_53A94+112j
 		push	di
 		mov	ax, word_706A0
 		add	ax, 34h	; '4'
@@ -6948,8 +7041,8 @@ loc_53BAD:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+112j
 		mov	word ptr [bp+var_10+2],	dx
 		mov	word ptr [bp+var_10], ax
 
-loc_53BC2:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+105j
-					; Combat_TeamOpposedCheckAndDispatch_53A94+10Bj ...
+loc_53BC2:				; CODE XREF: World_OnObjectDestroyed_53A94+105j
+					; World_OnObjectDestroyed_53A94+10Bj ...
 		cmp	[bp+var_10], 0
 		jz	short loc_53C2B
 		mov	al, [bp+var_7]
@@ -6970,7 +7063,7 @@ loc_53BE0:
 		les	bx, [bp+var_10]
 		inc	word ptr es:[bx+3Eh]
 
-loc_53BE7:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+14Aj
+loc_53BE7:				; CODE XREF: World_OnObjectDestroyed_53A94+14Aj
 		test	byte ptr [si+4], 40h
 		jz	short loc_53BFD
 
@@ -6988,11 +7081,11 @@ loc_53BF8:
 		jmp	short loc_53BFF
 ; ���������������������������������������������������������������������������
 
-loc_53BFD:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+157j
-					; Combat_TeamOpposedCheckAndDispatch_53A94+162j
+loc_53BFD:				; CODE XREF: World_OnObjectDestroyed_53A94+157j
+					; World_OnObjectDestroyed_53A94+162j
 		xor	ax, ax
 
-loc_53BFF:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+167j
+loc_53BFF:				; CODE XREF: World_OnObjectDestroyed_53A94+167j
 		or	al, al
 		jnz	short loc_53C24
 		mov	al, [si+4]
@@ -7009,20 +7102,20 @@ loc_53BFF:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+167j
 		jmp	short loc_53C20
 ; ���������������������������������������������������������������������������
 
-loc_53C1E:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+178j
-					; Combat_TeamOpposedCheckAndDispatch_53A94+183j
+loc_53C1E:				; CODE XREF: World_OnObjectDestroyed_53A94+178j
+					; World_OnObjectDestroyed_53A94+183j
 		xor	ax, ax
 
-loc_53C20:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+188j
+loc_53C20:				; CODE XREF: World_OnObjectDestroyed_53A94+188j
 		or	al, al
 		jz	short loc_53C2B
 
-loc_53C24:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+16Dj
+loc_53C24:				; CODE XREF: World_OnObjectDestroyed_53A94+16Dj
 		les	bx, [bp+var_10]
 		inc	word ptr es:[bx+40h]
 
-loc_53C2B:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+133j
-					; Combat_TeamOpposedCheckAndDispatch_53A94+13Cj ...
+loc_53C2B:				; CODE XREF: World_OnObjectDestroyed_53A94+133j
+					; World_OnObjectDestroyed_53A94+13Cj ...
 		cmp	si, word_722E6
 		jnz	short loc_53C45
 		mov	[bp+var_12], di
@@ -7033,7 +7126,7 @@ loc_53C2B:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+133j
 		jmp	loc_53D7A
 ; ���������������������������������������������������������������������������
 
-loc_53C45:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+19Bj
+loc_53C45:				; CODE XREF: World_OnObjectDestroyed_53A94+19Bj
 		mov	al, byte_6E4B4
 		mov	ah, 0
 		or	ax, ax
@@ -7041,14 +7134,14 @@ loc_53C45:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+19Bj
 		jmp	loc_53D7A
 ; ���������������������������������������������������������������������������
 
-loc_53C51:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1B8j
+loc_53C51:				; CODE XREF: World_OnObjectDestroyed_53A94+1B8j
 		mov	al, [bp+var_2]
 		mov	ah, 0
 		mov	[bp+var_16], ax
 		mov	cx, 5		; switch 5 cases
 		mov	bx, offset word_53D7E
 
-loc_53C5F:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1D6j
+loc_53C5F:				; CODE XREF: World_OnObjectDestroyed_53A94+1D6j
 		mov	ax, cs:[bx]
 		cmp	ax, [bp+var_16]
 		jz	short loc_53C6F
@@ -7057,7 +7150,7 @@ loc_53C5F:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1D6j
 		jmp	loc_53D6E	; default
 ; ���������������������������������������������������������������������������
 
-loc_53C6F:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1D1j
+loc_53C6F:				; CODE XREF: World_OnObjectDestroyed_53A94+1D1j
 		jmp	word ptr cs:[bx+0Ah] ; switch jump
 
 loc_53C73:				; DATA XREF: seg114:2F28o
@@ -7068,11 +7161,11 @@ loc_53C73:				; DATA XREF: seg114:2F28o
 		jmp	loc_53D6E	; default
 ; ���������������������������������������������������������������������������
 
-loc_53C7F:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1E6j
+loc_53C7F:				; CODE XREF: World_OnObjectDestroyed_53A94+1E6j
 		cmp	[bp+var_6], 0FFh
 		jnz	short loc_53CC9
 		push	si
-		call	Weapon_HUDBox_UpdateAndRenderVariant_5AA49
+		call	Music_OnObjectDestroyed_5AA49
 		pop	cx
 		mov	ah, 0
 		or	ax, ax
@@ -7090,35 +7183,35 @@ loc_53C7F:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1E6j
 		jmp	short loc_53CB8
 ; ���������������������������������������������������������������������������
 
-loc_53CAE:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+20Cj
+loc_53CAE:				; CODE XREF: World_OnObjectDestroyed_53A94+20Cj
 		mov	ax, 10h
 		jmp	short loc_53CBB
 ; ���������������������������������������������������������������������������
 
-loc_53CB3:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+211j
-					; Combat_TeamOpposedCheckAndDispatch_53A94+216j
+loc_53CB3:				; CODE XREF: World_OnObjectDestroyed_53A94+211j
+					; World_OnObjectDestroyed_53A94+216j
 		mov	ax, 11h
 		jmp	short loc_53CBB
 ; ���������������������������������������������������������������������������
 
-loc_53CB8:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+218j
+loc_53CB8:				; CODE XREF: World_OnObjectDestroyed_53A94+218j
 		mov	ax, 12h
 
-loc_53CBB:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+21Dj
-					; Combat_TeamOpposedCheckAndDispatch_53A94+222j
+loc_53CBB:				; CODE XREF: World_OnObjectDestroyed_53A94+21Dj
+					; World_OnObjectDestroyed_53A94+222j
 		cmp	ax, 0FFFFh
 		jz	short loc_53CF2
 		push	ax
 
 loc_53CC1:
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 
 loc_53CC6:
 		pop	cx
 		jmp	short loc_53CF2
 ; ���������������������������������������������������������������������������
 
-loc_53CC9:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1EFj
+loc_53CC9:				; CODE XREF: World_OnObjectDestroyed_53A94+1EFj
 		cmp	[bp+var_6], 1
 
 loc_53CCD:
@@ -7144,19 +7237,19 @@ loc_53CE3:
 		jmp	short loc_53CEB
 ; ���������������������������������������������������������������������������
 
-loc_53CE8:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94:loc_53CDCj
-					; Combat_TeamOpposedCheckAndDispatch_53A94+24Dj
+loc_53CE8:				; CODE XREF: World_OnObjectDestroyed_53A94:loc_53CDCj
+					; World_OnObjectDestroyed_53A94+24Dj
 		mov	ax, 0Fh
 
-loc_53CEB:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+252j
+loc_53CEB:				; CODE XREF: World_OnObjectDestroyed_53A94+252j
 		push	ax
 
 loc_53CEC:
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 		pop	cx
 
-loc_53CF2:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1FCj
-					; Combat_TeamOpposedCheckAndDispatch_53A94+202j ...
+loc_53CF2:				; CODE XREF: World_OnObjectDestroyed_53A94+1FCj
+					; World_OnObjectDestroyed_53A94+202j ...
 		or	di, di
 		jz	short loc_53D6E	; default
 		mov	byte_6E4BB, 0
@@ -7166,8 +7259,8 @@ loc_53CF2:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1FCj
 		jnz	short loc_53D0B
 		mov	byte_6E4C3, 1
 
-loc_53D0B:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+26Bj
-					; Combat_TeamOpposedCheckAndDispatch_53A94+270j
+loc_53D0B:				; CODE XREF: World_OnObjectDestroyed_53A94+26Bj
+					; World_OnObjectDestroyed_53A94+270j
 		cmp	[bp+arg_2], 0
 		jz	short loc_53D39
 		push	[bp+arg_2]
@@ -7185,10 +7278,10 @@ loc_53D0B:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+26Bj
 		jmp	short loc_53D30
 ; ���������������������������������������������������������������������������
 
-loc_53D2E:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+28Aj
+loc_53D2E:				; CODE XREF: World_OnObjectDestroyed_53A94+28Aj
 		mov	al, 17h
 
-loc_53D30:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+298j
+loc_53D30:				; CODE XREF: World_OnObjectDestroyed_53A94+298j
 		cmp	al, 0Dh
 
 loc_53D32:
@@ -7197,8 +7290,8 @@ loc_53D32:
 loc_53D34:
 		mov	byte_6E4C4, 1
 
-loc_53D39:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+27Bj
-					; Combat_TeamOpposedCheckAndDispatch_53A94:loc_53D32j
+loc_53D39:				; CODE XREF: World_OnObjectDestroyed_53A94+27Bj
+					; World_OnObjectDestroyed_53A94:loc_53D32j
 		mov	[bp+var_14], di
 
 loc_53D3C:
@@ -7219,7 +7312,7 @@ loc_53D47:
 		jmp	short loc_53D6E	; default
 ; ���������������������������������������������������������������������������
 
-loc_53D59:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+2BCj
+loc_53D59:				; CODE XREF: World_OnObjectDestroyed_53A94+2BCj
 		mov	al, [bp+var_4]
 		cbw
 		push	ax
@@ -7231,23 +7324,23 @@ loc_53D59:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+2BCj
 		jnz	short loc_53D6E	; default
 		mov	byte_6E4BF, 1
 
-loc_53D6E:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1D8j
-					; Combat_TeamOpposedCheckAndDispatch_53A94+1E8j ...
+loc_53D6E:				; CODE XREF: World_OnObjectDestroyed_53A94+1D8j
+					; World_OnObjectDestroyed_53A94+1E8j ...
 		push	[bp+arg_2]	; default
 		push	si
 		call	UIScreen_SetWidgetValue_50654
 		add	sp, 4
 
-loc_53D7A:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1AEj
-					; Combat_TeamOpposedCheckAndDispatch_53A94+1BAj
+loc_53D7A:				; CODE XREF: World_OnObjectDestroyed_53A94+1AEj
+					; World_OnObjectDestroyed_53A94+1BAj
 		pop	di
 		pop	si
 		leave
 		retf
-Combat_TeamOpposedCheckAndDispatch_53A94	endp
+World_OnObjectDestroyed_53A94	endp
 
 ; ���������������������������������������������������������������������������
-word_53D7E	dw	1,     6,   13h,   14h ; DATA XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1C8o
+word_53D7E	dw	1,     6,   13h,   14h ; DATA XREF: World_OnObjectDestroyed_53A94+1C8o
 		dw    15h		; value	table for switch statement
 		dw offset loc_53C73	; jump table for switch	statement
 		dw offset loc_53C73
@@ -7263,7 +7356,7 @@ word_53D7E	dw	1,     6,   13h,   14h ; DATA XREF: Combat_TeamOpposedCheckAndDisp
 ; ⚠️ far, 395 lignes, NON DÉTAILLÉE — sous-routine récursive de UIScreen_BuildWidgetTree_53A94
 ; (mêmes dispatchs vtable et Expr_Node_Accessor_52E17). Candidat pour session dédiée.
 ; ==============================================================================================
-UIScreen_BuildWidgetTree_Recurse_53D92	proc far		; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+15p
+UIScreen_BuildWidgetTree_Recurse_53D92	proc far		; CODE XREF: World_OnObjectDestroyed_53A94+15p
 
 var_1E		= dword	ptr -1Eh
 var_1A		= dword	ptr -1Ah
@@ -8061,20 +8154,20 @@ Expr_Node_ComputeAggregateField_54121	endp
 
 ; ==============================================================================================
 ; far, référencée depuis seg004 (cœur IA) : combine Expr_Node_Accessor_52E17,
-; Expr_LookupNamedValue_52D08 et GeomNode_SumOffsetsUpChain_50EEB — confirme l'usage du
-; système GeomNode par l'IA de vol/combat pour résoudre des positions de référence. LUE
-; INTEGRALEMENT (verification du lien avec AI_ManeuverSolutionMain_781D0, a la demande de
-; Remi). CONCLUSION : CE N'EST PAS LA MEME FAMILLE. AI_ResolveNodePosition_54274 resout une
-; POSITION NOMMEE en combinant le systeme d'EXPRESSIONS (Expr_Node_Accessor_52E17 /
-; Expr_LookupNamedValue_52D08 - le meme systeme que MissionScript_ExecutePROG) et la
-; HIERARCHIE GEOMETRIQUE (GeomNode_SumOffsetsUpChain_50EEB - somme les decalages en remontant
-; l'arbre de noeuds d'un modele 3D, typiquement pour resoudre un point d'ancrage nomme comme
-; un point de formation ou un point d'attache d'arme). En cas d'echec de resolution, replie
-; sur des valeurs GLOBALES fixes (dword_707F8/7FC/800) ou sur les champs d'un objet reference
-; alternatif (+0x22). AI_ManeuverSolutionMain_781D0, elle, interprete le bytecode COMP pour
-; DEPLACER une entite dans le temps (integrateur cinematique). CE SONT DEUX MECANISMES
-; COMPLEMENTAIRES MAIS DISTINCTS : l'un repond a 'ou est ce point', l'autre anime 'comment s'y
-; deplacer' - aucun lien de classe/famille commun confirme.
+; Expr_LookupNamedValue_52D08 et AreaRelPos_ToWorld_50EEB — confirme l'usage du système
+; GeomNode par l'IA de vol/combat pour résoudre des positions de référence. LUE INTEGRALEMENT
+; (verification du lien avec AI_ManeuverSolutionMain_781D0, a la demande de Remi). CONCLUSION
+; : CE N'EST PAS LA MEME FAMILLE. AI_ResolveNodePosition_54274 resout une POSITION NOMMEE en
+; combinant le systeme d'EXPRESSIONS (Expr_Node_Accessor_52E17 / Expr_LookupNamedValue_52D08 -
+; le meme systeme que MissionScript_ExecutePROG) et la HIERARCHIE GEOMETRIQUE
+; (AreaRelPos_ToWorld_50EEB - somme les decalages en remontant l'arbre de noeuds d'un modele
+; 3D, typiquement pour resoudre un point d'ancrage nomme comme un point de formation ou un
+; point d'attache d'arme). En cas d'echec de resolution, replie sur des valeurs GLOBALES fixes
+; (dword_707F8/7FC/800) ou sur les champs d'un objet reference alternatif (+0x22).
+; AI_ManeuverSolutionMain_781D0, elle, interprete le bytecode COMP pour DEPLACER une entite
+; dans le temps (integrateur cinematique). CE SONT DEUX MECANISMES COMPLEMENTAIRES MAIS
+; DISTINCTS : l'un repond a 'ou est ce point', l'autre anime 'comment s'y deplacer' - aucun
+; lien de classe/famille commun confirme.
 ; ==============================================================================================
 AI_ResolveNodePosition_54274	proc far		; CODE XREF: seg004:081AP seg004:0942P
 
@@ -8137,7 +8230,7 @@ loc_542C1:
 		lea	ax, [bp+var_20]
 		push	ax
 		push	cs
-		call	near ptr GeomNode_SumOffsetsUpChain_50EEB
+		call	near ptr AreaRelPos_ToWorld_50EEB
 
 loc_542D3:
 		add	sp, 8
@@ -8503,8 +8596,8 @@ Expr_Node_UpdateSelectionCounters_544DC	endp
 ; Expr_Node_GetOrRecompute_53236, Expr_Node_ComputeAggregateField_54121, distance (sub_5828E).
 ; Référencée depuis sub_75746. Candidat pour session dédiée.
 ; ==============================================================================================
-UIScreen_RenderOrLayoutList_54503	proc far		; CODE XREF: AITargeting_RenderThreatList_75746+12EP
-					; UIScript_ParseAndEvaluate_7A054+9BP
+UIScreen_RenderOrLayoutList_54503	proc far		; CODE XREF: LandingBehavior_Start_75746+12EP
+					; Autopilot_JumpSequence_7A054+9BP
 
 var_60		= dword	ptr -60h
 var_58		= dword	ptr -58h
@@ -8744,7 +8837,7 @@ loc_546F1:
 		push	ax
 
 loc_546F2:
-		call	Physics_TestGlobalWindActive
+		call	JDYN_IsEngineDestroyed_47FCD
 		pop	cx
 
 loc_546F8:
@@ -8834,8 +8927,8 @@ UIScreen_RenderOrLayoutList_54503	endp
 ; far, référencée DIRECTEMENT par HUD_RenderSymbologyMain (sub_3E744) — confirme l'usage du
 ; système GeomNode/Expr par le rendu HUD pour positionner des éléments de symbologie.
 ; ==============================================================================================
-HUD_ResolveNodePosition_547B1	proc far		; CODE XREF: HUD_RenderSymbologyMain+165P
-					; HUD_RenderSymbologyMain+68CP ...
+HUD_ResolveNodePosition_547B1	proc far		; CODE XREF: WeaponSystem_LaunchFromStation_3E744+165P
+					; WeaponSystem_LaunchFromStation_3E744+68CP ...
 
 arg_0		= word ptr  6
 

@@ -457,7 +457,7 @@ loc_4F19F:				; CODE XREF: seg108:03E9j
 		push	word ptr [bp+0Ah]
 		push	word ptr [bp+8]
 		push	bx
-		call	Damage_SimulationTick
+		call	PolyInstance_Render_2BF6C
 		add	sp, 6
 		leave
 		retf

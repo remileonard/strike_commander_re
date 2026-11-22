@@ -1,0 +1,25 @@
+# Style du code C++ (regles de Remi, 2026-10-10) :
+#  - if / for / while / do toujours avec { }, accolade ouvrante sur la ligne de l'instruction ;
+#  - une seule instruction par ligne, y compris les declarations de variables ;
+#  - une liste d'initialisation de plus d'une valeur : une valeur par ligne.
+# clang-format applique les deux premiers points (sauf les declarations multiples, et
+# ColumnLimit 0 conserve les retours a la ligne choisis) ; tools/style_check.py verifie le tout.
+BasedOnStyle: LLVM
+IndentWidth: 4
+ColumnLimit: 0
+InsertBraces: true
+BreakBeforeBraces: Attach
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: None
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortLambdasOnASingleLine: None
+AllowShortEnumsOnASingleLine: false
+IndentCaseLabels: false
+NamespaceIndentation: None
+AccessModifierOffset: -4
+PointerAlignment: Right
+SortIncludes: Never
+ReflowComments: false
+Cpp11BracedListStyle: false

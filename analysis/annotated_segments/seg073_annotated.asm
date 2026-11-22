@@ -239,8 +239,8 @@ Terrain_SectorLoadOnDemand	endp
 ; far,20L — incrémente un compteur de référence indexé (table à 0x553E) : incrément de
 ; compteur de référence d'un secteur de terrain.
 ; ==============================================================================================
-Terrain_SectorRefInc	proc far		; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F:loc_99C83P
-					; IndexedRecordReader_ScanAndReadTypedB_99B7F+117P
+Terrain_SectorRefInc	proc far		; CODE XREF: Terrain_LoadElevCell_99B7F:loc_99C83P
+					; Terrain_LoadElevCell_99B7F+117P
 
 arg_0		= byte ptr  6
 
@@ -549,7 +549,7 @@ loc_33796:
 		push	ss
 		lea	ax, [bp+var_C]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	di, si
 		add	di, 3Fh	; '?'
@@ -1942,13 +1942,13 @@ loc_34411:				; CODE XREF: Terrain_StreamingMain+31Dj
 					; Terrain_StreamingMain+336j
 		lea	ax, [bp+var_12A]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		lea	ax, [bp+var_11E]
 		push	ax
 
 loc_34421:
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 
 loc_34427:
@@ -1965,7 +1965,7 @@ loc_34436:
 		push	ax
 
 loc_34437:
-		call	Vector_TransformHelperA_550B7
+		call	Vector_CrossProduct3D_550B7
 		add	sp, 8
 		cmp	[bp+var_1BE], 0
 		jge	short loc_3444C

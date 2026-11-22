@@ -11,7 +11,7 @@ seg115		segment	byte public 'CODE' use16
 ; far, normalise un angle fixe (24.8, unité 0x16800=360°) dans l'intervalle [-180°,+180°]
 ; (0xB400) par additions/soustractions successives d'un tour complet.
 ; ==============================================================================================
-Math_NormalizeAngle180_547EF	proc far		; CODE XREF: Math_Sin_5483F+Fp Math_Cos_54876+Fp ...
+Math_NormalizeAngle180_547EF	proc far		; CODE XREF: Math_CosDeg_5483F+Fp Math_SinDeg_54876+Fp ...
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -73,11 +73,12 @@ Math_NormalizeAngle180_547EF	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, normalise l'angle (Math_NormalizeAngle180) puis appelle sub_580A7 (sinus fixe).
-; Référencée par le cœur IA (seg002/seg003) et AI_ManeuverSolution.
+; far, LUE (2026-09-24). Ex-'Math_Sin' : NOM INVERSE, c'est un COSINUS.
+; Math_NormalizeAngle180_547EF(angle 24.8 en degres) puis Math_CosRaw_580A7 ; resultat 24.8
+; dans *arg_0.
 ; ==============================================================================================
-Math_Sin_5483F	proc far		; CODE XREF: AI_ManeuverSolution_Major+214P
-					; AI_VisibilityTest+1F5P ...
+Math_CosDeg_5483F	proc far		; CODE XREF: AI_GunSnapAim_6977+214P
+					; AI_CollisionCourseTest_DD21+1F5P ...
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -96,7 +97,7 @@ arg_4		= word ptr  0Ah
 		call	near ptr Math_NormalizeAngle180_547EF
 		add	sp, 6
 		push	large [bp+var_8]
-		call	Math_Sin_Raw_580A7
+		call	Math_CosRaw_580A7
 		push	dx
 		push	ax
 		pop	eax
@@ -108,7 +109,7 @@ arg_4		= word ptr  0Ah
 		mov	ax, [bp+arg_0]
 		leave
 		retf
-Math_Sin_5483F	endp
+Math_CosDeg_5483F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -116,10 +117,11 @@ Math_Sin_5483F	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, normalise l'angle puis appelle sub_58063 (cosinus fixe). Référencée par le cœur IA
-; (seg002/seg003).
+; far, LUE (2026-09-24). Ex-'Math_Cos' : NOM INVERSE, c'est un SINUS.
+; Math_NormalizeAngle180_547EF(angle 24.8 en degres) puis Math_SinRaw_58063 ; resultat 24.8
+; dans *arg_0.
 ; ==============================================================================================
-Math_Cos_54876	proc far		; CODE XREF: seg002:0F18P seg003:0CD3P ...
+Math_SinDeg_54876	proc far		; CODE XREF: seg002:0F18P seg003:0CD3P ...
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -138,7 +140,7 @@ arg_4		= word ptr  0Ah
 		call	near ptr Math_NormalizeAngle180_547EF
 		add	sp, 6
 		push	large [bp+var_8]
-		call	Math_Cos_Raw_58063
+		call	Math_SinRaw_58063
 		push	dx
 		push	ax
 		pop	eax
@@ -150,7 +152,7 @@ arg_4		= word ptr  0Ah
 		mov	ax, [bp+arg_0]
 		leave
 		retf
-Math_Cos_54876	endp
+Math_SinDeg_54876	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -262,9 +264,10 @@ Math_Tan_548AD	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, arc sinus fixe (délègue à sub_581E3). Référencée par AI_GuidanceSolution_Major_702A.
+; far, LUE (2026-09-24). Ex-'Math_ArcSin' : NOM INVERSE, ARC COSINUS. Si |x| <= 1.0 :
+; Math_AcosRaw_581E3(x), sinon 0. Resultat en degres 24.8 dans *arg_0.
 ; ==============================================================================================
-Math_ArcSin_5493E	proc far		; CODE XREF: AI_GuidanceSolution_Major+2EFP
+Math_AcosDeg_5493E	proc far		; CODE XREF: AI_GuidanceSolution_Major+2EFP
 					; seg015:042BP	...
 
 var_C		= dword	ptr -0Ch
@@ -293,7 +296,7 @@ loc_54946:
 		jge	short loc_5495E
 		neg	eax
 
-loc_5495E:				; CODE XREF: Math_ArcSin_5493E+1Bj
+loc_5495E:				; CODE XREF: Math_AcosDeg_5493E+1Bj
 		mov	[bp+var_8], eax
 		mov	eax, [bp+var_8]
 		mov	[bp+var_C], eax
@@ -303,21 +306,21 @@ loc_5495E:				; CODE XREF: Math_ArcSin_5493E+1Bj
 		jmp	short loc_5497B
 ; ���������������������������������������������������������������������������
 
-loc_54979:				; CODE XREF: Math_ArcSin_5493E+34j
+loc_54979:				; CODE XREF: Math_AcosDeg_5493E+34j
 		xor	ax, ax
 
-loc_5497B:				; CODE XREF: Math_ArcSin_5493E+39j
+loc_5497B:				; CODE XREF: Math_AcosDeg_5493E+39j
 		or	al, al
 		jz	short loc_54992
 		push	large dword ptr	[si]
-		call	Math_ArcSin_Raw_581E3
+		call	Math_AcosRaw_581E3
 		push	dx
 		push	ax
 		pop	eax
 		add	sp, 4
 		mov	[bp+var_4], eax
 
-loc_54992:				; CODE XREF: Math_ArcSin_5493E+3Fj
+loc_54992:				; CODE XREF: Math_AcosDeg_5493E+3Fj
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_4]
 		mov	[bx], eax
@@ -327,7 +330,7 @@ loc_54992:				; CODE XREF: Math_ArcSin_5493E+3Fj
 		pop	si
 		leave
 		retf
-Math_ArcSin_5493E	endp
+Math_AcosDeg_5493E	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -335,10 +338,11 @@ Math_ArcSin_5493E	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, arc cosinus fixe (délègue à sub_581A0).
+; far, LUE (2026-09-24). Ex-'Math_ArcCos' : NOM INVERSE, ARC SINUS. Si |x| <= 1.0 :
+; Math_AsinRaw_581A0(x), sinon 0. Resultat en degres 24.8 dans *arg_0.
 ; ==============================================================================================
-Math_ArcCos_549A6	proc far		; CODE XREF: AI_ComputeBearingToRef+64P
-					; Math_ArcCosOfRatio_54A76+46p
+Math_AsinDeg_549A6	proc far		; CODE XREF: AI_ComputeBearingToRef+64P
+					; Math_AsinOfRatio_54A76+46p
 
 var_C		= dword	ptr -0Ch
 var_8		= dword	ptr -8
@@ -360,7 +364,7 @@ arg_4		= word ptr  0Ah
 		jge	short loc_549C6
 		neg	eax
 
-loc_549C6:				; CODE XREF: Math_ArcCos_549A6+1Bj
+loc_549C6:				; CODE XREF: Math_AsinDeg_549A6+1Bj
 		mov	[bp+var_8], eax
 
 loc_549CA:
@@ -374,14 +378,14 @@ loc_549D2:
 		jmp	short loc_549E3
 ; ���������������������������������������������������������������������������
 
-loc_549E1:				; CODE XREF: Math_ArcCos_549A6+34j
+loc_549E1:				; CODE XREF: Math_AsinDeg_549A6+34j
 		xor	ax, ax
 
-loc_549E3:				; CODE XREF: Math_ArcCos_549A6+39j
+loc_549E3:				; CODE XREF: Math_AsinDeg_549A6+39j
 		or	al, al
 		jz	short loc_549FA
 		push	large dword ptr	[si]
-		call	Math_ArcCos_Raw_581A0
+		call	Math_AsinRaw_581A0
 		push	dx
 		push	ax
 		pop	eax
@@ -390,7 +394,7 @@ loc_549F3:
 		add	sp, 4
 		mov	[bp+var_4], eax
 
-loc_549FA:				; CODE XREF: Math_ArcCos_549A6+3Fj
+loc_549FA:				; CODE XREF: Math_AsinDeg_549A6+3Fj
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_4]
 
@@ -402,7 +406,7 @@ loc_54A01:
 		pop	si
 		leave
 		retf
-Math_ArcCos_549A6	endp
+Math_AsinDeg_549A6	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -410,10 +414,10 @@ Math_ArcCos_549A6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, calcule un ratio (dividende/diviseur, garde contre diviseur nul) puis Math_ArcSin_5493E
-; — arcsin(num/den). Référencée par seg030 (zoom carte/radar).
+; far, LUE (2026-09-24). Ex-'Math_ArcSinOfRatio' : NOM INVERSE. Si den != 0 :
+; Math_AcosDeg_5493E(num/den) (arc COSINUS), sinon 0.
 ; ==============================================================================================
-Math_ArcSinOfRatio_54A0E	proc far		; CODE XREF: seg030:18C0P
+Math_AcosOfRatio_54A0E	proc far		; CODE XREF: seg030:18C0P
 					; Render_PolygonProjectVertices:loc_2FDCFP	...
 
 var_10		= dword	ptr -10h
@@ -456,12 +460,12 @@ loc_54A42:
 		lea	ax, [bp+var_10]
 		push	ax
 		push	cs
-		call	near ptr Math_ArcSin_5493E
+		call	near ptr Math_AcosDeg_5493E
 		add	sp, 6
 		mov	eax, [bp+var_10]
 		mov	[bp+var_4], eax
 
-loc_54A62:				; CODE XREF: Math_ArcSinOfRatio_54A0E+1Aj
+loc_54A62:				; CODE XREF: Math_AcosOfRatio_54A0E+1Aj
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_4]
 		mov	[bx], eax
@@ -471,7 +475,7 @@ loc_54A62:				; CODE XREF: Math_ArcSinOfRatio_54A0E+1Aj
 		pop	si
 		leave
 		retf
-Math_ArcSinOfRatio_54A0E	endp
+Math_AcosOfRatio_54A0E	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -479,11 +483,11 @@ Math_ArcSinOfRatio_54A0E	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, variante de Math_ArcSinOfRatio pour Math_ArcCos_549A6 — arccos(num/den). Référencée par
-; Guidance_HomingVelocityUpdate (sub_49C2E).
+; far, LUE (2026-09-24). Ex-'Math_ArcCosOfRatio' : NOM INVERSE. Si den != 0 :
+; Math_AsinDeg_549A6(num/den) (arc SINUS), sinon 0.
 ; ==============================================================================================
-Math_ArcCosOfRatio_54A76	proc far		; CODE XREF: Guidance_HomingVelocityUpdate+6D9P
-					; Guidance_HomingVelocityUpdate+765P ...
+Math_AsinOfRatio_54A76	proc far		; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+6D9P
+					; Autopilot_FlyToPointKinematic_49C2E+765P ...
 
 var_10		= dword	ptr -10h
 var_C		= dword	ptr -0Ch
@@ -519,14 +523,14 @@ arg_6		= word ptr  0Ch
 		lea	ax, [bp+var_10]
 		push	ax
 		push	cs
-		call	near ptr Math_ArcCos_549A6
+		call	near ptr Math_AsinDeg_549A6
 		add	sp, 6
 
 loc_54AC2:
 		mov	eax, [bp+var_10]
 		mov	[bp+var_4], eax
 
-loc_54ACA:				; CODE XREF: Math_ArcCosOfRatio_54A76+1Aj
+loc_54ACA:				; CODE XREF: Math_AsinOfRatio_54A76+1Aj
 		mov	bx, [bp+arg_0]
 
 loc_54ACD:
@@ -540,7 +544,7 @@ loc_54AD4:
 		pop	si
 		leave
 		retf
-Math_ArcCosOfRatio_54A76	endp
+Math_AsinOfRatio_54A76	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -551,7 +555,7 @@ Math_ArcCosOfRatio_54A76	endp
 ; far, arc tangente fixe (délègue à sub_58223).
 ; ==============================================================================================
 Math_ArcTan_54ADE	proc far		; CODE XREF: AI_IncomingThreatWarning+25AP
-					; AI_ManeuverSolution_Major+59FP ...
+					; AI_GunSnapAim_6977+59FP ...
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -746,7 +750,7 @@ Math_ArcTan2_54B0A	endp
 ; mise à l'échelle) si l'entrée est négative. Référencée par AI_ManeuverSolution_Major_6977 et
 ; AI_CombatDecision_Major_75F8.
 ; ==============================================================================================
-Math_Sqrt_54BF1	proc far		; CODE XREF: AI_ManeuverSolution_Major+15CP
+Math_Sqrt_54BF1	proc far		; CODE XREF: AI_GunSnapAim_6977+15CP
 					; AI_CombatDecision_Major+171P ...
 
 var_4		= dword	ptr -4
@@ -799,8 +803,8 @@ Math_Sqrt_54BF1	endp
 ; far, carré fixe (24.8) : x*x avec décalage 8 bits (imul+shrd). Référencée deux fois par
 ; AI_ManeuverSolution_Major_6977.
 ; ==============================================================================================
-Math_Square_54C39	proc far		; CODE XREF: AI_ManeuverSolution_Major+12AP
-					; AI_ManeuverSolution_Major+13BP ...
+Math_Square_54C39	proc far		; CODE XREF: AI_GunSnapAim_6977+12AP
+					; AI_GunSnapAim_6977+13BP ...
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -1082,8 +1086,8 @@ UIScreen_BuildFormattedText_54CC9	endp
 ; far, multiplie une valeur par un nombre pseudo-aléatoire (sub_70D) mis à l'échelle (÷0x8000)
 ; — magnitude aléatoire. Référencée deux fois par AI_ManeuverSolution_Major_6977.
 ; ==============================================================================================
-Math_RandomScale_54DF4	proc far		; CODE XREF: AI_ManeuverSolution_Major+16BP
-					; AI_ManeuverSolution_Major+174P ...
+Math_RandomScale_54DF4	proc far		; CODE XREF: AI_GunSnapAim_6977+16BP
+					; AI_GunSnapAim_6977+174P ...
 
 var_2		= word ptr -2
 
@@ -1111,8 +1115,8 @@ Math_RandomScale_54DF4	endp
 ; far, variante de Math_RandomScale centrée : retourne une valeur aléatoire dans [-x,+x].
 ; Référencée par sub_3844F.
 ; ==============================================================================================
-Math_RandomJitter_54E1C	proc far		; CODE XREF: Debris_SpawnAtAttachPoint+BAP
-					; Debris_SpawnAtAttachPoint+D9P ...
+Math_RandomJitter_54E1C	proc far		; CODE XREF: Debris_SpawnFromDebrList_3844F+BAP
+					; Debris_SpawnFromDebrList_3844F+D9P ...
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -1156,7 +1160,7 @@ Math_RandomJitter_54E1C	endp
 ; par sub_4D04E et ChaseCamera_RenderEffect_4D1C9 (spawn probabiliste d'effet).
 ; ==============================================================================================
 Math_RandomChance_54E4F	proc far		; CODE XREF: Particle_SpawnWithColor+132P
-					; Elements_SpawnAlongSegment_4D1C9+310P ...
+					; Particles_SpawnAlongSegment_4D1C9+310P ...
 
 var_4		= word ptr -4
 var_2		= word ptr -2

@@ -71,7 +71,7 @@ VROOMM_StubThunk_6CDAF	endp
 ; d'overlay actuellement charge en memoire. fileoff=36060h, codesize=0A17h, nentries=13.
 ; ==============================================================================================
 VROOMM_StubThunk_6CDB4	proc far
-		jmp	MissionLoader_LoadPosition_A7A10
+		jmp	World_LoadLGHTChunk_A7A10
 VROOMM_StubThunk_6CDB4	endp
 
 
@@ -84,7 +84,7 @@ VROOMM_StubThunk_6CDB4	endp
 ; d'overlay actuellement charge en memoire. fileoff=36060h, codesize=0A17h, nentries=13.
 ; ==============================================================================================
 VROOMM_StubThunk_6CDB9	proc far
-		jmp	MissionLoader_LoadChunkB_A7CA1
+		jmp	World_LoadSmokeSet_A7CA1
 VROOMM_StubThunk_6CDB9	endp
 
 

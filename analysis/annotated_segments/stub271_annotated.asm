@@ -18,8 +18,8 @@ stru_6B8C0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0936o
 ; far, thunk fixe VROOMM (jmp sub_94C80) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=229D0h, codesize=148h, nentries=3.
 ; ==============================================================================================
-VROOMM_StubThunk_6B8E0	proc far		; CODE XREF: AircraftComponent_LoadMixedFieldsB_96321+C6P
-		jmp	MissionText_AllocateMultiBuffer_94C80
+VROOMM_StubThunk_6B8E0	proc far		; CODE XREF: Poly_LoadFromIFF_96321+C6P
+		jmp	Poly_BuildFaceElements_94C80
 VROOMM_StubThunk_6B8E0	endp
 
 
@@ -32,7 +32,7 @@ VROOMM_StubThunk_6B8E0	endp
 ; d'overlay actuellement charge en memoire. fileoff=229D0h, codesize=148h, nentries=3.
 ; ==============================================================================================
 VROOMM_StubThunk_6B8E5	proc far
-		jmp	MissionText_ReleaseSubrecordA_94BF0
+		jmp	Poly_LoadLINS_94BF0
 VROOMM_StubThunk_6B8E5	endp
 
 
@@ -45,7 +45,7 @@ VROOMM_StubThunk_6B8E5	endp
 ; d'overlay actuellement charge en memoire. fileoff=229D0h, codesize=148h, nentries=3.
 ; ==============================================================================================
 VROOMM_StubThunk_6B8EA	proc far
-		jmp	MissionText_ReleaseSubrecordB_94C38
+		jmp	Poly_LoadSPRS_94C38
 VROOMM_StubThunk_6B8EA	endp
 
 stub271		ends

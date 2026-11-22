@@ -531,7 +531,7 @@ loc_82EE1:
 		push	ax
 		lea	ax, [bp+var_DE]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		lea	ax, [bp+var_DE]
 		push	ax
@@ -592,7 +592,7 @@ loc_82FB1:				; CODE XREF: HUDSymbol_RenderWithClipTestD_82DEB+1C2j
 		push	ax
 		lea	ax, [bp+var_11A]
 		push	ax
-		call	UI_ApplyLineOfSightCheck_55A9E
+		call	Vector_SetLength_55A9E
 		add	sp, 4
 		mov	eax, [bp+var_DE]
 		sub	eax, [bp+var_11A]
@@ -1679,8 +1679,8 @@ HUDSymbol_ConstructWithMatrix_839CA	endp
 ; ==============================================================================================
 ; ⚠️ far, 140 lignes, NON DÉTAILLÉE — combine longueur vectorielle,
 ; UI_ApplyLineOfSightAndTransform_57DAE, Camera_ComputeViewMatrix,
-; Missile_ComputeDirectionVector2D_556D4 (×2, seg116) — probable affichage d'un vecteur de
-; direction de missile sur le HUD.
+; Vector_RotateHeading2D_556D4 (×2, seg116) — probable affichage d'un vecteur de direction de
+; missile sur le HUD.
 ; ==============================================================================================
 HUDSymbol_RenderMissileDirection_83A42	proc far		; CODE XREF: VROOMM_StubThunk_6AFFBJ
 
@@ -1780,7 +1780,7 @@ loc_83AF0:				; CODE XREF: HUDSymbol_RenderMissileDirection_83A42+12j
 		mov	ax, si
 		add	ax, 20h	; ' '
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 		mov	ax, [si+8Bh]
 		mov	[bp+var_8], ax
@@ -1792,7 +1792,7 @@ loc_83AF0:				; CODE XREF: HUDSymbol_RenderMissileDirection_83A42+12j
 		mov	ax, si
 		add	ax, 2Ch	; ','
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 		mov	ax, [si+8Bh]
 		mov	[bp+var_E], ax
@@ -1804,12 +1804,12 @@ loc_83AF0:				; CODE XREF: HUDSymbol_RenderMissileDirection_83A42+12j
 		mov	ax, si
 		add	ax, 38h	; '8'
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 		mov	ax, si
 		add	ax, 20h	; ' '
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		push	si
 		call	Camera_ComputeViewMatrix
@@ -2177,8 +2177,8 @@ HUDSymbol_ConstructAndInitAngleD_83CE9	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 189 lignes, NON DÉTAILLÉE — combine SetReference16, Matrix_BuildFromAngle_56D72,
-; Matrix_BuildAxisZ_572BC, Matrix_BuildAxisX_56EC3, Matrix_ApplyToVectorY_57660 (seg116) —
-; construction de matrice d'orientation complète pour un symbole HUD.
+; Matrix_BuildAxisZ_572BC, Matrix_BuildAxisX_56EC3, Matrix_OrthonormalizeKeepRow1_57660
+; (seg116) — construction de matrice d'orientation complète pour un symbole HUD.
 ; ==============================================================================================
 HUDSymbol_ConstructWithFullMatrix_83DD7	proc far		; CODE XREF: VROOMM_StubThunk_6B02DJ HUDSymbol_Helper7_84337+59p	...
 
@@ -2304,7 +2304,7 @@ loc_83E83:				; CODE XREF: HUDSymbol_ConstructWithFullMatrix_83DD7+8Bj
 		mov	ax, si
 		add	ax, 20h	; ' '
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		mov	eax, [si+2Ch]
 		neg	eax
@@ -2377,8 +2377,8 @@ HUDSymbol_ConstructWithFullMatrix_83DD7	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 207 lignes, NON DÉTAILLÉE — combine SetReference16 (×2),
-; Math_VectorLength3D_Scaled_54F57, Math_AngleBetweenVectors_552E1,
-; AI_ComputeApproachAngles_553CF (seg116) — affichage HUD d'angle d'approche.
+; Math_VectorLength3D_Scaled_54F57, Math_ElevationAngle_552E1, Math_HeadingAngle_553CF
+; (seg116) — affichage HUD d'angle d'approche.
 ; ==============================================================================================
 HUDSymbol_ComputeApproachDisplay_83FC9	proc far		; CODE XREF: VROOMM_StubThunk_6B032J
 
@@ -2564,7 +2564,7 @@ loc_84133:				; CODE XREF: HUDSymbol_ComputeApproachDisplay_83FC9+165j
 		push	ss
 		lea	ax, [bp+var_34]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 
 loc_8414F:
 		add	sp, 6
@@ -2577,7 +2577,7 @@ loc_84156:
 		push	ss
 		lea	ax, [bp+var_38]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	eax, [bp+var_38]
 		mov	dword_6D77B, eax
@@ -2594,8 +2594,10 @@ HUDSymbol_ComputeApproachDisplay_83FC9	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 217 lignes, NON DÉTAILLÉE — combine Math_Cos_54876, Camera_TransformPoint,
-; Math_ArcCosOfRatio_54A76 (seg115) — affichage HUD de gisement.
+; ⚠️ far, 217 lignes, NON DÉTAILLÉE — combine Math_SinDeg_54876, Camera_TransformPoint,
+; Math_AsinOfRatio_54A76 (seg115) — affichage HUD de gisement. ⚠️ (2026-09-24) Math_Sin_5483F
+; / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute
+; mention de sinus/cosinus tiree de ces noms dans ce resume est a relire.
 ; ==============================================================================================
 HUDSymbol_ComputeBearingDisplay_8417C	proc far		; CODE XREF: VROOMM_StubThunk_6B00AJ HUDSymbol_ProcessJoystickAndFilter_843B5+25Dp
 
@@ -2639,7 +2641,7 @@ arg_2		= word ptr  8
 		push	ss
 		lea	ax, [bp+var_4]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	ax, si
 		add	ax, 8Ch	; '�'
@@ -2776,7 +2778,7 @@ loc_842C5:				; CODE XREF: HUDSymbol_ComputeBearingDisplay_8417C+135j
 		push	ss
 		lea	ax, [bp+var_38]
 		push	ax
-		call	Math_ArcCosOfRatio_54A76
+		call	Math_AsinOfRatio_54A76
 		add	sp, 8
 		mov	eax, [bp+var_38]
 		neg	eax
@@ -3259,7 +3261,7 @@ loc_84646:
 		mov	ax, si
 		add	ax, 20h	; ' '
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		mov	eax, [si+2Ch]
 		neg	eax

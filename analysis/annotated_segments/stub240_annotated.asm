@@ -45,7 +45,7 @@ VROOMM_StubThunk_6ADF5	endp
 ; d'overlay actuellement charge en memoire. fileoff=9F80h, codesize=0B74h, nentries=3.
 ; ==============================================================================================
 VROOMM_StubThunk_6ADFA	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP+7BP
-		jmp	MissionRecord_LoadAndBuildWidgetTree_7D31A
+		jmp	Player_EjectSequence_7D31A
 VROOMM_StubThunk_6ADFA	endp
 
 stub240		ends

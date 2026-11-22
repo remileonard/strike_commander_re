@@ -19,8 +19,8 @@ ovr229		segment	para public 'OVERLAY' use16
 ; Anciennement mal nommee TargetTrackObject_Construct (aucun rapport avec le suivi de cible,
 ; erreur du balayage rapide initial). CLASSE COMPLETE IDENTIFIEE (ovr229, 5 fonctions, 161
 ; lignes au total - confirme l'hypothese 'un overlay = une classe C++') : voir
-; NotifiableRef_AttachTarget_75612, NotifiableRef_DetachTarget_75661,
-; NotifiableRef_SwapTarget_756A4, NotifiableRef_Destructor_756D5.
+; Behavior_PopFinished_75612, NotifiableRef_DetachTarget_75661, Behavior_PushRunning_756A4,
+; NotifiableRef_Destructor_756D5.
 ; ==============================================================================================
 PilotProfile_NamedPropertyNode_Construct_755A0	proc far		; CODE XREF: VROOMM_StubThunk_6AB4AJ
 
@@ -74,15 +74,12 @@ PilotProfile_NamedPropertyNode_Construct_755A0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 31 lignes - CONFIRME methode de la classe 'reference notifiable' (ovr229, meme classe
-; que PilotProfile_NamedPropertyNode_Construct_755A0). Appelee via VROOMM_StubThunk_6AB45.
-; Copie this+4/+6 (dword) vers l'objet cible dereference (this+8 -> +0xF/+0xD), copie
-; this+0x21 (byte) vers cible+0x19, reinitialise this+0xC=0. SI this+4 (dword) == 0 : appelle
-; la methode virtuelle [vtable+0x1Ch] du POINTEUR CIBLE avec argument 1 - probable
-; notification 'attache-toi a moi' quand la cible n'a pas encore de valeur de retour en cache.
-; Anciennement mal nommee TargetTrackObject_Helper (balayage rapide, jamais revalidee).
+; far, LUE (2026-09-24). Ex-'NotifiableRef_AttachTarget'. Termine un comportement :
+; [noeud+8]+0x0D = noeud+4 (restaure le precedent), [noeud+8]+0x19 = noeud+0x21 (identifiant
+; du comportement termine), noeud+0x0C = 0 ; s'il n'y avait pas de precedent :
+; [noeud+8]->vtable+0x1C(1).
 ; ==============================================================================================
-NotifiableRef_AttachTarget_75612	proc far		; CODE XREF: VROOMM_StubThunk_6AB45J
+Behavior_PopFinished_75612	proc far		; CODE XREF: VROOMM_StubThunk_6AB45J
 
 arg_0		= dword	ptr  6
 
@@ -109,10 +106,10 @@ arg_0		= dword	ptr  6
 		call	dword ptr [bx+1Ch]
 		add	sp, 6
 
-loc_7565F:				; CODE XREF: NotifiableRef_AttachTarget_75612+37j
+loc_7565F:				; CODE XREF: Behavior_PopFinished_75612+37j
 		pop	bp
 		retf
-NotifiableRef_AttachTarget_75612	endp
+Behavior_PopFinished_75612	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -120,9 +117,9 @@ NotifiableRef_AttachTarget_75612	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 25 lignes - CONFIRME methode SOEUR de NotifiableRef_AttachTarget_75612 (meme classe,
-; ovr229). Appelee via VROOMM_StubThunk_6AB54 - CONNEXION MAJEURE : ce thunk est le meme que
-; celui appele partout dans le code IA pour 'notifier la cible' (AIEntity_MasterTick_5ACC,
+; far, 25 lignes - CONFIRME methode SOEUR de Behavior_PopFinished_75612 (meme classe, ovr229).
+; Appelee via VROOMM_StubThunk_6AB54 - CONNEXION MAJEURE : ce thunk est le meme que celui
+; appele partout dans le code IA pour 'notifier la cible' (AIEntity_MasterTick_5ACC,
 ; Entity_ProximityTest_ThreatGate_315B, et d'autres) - confirme que le mecanisme de
 ; notification de cible dissemine dans tout le systeme IA appartient a CETTE CLASSE, qui n'est
 ; donc PAS reservee aux noeuds de propriete MVRS mais sert de wrapper de reference notifiable
@@ -163,12 +160,11 @@ NotifiableRef_DetachTarget_75661	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 21 lignes - CONFIRME methode de la meme classe (ovr229) : operation 'echange' entre
-; this et sa cible dereferencee (this+8) - lit cible+0xF/+0xD et les copie vers this+6/+4,
-; PUIS ecrit une nouvelle valeur (argument passe en this+2/this) dans cible+0xF/+0xD. Get-
-; then-set sur le meme champ. Anciennement mal nommee TargetTrackObject_Helper3.
+; far, LUE (2026-09-24). Ex-'NotifiableRef_SwapTarget'. Empile un comportement : noeud+4 =
+; [noeud+8]+0x0D (comportement en cours precedent), [noeud+8]+0x0D = noeud. [noeud+8] =
+; l'entite.
 ; ==============================================================================================
-NotifiableRef_SwapTarget_756A4	proc far		; CODE XREF: VROOMM_StubThunk_6AB4FJ
+Behavior_PushRunning_756A4	proc far		; CODE XREF: VROOMM_StubThunk_6AB4FJ
 
 arg_0		= dword	ptr  6
 
@@ -188,7 +184,7 @@ arg_0		= dword	ptr  6
 		mov	es:[bx+0Dh], dx
 		pop	bp
 		retf
-NotifiableRef_SwapTarget_756A4	endp
+Behavior_PushRunning_756A4	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

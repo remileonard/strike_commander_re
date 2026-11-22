@@ -38,7 +38,7 @@ loc_5F57B:				; CODE XREF: seg159:0014j seg159:0023j
 ; far, insère un nœud en queue de la même structure de liste. Référencée par sub_1F4BB et
 ; sub_2387E.
 ; ==============================================================================================
-LinkedListB_InsertAtTail_5F57F	proc far		; CODE XREF: UIList_CreateMarker+55P
+LinkedListB_InsertAtTail_5F57F	proc far		; CODE XREF: Rwr_AddContact_1F4BB+55P
 					; EntityTracker_AddEntryObj+1BP ...
 
 arg_0		= word ptr  6
@@ -358,7 +358,7 @@ LinkedListB_Helper_5F6A9	endp
 ; ==============================================================================================
 ; far, aucun appel externe visible (rôle exact non détaillé).
 ; ==============================================================================================
-LinkedListB_Helper_5F6D5	proc far		; CODE XREF: ListItem_AddNumberedLimited+46P
+LinkedListB_Helper_5F6D5	proc far		; CODE XREF: LightSet_InsertLight_2B266+46P
 					; TerrainTile_CacheEntryConstruct+CP	...
 
 var_4		= dword	ptr -4

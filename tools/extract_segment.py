@@ -19,6 +19,7 @@ Deux styles de fonctions coexistent dans strike.asm :
 
 Usage :
     python3 extract_segment.py <nom_segment>
+    python3 extract_segment.py --exe optest <nom_segment>   # optest.asm
     python3 extract_segment.py seg114
     python3 extract_segment.py ovr239
     python3 extract_segment.py stub227
@@ -144,15 +145,17 @@ def extract_functions(lines, lo, hi, seg_name):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
+    from exe_paths import paths, pop_exe_arg
+    exe, args = pop_exe_arg(sys.argv[1:])
+    if len(args) != 1:
         print(__doc__)
         sys.exit(1)
-    asm = load_asm()
+    asm = load_asm(paths(exe)['asm'])
     segs = find_segments(asm)
-    seg_name = sys.argv[1]
+    seg_name = args[0]
     if seg_name not in segs:
         print(f"Segment '{seg_name}' introuvable. Segments disponibles : "
-              f"{len(segs)} au total (voir analysis/segment_boundaries.json).")
+              f"{len(segs)} au total (voir segment_boundaries.json de l'exécutable).")
         sys.exit(1)
     lo, hi = segs[seg_name]
     funcs = extract_functions(asm, lo, hi, seg_name)

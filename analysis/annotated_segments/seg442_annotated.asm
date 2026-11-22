@@ -4651,7 +4651,7 @@ PaletteScreen_ReleaseResources_A296C	endp
 
 ; ==============================================================================================
 ; far, combine PaletteScreen_DrawWidgetBorderWrapper_A21A1, Memory_TypedAllocDispatchB_5C832,
-; Render_MeasureOrDrawTextString_61F52 (seg174).
+; Shape_DrawSpans_61F52 (seg174).
 ; ==============================================================================================
 PaletteScreen_MeasureAndDrawBorder_A29B4	proc far		; CODE XREF: VROOMM_StubThunk_6C80CJ
 
@@ -4713,7 +4713,7 @@ loc_A2A02:
 		push	[bp+var_4]
 		push	[bp+var_2]
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	si
 		push	cs
@@ -4846,7 +4846,7 @@ loc_A2AB1:
 
 loc_A2AD1:
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	word_6FEDC
 		push	0FFh

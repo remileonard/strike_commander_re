@@ -364,7 +364,7 @@ loc_3CEED:				; DATA XREF: seg339:off_6ECA2o
 		lea	ax, [bp-0Ch]
 		push	ax
 		push	si
-		call	Debris_BodyIntegrateForces
+		call	WorldObject_TranslateBy_37D54
 		add	sp, 8
 		pop	si
 		leave
@@ -929,21 +929,21 @@ loc_3D319:				; CODE XREF: seg085:06B5j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,233L — TICK PAR FRAME DE LA POSITION D'UNE CAMÉRA EXTERNE ATTACHÉE (seg087:0250 ; vtable
-; seg339:off_6F6DC). si = objet caméra. (1) Vlin = si[+0x51] ? mount[+8/+0xC/+0x10] *
-; dword_7045E/256 : (0,0,0) (dword_707F8/FC/800). (2) Debris_BodyIntegrateForces_37D54(si,
-; &Vlin) => si[+0x12/+0x16/+0x1A] += Vlin — la position n'est PAS posée en absolu, elle
-; INTEGRE la vitesse du mount * dt chaque frame (jamais de snap, jamais d'offset constant
-; ici). (3) W = si[+0x51]->vtable[+0x2C]() (sinon 0) ; theta = W.y * dword_70458/256 ;
-; rotation 2D de (W.x, W.z) par theta (Math_Cos_58063 / Math_Sin_580A7 / FixedMul_58034) ;
-; si->vtable[+0x30](&{W.x*dt, W.y*dt, W.z*dt}) et si[+0x51]->vtable[+0x30](&W_tourné) —
-; RATTRAPAGE DE CAP rate-limité appliqué à l'orientation de la caméra ET du mount. => le 'lag
-; chase' = (a) position qui intègre v_mount*dt + (b) cap qui rattrape à taux*dt. Reste ouvert
-; : cam[+0x12] démarre à 0 et n'est jamais posé en absolu (=> offset relatif au mount, ou
-; accumulateur de force ; Debris_BodyGetPosition_37D04 le lit pourtant brut) ; où l'offset de
-; recul initial est posé ; identité du mount cam[+0x51] pour CHASE. Voir CAMERA_SYSTEM.md §4.
+; far, LUE INTEGRALEMENT (2026-09-25). Ex-'Camera_ComputeMountedPosition' (FAUX). INTEGRATION
+; DU MOUVEMENT de l'objet monde, methode +0x14 (pour l'avion : loc_3E115, vtable seg339
+; off_6F880). (1) POSITION : WorldObject_TranslateBy_37D54(objet, vitesse du corps (+0x51 ->
+; +8) * dword_7045E). (2) ORIENTATION : Omega = corps->vtable+0x2C (pour JDYN : thunk
+; loc_3B6DC -> loc_46B74 = copie de JDYN+4/+8/+0x0C, la vitesse angulaire) ;
+; objet->vtable+0x30(Omega * dword_70458) (avion :
+; WorldObject_ComposeOrientationAngleArray_3CB0B, rotation de l'orientation par ces
+; increments) ; puis avec theta = Omega.c1 * dt : Omega.c2' = Omega.c2 cos + Omega.c0 sin,
+; Omega.c0' = Omega.c0 cos - Omega.c2 sin (Math_CosRaw_580A7 / Math_SinRaw_58063 /
+; Math_FixedMultiply_58034) ; corps->vtable+0x30(Omega') (JDYN : loc_3B6C5 -> loc_46BC0, ecrit
+; JDYN+4/+8/+0x0C). Sans corps : vecteur nul (dword_707F8..70800). dword_7045E (position) et
+; dword_70458 (rotation) sont IDENTIQUES : Frame_UpdateTimingAndNotifyTrackedObjects_500F6
+; fait toujours dword_7045E = dword_70458 en sortie (loc_50399).
 ; ==============================================================================================
-Camera_ComputeMountedPosition_3D31D	proc far		; CODE XREF: seg087:0250P
+WorldObject_IntegrateBodyMotion_3D31D	proc far		; CODE XREF: seg087:0250P
 					; DATA XREF: seg339:off_6F6DCo	...
 
 var_68		= dword	ptr -68h
@@ -1018,7 +1018,7 @@ loc_3D392:
 		jmp	short loc_3D3C6
 ; ���������������������������������������������������������������������������
 
-loc_3D3A9:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+Fj
+loc_3D3A9:				; CODE XREF: WorldObject_IntegrateBodyMotion_3D31D+Fj
 		mov	eax, dword_707F8
 		mov	[bp+var_50], eax
 		mov	eax, dword_707FC
@@ -1032,7 +1032,7 @@ loc_3D3C1:
 loc_3D3C3:
 		lea	ax, [bp+var_50]
 
-loc_3D3C6:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+8Aj
+loc_3D3C6:				; CODE XREF: WorldObject_IntegrateBodyMotion_3D31D+8Aj
 		lea	ax, [bp+var_48]
 		push	ax
 		lea	ax, [bp+var_4C]
@@ -1040,7 +1040,7 @@ loc_3D3C6:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+8Aj
 		lea	ax, [bp+var_50]
 		push	ax
 		push	si
-		call	Debris_BodyIntegrateForces
+		call	WorldObject_TranslateBy_37D54
 		add	sp, 8
 		cmp	word ptr [si+51h], 0
 		jz	short loc_3D3FB
@@ -1057,7 +1057,7 @@ loc_3D3C6:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+8Aj
 		jmp	short loc_3D418
 ; ���������������������������������������������������������������������������
 
-loc_3D3FB:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+C2j
+loc_3D3FB:				; CODE XREF: WorldObject_IntegrateBodyMotion_3D31D+C2j
 		mov	eax, dword_707F8
 		mov	[bp+var_5C], eax
 		mov	eax, dword_707FC
@@ -1067,7 +1067,7 @@ loc_3D3FB:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+C2j
 		mov	dx, ss
 		lea	ax, [bp+var_5C]
 
-loc_3D418:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+DCj
+loc_3D418:				; CODE XREF: WorldObject_IntegrateBodyMotion_3D31D+DCj
 		mov	eax, [bp+var_54]
 		mov	[bp+var_20], eax
 		mov	eax, [bp+var_5C]
@@ -1108,7 +1108,7 @@ loc_3D483:
 		mov	[bp+var_40], eax
 		mov	[bp+var_44], eax
 		push	eax
-		call	Math_Cos_Raw_58063
+		call	Math_SinRaw_58063
 		push	dx
 		push	ax
 		pop	eax
@@ -1117,7 +1117,7 @@ loc_3D483:
 
 loc_3D4BF:
 		push	large [bp+var_40]
-		call	Math_Sin_Raw_580A7
+		call	Math_CosRaw_580A7
 		push	dx
 		push	ax
 		pop	eax
@@ -1170,12 +1170,12 @@ loc_3D4BF:
 		add	sp, 4
 		jmp	short $+2
 
-loc_3D562:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+22Fj
+loc_3D562:				; CODE XREF: WorldObject_IntegrateBodyMotion_3D31D+22Fj
 		pop	di
 		pop	si
 		leave
 		retf
-Camera_ComputeMountedPosition_3D31D	endp
+WorldObject_IntegrateBodyMotion_3D31D	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1183,11 +1183,15 @@ Camera_ComputeMountedPosition_3D31D	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,19L — positionne un flag (+0x53) si la cible référencée (+0xE) a un indicateur actif
-; (+0x38) : activation conditionnelle du mode caméra suiveuse selon l'état de la cible.
+; far, ALLUME LA TRAÎNÉE DE FUMÉE D'UN OBJET (ex-Camera_EnableFollowIfActive, aucun rapport
+; avec une caméra) : instance +0x53 = 1 si le modèle (+0x0E) a un chunk SMOK (modèle +0x38 ≠
+; 0). Appelée notamment par Debris_SpawnOrchestratorVariant_9D770 juste après
+; World_OnObjectDestroyed_53A94 (l'objet détruit se met à fumer ; son type de fumée +0x54 y
+; est remplacé), par Collision_OnTerrainContact_9D910 et par deux fonctions PlayerComponent
+; (seg434/seg438).
 ; ==============================================================================================
-Camera_EnableFollowIfActive	proc far		; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+173P
-					; Gauge_ComputeAndRenderNeedle_9D910:loc_9DCEEP	...
+SmokeTrail_EnableIfModelHasSmok_3D566	proc far		; CODE XREF: Aircraft_OnDestroyed_9D770+173P
+					; Aircraft_OnCollision_9D910:loc_9DCEEP	...
 
 arg_0		= word ptr  6
 
@@ -1200,11 +1204,11 @@ arg_0		= word ptr  6
 		jz	short loc_3D57B
 		mov	byte ptr [si+53h], 1
 
-loc_3D57B:				; CODE XREF: Camera_EnableFollowIfActive+Fj
+loc_3D57B:				; CODE XREF: SmokeTrail_EnableIfModelHasSmok_3D566+Fj
 		pop	si
 		pop	bp
 		retf
-Camera_EnableFollowIfActive	endp
+SmokeTrail_EnableIfModelHasSmok_3D566	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1212,18 +1216,18 @@ Camera_EnableFollowIfActive	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 437 L. NOM PRÉCÉDENT (Camera_ChaseComputeMain) FAUX — ce n'est PAS le calcul de la
-; caméra de poursuite. Relu 2026-09-06 : MAJ par frame d'un émetteur ancré sur l'avion. Abort
-; si obj[+0x53]==0 / es:[[obj+0x0A]+8]==0 / word_70483==0. Charge S = { *(entity+0x3A),
-; *(entity+0x3E), *(entity+0x42) } = le vec3 écrit par le chunk IFF SMOK du modèle
-; (JDYN_LoadAngleAndChunk_9D189, ovr310 : SeekAndRead('SMOK') -> u8 +0x39 puis 3× u32
-; +0x3A/+0x3E/+0x42 ; F-16 = (0,-3584,0) = (0,-14,0) en 24.8). Calcule 2 points =
-; obj.pos(+0x12) + orientation·S [+ pos_ancre×dword_7045E/256], orientation = ligne obj+0x38
-; (branche S.x!=0&&S.z!=0) ou matrice obj+0x2C / de l'ancre. Passe les 2 points + obj[+0x54] +
-; word_70483 à Elements_SpawnAlongSegment_4D1C9. Appelée depuis Camera_ExternalUpdate
-; (sub_3D9B4) et sub_3DA0B. Rôle exact de SMOK non confirmé.
+; far, 437 L, LUE 2026-10-12. TRAÎNÉE DE FUMÉE D'UN OBJET, à chaque image (ex-
+; Emitter_UpdateFromEntitySMOKVec). Rien si la traînée est éteinte (+0x53 = 0), si le sous-
+; objet visuel est absent ou si aucun jeu de fumées n'est chargé (word_70483 = 0). S = point
+; d'émission du chunk SMOK (modèle +0x3A/+0x3E/+0x42, repère de l'objet). Point courant =
+; position (+0x12) + matrice de l'objet (+0x2C) · S (Matrix_LocalToWorld_58828) ; point
+; précédent = position + matrice de l'ancre · S + déplacement de l'ancre pendant l'image
+; (vitesse +0x51 · dword_7045E, ou vecteur global dword_707F8). Branche particulière si S.c0 =
+; 0 et S.c2 = 0 (point sur l'axe du nez) : S.c1 multiplie la ligne +0x38 de l'objet. Puis
+; Particles_SpawnAlongSegment_4D1C9(word_70483, type = +0x54, point courant, point précédent,
+; dt) : particules réparties le long du segment parcouru.
 ; ==============================================================================================
-Emitter_UpdateFromEntitySMOKVec_3D57E	proc far		; CODE XREF: Camera_ExternalUpdate_3D9B4+28p
+SmokeTrail_Tick_3D57E	proc far		; CODE XREF: WorldObject_TickBodyAndSmoke_3D9B4+28p
 					; WorldObject_UpdateWithAIEntity_3D9FB:loc_3DACEp	...
 
 var_F0		= dword	ptr -0F0h
@@ -1300,20 +1304,20 @@ loc_3D581:
 		jmp	loc_3D9B0
 ; ���������������������������������������������������������������������������
 
-loc_3D593:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+10j
+loc_3D593:				; CODE XREF: SmokeTrail_Tick_3D57E+10j
 		les	bx, [si+0Ah]
 		cmp	byte ptr es:[bx+8], 0
 		jnz	short loc_3D5A0
 		jmp	loc_3D9B0
 ; ���������������������������������������������������������������������������
 
-loc_3D5A0:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+1Dj
+loc_3D5A0:				; CODE XREF: SmokeTrail_Tick_3D57E+1Dj
 		cmp	word_70483, 0
 		jnz	short loc_3D5AA
 		jmp	loc_3D9B0
 ; ���������������������������������������������������������������������������
 
-loc_3D5AA:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+27j
+loc_3D5AA:				; CODE XREF: SmokeTrail_Tick_3D57E+27j
 		cmp	word ptr [si+51h], 0
 		jz	short loc_3D62B
 
@@ -1364,7 +1368,7 @@ loc_3D5D2:
 		jmp	short loc_3D648
 ; ���������������������������������������������������������������������������
 
-loc_3D62B:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+30j
+loc_3D62B:				; CODE XREF: SmokeTrail_Tick_3D57E+30j
 		mov	eax, dword_707F8
 		mov	[bp+var_58], eax
 		mov	eax, dword_707FC
@@ -1374,7 +1378,7 @@ loc_3D62B:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+30j
 		mov	dx, ss
 		lea	ax, [bp+var_58]
 
-loc_3D648:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+ABj
+loc_3D648:				; CODE XREF: SmokeTrail_Tick_3D57E+ABj
 		mov	ax, [si+10h]
 		mov	dx, [si+0Eh]
 		add	dx, 3Ah	; ':'
@@ -1393,32 +1397,32 @@ loc_3D648:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+ABj
 		jmp	short loc_3D682
 ; ���������������������������������������������������������������������������
 
-loc_3D680:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+FBj
+loc_3D680:				; CODE XREF: SmokeTrail_Tick_3D57E+FBj
 		xor	ax, ax
 
-loc_3D682:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+100j
+loc_3D682:				; CODE XREF: SmokeTrail_Tick_3D57E+100j
 		or	al, al
 		jnz	short loc_3D689
 		jmp	loc_3D7CD
 ; ���������������������������������������������������������������������������
 
-loc_3D689:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+106j
+loc_3D689:				; CODE XREF: SmokeTrail_Tick_3D57E+106j
 		cmp	[bp+var_5C], 0
 		jnz	short loc_3D695
 		mov	ax, 1
 		jmp	short loc_3D697
 ; ���������������������������������������������������������������������������
 
-loc_3D695:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+110j
+loc_3D695:				; CODE XREF: SmokeTrail_Tick_3D57E+110j
 		xor	ax, ax
 
-loc_3D697:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+115j
+loc_3D697:				; CODE XREF: SmokeTrail_Tick_3D57E+115j
 		or	al, al
 		jnz	short loc_3D69E
 		jmp	loc_3D7CD
 ; ���������������������������������������������������������������������������
 
-loc_3D69E:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+11Bj
+loc_3D69E:				; CODE XREF: SmokeTrail_Tick_3D57E+11Bj
 		mov	di, si
 		add	di, 38h	; '8'
 		mov	eax, [di]
@@ -1507,8 +1511,8 @@ loc_3D7C1:
 		jmp	loc_3D98A
 ; ���������������������������������������������������������������������������
 
-loc_3D7CD:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+108j
-					; Emitter_UpdateFromEntitySMOKVec_3D57E+11Dj
+loc_3D7CD:				; CODE XREF: SmokeTrail_Tick_3D57E+108j
+					; SmokeTrail_Tick_3D57E+11Dj
 		mov	ax, si
 		add	ax, 2Ch	; ','
 		mov	word ptr [bp+var_20+2],	ax
@@ -1532,7 +1536,7 @@ loc_3D7CD:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+108j
 		jmp	short loc_3D826
 ; ���������������������������������������������������������������������������
 
-loc_3D805:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+269j
+loc_3D805:				; CODE XREF: SmokeTrail_Tick_3D57E+269j
 		mov	eax, dword_707F8
 		mov	[bp+var_94], eax
 		mov	eax, dword_707FC
@@ -1542,7 +1546,7 @@ loc_3D805:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+269j
 		mov	dx, ss
 		lea	ax, [bp+var_94]
 
-loc_3D826:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+285j
+loc_3D826:				; CODE XREF: SmokeTrail_Tick_3D57E+285j
 		lea	ax, [bp+var_94]
 		push	ax
 		lea	ax, [bp+var_88]
@@ -1560,7 +1564,7 @@ loc_3D826:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+285j
 		push	ax
 		lea	ax, [bp+var_64]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	di, si
 		add	di, 12h
@@ -1597,7 +1601,7 @@ loc_3D8C0:
 		push	ax
 		lea	ax, [bp+var_A0]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	di, si
 		add	di, 12h
@@ -1638,7 +1642,7 @@ loc_3D8C0:
 		mov	eax, [bp+var_E0]
 		mov	[bp+var_38], eax
 
-loc_3D98A:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+24Cj
+loc_3D98A:				; CODE XREF: SmokeTrail_Tick_3D57E+24Cj
 		sub	sp, 4
 		mov	eax, dword_70458
 		mov	[bp+var_F0], eax
@@ -1650,16 +1654,16 @@ loc_3D98A:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+24Cj
 		mov	ah, 0
 		push	ax
 		push	word_70483
-		call	Elements_SpawnAlongSegment_4D1C9
+		call	Particles_SpawnAlongSegment_4D1C9
 		add	sp, 0Ch
 
-loc_3D9B0:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+12j
-					; Emitter_UpdateFromEntitySMOKVec_3D57E+1Fj ...
+loc_3D9B0:				; CODE XREF: SmokeTrail_Tick_3D57E+12j
+					; SmokeTrail_Tick_3D57E+1Fj ...
 		pop	di
 		pop	si
 		leave
 		retf
-Emitter_UpdateFromEntitySMOKVec_3D57E	endp
+SmokeTrail_Tick_3D57E	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1667,11 +1671,14 @@ Emitter_UpdateFromEntitySMOKVec_3D57E	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,46L — teste l'état détruit puis délègue soit à un point de montage caméra (+0x51,
-; vtable[0x3C]) soit au calcul complet (sub_3D57E) : mise à jour de la caméra externe (avec ou
-; sans point de montage fixe).
+; far, 46L, LUE 2026-10-15. MISE A JOUR DU CORPS PHYSIQUE ET DE LA TRAINEE d'un objet monde
+; (aucun rapport avec la camera). Si WorldObject_IsAlive_3CBB7(objet) est faux : renvoie 0.
+; Sinon : si un corps existe (+0x51), appelle son tick (corps->vtable+0x3C :
+; MissileBody_GuidanceTick_42A4E pour un missile ; valeur de retour ignoree), puis
+; SmokeTrail_Tick_3D57E(objet), et renvoie 1. Appelants : Missile_UpdateSeekerAndFuse_42458 et
+; d'autres mises a jour d'objets (seg089...). Ex-'Camera_ExternalUpdate_3D9B4'.
 ; ==============================================================================================
-Camera_ExternalUpdate_3D9B4	proc far		; CODE XREF: seg089:078AP
+WorldObject_TickBodyAndSmoke_3D9B4	proc far		; CODE XREF: seg089:078AP
 					; seg089:loc_41B6FP ...
 
 arg_0		= word ptr  6
@@ -1700,23 +1707,23 @@ loc_3D9C6:
 		pop	cx
 		jmp	short $+2
 
-loc_3D9DA:				; CODE XREF: Camera_ExternalUpdate_3D9B4+16j
+loc_3D9DA:				; CODE XREF: WorldObject_TickBodyAndSmoke_3D9B4+16j
 		push	si
 		push	cs
-		call	near ptr Emitter_UpdateFromEntitySMOKVec_3D57E
+		call	near ptr SmokeTrail_Tick_3D57E
 		pop	cx
 		mov	al, 1
 		jmp	short loc_3D9E6
 ; ���������������������������������������������������������������������������
 
-loc_3D9E4:				; CODE XREF: Camera_ExternalUpdate_3D9B4+10j
+loc_3D9E4:				; CODE XREF: WorldObject_TickBodyAndSmoke_3D9B4+10j
 		mov	al, 0
 
-loc_3D9E6:				; CODE XREF: Camera_ExternalUpdate_3D9B4+2Ej
+loc_3D9E6:				; CODE XREF: WorldObject_TickBodyAndSmoke_3D9B4+2Ej
 		pop	si
 		pop	bp
 		retf
-Camera_ExternalUpdate_3D9B4	endp
+WorldObject_TickBodyAndSmoke_3D9B4	endp
 
 ; ���������������������������������������������������������������������������
 
@@ -1748,9 +1755,11 @@ loc_3D9F1:				; DATA XREF: seg339:off_6F6FCo
 ; AIEntity_MasterTick_5ACC (slot +0xC de l'entité pointée par +0x55) ; si l'octet +0x59 == 0,
 ; appelle ensuite le slot +8 de l'entité (loc_4F85, pas lu) et passe son résultat au slot
 ; +0x40 de l'objet à +0x51 (pas identifié). (3) Si byte_6D558 != 0 : pas de tick IA, seulement
-; slot +8 puis slot +0x40. (4) Emitter_UpdateFromEntitySMOKVec_3D57E(objet), renvoie 1
-; (vivant). Anciennement Camera_LookAtSecondaryTarget (nom de caméra sans rapport avec le
-; corps).
+; slot +8 puis slot +0x40. (4) SmokeTrail_Tick_3D57E(objet), renvoie 1 (vivant). Anciennement
+; Camera_LookAtSecondaryTarget (nom de caméra sans rapport avec le corps). | 2026-09-27 :
+; l'octet +0x59 SUSPEND LA PHYSIQUE : non nul -> seul le tick IA tourne (pas de lecture des
+; commandes ni de tick de dynamique). Pose par le decollage/atterrissage (roulage, approche)
+; et par Goal_FollowAllyExec pendant la formation.
 ; ==============================================================================================
 WorldObject_UpdateWithAIEntity_3D9FB	proc far		; CODE XREF: Camera_ResolvePositionVelocity_3DDC4:loc_3DDCFP
 					; DATA XREF: seg339:off_6F6D8o
@@ -1874,7 +1883,7 @@ loc_3DACC:				; CODE XREF: WorldObject_UpdateWithAIEntity_3D9FB+58j
 		push	cs
 
 loc_3DACE:
-		call	near ptr Emitter_UpdateFromEntitySMOKVec_3D57E
+		call	near ptr SmokeTrail_Tick_3D57E
 		pop	cx
 
 loc_3DAD2:
@@ -1967,7 +1976,7 @@ Camera_DestructSimple	endp
 ; far,14L — positionne un flag (+4 bit2) : marqueur 'caméra à recalculer'.
 ; ==============================================================================================
 Camera_MarkRecalc	proc far		; CODE XREF: Camera_AttachSubcomponent+16p
-					; Debris_ResetBodyAndMarkCamera_9C85A+4BP
+					; Decoy_ConstructInstance_9C85A+4BP
 
 arg_0		= word ptr  6
 
@@ -1990,7 +1999,7 @@ Camera_MarkRecalc	endp
 ; far,21L — attache un sous-composant (sub_37C89) puis marque le recalcul (sub_3DB48) :
 ; attachement d'un sous-composant caméra avec invalidation du cache.
 ; ==============================================================================================
-Camera_AttachSubcomponent	proc far		; CODE XREF: seg104:00D2P Camera_AttachSubcomponentWrapper_9C90B+FP ...
+Camera_AttachSubcomponent	proc far		; CODE XREF: seg104:00D2P Decoy_AttachAndStartLifetime_9C90B+FP ...
 
 arg_0		= word ptr  6
 arg_2		= dword	ptr  8

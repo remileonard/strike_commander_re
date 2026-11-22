@@ -14,8 +14,8 @@ ovr245		segment	para public 'OVERLAY' use16
 ; arg_2*0x1D ; Matrix_BuildFullOrientation_575B2(si+0x143, record[+0x0B], record[+0x0D],
 ; record[+0x0F]) (3 angles i16 en degrés, <<8 -> axes X,Y,Z) ; si[+0x167] = record[+0x11]
 ; (i32), si[+0x16B] = record[+0x15], si[+0x16F] = record[+0x19] (= OFFSET DE L'ŒIL DU PILOTE,
-; 24.8, identique pour tous les records du F-16 : (0, 2016, 400) = (0, 7.875, 1.5625) pieds) ;
-; lit aussi record[+0x01] (FOV i16), record[+0x03] (dword=921), record[+0x07]/[+0x09] (u16),
+; 24.8, identique pour tous les records du F-16 : (0, 2016, 400) = (0, 7.875, 1.5625) mètres)
+; ; lit aussi record[+0x01] (FOV i16), record[+0x03] (dword=921), record[+0x07]/[+0x09] (u16),
 ; écrit dans [si+0x1E] (sous-objet viewport). Table [si+0x133] chargée par
 ; Cockpit_LoadViewTable_86B53. Voir CAMERA_SYSTEM.md §3bis.
 ; ==============================================================================================

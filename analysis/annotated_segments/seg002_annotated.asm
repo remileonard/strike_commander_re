@@ -14,7 +14,14 @@ seg002		segment	byte public 'CODE' use16
 ; (angles) et dword_7209B vs dword_7201C (distance/seuil NUMS), avec des ajustements
 ; +2/-3/-4/-6/-10 selon les paliers d'angle - puis GARDE FINALE sur byte_720DF (si actif,
 ; soustrait entite->aircraft+0xB0 /2 - meme champ carburant que MVRS_ID13/19 connu). Score
-; final borne [0,9].
+; final borne [0,9]. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47
+; range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97,
+; +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A
+; (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 =
+; PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3
+; = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute
+; mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire
+; selon cette table.
 ; ==============================================================================================
 MVRS_ID1_ScoreAngularGuarded_3E90:				; DATA XREF: seg339:02B8o
 		push	bp
@@ -48,7 +55,7 @@ loc_3EC3:				; CODE XREF: seg002:002Ej
 
 loc_3ECD:				; CODE XREF: seg002:0038j
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jz	short loc_3EE1
@@ -58,7 +65,7 @@ loc_3ECD:				; CODE XREF: seg002:0038j
 loc_3EE1:				; CODE XREF: seg002:004Cj
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_InterceptFeasibleCached
+		call	AI_Sensor_TooLow_56E5
 		add	sp, 4
 		or	al, al
 		jz	short loc_3EF8
@@ -173,11 +180,26 @@ loc_3FC6:				; CODE XREF: seg002:0129j seg002:012Fj
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far - LUE INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x3 (tag 0x278). Meme famille
-; angulaire generique que 0x4/0x5/0x6/0x7/0x8 (base=5, ajuste via word_72093/72095, seuils
-; NUMS dword_7201C, gardee par byte_720C3/byte_72038). Borne 0-9.
+; Ex-'MVRS_ID3_ScoreGeneric_3FCB'. far - LUE INTEGRALEMENT. Fonction de SCORE de l'ID 2 (tag
+; 0x28C ; relu 2026-10-11). Base 5 ; nul sans cible, si la classe de la cible <= 6, si
+; word_72093 > 20, trop lent, trop bas, ou si byte_720DF (entite avion) : un avion IA ne la
+; choisit donc jamais. Puis - usages/2 ; angle nez > 135, word_72093 < 30 et d < 1800 : +7 ;
+; sinon -3 cible devant, -3 si d > 1800 ; vitesse indiquee < mini : -6 ;
+; Pilot_SkillCheck_B7(SM, 5) : +3. [Ancienne phrase : Fonction de SCORE pour MVRS ID=0x3 (tag
+; 0x278).] Meme famille angulaire generique que 0x4/0x5/0x6/0x7/0x8 (base=5, ajuste via
+; word_72093/72095, seuils NUMS dword_7201C, gardee par byte_720C3/byte_72038). Borne 0-9. |
+; IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
+; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
+; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale. TRAITS ATRB CORRIGES
+; 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH,
+; CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B,
+; +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr
+; es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 =
+; FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 =
+; SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1,
+; LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table.
 ; ==============================================================================================
-MVRS_ID3_ScoreGeneric_3FCB:				; DATA XREF: seg339:off_6D340o
+MVRS_ID2_Score_3FCB:				; DATA XREF: seg339:off_6D340o
 		push	bp
 		mov	bp, sp
 		sub	sp, 2
@@ -207,7 +229,7 @@ loc_3FFE:				; CODE XREF: seg002:0169j
 
 loc_4008:				; CODE XREF: seg002:0173j
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jz	short loc_401C
@@ -217,7 +239,7 @@ loc_4008:				; CODE XREF: seg002:0173j
 loc_401C:				; CODE XREF: seg002:0187j
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_InterceptFeasibleCached
+		call	AI_Sensor_TooLow_56E5
 		add	sp, 4
 		or	al, al
 		jz	short loc_4033
@@ -360,7 +382,14 @@ loc_4123:				; CODE XREF: seg002:0286j seg002:028Cj
 ; plus simple). CALCUL : ajustements -3/-6 sur word_72095 (paliers 0x5A/0x2D), +3 ou -3 selon
 ; dword_7209B vs dword_7201C (deux comparaisons opposees successives). GARDE FINALE : si
 ; byte_720DF actif, soustrait entite->aircraft+0xB0 /4 (meme champ carburant, division
-; differente des autres IDs qui font /2). Score borne [0,9].
+; differente des autres IDs qui font /2). Score borne [0,9]. TRAITS ATRB CORRIGES 2026-09-25 :
+; le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY,
+; FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D,
+; +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h',
+; vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 =
+; TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR,
+; +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou
+; FL pour +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 MVRS_ID3_ScoreAngularSimple_4128:				; DATA XREF: seg339:off_6D32Co
 		push	bp
@@ -512,7 +541,7 @@ loc_4210:				; CODE XREF: seg002:037Bj
 
 loc_421A:				; CODE XREF: seg002:0385j
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jz	short loc_422E
@@ -522,7 +551,7 @@ loc_421A:				; CODE XREF: seg002:0385j
 loc_422E:				; CODE XREF: seg002:0399j
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_InterceptFeasibleCached
+		call	AI_Sensor_TooLow_56E5
 		add	sp, 4
 		or	al, al
 		jz	short loc_4245
@@ -709,7 +738,7 @@ MVRS_ID5_ScoreSubmodeManeuver_434E:				; DATA XREF: seg339:0254o
 
 loc_437A:				; CODE XREF: seg002:04E5j
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jz	short loc_438E
@@ -971,7 +1000,7 @@ loc_4554:
 loc_4557:				; CODE XREF: seg002:067Ej seg002:06ABj
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_InterceptFeasibleCached
+		call	AI_Sensor_TooLow_56E5
 		add	sp, 4
 		or	al, al
 		jz	short loc_4571
@@ -1233,7 +1262,7 @@ loc_472D:				; CODE XREF: seg002:0899j
 loc_473F:				; CODE XREF: seg002:089Fj
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jz	short loc_4757
@@ -1323,13 +1352,20 @@ loc_47CF:				; CODE XREF: seg002:0932j seg002:0938j
 ; (entite+0x22->+0xB0) <= 13, appelle sub_8C1E (AI_ManeuverSolution_91DF, deja documente) avec
 ; constante -7 (0xFFF9) - si echoue, branche differente (loc_498F, calcul distance/seuil
 ; simplifie avec clamp final [1,9]). CALCUL PRINCIPAL (si sub_8C1E reussit) : ajustements
-; bases sur word_72093/72095/72097 puis appel Math_AngleBetweenVectors_552E1 avec la constante
+; bases sur word_72093/72095/72097 puis appel Math_ElevationAngle_552E1 avec la constante
 ; 0x4FA3 (deja croisee dans les sequences de manoeuvre) pour calculer un angle de correction
 ; complexe (division/multiplication). GARDE byte_720DF+byte_720E0 (ou byte_720E1) : ECRIT UNE
 ; POSITION D'INTERCEPTION (dword_720D1/D5/D9) dans node+0x26/0x2A/0x2E ET POSE UN BIT sur
 ; entite+0x32 (bit1 si byte_720E0, bit3 si byte_720E1) - CONFIRME que c'est CETTE fonction
 ; (pas ID=8) qui ecrit initialement ces bits consultes ailleurs. Score final borne [1,9]
-; (PLANCHER A 1, PAS 0 - distinct des autres IDs).
+; (PLANCHER A 1, PAS 0 - distinct des autres IDs). TRAITS ATRB CORRIGES 2026-09-25 : le
+; chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL,
+; AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E,
+; +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable
+; 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH,
+; +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 =
+; 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
+; +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 MVRS_ID7_ScoreManeuverFuelGated_47D4:				; DATA XREF: seg339:022Co
 		push	bp
@@ -1409,7 +1445,7 @@ loc_4889:				; CODE XREF: seg002:09F3j
 		push	ss
 		lea	ax, [bp-0Ah]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	eax, [bp-0Ah]
 		sar	eax, 8
@@ -1427,7 +1463,7 @@ loc_4889:				; CODE XREF: seg002:09F3j
 		mov	[bp-2],	dx
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jz	short loc_48E4
@@ -1546,10 +1582,13 @@ loc_49D5:				; CODE XREF: seg002:0B38j seg002:0B3Ej
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far - LUE INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x9 (tag 0x200). TOUJOURS RETOURNE 0
-; - type placeholder/desactive, comme 0x15.
+; Ex-'MVRS_ID9_ScorePlaceholder_49DA'. far - LUE INTEGRALEMENT. Fonction de SCORE pour MVRS
+; ID=0x9 (tag 0x200). TOUJOURS RETOURNE 0 - type placeholder/desactive, comme 0x15. |
+; IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
+; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
+; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID9_ScorePlaceholder_49DA:				; DATA XREF: seg339:0218o
+MVRS_ID8_ScoreAlwaysZero_49DA:				; DATA XREF: seg339:0218o
 		push	bp
 		mov	bp, sp
 		push	word ptr [bp+0Ah]
@@ -1575,11 +1614,14 @@ loc_49FE:				; CODE XREF: seg002:0B66j seg002:0B6Aj
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=9 confirme via ancrage
-; sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le
-; resultat) - authentique emplacement vestige jamais implemente.
+; Ex-'MVRS_ID9_ScorePlaceholder_4A02'. far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT
+; ATTRIBUEE (ID=9 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le
+; debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais
+; implemente. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0
+; + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par
+; le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID9_ScorePlaceholder_4A02:				; DATA XREF: seg339:0204o
+MVRS_ID9_ScoreAlwaysZero_4A02:				; DATA XREF: seg339:0204o
 		push	bp
 		mov	bp, sp
 		push	word ptr [bp+0Ah]
@@ -1605,11 +1647,14 @@ loc_4A26:				; CODE XREF: seg002:0B8Ej seg002:0B92j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=10 confirme via ancrage
-; sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le
-; resultat) - authentique emplacement vestige jamais implemente.
+; Ex-'MVRS_ID10_ScorePlaceholder_4A2A'. far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT
+; ATTRIBUEE (ID=10 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le
+; debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais
+; implemente. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0
+; + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par
+; le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID10_ScorePlaceholder_4A2A:				; DATA XREF: seg339:01F0o
+MVRS_ID10_ScoreAlwaysZero_4A2A:				; DATA XREF: seg339:01F0o
 		push	bp
 		mov	bp, sp
 		sub	sp, 2
@@ -1624,11 +1669,14 @@ MVRS_ID10_ScorePlaceholder_4A2A:				; DATA XREF: seg339:01F0o
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=11 confirme via ancrage
-; sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le
-; resultat) - authentique emplacement vestige jamais implemente.
+; Ex-'MVRS_ID11_ScorePlaceholder_4A49'. far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT
+; ATTRIBUEE (ID=11 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le
+; debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais
+; implemente. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0
+; + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par
+; le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID11_ScorePlaceholder_4A49:				; DATA XREF: seg339:01DCo
+MVRS_ID11_ScoreAlwaysZero_4A49:				; DATA XREF: seg339:01DCo
 		push	bp
 		mov	bp, sp
 		push	word ptr [bp+0Ah]
@@ -1654,11 +1702,14 @@ loc_4A6D:				; CODE XREF: seg002:0BD5j seg002:0BD9j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=12 confirme via ancrage
-; sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le
-; resultat) - authentique emplacement vestige jamais implemente.
+; Ex-'MVRS_ID12_ScorePlaceholder_4A71'. far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT
+; ATTRIBUEE (ID=12 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le
+; debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais
+; implemente. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0
+; + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par
+; le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID12_ScorePlaceholder_4A71:				; DATA XREF: seg339:01C8o
+MVRS_ID12_ScoreAlwaysZero_4A71:				; DATA XREF: seg339:01C8o
 		push	bp
 		mov	bp, sp
 		push	word ptr [bp+0Ah]
@@ -1684,18 +1735,17 @@ loc_4A95:				; CODE XREF: seg002:0BFDj seg002:0C01j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, 258 lignes (12015-12269) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x1B0
-; confirme = ID=13 via ancrage sequentiel - CORRIGE : precedemment attribuee a ID=0xE/14b).
-; Base=1. Lit avion+0x86 (NOUVELLE capacite, probable taux de roulis max, mise a l'echelle
-; x256) compare a entite+0x11->+0x1A. Gardes : tache en cours, sub_564A. Calcul RICHE :
-; bearing dword_720BB/720B7, seuil dword_7205B, UTILISE dword_72039 ET dword_7202C (les DEUX
-; constantes NUMS deja identifiees dans la sequence de manoeuvre a 5 phases Scissors/Rollaway)
-; - CONFIRME QUE C'EST ID=13, PAS 0xE, QUI DECLENCHE CETTE SEQUENCE. Contient un calcul de
-; type 'temps de virage' (imul x5, idiv par dword_720BB, decalages 0x18) similaire a celui
-; documente dans la sequence elle-meme. Lit aussi avion+0x8B (MEME champ que ID=5) pour un
-; ajustement final, et sub_56E5 (capteur cache). Score borne [0,9].
+; Ex-'MVRS_ID13_ScoreScissorsRollaway_4A99'. far, 258L, RELUE 2026-09-25 (pas
+; Scissors/Rollaway). Score MVRS ID13 'prise d'altitude' : base 1 ; 0 sans cible, si trop lent
+; (AI_Sensor_TooSlow_564A), ou si mon altitude (entite+0x1A) >= plafond JDYN+0x86 (defaut
+; 11005). -2 x nombre d'utilisations. Si la cible est plus lente que moi, pas plus de 400 sous
+; moi, ma vitesse >= (croisiere + dword_72039)/2, je suis un avion et (cible dans mon arriere
+; byte_720E0 ou moi dans ses 6h byte_720E1) : +5 x (ma vitesse - la sienne)/la sienne, ou +5
+; si sa vitesse <= la minimale. Distance > 17700 (dword_7202C) et word_72093 < 30 : +5 ; sinon
+; distance < 1800 : -5 (et -5 encore si word_72093 < 20). + terme JDYN+0x8B. Trop bas
+; (AI_Sensor_TooLow_56E5) : +4. Borne 0..9.
 ; ==============================================================================================
-MVRS_ID13_ScoreScissorsRollaway_4A99:				; DATA XREF: seg339:01B4o
+MVRS_ID13_ScoreZoomClimb_4A99:				; DATA XREF: seg339:01B4o
 		push	bp
 		mov	bp, sp
 		sub	sp, 40h
@@ -1717,7 +1767,7 @@ MVRS_ID13_ScoreScissorsRollaway_4A99:				; DATA XREF: seg339:01B4o
 		cmp	word ptr es:[bx+13h], 0
 		jz	short loc_4B0E
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jnz	short loc_4B0E
@@ -1928,7 +1978,7 @@ loc_4C85:				; CODE XREF: seg002:0DE1j
 loc_4C9C:				; CODE XREF: seg002:0DF3j
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_InterceptFeasibleCached
+		call	AI_Sensor_TooLow_56E5
 		add	sp, 4
 		or	al, al
 		jz	short loc_4CB4
@@ -1953,13 +2003,12 @@ loc_4CCC:				; CODE XREF: seg002:0E2Fj seg002:0E35j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, 150 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0xF (tag 0x188).
-; STRUCTURELLEMENT DIFFERENTE des precedentes : calcul d'INTERCEPTION/ANTICIPATION DE
-; TRAJECTOIRE (position via [entite+0x11->vtable+0x3C], sub_57C67 et sub_54876='cosinus
-; pondere' pour un calcul de temps/angle d'interception), gardee par le seuil capteur
-; dword_7203D et dword_720A7. Score BINAIRE 0/0xA (10, pas 0-9).
+; Ex-'MVRS_ID14_ScoreIntercept_4CD1'. far, 150L, RELUE 2026-09-25. Score MVRS ID14 'evitement
+; du sol' : 10 si pas de cible, pilote automatique coupe, et hauteur-sol < entite+0xE1 x (1 +
+; sin(roulis/2)/2) ou (altitude < plancher et vitesse verticale dword_720A7 < 0) ; sinon 0.
+; Noeud fixe entite+0xC5, lance par AI_GroundAvoidReflex_E06C.
 ; ==============================================================================================
-MVRS_ID15b_ScoreIntercept_4CD1:				; DATA XREF: seg339:01A0o
+MVRS_ID14_ScoreGroundAvoid_4CD1:				; DATA XREF: seg339:01A0o
 		push	bp
 		mov	bp, sp
 		sub	sp, 3Ah
@@ -2034,7 +2083,7 @@ loc_4D58:
 		push	ss
 		lea	ax, [bp-12h]
 		push	ax
-		call	AI_ComputeGeometrySolution_57C67
+		call	Matrix_RollAngle_57C67
 		add	sp, 6
 		mov	eax, [bp-12h]
 		mov	ebx, 2
@@ -2047,7 +2096,7 @@ loc_4D58:
 		push	ss
 		lea	ax, [bp-1Eh]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp-1Eh]
 		sar	eax, 1
@@ -2113,15 +2162,12 @@ loc_4E27:				; CODE XREF: seg002:0E7Cj
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, 87 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x10 (tag 0x174). Gardee
-; par entite+0x22->0xB->0x68==0xFF ('timer rafraichi', meme champ que la sentinelle
-; initialisee dans les applications). Verifie flags_75 bit6 (modulateur de score de menace,
-; deja documente en §7) OU un seuil de distance (dword_720CD/720C9) OU un appel direct a
-; AI_Sensor_SecondaryAngle_59A5 (deja connue via AIEntity_MasterTick) compare a 0x1E00 (30 en
-; 24.8) - CONFIRME un lien direct et fort avec le systeme de detection de menace. Score
-; BINAIRE 0/0xA.
+; Ex-'MVRS_ID15_ScoreThreatSensor_4E2A'. far, 87L, RELUE 2026-09-25. Score MVRS ID15
+; 'recuperation nez haut / decrochage' : 10 si pas de cible, pilote automatique coupe, et
+; (drapeau de decrochage bit6, ou vitesse indiquee dword_720CD <= minimale dword_720C9 avec
+; assiette > 30) ; sinon 0. Noeud fixe entite+0xC9, lance par AI_StallRecoveryReflex_E159.
 ; ==============================================================================================
-MVRS_ID16_ScoreThreatSensor_4E2A:				; DATA XREF: seg339:018Co
+MVRS_ID15_ScoreStallRecovery_4E2A:				; DATA XREF: seg339:018Co
 		push	bp
 		mov	bp, sp
 		sub	sp, 6
@@ -2184,7 +2230,7 @@ loc_4E95:				; CODE XREF: seg002:1001j
 		push	ss
 		lea	ax, [bp-6]
 		push	ax
-		call	AI_Sensor_SecondaryAngle
+		call	AI_Sensor_NosePitch_59A5
 		add	sp, 8
 		cmp	dword ptr [bp-6], 1E00h
 		jle	short loc_4EBD
@@ -2211,14 +2257,18 @@ locret_4ECB:				; CODE XREF: seg002:0FD4j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, 59 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x13 (tag 0x160,
-; l'identifiant SPECIAL avec deux references faibles a la construction). ECHELLE COMPLETEMENT
-; DIFFERENTE des autres types (0x100 a 0x900, PAS 0-9/0-10) - retourne une VALEUR CONTINUE,
-; pas un petit score discret, basee sur entite+0x22->0xB0 (pourcentage/etat continu, probable
-; carburant ou ressource similaire) compare a un seuil fixe (0xC=12). Etant donne l'echelle
-; bien plus grande, ce type DOMINERAIT le tournoi de AI_BehaviorStateMachine des qu'actif.
+; Ex-'MVRS_ID16_ScoreFuelOrResource_4ECD'. far, 59L, RELUE 2026-09-25. Score MVRS ID16
+; 'reprendre de la vitesse' : 1 si le pilotage FL (entite+0xB0, 'cmp byte ptr es:[bx+0B0h],
+; 0Ch') est sous 12, sinon 0 (pas de carburant ni de retour a la base). TRAITS ATRB CORRIGES
+; 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH,
+; CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B,
+; +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr
+; es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 =
+; FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 =
+; SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1,
+; LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table.
 ; ==============================================================================================
-MVRS_ID19_ScoreFuelOrResource_4ECD:				; DATA XREF: seg339:0178o
+MVRS_ID16_ScoreLowSpeed_4ECD:				; DATA XREF: seg339:0178o
 		push	bp
 		mov	bp, sp
 		sub	sp, 10h
@@ -2280,12 +2330,15 @@ loc_4F4F:				; CODE XREF: seg002:1090j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, 10 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x15 (tag 0x138). TOUJOURS
-; RETOURNE 0 - un type PLACEHOLDER/DESACTIVE, jamais selectionnable dans le tournoi de
-; AI_BehaviorStateMachine quelle que soit la valeur brute du fichier PROF pour cet
-; identifiant.
+; Ex-'MVRS_ID21_ScorePlaceholder_4F54'. far, 10 lignes - LU INTEGRALEMENT. Fonction de SCORE
+; pour MVRS ID=0x15 (tag 0x138). TOUJOURS RETOURNE 0 - un type PLACEHOLDER/DESACTIVE, jamais
+; selectionnable dans le tournoi de AI_BehaviorStateMachine quelle que soit la valeur brute du
+; fichier PROF pour cet identifiant. | IDENTIFIANT CORRIGE 2026-09-25 : methode de
+; l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de
+; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
+; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID21_ScorePlaceholder_4F54:				; DATA XREF: seg339:off_6D200o
+MVRS_ID20_ScoreAlwaysZero_4F54:				; DATA XREF: seg339:off_6D200o
 		push	bp
 		mov	bp, sp
 		push	word ptr [bp+0Ah]
@@ -2297,7 +2350,12 @@ MVRS_ID21_ScorePlaceholder_4F54:				; DATA XREF: seg339:off_6D200o
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_4F6A:				; DATA XREF: seg339:013Co
+; ==============================================================================================
+; far (label, slot +4 de l'ID 21, tag 0x138), LU 2026-09-25.
+; MVRS_SharedContextSyncAndID2Score_EC22 puis renvoie 0 : jamais choisi par le tournoi ; le
+; noeud est appele directement via entite+0xD1.
+; ==============================================================================================
+MVRS_ID21_ScoreAlwaysZero_4F6A:				; DATA XREF: seg339:013Co
 		push	bp
 		mov	bp, sp
 		push	word ptr [bp+0Ah]

@@ -9,6 +9,11 @@ ne documente que ce qu'il faut écrire, pas l'état antérieur du code.*
 
 ---
 
+> **Mise à jour 2026-09-25.** Les corrections à apporter au code actuel (`SCAIBrain`,
+> `SCMissionActors`, `SCPilot`) à partir des lectures de l'assembleur du 2026-09-24/25 (attaque au
+> sol, pilote automatique, commandes de roulis/tangage, verrouillage et esquive) sont regroupées
+> dans `analysis/IMPL_SCAIBRAIN_CORRECTIONS.md`. Côté physique : `IMPL_SCJETPPLANE_CORRECTIONS.md`.
+
 ## 0. Architecture — deux événements, deux fréquences
 
 ```mermaid
@@ -155,17 +160,22 @@ bool SCMissionActors::skillCheck(uint8_t statValue, int modifier) {
 
 | Offset | Trait `ATRB` | Confirmé par |
 |---|---|---|
-| `+0xB0` | `TH` | jet de compétence, consulté par le tournoi |
-| `+0xB1` | `CN` | jet de compétence |
+| `+0xB0` | `FL` (corrigé 2026-09-25 : pas `TH`) | jet de pilotage, consulté par le tournoi |
+| `+0xB1` | `TH` (corrigé 2026-09-25 : pas `CN`) | jet (`Pilot_SkillCheck_B1`, depuis `AI_WeaponRecoveryBusy_9027`) |
 | `+0xB2` | `VB` | `canPlayRadioMessage` (§5.2) |
-| `+0xB3` | `LY` | sélection de registre de message contextuel |
-| `+0xB4` | `FL` | condition de branche (`> 14`) dans le dispatcheur de message |
+| `+0xB3` | `CN` (corrigé 2026-09-25 : pas `LY`) | calcul du moral (`AI_ComputeMorale_CD4A`) |
+| `+0xB4` | `LY` (corrigé 2026-09-25 : pas `FL`) | discipline (`AI_MoraleDisciplineCheck_CA93`), condition `> 14` dans le dispatcheur de message |
 | `+0xB5` | `AG` | jet de compétence |
 | `+0xB6` | `AA` | comparaison par division, appelée depuis le tournoi lui-même |
 | `+0xB7` | `SM` | jet de compétence |
 | `+0xB8` | `AR` | jet de compétence |
 
 ### 1.6 Remise à l'échelle de `FL`/`AG`/`AA` par la difficulté
+
+> 2026-10-03 : ne s'applique qu'aux **avions du camp ennemi** (`Cockpit_ReadControlsFrame_8F720` : catégorie 6 et camp
+> +0x50 == 0xFF), toujours à partir des valeurs du fichier (+0xA0..+0xA2). `word_7235F` : 0 = intact, 1 = moitié,
+> 2 = quart. Porté dans `SCMission::applyDifficulty` (`RSProf::ai.atrb_file`). `word_70466` n'est pas la
+> difficulté mais le compteur de frames de la mission.
 
 Concerne uniquement la copie de réglage, distincte de la copie de
 consommation directe ci-dessus :
@@ -237,12 +247,12 @@ enum class GoalSelector : uint8_t {
 enum class MVRSInstinct : uint8_t {
     None                   = 0,
     PursuitBase            = 1,  // angulaire complet, gagnant applique aussi GeometricUtility
-    PursuitAlwaysTen       = 2,  // score toujours 10, application = rupture directionnelle
-    PursuitSimple          = 3,  // angulaire simplifie, ajustement TH
+    PursuitAlwaysTen       = 2,  // CORRIGE 2026-10-11 : score MVRS_ID2_Score_3FCB, nul pour un avion ; application = rupture directionnelle
+    PursuitSimple          = 3,  // angulaire simplifie, ajustement FL
     PursuitExtended        = 4,  // angulaire etendu, application = solution d'interception
     PursuitImmelmannSplitS = 5,  // declenche la sequence acrobatique a 8 phases
     PursuitSensorGated     = 6,  // garde de portee, sous-mode et sequence propres
-    PursuitSkillGatedTH    = 7,  // garde flags_75 bit6 / TH, ecrit position d'interception
+    PursuitSkillGatedFL    = 7,  // garde flags_75 bit6 / FL, ecrit position d'interception
     // 8,9,10,11,12 : score nul dans le seul chemin de code lu a ce jour.
     // NE PAS traiter comme des coquilles vides / non implementes : la
     // recherche de leur vrai consommateur est incomplete, pas fermee
@@ -259,7 +269,7 @@ enum class MVRSInstinct : uint8_t {
     ScissorsRollaway       = 13, // declenche la sequence acrobatique a 5 phases
     Intercept              = 14, // calcul trigonometrique complet, binaire 0/10
     ThreatSensor           = 15, // binaire 0/10
-    ThGateBinary           = 16, // CORRIGE : binaire 0/1 sur TH<12 uniquement
+    ThGateBinary           = 16, // CORRIGE : binaire 0/1 sur FL<12 (entité+0xB0) uniquement
     WeaponReady            = 19,
     GeometricUtility       = 20, // score nul en tournoi ; outil geometrique reel hors-tournoi (§3.6)
     NavCommandCarrier      = 21, // score nul en tournoi ; porteur reel de commande de navigation
@@ -395,7 +405,7 @@ comment `current_command` s'articule avec la boucle `GOAL`.*
 3. Altitude : celle du terrain sous le point, plus l'altitude de croisière lue dans l'entité (constante issue de `NUMS`), moins l'altitude actuelle, bornée à ±1000, ajoutée à la position courante.
 4. Elle écrit le point (position visée) et la vitesse voulue (direction × vitesse de croisière `NUMS`) dans le bloc d'état commun au joueur et à l'IA, ainsi que dans les coordonnées de point de mission de l'entité, puis applique le nœud d'exécution du contrôleur (celui du chemin `ExecuteFlightCommand`) et renvoie vrai.
 5. Un test sur deux octets de l'état (`+0x1A` nul et code `0x15` en `+0x19`) peut sauter la génération du point : rôle non lu.
-6. Appelée par `Goal_ExecuteAction` (cas « aucun ordre ») et par `Formation_DamageReactionHandler`.
+6. Appelée par `Goal_ExecuteAction` (cas « aucun ordre ») et par `AI_EngageAttackerReaction_E246`.
 
 **Écart avec libRealSpace** : la version livrée tire un `SPOT` de la mission et non un point à 30 000 unités. Sa garde est `current_target != NO_TARGET` (cible de mission engagée).
 
@@ -450,7 +460,7 @@ les exécuter), `4` reste atteignable dans le même passage dès qu'il sera
 câblé.
 
 **Statut : hypothèse de travail, pas une certitude ASM.** `AI_SYSTEM.md`
-§4.4 (`Goal_ActiveWingmanEngagement`, sélecteur `5`) montre qu'au moins un
+§4.4 (`Goal_MoraleReaction_878F`, sélecteur `5`) montre qu'au moins un
 sélecteur délègue lui-même à `AI_BehaviorStateMachine` en interne, en fin
 de son propre traitement — ce qui suggère que l'articulation réelle entre
 `Goal_ExecuteAction` et le tournoi `MVRS` n'est peut-être pas une simple
@@ -518,7 +528,7 @@ Colonnes : **statut** = connu (lu dans l'ASM), partiel, inconnu ; **`SCAIBrain`*
 | nœud permanent (`+0xD9`) | appliqué directement quand une cible sol est posée sans cible aérienne ; rôle non lu | partiel | non | — |
 | nœuds spéciaux (`+0xC1` ID 20, `+0xD1` ID 21) | nœuds `MVRS` réutilisés hors tournoi | connu | non | — |
 
-**Tir et poursuite** (lus dans `AI_BehaviorSelector_8D30`)
+**Tir et poursuite** (lus dans `AI_BehaviorSelector`)
 
 | Champ (offset) | Rôle | Statut | `SCAIBrain` | Équivalent |
 |---|---|---|---|---|
@@ -531,10 +541,10 @@ Colonnes : **statut** = connu (lu dans l'ASM), partiel, inconnu ; **`SCAIBrain`*
 
 | Champ (offset) | Rôle | Statut | `SCAIBrain` | Équivalent |
 |---|---|---|---|---|
-| traits `ATRB` (`+0xB0` à `+0xB8`, copie de consommation) | `TH`, `CN`, `VB`, `LY`, `FL`, `AG`, `AA`, `SM`, `AR` | connu | non (lus par `owner->profile`) | `profile->ai.atrb` |
+| traits `ATRB` (`+0xB0` à `+0xB8`, copie de consommation) | `FL`, `TH`, `VB`, `CN`, `LY`, `AG`, `AA`, `SM`, `AR` (ordre en mémoire, corrigé 2026-09-25 ; fichier : TH, CN, VB, LY, FL, …) | connu | non (lus par `owner->profile`) | `profile->ai.atrb` |
 | tableau `GOAL` (`+0x1B0`, 8 octets par emplacement) | sélecteurs du profil | connu | non (lus par `owner->profile`) | `profile->ai.goal` |
 | nœuds `MVRS` (`+0x200` compteur, `+0x202` tableau, 5 octets chacun) | tournoi | connu | non (lus par `owner->profile`) | `profile->ai.mvrs` |
-| minuteur de rappel du ciblage (`+0x174`) | limite les rappels de `Targeting_AcquireBestThreat` du tournoi | connu | à déclarer plus tard | — |
+| cadence du ciblage (`+0x174` bits, `+0x175` horloge, `+0x179` masque selon `FL`) | limite les rappels de `Targeting_AcquireBestThreat` : toutes les 16/8/4 s (tournoi) ou 8/4/2 s (attaquant) selon `FL` — `IMPL_SCAIBRAIN_CORRECTIONS.md` §0bis | connu | à déclarer plus tard | — |
 | chronomètre (`+0x175`) | préparé par `AIEntity_MasterTick_5ACC` | partiel | non | — |
 | rayon d'arrivée (`+0x139`), vitesse de croisière (`+0x141`), `+0x13D` | constantes issues de `NUMS` | connu | non | `NUMS` sur `SCMission` |
 | décalage de formation (`+0x14A`, `+0x14E`, `+0x152`) | (300, 0, 0) en 24.8 | connu | non | `formation_pos_offset` (acteur) |
@@ -547,7 +557,7 @@ Colonnes : **statut** = connu (lu dans l'ASM), partiel, inconnu ; **`SCAIBrain`*
 | nœud du monde lié (`+0x102`) | position et objet de mon avion | connu | non (`owner->object`) | `owner->object` |
 | chargement d'armes (`+0x104`) | stations d'armement de 35 octets | connu | non | armes du `plane` / `RSEntity::weaps` |
 | avion (`+0xB`) et bloc d'état (`+0x7`) | drapeaux de l'avion ; commandes communes joueur et IA | connu | non (`owner->plane`, `owner->pilot`) | `PlaneControlEvent` |
-| pointeur vers l'objet portant le chargement d'armes (`+0x22`) | déduit de `MVRS_ID14_ScoreWeaponReadiness` | partiel | non | — |
+| pointeur vers l'objet portant le chargement d'armes (`+0x22`) | lu par `GroundAttack_CanEngage_77000` (`nœud+0x22` du nœud d'attaque au sol) | partiel | non | — |
 
 **État d'avancement (2026-09-20)** : `SCAIBrain` (`SCAIBrain.h/.cpp`, dans `src/strike_commander/`) existe et est créé par `SCMission` pour tout acteur dont le profil est IA. La boucle `GOAL` (`runGoalSelectors`, `executeGoalAction`, `tryWanderRandom`, `tryActiveWingman`) y a été déplacée telle quelle ; `SCMissionActors::onAIRefresh` garde ses gardes puis appelle `brain->tick()`. Validé en jeu : compile, l'IA réagit comme avant. Les champs de ciblage sont déclarés mais pas encore utilisés ; l'état de l'objectif reste sur l'acteur.
 
@@ -561,7 +571,7 @@ Colonnes : **statut** = connu (lu dans l'ASM), partiel, inconnu ; **`SCAIBrain`*
 
 ### 3.1 `SCMissionActors::runMVRSTournament`
 
-*Correction (2026-09-19) : le bruit de l'ASM est ±1, jamais 0 (`test ax, 1`). Ce pseudocode ne montre que la boucle de score ; les conditions d'entrée (cible `entité+0x287`, `AI_BehaviorSelector_8D30` avant le score, objet en cours à `entité+0x0D`) sont dans `AI_TICK_CALL_GRAPH.md`.*
+*Correction (2026-09-19) : le bruit de l'ASM est ±1, jamais 0 (`test ax, 1`). Ce pseudocode ne montre que la boucle de score ; les conditions d'entrée (cible `entité+0x287`, `AI_BehaviorSelector` avant le score, objet en cours à `entité+0x0D`) sont dans `AI_TICK_CALL_GRAPH.md`.*
 
 ```cpp
 void SCMissionActors::runMVRSTournament() {
@@ -594,7 +604,7 @@ int SCMissionActors::computeMVRSScore(MVRSInstinct id) {
         case MVRSInstinct::PursuitExtended:
         case MVRSInstinct::PursuitImmelmannSplitS:
         case MVRSInstinct::PursuitSensorGated:
-        case MVRSInstinct::PursuitSkillGatedTH:
+        case MVRSInstinct::PursuitSkillGatedFL:
         case MVRSInstinct::ScissorsRollaway:
             return this->scoreAngularFamily(id);
         case MVRSInstinct::Intercept:
@@ -604,8 +614,8 @@ int SCMissionActors::computeMVRSScore(MVRSInstinct id) {
         case MVRSInstinct::ThGateBinary:
             // La fonction d'origine initialise sa variable de travail a
             // zero AVANT tout calcul, rendant tout plafonnement ulterieur
-            // inatteignable. Le seul test qui compte est TH < 12 -> 0 ou 1.
-            return (this->profile->ai.atrb.TH < 12) ? 1 : 0;
+            // inatteignable. Le seul test qui compte est FL < 12 -> 0 ou 1.
+            return (this->profile->ai.atrb.FL < 12) ? 1 : 0;
         case MVRSInstinct::WeaponReady:
             return this->scoreWeaponReady();
         case MVRSInstinct::Unresolved8:
@@ -634,7 +644,7 @@ int SCMissionActors::scoreAngularFamily(MVRSInstinct id) {
 
     int base = 5;
     if (id == MVRSInstinct::PursuitSensorGated) base = 3;
-    if (id == MVRSInstinct::ScissorsRollaway || id == MVRSInstinct::PursuitSkillGatedTH) base = 1;
+    if (id == MVRSInstinct::ScissorsRollaway || id == MVRSInstinct::PursuitSkillGatedFL) base = 1;
 
     int score = base;
     if (pursuitAngle < 90.0f) score -= 3;
@@ -642,8 +652,8 @@ int SCMissionActors::scoreAngularFamily(MVRSInstinct id) {
 
     if (id == MVRSInstinct::PursuitSensorGated && !this->targetDetectedBySensor()) return 0;
 
-    if (id == MVRSInstinct::PursuitSkillGatedTH
-        && !this->skillCheck(this->profile->ai.atrb.TH, -7)) return 0;
+    if (id == MVRSInstinct::PursuitSkillGatedFL
+        && !this->skillCheck(this->profile->ai.atrb.FL, -7)) return 0;
 
     if (id == MVRSInstinct::ScissorsRollaway) {
         float fl = (float)this->profile->ai.atrb.FL;
@@ -720,7 +730,7 @@ void SCMissionActors::applyMVRSInstinct(MVRSInstinct id) {
             break;
         case MVRSInstinct::PursuitSimple:
         case MVRSInstinct::PursuitExtended:
-        case MVRSInstinct::PursuitSkillGatedTH:
+        case MVRSInstinct::PursuitSkillGatedFL:
             this->applyPursuitTracking();
             break;
         case MVRSInstinct::PursuitImmelmannSplitS:
@@ -809,7 +819,7 @@ void SCMissionActors::executeFireControlSolution() {
 
     if (this->computeSensorSecondaryAngle() > this->weaponFiringConeAngle(hpt_id)) return;
 
-    if (this->skillCheck(this->profile->ai.atrb.TH, 0)) {
+    if (this->skillCheck(this->profile->ai.atrb.FL, 0)) {
         this->plane->Shoot(hpt_id, this->target, this->mission);
     }
 }
@@ -878,20 +888,20 @@ Le camp hostile de l'ASM (`+0x50` de signe opposé) correspond au `team_id` de l
 1. `+0x27F == 2` → 0. Chercher parmi tous les objets du monde, sauf soi.
 2. **Candidat** : missile dont la cible est moi ; avion hostile (camp de signe opposé) ; objet hostile « `+0x11 = 2` » seulement si l'appel autorise une nouvelle cible et qu'une arme air-air est chargée.
 3. **Scores A, B et aptitude `si`** : bandes de distance (`NUMS` 72020/24/28/2C/30), angles d'aspect (30°, 45°, 60°, 90°, 135°), armes chargées (masques `1` = AIM-9J, `3` = AIM-9J ou AIM-9M, `0x700` = AIM-120, SA-2 ou SA-6, `0x83C` = AGM-65D, LAU-3, MK-20, MK-82 ou canon 20 mm ; bit = `weapon_id` − 1), persistance de la cible courante (+3/+5), bonus si l'avion me vise déjà.
-4. **Porte** : `roll = (rand() & 15) + 1` ; le candidat est retenu si `roll <= TH + si` (`TH` = `ATRB[+0xB0]`, octet signé). Refait à chaque candidat, à chaque appel. Échec = candidat ignoré.
-5. **Score final** `= (AR − TH + 16)·A + (TH − AR + 16)·B` (`AR` = `+0xB8`, `TH` = `+0xB0`) ; le meilleur part de −5000.
+4. **Porte** : `roll = (rand() & 15) + 1` ; le candidat est retenu si `roll <= FL + si` (`FL` = `ATRB` rangé en `+0xB0`, octet signé). Refait à chaque candidat, à chaque appel. Échec = candidat ignoré.
+5. **Score final** `= (AR − FL + 16)·A + (FL − AR + 16)·B` (`AR` = `+0xB8`, `FL` = `+0xB0`) ; le meilleur part de −5000.
 6. **Résultat** : avion → cible `+0x287` ; défense fixe → `+0x283` ; **missile qui me vise → `+0x281`, cibles vidées, `+0x27F = 2`**. Sans gagnant, rien n'est modifié.
 
-**Lecture des traits (hypothèse de travail de Rémi)** : les poids `AR − TH + 16` et `TH − AR + 16` valent toujours 32 au total. Un pilote agressif favorise A (cibles bien placées devant lui, à portée) et se rapproche de sa cible ; un pilote gâchette facile favorise B (cibles qui le menacent) et tire vite. Le choix de cible est lu dans l'ASM ; « se rapprocher » et « tirer vite » sont à vérifier dans `AI_GuidanceSolution_Major`, `AI_FireWeaponTrigger` et `Pilot_ReactionThreshold_B6` (non lues).
+**Lecture des traits (hypothèse de travail de Rémi)** : les poids `AR − FL + 16` et `FL − AR + 16` valent toujours 32 au total. Un pilote agressif favorise A (cibles bien placées devant lui, à portée) et se rapproche de sa cible ; un pilote gâchette facile favorise B (cibles qui le menacent) et tire vite. Le choix de cible est lu dans l'ASM ; « se rapprocher » et « tirer vite » sont à vérifier dans `AI_GuidanceSolution_Major`, `AI_FireWeaponTrigger` et `Pilot_ReactionThreshold_B6` (non lues).
 
 **Cibles sol et missile qui me vise (implémentés le 2026-09-20 dans `SCAIBrain`)** :
 - **Candidat sol** : `target_type == 2`, camp hostile, un armement sol chargé (masque `0x83C`), et `allow_new_target`. Score : cible de mission A +6 / aptitude +3 ; pour une défense fixe avec munitions, `B = 10·(1 − d/R) + 5` si `d ≤ R`, avec `R = swpn_data->effective_range` (le `+0x3E` de l'assembleur, confirmé par `SwpnModel_LoadDataChunk_A0A00`) ; au-delà de `range_ground` aptitude −4, sinon angle `ahead` < 45° : aptitude +5 et A +6, entre 45° et 90° : aptitude +3 et A +3. Un gagnant sol range `ground_target` et vide `air_target`.
-- **Missile qui me vise** : seulement si sa cible est moi, son `entity_type` est `missiles` et son `target_domain` vaut 1 (l'assembleur teste `objet+0x4E == 1`, c'est le second octet de classe du chunk `WDAT`, 1 pour les missiles guidés anti-avion). Son angle d'approche `aims` (nez du missile contre la direction vers moi) doit être ≤ 90° et la distance inférieure à `range_far`. Missile longue portée (`weapon_id` AIM-120, SA-2, SA-6) : `B = 16·(1 − d/range_far) + 24` ; sinon il faut `d ≤ range_long` et `B = 16·(1 − d/range_long) + 24` ; aptitude += `TH²/16 − 8`, et −4 si `ahead` > 135° sans contrôle de tir. Un jet de dé réussi range le missile dans `missile_threat` même s'il ne gagne pas ; s'il gagne, `air_target` et `ground_target` sont vidés et `threat_state` passe à 2 (remis à 0 à l'appel suivant).
+- **Missile qui me vise** : seulement si sa cible est moi, son `entity_type` est `missiles` et son `target_domain` vaut 1 (l'assembleur teste `objet+0x4E == 1`, c'est le second octet de classe du chunk `WDAT`, 1 pour les missiles guidés anti-avion). Son angle d'approche `aims` (nez du missile contre la direction vers moi) doit être ≤ 90° et la distance inférieure à `range_far`. Missile longue portée (`weapon_id` AIM-120, SA-2, SA-6) : `B = 16·(1 − d/range_far) + 24` ; sinon il faut `d ≤ range_long` et `B = 16·(1 − d/range_long) + 24` ; aptitude += `FL²/16 − 8`, et −4 si `ahead` > 135° sans contrôle de tir. Un jet de dé réussi range le missile dans `missile_threat` même s'il ne gagne pas ; s'il gagne, `air_target` et `ground_target` sont vidés et `threat_state` passe à 2 (remis à 0 à l'appel suivant).
 - **Pas implémenté** : le `+4` si l'avion visé est le lanceur du missile (le sens exact de la méthode `vtable+0x38` du nœud est inconnu), le test du cône arrière et le terme de classe.
 
 **Articulation avec les ordres du script (lu le 2026-09-20)** : `Goal_SetObjective_A307` écrit, pour « détruire la cible » comme pour « défendre la cible », **uniquement la cible de mission** (`SetReference` sur son seul champ) ; elle n'écrit ni la cible aérienne ni la cible sol, qui sont remplies par le ciblage. Les deux mécanismes se croisent à trois endroits :
 1. **Bonus de score** dans `Targeting_AcquireBestThreat` : candidat = cible de mission → cible sol : A +6 et aptitude +3 ; avion : A +2 et aptitude +4. Préférence, pas obligation.
-2. **Tir** : `MVRS_ID14_ScoreWeaponReadiness` utilise la cible sol acquise, sinon la cible de mission.
+2. **Attaque au sol** : `GroundAttack_CanEngage_77000` utilise la cible sol acquise, sinon la cible de mission (détail : `AI_TICK_CALL_GRAPH.md`, « L'attaque au sol »).
 3. **Exécution** : `Goal_ExecuteAction`, pour une cible de mission de type sol, applique directement le nœud permanent d'attaque au sol, sans passer par le ciblage.
 
 **Cibles sol : jamais acquises seules depuis `AI_TopLevelThink`.** Ce chemin appelle le ciblage avec « nouvelle cible » à 0, et un candidat sol n'est retenu que si cet argument est non nul (un avion hostile n'en a pas besoin). L'IA acquiert donc seule des avions et des missiles ; les cibles sol viennent du script. Le tournoi passe un argument non nul dans certains cas, à vérifier.
@@ -901,7 +911,7 @@ Le camp hostile de l'ASM (`+0x50` de signe opposé) correspond au `team_id` de l
 **À retenir pour l'implémentation** :
 - Un missile qui me vise **interrompt l'attaque** : plus de cible, pas de tir, pas de tournoi ce tick. La réaction défensive (leurres, virage) n'est pas dans cette fonction ; elle est à retrouver (lecteurs de `+0x281` et de `+0x27F == 2`).
 - Les défenses fixes comptent quand l'avion est **dans leur portée** (`objet+0x3E`).
-- Le tir n'est pas ici : il est fait par `AI_BehaviorSelector_8D30`, avant le tournoi (voir §3.1).
+- Le tir n'est pas ici : il est fait par `AI_BehaviorSelector`, avant le tournoi (voir §3.1).
 - `objet+0x11` est `RSEntity::target_type` (chunk `TRGT`, 1er octet) ; la valeur 2 = cible sol (cible qu'on attaque avec des armes non anti-avion). Il faut que ce champ soit lu pour toutes les classes (aujourd'hui seul `parseREAL_OBJT_JETP_TRGT` le remplit).
 - Non lu : les lecteurs de `+0x281/+0x283/+0x285/+0x289`.
 

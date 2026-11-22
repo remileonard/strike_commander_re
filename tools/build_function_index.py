@@ -15,19 +15,25 @@ Ce script :
      (summary) depuis analysis/known_functions.json, si disponible.
 
 Usage (depuis la racine de l'archive) :
-    python3 tools/build_function_index.py
+    python3 tools/build_function_index.py               # STRIKE.EXE
+    python3 tools/build_function_index.py --exe optest  # OPTEST.EXE
 
-Sortie : analysis/function_index.json, analysis/segment_boundaries.json
+Sortie : function_index.json et segment_boundaries.json dans le dossier
+d'analyse de l'exécutable (analysis/ ou analysis/optest/, voir exe_paths.py).
 """
 import re
 import json
 import os
+import sys
 
-ROOT = os.path.join(os.path.dirname(__file__), '..')
-STRIKE_ASM = os.path.join(ROOT, 'source', 'strike.asm')
-KNOWN_FUNCTIONS = os.path.join(ROOT, 'analysis', 'known_functions.json')
-OUT_INDEX = os.path.join(ROOT, 'analysis', 'function_index.json')
-OUT_SEGS = os.path.join(ROOT, 'analysis', 'segment_boundaries.json')
+from exe_paths import paths, pop_exe_arg
+
+EXE, _ = pop_exe_arg(sys.argv[1:])
+PATHS = paths(EXE)
+STRIKE_ASM = PATHS['asm']
+KNOWN_FUNCTIONS = PATHS['known_functions']
+OUT_INDEX = PATHS['function_index']
+OUT_SEGS = PATHS['segment_boundaries']
 
 
 def main():
@@ -132,7 +138,7 @@ def main():
     # LABEL_KNOWN_EXTENTS quand elle a ete verifiee manuellement pendant
     # une session (lecture ligne a ligne) ; a defaut, bornee a 1 ligne
     # (start_line uniquement fiable) plutot que de deviner.
-    LABEL_KNOWN_EXTENTS = {
+    LABEL_KNOWN_EXTENTS = {} if EXE != 'strike' else {
         'loc_5ACC': 14329,   # AIEntity_MasterTick_5ACC, lue en integralite
         'loc_12E47': 37442,  # PilotProfile_LoadATRB_12E47, lue en integralite
         'loc_878F': 19662,   # Goal_ActiveWingmanEngagement_878F, lue en integralite

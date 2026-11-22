@@ -8,15 +8,14 @@ seg123		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, cœur du sous-système « minuteur » (seg121-123) : vérifie une condition sur
-; l'emplacement actif (sub_603DE), l'active si prêt (sub_603D2), désactive l'ancien
-; emplacement (sub_6039C) et marque le nouveau comme actif (sentinelle 0xFFFF). Motif «
-; avancer vers le prochain créneau actif en exclusion mutuelle » — hypothèse : séquenceur de
-; contre-mesures (leurres/paillettes) ou de créneaux de message radio. Référencée par de
-; nombreuses fonctions du cluster Weapon_HUDBox (seg121-122).
+; Ex-'Sequencer_AdvanceActiveSlot_59F1D'. far, 65L, LUE 2026-10-06. Arrete et libere la
+; sequence d'un canal musical (struct canal : +0 pilote (+4 = handle AIL), +2 handle de
+; sequence, -1 si aucune, +4 table d'etat) : si AIL_sequence_status_603DE == 1 (en cours) ->
+; AIL_stop_sequence_603D2 ; puis AIL_release_sequence_handle_6039C et handle = -1. Canaux du
+; jeu : 5BE3h (principal) et 5BF5h (transition).
 ; ==============================================================================================
-Sequencer_AdvanceActiveSlot_59F1D	proc far		; CODE XREF: Interrupt_TimerCase_595C2+C9P
-					; Interrupt_TimerCase_595C2+124P ...
+Music_ChannelStopSequence_59F1D	proc far		; CODE XREF: Music_TuneTransitionResolve_595C2+C9P
+					; Music_TuneTransitionResolve_595C2+124P ...
 
 arg_0		= word ptr  6
 
@@ -33,7 +32,7 @@ arg_0		= word ptr  6
 
 loc_59F33:
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AE_603DE
+		call	AIL_sequence_status_603DE
 		add	sp, 4
 		cmp	ax, 1
 		jnz	short loc_59F48
@@ -41,17 +40,17 @@ loc_59F33:
 		jmp	short loc_59F4A
 ; ���������������������������������������������������������������������������
 
-loc_59F48:				; CODE XREF: Sequencer_AdvanceActiveSlot_59F1D+24j
+loc_59F48:				; CODE XREF: Music_ChannelStopSequence_59F1D+24j
 		xor	ax, ax
 
-loc_59F4A:				; CODE XREF: Sequencer_AdvanceActiveSlot_59F1D+29j
+loc_59F4A:				; CODE XREF: Music_ChannelStopSequence_59F1D+29j
 		jmp	short loc_59F4E
 ; ���������������������������������������������������������������������������
 
-loc_59F4C:				; CODE XREF: Sequencer_AdvanceActiveSlot_59F1D+Fj
+loc_59F4C:				; CODE XREF: Music_ChannelStopSequence_59F1D+Fj
 		mov	al, 0
 
-loc_59F4E:				; CODE XREF: Sequencer_AdvanceActiveSlot_59F1D:loc_59F4Aj
+loc_59F4E:				; CODE XREF: Music_ChannelStopSequence_59F1D:loc_59F4Aj
 		or	al, al
 		jz	short loc_59F69
 		cmp	word ptr [si], 0
@@ -59,27 +58,27 @@ loc_59F4E:				; CODE XREF: Sequencer_AdvanceActiveSlot_59F1D:loc_59F4Aj
 		push	word ptr [si+2]
 		mov	bx, [si]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AB_603D2
+		call	AIL_stop_sequence_603D2
 		add	sp, 4
 		jmp	short $+2
 
-loc_59F69:				; CODE XREF: Sequencer_AdvanceActiveSlot_59F1D+33j
-					; Sequencer_AdvanceActiveSlot_59F1D+38j
+loc_59F69:				; CODE XREF: Music_ChannelStopSequence_59F1D+33j
+					; Music_ChannelStopSequence_59F1D+38j
 		cmp	word ptr [si+2], 0FFFFh
 		jz	short loc_59F84
 		push	word ptr [si+2]
 		mov	bx, [si]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_98_6039C
+		call	AIL_release_sequence_handle_6039C
 		add	sp, 4
 		mov	word ptr [si+2], 0FFFFh
 
-loc_59F84:				; CODE XREF: Sequencer_AdvanceActiveSlot_59F1D+Aj
-					; Sequencer_AdvanceActiveSlot_59F1D+50j
+loc_59F84:				; CODE XREF: Music_ChannelStopSequence_59F1D+Aj
+					; Music_ChannelStopSequence_59F1D+50j
 		pop	si
 		pop	bp
 		retf
-Sequencer_AdvanceActiveSlot_59F1D	endp
+Music_ChannelStopSequence_59F1D	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -87,10 +86,11 @@ Sequencer_AdvanceActiveSlot_59F1D	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle sub_60390 et sub_5C774 (motif de libération de ressource) — probable libération
-; d'un emplacement du séquenceur.
+; Ex-'Sequencer_ReleaseSlot_59F87'. far, 49L, LUE 2026-10-06. Initialise un canal musical pour
+; un pilote : canal+0 = pilote, handle = -1, alloue la table d'etat XMIDI de
+; AIL_state_table_size_60390 octets (pool 5C44h) en canal+4, taille en +0xA.
 ; ==============================================================================================
-Sequencer_ReleaseSlot_59F87	proc far		; CODE XREF: TextRenderer_Main+843P
+Music_ChannelInit_59F87	proc far		; CODE XREF: TextRenderer_Main+843P
 					; TextRenderer_Main+852P ...
 
 var_A		= dword	ptr -0Ah
@@ -111,7 +111,7 @@ arg_2		= word ptr  8
 		mov	word ptr [si+2], 0FFFFh
 		mov	bx, [si]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_96_60390
+		call	AIL_state_table_size_60390
 		pop	cx
 		mov	[bp+var_2], ax
 		movzx	eax, [bp+var_2]
@@ -134,11 +134,11 @@ arg_2		= word ptr  8
 		mov	eax, [bp+var_6]
 		mov	[si+0Ah], eax
 
-loc_59FF2:				; CODE XREF: Sequencer_ReleaseSlot_59F87+Fj
+loc_59FF2:				; CODE XREF: Music_ChannelInit_59F87+Fj
 		pop	si
 		leave
 		retf
-Sequencer_ReleaseSlot_59F87	endp
+Music_ChannelInit_59F87	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -146,13 +146,16 @@ Sequencer_ReleaseSlot_59F87	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 135 lignes, NON DÉTAILLÉE — orchestrateur du séquenceur
-; (sub_5BD80/60396/603AE/5A62A, fonctions non encore documentées). Référencée massivement
-; depuis le cluster Weapon_HUDBox (seg121-122). Candidat pour session dédiée en lien avec
-; Weapon_HUDBox_MasterUpdate_59CFA.
+; Ex-'Sequencer_ProcessQueue_59FF5'. far, 135L, LUE 2026-10-06. Charge une piste dans un canal
+; : si le descripteur est de type 3 (donnees en memoire paginee), la projette d'abord
+; (PagedMemory_ReleaseRange_5BD80, echec -> byte_7084A = 6) ;
+; AIL_register_sequence_60396(pilote, donnees XMIDI, numero de sequence arg_4, table d'etat,
+; 0) -> handle (-1 -> byte_7084A = 3, -2 -> 5) ; puis boucle AIL_timbre_request_603AE ->
+; Music_InstallTimbre_5A62A(banque, patch) jusqu'a 0xFFFF (tous les timbres necessaires
+; installes). Le demarrage se fait ensuite par AIL_start_sequence_603CC.
 ; ==============================================================================================
-Sequencer_ProcessQueue_59FF5	proc far		; CODE XREF: seg121:058AP
-					; Interrupt_TimerCase_595C2+EAP ...
+Music_ChannelRegisterSequence_59FF5	proc far		; CODE XREF: seg121:058AP
+					; Music_TuneTransitionResolve_595C2+EAP ...
 
 var_10		= dword	ptr -10h
 var_C		= dword	ptr -0Ch
@@ -175,23 +178,23 @@ arg_4		= word ptr  0Ah
 		jmp	loc_5A0EF
 ; ���������������������������������������������������������������������������
 
-loc_5A00B:				; CODE XREF: Sequencer_ProcessQueue_59FF5+11j
+loc_5A00B:				; CODE XREF: Music_ChannelRegisterSequence_59FF5+11j
 		cmp	word ptr [si+2], 0FFFFh
 		jz	short loc_5A014
 		jmp	loc_5A0EF
 ; ���������������������������������������������������������������������������
 
-loc_5A014:				; CODE XREF: Sequencer_ProcessQueue_59FF5+1Aj
+loc_5A014:				; CODE XREF: Music_ChannelRegisterSequence_59FF5+1Aj
 		cmp	byte ptr [di+4], 3
 		jnz	short loc_5A01F
 		mov	ax, 1
 		jmp	short loc_5A021
 ; ���������������������������������������������������������������������������
 
-loc_5A01F:				; CODE XREF: Sequencer_ProcessQueue_59FF5+23j
+loc_5A01F:				; CODE XREF: Music_ChannelRegisterSequence_59FF5+23j
 		xor	ax, ax
 
-loc_5A021:				; CODE XREF: Sequencer_ProcessQueue_59FF5+28j
+loc_5A021:				; CODE XREF: Music_ChannelRegisterSequence_59FF5+28j
 		mov	[bp+var_3], al
 
 loc_5A024:
@@ -218,7 +221,7 @@ loc_5A024:
 		jmp	loc_5A0EF
 ; ���������������������������������������������������������������������������
 
-loc_5A06D:				; CODE XREF: Sequencer_ProcessQueue_59FF5+6Ej
+loc_5A06D:				; CODE XREF: Music_ChannelRegisterSequence_59FF5+6Ej
 		mov	al, [bp+var_3]
 		mov	ah, 0
 		push	ax
@@ -229,7 +232,7 @@ loc_5A06D:				; CODE XREF: Sequencer_ProcessQueue_59FF5+6Ej
 		jmp	short loc_5A096
 ; ���������������������������������������������������������������������������
 
-loc_5A083:				; CODE XREF: Sequencer_ProcessQueue_59FF5+3Bj
+loc_5A083:				; CODE XREF: Music_ChannelRegisterSequence_59FF5+3Bj
 		mov	al, [bp+var_3]
 		mov	ah, 0
 		push	ax
@@ -238,10 +241,10 @@ loc_5A083:				; CODE XREF: Sequencer_ProcessQueue_59FF5+3Bj
 		push	[bp+arg_4]
 		push	large dword ptr	[di]
 
-loc_5A096:				; CODE XREF: Sequencer_ProcessQueue_59FF5+8Cj
+loc_5A096:				; CODE XREF: Music_ChannelRegisterSequence_59FF5+8Cj
 		mov	bx, [si]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_97_60396
+		call	AIL_register_sequence_60396
 		add	sp, 12h
 		mov	[si+2],	ax
 		cmp	word ptr [si+2], 0FFFFh
@@ -250,19 +253,19 @@ loc_5A096:				; CODE XREF: Sequencer_ProcessQueue_59FF5+8Cj
 		jmp	short loc_5A0EF
 ; ���������������������������������������������������������������������������
 
-loc_5A0B3:				; CODE XREF: Sequencer_ProcessQueue_59FF5+B5j
+loc_5A0B3:				; CODE XREF: Music_ChannelRegisterSequence_59FF5+B5j
 		cmp	word ptr [si+2], 0FFFEh
 		jnz	short loc_5A0C0
 		mov	byte_7084A, 5
 		jmp	short loc_5A0EF
 ; ���������������������������������������������������������������������������
 
-loc_5A0C0:				; CODE XREF: Sequencer_ProcessQueue_59FF5+C2j
-					; Sequencer_ProcessQueue_59FF5+F8j
+loc_5A0C0:				; CODE XREF: Music_ChannelRegisterSequence_59FF5+C2j
+					; Music_ChannelRegisterSequence_59FF5+F8j
 		push	word ptr [si+2]
 		mov	bx, [si]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_9B_603AE
+		call	AIL_timbre_request_603AE
 		add	sp, 4
 		mov	dx, ax
 		cmp	dx, 0FFFFh
@@ -272,19 +275,19 @@ loc_5A0C0:				; CODE XREF: Sequencer_ProcessQueue_59FF5+C2j
 		mov	byte ptr [bp+var_2], dl
 		push	[bp+var_2]
 		push	word ptr [si]
-		call	Sequencer_ValidatePlacement_5A62A
+		call	Music_InstallTimbre_5A62A
 		add	sp, 4
 		jmp	short loc_5A0C0
 ; ���������������������������������������������������������������������������
 
-loc_5A0EF:				; CODE XREF: Sequencer_ProcessQueue_59FF5+13j
-					; Sequencer_ProcessQueue_59FF5+1Cj ...
+loc_5A0EF:				; CODE XREF: Music_ChannelRegisterSequence_59FF5+13j
+					; Music_ChannelRegisterSequence_59FF5+1Cj ...
 		pop	di
 
 loc_5A0F0:
 		pop	si
 		leave
 		retf
-Sequencer_ProcessQueue_59FF5	endp
+Music_ChannelRegisterSequence_59FF5	endp
 
 seg123		ends

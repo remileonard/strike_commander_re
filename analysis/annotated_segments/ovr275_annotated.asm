@@ -7,10 +7,15 @@ ovr275		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 666 lignes, NON DÉTAILLÉE — combine
-; ResourceRecord_SeekAndRead_64743/SeekAndReadB_647B2 répétés.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). PASSE DE DIMENSIONNEMENT (ex-
+; AircraftComponent_LoadFieldSequence). VERT : nombre de sommets = taille ÷ 12 → +2. FORM
+; TRIS/VTRI : taille ÷ 8 faces, cumule pour chaque face selon son octet 0 (type 0..9) la
+; taille de son élément de dessin (17h..24h o) et de ses données de face (26h..2Ah o). FORM
+; LINS/VLIN : 7 o par ligne ; FORM SPRS/VSPR : 8 o. Alloue +12h (sommets 18h o + données de
+; face), +8 (sommets projetés 12h o), +1Ch (éléments de dessin), +28h (une entrée de 4 o par
+; primitive).
 ; ==============================================================================================
-AircraftComponent_LoadFieldSequence_95800	proc far		; CODE XREF: VROOMM_StubThunk_6B9A0J
+Poly_SizeBuffers_95800	proc far		; CODE XREF: VROOMM_StubThunk_6B9A0J
 
 var_5A		= dword	ptr -5Ah
 var_56		= dword	ptr -56h
@@ -71,7 +76,7 @@ arg_4		= word ptr  0Ah
 		les	bx, [bp+arg_0]
 		mov	es:[bx+2], ax
 
-loc_9585D:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+45j
+loc_9585D:				; CODE XREF: Poly_SizeBuffers_95800+45j
 		push	0
 		push	large 53495254h
 		push	si
@@ -82,7 +87,7 @@ loc_9585D:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+45j
 		jmp	loc_959D6
 ; ���������������������������������������������������������������������������
 
-loc_95875:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+70j
+loc_95875:				; CODE XREF: Poly_SizeBuffers_95800+70j
 		push	0
 		push	large 49525456h
 		push	si
@@ -93,7 +98,7 @@ loc_95875:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+70j
 		jmp	loc_959CF
 ; ���������������������������������������������������������������������������
 
-loc_9588D:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+88j
+loc_9588D:				; CODE XREF: Poly_SizeBuffers_95800+88j
 		mov	eax, [si+72h]
 		mov	ebx, 8
 		cdq
@@ -142,7 +147,7 @@ loc_9588D:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+88j
 		jmp	short loc_95993
 ; ���������������������������������������������������������������������������
 
-loc_9591E:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+195j
+loc_9591E:				; CODE XREF: Poly_SizeBuffers_95800+195j
 		les	bx, [bp+var_5A]
 		mov	al, es:[bx]
 		cbw
@@ -152,34 +157,34 @@ loc_9591E:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+195j
 		shl	bx, 1
 		jmp	cs:off_95E07[bx] ; switch jump
 
-loc_95933:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+12Aj
-					; AircraftComponent_LoadFieldSequence_95800:loc_9593Fj
+loc_95933:				; CODE XREF: Poly_SizeBuffers_95800+12Aj
+					; Poly_SizeBuffers_95800:loc_9593Fj
 					; DATA XREF: ...
 		add	[bp+var_C], 27h	; ''' ; default
 		add	[bp+var_8], 17h
 		jmp	short loc_9598E
 ; ���������������������������������������������������������������������������
 
-loc_9593F:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+12Ej
+loc_9593F:				; CODE XREF: Poly_SizeBuffers_95800+12Ej
 					; DATA XREF: ovr275:off_95E07o
 		jmp	short loc_95933	; case 0x1
 ; ���������������������������������������������������������������������������
 
-loc_95941:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+12Ej
+loc_95941:				; CODE XREF: Poly_SizeBuffers_95800+12Ej
 					; DATA XREF: ovr275:off_95E07o
 		add	[bp+var_C], 2Ah	; '*' ; case 0x2
 		add	[bp+var_8], 1Ah
 		jmp	short loc_9598E
 ; ���������������������������������������������������������������������������
 
-loc_9594D:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+12Ej
+loc_9594D:				; CODE XREF: Poly_SizeBuffers_95800+12Ej
 					; DATA XREF: ovr275:off_95E07o
 		add	[bp+var_C], 29h	; ')' ; case 0x4
 		add	[bp+var_8], 1Ch
 		jmp	short loc_9598E
 ; ���������������������������������������������������������������������������
 
-loc_95959:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+12Ej
+loc_95959:				; CODE XREF: Poly_SizeBuffers_95800+12Ej
 					; DATA XREF: ovr275:off_95E07o
 		add	[bp+var_C], 28h	; '(' ; case 0x3
 
@@ -190,39 +195,39 @@ loc_95963:
 		jmp	short loc_9598E
 ; ���������������������������������������������������������������������������
 
-loc_95965:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+12Ej
+loc_95965:				; CODE XREF: Poly_SizeBuffers_95800+12Ej
 					; DATA XREF: ovr275:off_95E07o
 		add	[bp+var_C], 26h	; '&' ; case 0x6
 		add	[bp+var_8], 1Eh
 		jmp	short loc_9598E
 ; ���������������������������������������������������������������������������
 
-loc_95971:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+12Ej
+loc_95971:				; CODE XREF: Poly_SizeBuffers_95800+12Ej
 					; DATA XREF: ovr275:off_95E07o
 		add	[bp+var_C], 29h	; ')' ; case 0x7
 		jmp	short loc_95989
 ; ���������������������������������������������������������������������������
 
-loc_95978:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+12Ej
+loc_95978:				; CODE XREF: Poly_SizeBuffers_95800+12Ej
 					; DATA XREF: ovr275:off_95E07o
 		add	[bp+var_C], 28h	; '(' ; case 0x8
 		add	[bp+var_8], 20h	; ' '
 		jmp	short loc_9598E
 ; ���������������������������������������������������������������������������
 
-loc_95984:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+12Ej
+loc_95984:				; CODE XREF: Poly_SizeBuffers_95800+12Ej
 					; DATA XREF: ovr275:off_95E07o
 		add	[bp+var_C], 26h	; '&' ; case 0x9
 
-loc_95989:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+176j
+loc_95989:				; CODE XREF: Poly_SizeBuffers_95800+176j
 		add	[bp+var_8], 24h	; '$'
 
-loc_9598E:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+13Dj
-					; AircraftComponent_LoadFieldSequence_95800+14Bj ...
+loc_9598E:				; CODE XREF: Poly_SizeBuffers_95800+13Dj
+					; Poly_SizeBuffers_95800+14Bj ...
 		inc	dx
 		add	word ptr [bp+var_5A], 8
 
-loc_95993:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+11Cj
+loc_95993:				; CODE XREF: Poly_SizeBuffers_95800+11Cj
 		cmp	dx, di
 		jl	short loc_9591E
 		cmp	[bp+var_49], 0
@@ -239,18 +244,18 @@ loc_95993:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+11Cj
 		add	sp, 8
 		jmp	short $+2
 
-loc_959BB:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+19Bj
-					; AircraftComponent_LoadFieldSequence_95800+1A2j
+loc_959BB:				; CODE XREF: Poly_SizeBuffers_95800+19Bj
+					; Poly_SizeBuffers_95800+1A2j
 		mov	[bp+var_4E], 0
 		mov	[bp+var_49], 0
 		mov	[bp+var_48], 0
 
-loc_959CF:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+8Aj
+loc_959CF:				; CODE XREF: Poly_SizeBuffers_95800+8Aj
 		push	si
 		call	ResourceRecord_ReleaseAndClear_64D25
 		pop	cx
 
-loc_959D6:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+72j
+loc_959D6:				; CODE XREF: Poly_SizeBuffers_95800+72j
 		push	0
 		push	large 534E494Ch
 		push	si
@@ -261,7 +266,7 @@ loc_959D6:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+72j
 		jmp	loc_95B14
 ; ���������������������������������������������������������������������������
 
-loc_959EE:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+1E9j
+loc_959EE:				; CODE XREF: Poly_SizeBuffers_95800+1E9j
 		push	0
 		push	large 4E494C56h
 		push	si
@@ -272,7 +277,7 @@ loc_959EE:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+1E9j
 		jmp	loc_95B0D
 ; ���������������������������������������������������������������������������
 
-loc_95A06:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+201j
+loc_95A06:				; CODE XREF: Poly_SizeBuffers_95800+201j
 		mov	eax, [si+72h]
 		mov	ebx, 7
 		cdq
@@ -327,7 +332,7 @@ loc_95A76:
 		jmp	short loc_95AD0
 ; ���������������������������������������������������������������������������
 
-loc_95A98:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+2D3j
+loc_95A98:				; CODE XREF: Poly_SizeBuffers_95800+2D3j
 		les	bx, [bp+var_5A]
 		mov	al, es:[bx]
 		cbw
@@ -340,22 +345,22 @@ loc_95A98:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+2D3j
 		jmp	short loc_95ACB
 ; ���������������������������������������������������������������������������
 
-loc_95AB5:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+2A2j
+loc_95AB5:				; CODE XREF: Poly_SizeBuffers_95800+2A2j
 		add	[bp+var_10], 0Eh
 		add	[bp+var_14], 16h
 		jmp	short loc_95ACB
 ; ���������������������������������������������������������������������������
 
-loc_95AC1:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+2A7j
+loc_95AC1:				; CODE XREF: Poly_SizeBuffers_95800+2A7j
 		add	[bp+var_10], 0Ch
 		add	[bp+var_14], 14h
 
-loc_95ACB:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+2B3j
-					; AircraftComponent_LoadFieldSequence_95800+2BFj
+loc_95ACB:				; CODE XREF: Poly_SizeBuffers_95800+2B3j
+					; Poly_SizeBuffers_95800+2BFj
 		inc	dx
 		add	word ptr [bp+var_5A], 7
 
-loc_95AD0:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+296j
+loc_95AD0:				; CODE XREF: Poly_SizeBuffers_95800+296j
 		cmp	dx, [bp+var_2]
 		jl	short loc_95A98
 		cmp	[bp+var_49], 0
@@ -372,18 +377,18 @@ loc_95AD0:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+296j
 		add	sp, 8
 		jmp	short $+2
 
-loc_95AF9:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+2D9j
-					; AircraftComponent_LoadFieldSequence_95800+2E0j
+loc_95AF9:				; CODE XREF: Poly_SizeBuffers_95800+2D9j
+					; Poly_SizeBuffers_95800+2E0j
 		mov	[bp+var_4E], 0
 		mov	[bp+var_49], 0
 		mov	[bp+var_48], 0
 
-loc_95B0D:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+203j
+loc_95B0D:				; CODE XREF: Poly_SizeBuffers_95800+203j
 		push	si
 		call	ResourceRecord_ReleaseAndClear_64D25
 		pop	cx
 
-loc_95B14:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+1EBj
+loc_95B14:				; CODE XREF: Poly_SizeBuffers_95800+1EBj
 		push	0
 		push	large 53525053h
 		push	si
@@ -394,7 +399,7 @@ loc_95B14:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+1EBj
 		jmp	loc_95C4C
 ; ���������������������������������������������������������������������������
 
-loc_95B2C:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+327j
+loc_95B2C:				; CODE XREF: Poly_SizeBuffers_95800+327j
 		push	0
 		push	large 52505356h
 		push	si
@@ -405,7 +410,7 @@ loc_95B2C:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+327j
 		jmp	loc_95C45
 ; ���������������������������������������������������������������������������
 
-loc_95B44:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+33Fj
+loc_95B44:				; CODE XREF: Poly_SizeBuffers_95800+33Fj
 		mov	eax, [si+72h]
 		mov	ebx, 8
 		cdq
@@ -458,7 +463,7 @@ loc_95B71:
 		jmp	short loc_95C08
 ; ���������������������������������������������������������������������������
 
-loc_95BD6:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+40Bj
+loc_95BD6:				; CODE XREF: Poly_SizeBuffers_95800+40Bj
 		les	bx, [bp+var_5A]
 		mov	al, es:[bx]
 		cbw
@@ -469,8 +474,8 @@ loc_95BD6:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+40Bj
 		cmp	ax, 3
 		jz	short loc_95C03
 
-loc_95BEB:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+3DFj
-					; AircraftComponent_LoadFieldSequence_95800+3F7j
+loc_95BEB:				; CODE XREF: Poly_SizeBuffers_95800+3DFj
+					; Poly_SizeBuffers_95800+3F7j
 		add	[bp+var_18], 0Ah
 		add	[bp+var_1C], 11h
 		jmp	short loc_95C03
@@ -478,16 +483,16 @@ loc_95BEB:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+3DFj
 		jmp	short loc_95BEB
 ; ���������������������������������������������������������������������������
 
-loc_95BF9:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+3E4j
+loc_95BF9:				; CODE XREF: Poly_SizeBuffers_95800+3E4j
 		add	[bp+var_18], 0Dh
 		add	[bp+var_1C], 14h
 
-loc_95C03:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+3E9j
-					; AircraftComponent_LoadFieldSequence_95800+3F5j
+loc_95C03:				; CODE XREF: Poly_SizeBuffers_95800+3E9j
+					; Poly_SizeBuffers_95800+3F5j
 		inc	dx
 		add	word ptr [bp+var_5A], 8
 
-loc_95C08:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+3D4j
+loc_95C08:				; CODE XREF: Poly_SizeBuffers_95800+3D4j
 		cmp	dx, [bp+var_4]
 		jl	short loc_95BD6
 		cmp	[bp+var_49], 0
@@ -504,18 +509,18 @@ loc_95C08:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+3D4j
 		add	sp, 8
 		jmp	short $+2
 
-loc_95C31:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+411j
-					; AircraftComponent_LoadFieldSequence_95800+418j
+loc_95C31:				; CODE XREF: Poly_SizeBuffers_95800+411j
+					; Poly_SizeBuffers_95800+418j
 		mov	[bp+var_4E], 0
 		mov	[bp+var_49], 0
 		mov	[bp+var_48], 0
 
-loc_95C45:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+341j
+loc_95C45:				; CODE XREF: Poly_SizeBuffers_95800+341j
 		push	si
 		call	ResourceRecord_ReleaseAndClear_64D25
 		pop	cx
 
-loc_95C4C:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+329j
+loc_95C4C:				; CODE XREF: Poly_SizeBuffers_95800+329j
 		mov	[bp+var_1D], 2
 		call	Registry_LookupForTextRenderer_5B5D9
 		push	dx
@@ -546,11 +551,11 @@ loc_95C74:
 		cmp	[bp+var_26], 17318h
 		jge	short loc_95C96
 
-loc_95C92:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+486j
+loc_95C92:				; CODE XREF: Poly_SizeBuffers_95800+486j
 		mov	[bp+var_1D], 3
 
-loc_95C96:				; CODE XREF: AircraftComponent_LoadFieldSequence_95800+47Cj
-					; AircraftComponent_LoadFieldSequence_95800+490j
+loc_95C96:				; CODE XREF: Poly_SizeBuffers_95800+47Cj
+					; Poly_SizeBuffers_95800+490j
 		mov	eax, [bp+var_C]
 		add	eax, [bp+var_10]
 		add	eax, [bp+var_18]
@@ -675,10 +680,10 @@ loc_95DBF:
 		pop	si
 		leave
 		retf
-AircraftComponent_LoadFieldSequence_95800	endp
+Poly_SizeBuffers_95800	endp
 
 ; ���������������������������������������������������������������������������
-off_95E07	dw offset loc_95933	; DATA XREF: AircraftComponent_LoadFieldSequence_95800+12Er
+off_95E07	dw offset loc_95933	; DATA XREF: Poly_SizeBuffers_95800+12Er
 		dw offset loc_9593F	; jump table for switch	statement
 		dw offset loc_95941
 		dw offset loc_95959

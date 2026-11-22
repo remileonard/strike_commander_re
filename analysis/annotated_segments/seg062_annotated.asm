@@ -513,8 +513,8 @@ off_2DCD4	dw offset loc_2DC1A	; DATA XREF: seg062:loc_2DBE2r
 ; tableau : résolution de valeur par recherche dans une table triée (jauge/barre graduée avec
 ; interpolation).
 ; ==============================================================================================
-Gauge_ResolveInterpolated	proc far		; CODE XREF: Debris_SpawnAtAttachPoint+1C5P
-					; Debris_SpawnOrchestrator+2FFP
+Gauge_ResolveInterpolated	proc far		; CODE XREF: Debris_SpawnFromDebrList_3844F+1C5P
+					; Object_SpawnDestructionEffects_3863A+2FFP
 
 var_8		= word ptr -8
 var_6		= word ptr -6

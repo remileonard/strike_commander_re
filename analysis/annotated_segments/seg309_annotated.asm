@@ -32,7 +32,7 @@ VROOMM_StubThunk_6C380	endp
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
 VROOMM_StubThunk_6C385	proc far
-		jmp	PlayerComponent_LoadFromResourceRecord_9DF63
+		jmp	WeaponSys_LoadWeaponEntry_9DF63
 VROOMM_StubThunk_6C385	endp
 
 
@@ -83,9 +83,9 @@ VROOMM_StubThunk_6C394	endp
 ; far, thunk fixe VROOMM (jmp sub_9E289) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
-VROOMM_StubThunk_6C399	proc far		; CODE XREF: HUD_RenderSymbologyMain+C47P
-					; HUD_RenderSymbologyMain+CE9P ...
-		jmp	TimedTrigger_SpawnAndBindGeometry_9E289
+VROOMM_StubThunk_6C399	proc far		; CODE XREF: WeaponSystem_LaunchFromStation_3E744+C47P
+					; WeaponSystem_LaunchFromStation_3E744+CE9P ...
+		jmp	WeaponSystem_ReleaseBomb_9E289
 VROOMM_StubThunk_6C399	endp
 
 
@@ -97,8 +97,8 @@ VROOMM_StubThunk_6C399	endp
 ; far, thunk fixe VROOMM (jmp sub_9E651) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
-VROOMM_StubThunk_6C39E	proc far		; CODE XREF: HUD_RenderSymbologyMain+101AP
-					; HUD_RenderSymbologyAlt+591P ...
+VROOMM_StubThunk_6C39E	proc far		; CODE XREF: WeaponSystem_LaunchFromStation_3E744+101AP
+					; WeaponSystem_FrameUpdate_3F8C0+591P ...
 		jmp	PlayerComponent_Helper_9E651
 VROOMM_StubThunk_6C39E	endp
 
@@ -112,7 +112,7 @@ VROOMM_StubThunk_6C39E	endp
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
 VROOMM_StubThunk_6C3A3	proc far
-		jmp	PlayerComponent_LoadTripleField_9E682
+		jmp	WeaponSys_LoadHardpoint_9E682
 VROOMM_StubThunk_6C3A3	endp
 
 
@@ -177,7 +177,7 @@ VROOMM_StubThunk_6C3B7	endp
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
 VROOMM_StubThunk_6C3BC	proc far
-		jmp	PlayerComponent_ComputeComplexB_9EA2E
+		jmp	WeaponSys_LoadStoresOnHardpoint_9EA2E
 VROOMM_StubThunk_6C3BC	endp
 
 
@@ -229,7 +229,7 @@ VROOMM_StubThunk_6C3CB	endp
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
 VROOMM_StubThunk_6C3D0	proc far
-		jmp	PlayerComponent_Dispatch_9ED62
+		jmp	WeaponSys_LoadFromIFF_9ED62
 VROOMM_StubThunk_6C3D0	endp
 
 
@@ -242,7 +242,7 @@ VROOMM_StubThunk_6C3D0	endp
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
 VROOMM_StubThunk_6C3D5	proc far		; CODE XREF: MissionScenario_DispatchWrapper_AA0C7+26P
-		jmp	PlayerComponent_LoadSequence_9EF74
+		jmp	WeaponSys_LoadFormWEAP_9EF74
 VROOMM_StubThunk_6C3D5	endp
 
 
@@ -255,7 +255,7 @@ VROOMM_StubThunk_6C3D5	endp
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
 VROOMM_StubThunk_6C3DA	proc far		; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+4BBP
-		jmp	PlayerComponent_ConstructFromStream_9EFBE
+		jmp	WeaponSys_LoadFromFile_9EFBE
 VROOMM_StubThunk_6C3DA	endp
 
 
@@ -268,7 +268,7 @@ VROOMM_StubThunk_6C3DA	endp
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
 VROOMM_StubThunk_6C3DF	proc far
-		jmp	PlayerComponent_LoadMultiField_9F07F
+		jmp	WeaponSys_LoadInfoHptsDcoy_9F07F
 VROOMM_StubThunk_6C3DF	endp
 
 
@@ -281,7 +281,7 @@ VROOMM_StubThunk_6C3DF	endp
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
 VROOMM_StubThunk_6C3E4	proc far
-		jmp	PlayerComponent_LoadAndApply_9EDD4
+		jmp	WeaponSys_LoadWPNS_9EDD4
 VROOMM_StubThunk_6C3E4	endp
 
 
@@ -425,7 +425,7 @@ VROOMM_StubThunk_6C416	endp
 ; far, thunk fixe VROOMM (jmp sub_9F784) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
-VROOMM_StubThunk_6C41B	proc far		; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+366P
+VROOMM_StubThunk_6C41B	proc far		; CODE XREF: Aircraft_OnCollision_9D910+366P
 		jmp	PlayerComponent_FormatAndDisplay_9F784
 VROOMM_StubThunk_6C41B	endp
 
@@ -478,7 +478,7 @@ VROOMM_StubThunk_6C42A	endp
 ; far, thunk fixe VROOMM (jmp sub_9E027) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
-VROOMM_StubThunk_6C42F	proc far		; CODE XREF: HUD_RenderSymbologyAlt+19DP
+VROOMM_StubThunk_6C42F	proc far		; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+19DP
 		jmp	PlayerComponent_ComputeGeometryComplex_9E027
 VROOMM_StubThunk_6C42F	endp
 
@@ -491,8 +491,8 @@ VROOMM_StubThunk_6C42F	endp
 ; far, thunk fixe VROOMM (jmp sub_9F98D) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
-VROOMM_StubThunk_6C434	proc far		; CODE XREF: HUD_RenderSymbologyMain+C8EP
-					; HUD_RenderSymbologyAlt+219P ...
+VROOMM_StubThunk_6C434	proc far		; CODE XREF: WeaponSystem_LaunchFromStation_3E744+C8EP
+					; WeaponSystem_FrameUpdate_3F8C0+219P ...
 		jmp	PlayerComponent_MainOrchestrator_9F98D
 VROOMM_StubThunk_6C434	endp
 
@@ -518,7 +518,7 @@ VROOMM_StubThunk_6C439	endp
 ; far, thunk fixe VROOMM (jmp sub_9EBD7) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
-VROOMM_StubThunk_6C43E	proc far		; CODE XREF: Camera_Helper2_9D380+2FP
+VROOMM_StubThunk_6C43E	proc far		; CODE XREF: Armed_LoadFromIFF_9D380+2FP
 		jmp	PlayerComponent_ReleaseAndLoad_9EBD7
 VROOMM_StubThunk_6C43E	endp
 

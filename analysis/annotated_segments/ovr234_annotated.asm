@@ -131,7 +131,7 @@ AIManeuver_BuildRotationAndLookupB_7A836	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine AI_ApplyAngleBetweenVectors_57C3A et AI_ApplyApproachAngles_57D81 (seg116).
+; far, combine Matrix_NosePitchAngle_57C3A et AI_ApplyApproachAngles_57D81 (seg116).
 ; ==============================================================================================
 AI_ApplyManeuverAngles_7A90A	proc far		; CODE XREF: VROOMM_StubThunk_6ACBAJ
 
@@ -163,7 +163,7 @@ loc_7A922:				; CODE XREF: AI_ApplyManeuverAngles_7A90A+12j
 		push	ss
 		lea	ax, [bp+var_4]
 		push	ax
-		call	AI_ApplyAngleBetweenVectors_57C3A
+		call	Matrix_NosePitchAngle_57C3A
 		add	sp, 6
 		mov	ax, [bp+var_4+1]
 		mov	[si+189h], ax

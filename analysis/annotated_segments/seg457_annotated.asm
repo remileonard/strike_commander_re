@@ -802,16 +802,19 @@ ExprSlot_ReleaseArray_A98EC	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 125 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). RENOMMEE (ancien
-; nom 'ExprSlot_ReleaseAndReloadDword' n'avait aucun rapport). C'EST LE VRAI LECTEUR DU CHUNK
-; CAST (confirme via DATA_MODEL.md 'sub_6CF0D->A9956'). Taille d'enregistrement : 9 octets
-; (compteur = taille_chunk/9). Pour chaque entree : si le tag vaut le litteral 'TEAM' (4
-; octets), lit un 5eme octet comme caractere ASCII de numero d'equipe (0-9), puis copie un nom
-; de pilote de 8 caracteres par-dessus (deborde volontairement sur l'entree suivante) — soit
-; 'BILLY' en dur si byte_7070E==0 (mode test/defaut), soit une entree resolue depuis une table
-; nommee (word_706A0+0x86+idx*9) sinon. CONCLUSION : CAST est la table qui associe un numero
-; d'equipe au NOM DE FICHIER PROF a charger — le chainon manquant vers
-; PilotProfile_LoadFromPROF.
+; far, LUE INTÉGRALEMENT. LECTEUR DU CHUNK CAST de MISN (via VROOMM_StubThunk_6CF0D ; liste
+; rangée à MissionScenario+0x2E). Enregistrements de 9 o = nom de pilote char[8] + zéro de fin
+; ; nombre = taille ÷ 9 (mov bx, 9 / div bx), sans contrôle du reste. Le chunk entier est lu
+; brut (ResourceRecord_ReadDwordFieldB_64AFF, taille [di+72h]) ; liste = [+0] u16 nombre, [+2]
+; far ptr buffer. Noms spéciaux 'TEAMn' (cmp dword ptr es:[bx], 4D414554h ; n = 5e caractère −
+; '0', add ax, 0FFD0h) remplacés SUR PLACE (8 octets en tête d'enregistrement puis +0x08 = 0 —
+; pas de débordement sur l'entrée suivante) : si byte_7070E = 1 (mission lancée depuis la
+; campagne, posé par MissionScenario_LoadFromIFF_A8C44) et n < 3 → n-ième nom d'équipe de
+; DATA\OP2MISN.IFF (chunk TEAM, word_706A0+0x86+n×9 : ailiers choisis par le joueur) ; n ≥ 3 →
+; inchangé ; si byte_7070E = 0 (mission chargée directement) → 'BILLY'. Usage :
+; Mission_GetCastName_52C5F (index PART+0x1B) →
+; AIAircraft_SpawnAndConditionalLoadProfile_53363 : 'PLAYER' = joueur (pas de profil),
+; 'NETWORK' = réseau, sinon IA avec profil INTEL\<nom>.IFF (PilotProfile_LoadFromPROF_73B4F).
 ; ==============================================================================================
 PLAY_LoadCASTTeamNames_A9956	proc far		; CODE XREF: VROOMM_StubThunk_6CF0DJ
 
@@ -1643,10 +1646,13 @@ PartEntry_ResetState_A9DFD	endp
 ; progs_id) : appelle PartEntry_ResetState_A9DFD, lit 62 octets bruts du chunk
 ; (ResourceRecord_ReadFieldGroupA), en extrait +0x1B (1er octet), resout 3 noms de 8
 ; caracteres via sub_2E74 (aux offsets entite+9, +0x12, +0x1A -- roles precis non elucides),
-; resout une position nommee via GeomNode_SumAndCount_53034 -> +0x1D/+0x1F/+0x1C, copie des
-; champs +0x21/+0x25/+0x29/+0x2D/+0x2F/+0x31/+0x32/+0x33/+0x35/+0x37 (roles precis non
-; elucides, correspondent probablement a d'autres champs de l'implementation de Remi -- point
-; ouvert).
+; resout une position nommee via PtrList_GetAt_53034 -> +0x1D/+0x1F/+0x1C, copie des champs
+; +0x21/+0x25/+0x29/+0x2D/+0x2F/+0x31/+0x32/+0x33/+0x35/+0x37 (roles precis non elucides,
+; correspondent probablement a d'autres champs de l'implementation de Remi -- point ouvert). |
+; 2026-09-27 : enregistrement PART de 62 octets : +0x1C octet 28, +0x21/+0x25/+0x29 dwords
+; 29/33/37, +0x2D/+0x2F mots 41/43, +0x31 octet 45, +0x32 octet 46 = ALLIE PAR DEFAUT de
+; l'ordre 'suivre', +0x33/+0x35/+0x37 mots 48/50/52 = POSTE (cote, avant, haut, m) de l'ordre
+; 'suivre', 4 programmes mots 54..60.
 ; ==============================================================================================
 PartEntry_LoadAndResolveNames_A9E3C	proc far		; CODE XREF: VROOMM_StubThunk_6CF1CJ PartEntry_AllocateArray_AA23D+6Fp
 
@@ -1743,7 +1749,7 @@ loc_A9EB2:
 		mov	ax, si
 		add	ax, 1Ah
 		push	ax
-		call	GeomNode_SumAndCount_53034
+		call	PtrList_GetAt_53034
 		add	sp, 4
 		les	bx, [bp+arg_0]
 		mov	es:[bx+1Fh], dx
@@ -2606,19 +2612,17 @@ ExprSlot_ReleaseSingleE_AA37D	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,123L — parse un chunk 'SCNE' (scene) en un record de 0x27 octets. Appele par
-; MissionPlay_LoadScenes_AA595. En-tete disque fixe de 24 octets (ReadFieldGroupA) : +0x00 u8
-; is_active ; +0x01 u16 area_id (index dans AREA, -1=scene globale ; resolu par
-; GeomNode_SumAndCount_53034(ctx+0x1A) -> record+0x04) ; +0x03/+0x05/+0x07 3x i16 = handlers
-; PROG on_activated/on_leaving/on_mission_update (-1=aucun ; resolus par
-; Expr_LookupNamedValue_51E4A(ctx+0x40=liste PROG) -> record+0x08/+0x0C/+0x10) ; +0x09 u8
-; has_own_coord ; +0x0A u16 heading (candidat cap deg ; =180 si ancre a l'aire, =0 si coord
-; explicite) ; +0x0C/+0x10/+0x14 3x i32 position (X, Y, Z) fixed-point /256 ; 3e composante
-; (+0x14) = Z = altitude (repere ASM Z-up, cf. CLAUDE.md) -> record+0x1B/+0x1F/+0x23. Puis
-; (taille_chunk-24)/2 mots u16 en queue = LISTE D'UNITES : index dans le chunk PART en ORDRE
-; DE STOCKAGE (pas un id d'entite, pas un index CAST, sans offset) -> PART[slot].entity_id ->
-; CAST[entity_id]. malloc + ReadFieldGroupA -> record+0x14 count, +0x16 ptr. Verifie sur
-; MISSIONS/MISN-1A.IFF. Detail complet : analysis/DATA_MODEL.md §6.6a.
+; far,123L, relue 2026-10-31 — parse un chunk 'SCNE' (scène) en un record de 0x27 octets
+; (appelé par MissionPlay_LoadScenes_AA595). En-tête disque de 24 octets (push large 18h /
+; ResourceRecord_ReadFieldGroupA_64A19) : +0x00 u8 active au départ ; +0x01 u16 zone (index
+; AREA, -1 = scène globale ; PtrList_GetAt_53034(ctx+0x1A) → record+0x04) ; +0x03/+0x05/+0x07
+; 3× i16 scripts PROG : à l'activation, à chaque image, en quittant (-1 = aucun ;
+; Expr_LookupNamedValue_51E4A(ctx+0x40) → record+0x08/+0x0C/+0x10) ; +0x09 u8 → record+0x18 =
+; point d'arrivée du pilote automatique défini ; +0x0A i16 → record+0x19 = cap d'arrivée en
+; degrés (-1 = aucun) ; +0x0C/+0x10/+0x14 3× i32 24.8 → record+0x1B/+0x1F/+0x23 = position
+; d'arrivée absolue. Ces champs d'arrivée sont lus par Autopilot_JumpSequence_7A054. Puis
+; (taille − 24)/2 u16 = index dans PART des objets de la scène → record+0x14 nombre, +0x16
+; tableau. IMPL_MISSION_AREAS.md § 4.1.
 ; ==============================================================================================
 MissionScene_ParseRecord_AA3A5	proc far		; CODE XREF: VROOMM_StubThunk_6CF3FJ MissionPlay_LoadScenes_AA595+DFp
 
@@ -2658,7 +2662,7 @@ arg_4		= word ptr  0Ah
 		mov	ax, [si+2]
 		add	ax, 1Ah
 		push	ax
-		call	GeomNode_SumAndCount_53034
+		call	PtrList_GetAt_53034
 		add	sp, 4
 		mov	[si+6],	dx
 		mov	[si+4],	ax
@@ -3134,7 +3138,7 @@ MissionScenario_Helper_AA687	endp
 ; ==============================================================================================
 ; far, aucun appel externe visible (14 lignes).
 ; ==============================================================================================
-ExprSlot_Helper9_AA6B3	proc far		; CODE XREF: VROOMM_StubThunk_6CEE0J ExprSlot_LoadFieldGroupWithErrorCheck_AA6C9+10p
+ExprSlot_Helper9_AA6B3	proc far		; CODE XREF: VROOMM_StubThunk_6CEE0J Mission_LoadSpotList_AA6C9+10p
 
 arg_0		= word ptr  6
 
@@ -3155,10 +3159,19 @@ ExprSlot_Helper9_AA6B3	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 104 lignes, NON DÉTAILLÉE — combine ExprSlot_Helper9_AA6B3, gestion d'erreur,
-; Memory_TypedFreeWrapperC_5C6F3, ReadFieldGroupA_64A19, GeomNode_SumAndCount_53034.
+; far, LECTEUR DU CHUNK 'SPOT' de MISN (via VROOMM_StubThunk_6CEE5 depuis
+; MissionScenario_LoadMainRecord_A8331 ; liste rangée à MissionScenario+0x1E). Enregistrements
+; disque fixes de 14 o : nombre = taille ÷ 14 (mov bx,0Eh / div bx) ; erreur 9114h si taille ≠
+; nombre×14 (imul ax,0Eh / cmp eax,[di+72h]). Disque : +0x00 u16 index AREA de rattachement ;
+; +0x02/+0x06/+0x0A 3× i32 24.8 = décalage relatif à la zone (asm c0/c1/c2, c2 = altitude ;
+; libRealSpace : X, Z, Y ; ÷256 → m). Mémoire : liste [+0] u16 nombre, [+2] far ptr tableau de
+; records de 16 o (shl ax,4) : +0 far ptr zone AREA (PtrList_GetAt_53034(scénario+0x1A, index)
+; ; nul si index hors liste), +4/+8/+0xC décalage. Position monde = AreaRelPos_ToWorld_50EEB
+; (décalage + point de référence de la zone, ou décalage seul si zone nulle). Utilisé par les
+; ordres de mission (0xA1, 0xA2…) via Mission_GetSpotWorldPosition_5305A. Détail :
+; DATA_MODEL.md, chunk SPOT.
 ; ==============================================================================================
-ExprSlot_LoadFieldGroupWithErrorCheck_AA6C9	proc far		; CODE XREF: VROOMM_StubThunk_6CEE5J
+Mission_LoadSpotList_AA6C9	proc far		; CODE XREF: VROOMM_StubThunk_6CEE5J
 
 var_20		= word ptr -20h
 var_1E		= dword	ptr -1Eh
@@ -3198,7 +3211,7 @@ arg_4		= word ptr  0Ah
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_AA701:				; CODE XREF: ExprSlot_LoadFieldGroupWithErrorCheck_AA6C9+2Dj
+loc_AA701:				; CODE XREF: Mission_LoadSpotList_AA6C9+2Dj
 		push	1
 		push	0
 		push	2
@@ -3217,7 +3230,7 @@ loc_AA701:				; CODE XREF: ExprSlot_LoadFieldGroupWithErrorCheck_AA6C9+2Dj
 		jmp	short loc_AA799
 ; ���������������������������������������������������������������������������
 
-loc_AA732:				; CODE XREF: ExprSlot_LoadFieldGroupWithErrorCheck_AA6C9+D5j
+loc_AA732:				; CODE XREF: Mission_LoadSpotList_AA6C9+D5j
 		push	large 0Eh
 		push	ss
 		lea	ax, [bp+var_20]
@@ -3229,7 +3242,7 @@ loc_AA732:				; CODE XREF: ExprSlot_LoadFieldGroupWithErrorCheck_AA6C9+D5j
 		mov	ax, [bp+arg_2]
 		add	ax, 1Ah
 		push	ax
-		call	GeomNode_SumAndCount_53034
+		call	PtrList_GetAt_53034
 		add	sp, 4
 		les	bx, [bp+var_4]
 		mov	es:[bx+2], dx
@@ -3253,7 +3266,7 @@ loc_AA774:
 		inc	[bp+var_6]
 		add	word ptr [bp+var_4], 10h
 
-loc_AA799:				; CODE XREF: ExprSlot_LoadFieldGroupWithErrorCheck_AA6C9+67j
+loc_AA799:				; CODE XREF: Mission_LoadSpotList_AA6C9+67j
 		mov	ax, [si]
 		cmp	ax, [bp+var_6]
 		jg	short loc_AA732
@@ -3261,7 +3274,7 @@ loc_AA799:				; CODE XREF: ExprSlot_LoadFieldGroupWithErrorCheck_AA6C9+67j
 		pop	si
 		leave
 		retf
-ExprSlot_LoadFieldGroupWithErrorCheck_AA6C9	endp
+Mission_LoadSpotList_AA6C9	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

@@ -20,7 +20,7 @@ seg001		segment	byte public 'CODE' use16
 ; CONFIRME que ID=20 sert de solveur geometrique partage, pas un instinct classique du tournoi
 ; consomme via le tableau MVRS du fichier.
 ; ==============================================================================================
-AI_ProximityGeometricWarning_315B	proc far		; CODE XREF: AI_VisibilityTest+260P
+AI_ProximityGeometricWarning_315B	proc far		; CODE XREF: AI_CollisionCourseTest_DD21+260P
 
 var_4A		= dword	ptr -4Ah
 var_46		= dword	ptr -46h
@@ -96,7 +96,7 @@ arg_6		= word ptr  0Ch
 		push	ss
 		lea	ax, [bp+var_4A]
 		push	ax
-		call	Vector_TransformHelperA_550B7
+		call	Vector_CrossProduct3D_550B7
 		add	sp, 8
 		mov	eax, [bp+var_4A]
 		mov	[bp+var_26], eax
@@ -209,7 +209,22 @@ AI_ProximityGeometricWarning_315B	endp
 ; la cible courante. Un missile gagnant vide +0x287 et +0x283 et pose +0x27F=2 (pas de tir,
 ; pas de tournoi ce tick). Court-circuit : si byte_6E33B non nul, cible = word_722E6 (joueur).
 ; Non lu : Pilot_SkillCheck_B0, sens de objet+0x11==2. Détail :
-; analysis/AI_TICK_CALL_GRAPH.md.
+; analysis/AI_TICK_CALL_GRAPH.md. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur
+; PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA,
+; SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ;
+; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368
+; slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 =
+; VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e
+; octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
+; +0xB4 est a lire selon cette table. | CLASSE ET ADMISSIBILITE (relu 2026-10-02) : var_E = ma
+; classe (octet +0x52 du modele de mon avion, chunk JINF), var_7 = (>= 9), var_8 = (>= 6).
+; Candidat admis (loc_3623) si : missile (categorie 8) qui me vise avec target_domain 1 ; OU
+; camp du candidat (+0x50) == -mon camp (1 contre 0xFF ; 0 contre 0) et (cible sol +0x11 == 2
+; avec arg_4 et arme sol, OU avion categorie 6 dont le pilote n'est pas ejecte (flags_75 bit
+; 5) et ma classe >= 6). Score des avions (loc_3CCF), c = classe du candidat, m = la mienne, K
+; = byte_72038 = 6 : c <= K -> B (var_12) = 0 ; sinon A et aptitude += (c - 2 <= m ? c - K : m
+; - c). Puis bit 1 de +0x28B (aptitude +4) et +0x285 (A +10, aptitude +5) pour tous les
+; candidats.
 ; ==============================================================================================
 Targeting_AcquireBestThreat	proc far		; CODE XREF: AI_TopLevelThink+23P AI_BehaviorStateMachine_WeightedOptionSelector_9D05+75P ...
 
@@ -1025,7 +1040,7 @@ loc_3A31:				; CODE XREF: Targeting_AcquireBestThreat+705j
 					; Targeting_AcquireBestThreat+718j
 		lea	ax, [bp+var_B8]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+102h]
@@ -1040,7 +1055,7 @@ loc_3A31:				; CODE XREF: Targeting_AcquireBestThreat+705j
 		push	ss
 		lea	ax, [bp+var_A8]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	[bp+var_AC], 0FFFFFF4Ch
 		mov	eax, [bp+var_A8]
@@ -1146,7 +1161,7 @@ loc_3B31:				; CODE XREF: Targeting_AcquireBestThreat+7BBj
 					; Targeting_AcquireBestThreat+7C1j ...
 		lea	ax, [bp+var_B8]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+102h]
@@ -1161,7 +1176,7 @@ loc_3B31:				; CODE XREF: Targeting_AcquireBestThreat+7BBj
 		push	ss
 		lea	ax, [bp+var_60]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	[bp+var_64], 0FFFFFF4Ch
 		mov	eax, [bp+var_60]

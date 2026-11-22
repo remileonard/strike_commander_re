@@ -3,7 +3,16 @@ seg043		segment	byte public 'CODE' use16
 		;org 2
 		assume es:nothing, ss:nothing, ds:seg339, fs:nothing, gs:nothing
 
-loc_24EE2:				; DATA XREF: seg339:15EDo seg339:1615o ...
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). VISIBILITÉ D'UNE FACE ET
+; PROJECTION DE SES SOMMETS (méthode +18h de tous les éléments). Face simple (+25h bit 0 = 0)
+; : d = (centre + position objet−œil dans le repère objet) · normale ; d ≥ 0 (jns) → face vue
+; de dos, non dessinée. Puis pour chaque sommet non encore transformé (+11h bit 1) : x = ligne
+; 0 · v + t0 → +5, profondeur = ligne 1 · v + t1 → +9, haut = ligne 2 · v + t2 → +0Dh ; écran
+; x = 514Eh + x × [5152h] ÷ profondeur, y = 5150h − haut × [5156h] ÷ profondeur, bornés à
+; ±7D00h → +1/+3.
+; ==============================================================================================
+FaceElement_CullAndProject_24EE2:				; DATA XREF: seg339:15EDo seg339:1615o ...
 		enter	0Eh, 0
 		push	si
 		push	di

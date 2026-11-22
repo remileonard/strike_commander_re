@@ -54,8 +54,8 @@ typées, chacune sachant se calculer elle-même. Une seule entrée est
 
 **`word_72A8F`** = pointeur vers l'entrée active. Lu partout où le rendu /
 le HUD a besoin de la position caméra (seg011 `Player_MainUpdate`, seg088
-`HUD_RenderSymbologyMain`, seg079, seg107…). Position monde de la caméra =
-`word_72A8F[+0x14/+0x18/+0x1C]` (i32, **fixed-point 24.8**, `/256` = pieds ;
+`WeaponSystem_LaunchFromStation_3E744`, seg079, seg107…). Position monde de la caméra =
+`word_72A8F[+0x14/+0x18/+0x1C]` (i32, **fixed-point 24.8**, `/256` = mètres ;
 la 3ᵉ composante `+0x1C` = altitude côté ASM).
 
 > **Preuve du 24.8** : partout, `delta = entité[+0x12/+0x16/+0x1A] −
@@ -109,7 +109,7 @@ En-tête commun, décodé sur `MAURITAN.IFF` (payload copié verbatim, longueur
 +0x00  char[8]   nom interne     "CHASECAM" / "COCKPIT" / "VICTIM" / "AUTOTRAC" / "WEAPON" / "ROTATCAM"
 +0x08  ...       slot look-at    CHAS : 14 o à 0    │ autres : 2 o à 0   (jamais renseigné dans les WRLD livrés)
 +0x16  char[8]   sujet           entité porteuse, ex. "PLAYER"  (CKPT insère avant : char[8] art cockpit "F16-CKPT")
-+0x1E  u32       farClip         50000 (0xC350)     — pieds ; le moteur applique <<8
++0x1E  u32       farClip         50000 (0xC350)     — mètres ; le moteur applique <<8
 +0x22  u16       fov             40 (0x28)          — le moteur applique <<8
 +0x24  u32       nearClip        contient ~10 (0x0A) — l'ASM lit UN dword ici (pas pad + octet)
 +0x28  u16 ×4    rect viewport   x, y, w, h   (0, 0, 319, 199) = (w-1, h-1)
@@ -123,7 +123,7 @@ En-tête commun, décodé sur `MAURITAN.IFF` (payload copié verbatim, longueur
 ### 2.4 Queue étendue `VICT` / `WEAP` — table d'offsets 24.8
 
 Après l'en-tête, une table `i32` de vecteurs de keyframe/boîte relatifs au
-sujet, en **fixed-point 24.8** (`/256` = pieds). Exemple `WEAPON` (÷256) :
+sujet, en **fixed-point 24.8** (`/256` = mètres). Exemple `WEAPON` (÷256) :
 
 ```
 -10, 20, -30, -8, 1.5, [153], -4, [307], 0, -6, 10, 2.5, 20, 5, [153], 2.5, 6, 0.5, [-153], -0.5, 102
@@ -302,8 +302,8 @@ en-tête : `count = 5`, `byte = 4`.
 | 4 | `0xFF` | — (défaut zoom) | 30 | (0, 0, 0) | (0, 7.875, 1.5625) |
 
 → **offset identique pour les 5 = la position de l'œil du pilote** relative
-à l'origine de l'avion : 0 latéral, **7.875 pieds vers l'avant**, **1.5625
-pieds au-dessus**. Les records ne diffèrent que par la **direction de
+à l'origine de l'avion : 0 latéral, **7.875 mètres vers l'avant**, **1.5625
+mètres au-dessus**. Les records ne diffèrent que par la **direction de
 regard** (angle `+0x0F` : 0 avant / ±90 côtés / 180 arrière) et le FOV.
 
 ### Application par frame — `Cockpit_ApplyViewRecord_84EC0` (ovr245)
@@ -389,7 +389,7 @@ seg015, > 0x220 o, table de vues en `+0x133`), `di` = l'entrée.
      ref_fwd = si[+0x14F]                               ; vecteur avant courant de la vue
      tgt     = ref_fwd * 0x6400                         ; * 100.0
      step    = tgt - D
-     si  |step| > 0x600  :  step = clamp_len(step, 0x600)   (UI_ApplyLineOfSightCheck_55A9E)
+     si  |step| > 0x600  :  step = clamp_len(step, 0x600)   (Vector_SetLength_55A9E)
      D      += step                                     ; => pas MAX 0x600 = 6.0 unités / frame
    ⇒ le "lag" est un simple RATE-LIMIT par frame. Pas de force, pas de ressort amorti, pas d'EDO.
 
@@ -440,23 +440,23 @@ seg015, > 0x220 o, table de vues en `+0x133`), `di` = l'entrée.
 
 ### 4.4 `SMOK` — statut
 
-Chunk `REAL/OBJT/JETP/SMOK` du modèle 3D avion (`JDYN_LoadAngleAndChunk_9D189`,
+Chunk `REAL/OBJT/JETP/SMOK` du modèle 3D avion (`MobileObject_LoadDynamicsAndSmoke_9D189`,
 ovr310) : `entité[+0x39]` u8 (F-16 : 3) + vec3 `entité[+0x3A/+0x3E/+0x42]`
 (F-16 : `(0, −3584, 0)` = `(0, −14, 0)` en 24.8).
 
 - **L'objet caméra externe seg085 en tire des données** :
   `Camera_InitAttachedWithTarget_3DC3D` fait `cam[+0x54] = entité[+0x39]`
   (le compte SMOK).
-- Mais le **vecteur** SMOK est consommé par `Emitter_UpdateFromEntitySMOKVec_3D57E`
-  (appelé par `Camera_ExternalUpdate_3D9B4` / `Camera_LookAtSecondaryTarget_3D9FB`)
+- Mais le **vecteur** SMOK est consommé par `SmokeTrail_Tick_3D57E`
+  (appelé par `WorldObject_TickBodyAndSmoke_3D9B4` / `Camera_LookAtSecondaryTarget_3D9FB`)
   qui calcule 2 points `cam.pos + ligne_orient·SMOK.y + mvt_mount` et
-  **spawne N éléments** via `Elements_SpawnAlongSegment_4D1C9` (×`cam[+0x54]`).
+  **spawne N éléments** via `Particles_SpawnAlongSegment_4D1C9` (×`cam[+0x54]`).
   → **traînée moteur** ; il *lit* `cam.pos`, ne l'*écrit* pas.
 - Donc l'intuition « SMOK réutilisé par la caméra » n'est pas absurde
   (le compte SMOK sert de param), mais le **vecteur** SMOK sert à la fumée,
   pas au placement.
 
-### 4.5 Cluster caméra externe seg085/086/087 — `Camera_ComputeMountedPosition_3D31D`
+### 4.5 Cluster caméra externe seg085/086/087 — `WorldObject_IntegrateBodyMotion_3D31D`
 
 Tick par frame (`seg087:0250`). `Vlin = cam[+0x51] ? mount[+8..+0x10] ×
 dword_7045E/256 : 0` ; `cam[+0x12..] += Vlin` (**intègre** la vitesse du
@@ -500,7 +500,7 @@ zoom/transition MFD en 2 étapes, non détaillés), le bloc clé (gardé par
 ```
 forward = si[+0x14F]                                   ; le vecteur avant de la vue (même champ que loc_1519E §4.2 pt.5)
 obj     = subject->vtable[0x3C]()                       ; même appel que loc_1519E pt.1
-forward = Math_ApplyRotationHelperB_58828(forward, obj)  ; rotation de forward par cet objet
+forward = Matrix_LocalToWorld_58828(forward, obj)  ; rotation de forward par cet objet
 bearing_elev = Targeting_ComputeBearingElevation_55B1A(0x5AA7, forward)
 si  si[+0x1EC] >= bearing_elev  :                        ; seuil dépassé -> hors cadre
     value = si[+0x1F0] * bearing_elev + si[+0x1E8]
@@ -597,7 +597,8 @@ WorldObject `+0x20` « masse-ish » (sommé à une magnitude de force dans
 (`sub_4B90B`, seg104) ne lit que : `model[+0x37]` = **rayon de collision**
 (word, défaut `0x14` = 20), `model[+0x39]`/`+0x3A` = flags. Ce rayon EST
 recopié côté caméra (`model[+0x37] << 8` → `cam[+0x2E]`, via
-`Camera_AttachSubcomponentWrapper_9C90B`) mais à `+0x2E`, **pas `+0x20`**.
+`Decoy_AttachAndStartLifetime_9C90B`) mais à `+0x2E`, **pas `+0x20`**.
+*(Correction 2026-09-24 : `Decoy_AttachAndStartLifetime_9C90B` est le rattachement de l'instance **leurre** `DECY` ; pour cette classe `model[+0x37]` est la durée de vie lue dans le chunk `DATA` par `DecoyModel_LoadDATALifetime_9C810`, et `+0x2E` est le temps restant. Voir `AI_TICK_CALL_GRAPH.md`, « Qui écrit les octets de signature ».)*
 
 **Confirmé côté données (Rémi, 2026-09-12) : le chunk `INFO` de `REAL/OBJT`
 est systématiquement vide dans les fichiers livrés** (donc le rayon de
@@ -733,7 +734,7 @@ Opcode inconnu → ignoré (avance de 1).
 | `0E` | 13     | `i32 x,y,z`           | **position relative à l'entité liée** : `<<8`, tourné par orient(`obj+92`) + pos(`obj+92`) → `obj+14/18/1C` |
 | `0F` | 5      | `i16 h ; i16 k`       | `obj+F0 = h` (raw) ; `obj+F2 = k` (`<<8`) ; angles d'approche → `obj+F6/FA` |
 | `10` | 1      | —                     | si `obj+92` : **`obj+20 (orient. caméra) ← orient. de l'entité liée`** (`AI_ComputeGeometryHelper_56E29`) |
-| `11` | 7      | `i16 a,b,c`           | **compose** des axes d'orientation sur `obj+20` (`Matrix_BuildAxisZ/X/Y_572BC/56EC3/570C5`, `<<8`) + `Matrix_ApplyToVectorY` |
+| `11` | 7      | `i16 a,b,c`           | **compose** des axes d'orientation sur `obj+20` (`Matrix_BuildAxisZ/X/Y_572BC/56EC3/570C5`, `<<8`) + `Matrix_OrthonormalizeKeepRow1_57660` |
 | `12` | 13     | `i32 x,y,z`           | offset d'ancrage dans le repère entité `obj+94/98/9C` (raw)        |
 | `13` | 1      | —                     | `obj+FF = 1 ; obj+100 = 0`                                          |
 | `14` | 5      | `i32 s`               | `obj+C0/C4/C8 = lignes_orient(obj+2C) × s` (24.8)                   |
@@ -796,8 +797,8 @@ chemin `0xF00` = 3840) :
      `erreur/A0 · dword_70458`.
    - **`8`** — pas de handler ; intégrateur générique seul.
    - **`0xB` — visée/poursuite d'un point** : `dir = obj+0xB0.. − pos` ;
-     `ligne_orient(obj+0x2C) ← dir` (+ `dir/A0`/frame) ; `Targeting_LineOfSightCheck` ;
-     `Matrix_ApplyToVectorY`.
+     `ligne_orient(obj+0x2C) ← dir` (+ `dir/A0`/frame) ; `Vector_NormalizeInPlace_5593A` (normalisation) ;
+     `Matrix_OrthonormalizeKeepRow1_57660`.
    - **`0x1D` — déplacement sur segment** vers `rotate(obj+0xE4.., orient_entité)` :
      `pas = ((cible − obj+0xB0..)<<8)/obj+0xA0 · dword_70458` ; `obj+0xB0.. += pas` ;
      `pos_monde = obj+0xB0.. + pos_entité`. Snap + mode `0xFF` si `obj+0xA0 ≤ 0`
@@ -908,7 +909,7 @@ roulis/tangage/lacet sur un axe sans vérification explicite dans le code.
 ### 6.2 Règle du 24.8
 
 - Opérande sur laquelle l'ASM fait `shl eax, 8` → **entier déjà en unités**
-  (pieds / degrés) : garder tel quel en float, **pas** de `/256`.
+  (mètres / degrés) : garder tel quel en float, **pas** de `/256`.
 - Opérande stockée **brute** dans un champ `+0x..` ensuite utilisé avec de
   la maths 24.8 → **réel = brut / 256** : convertir **au décodage**, jamais
   au runtime.
@@ -965,7 +966,7 @@ au runtime ; s'adapter à libRealSpace (Matrix 4×4, OpenGL Y-up).
 | **F6** (external)              | idem → code `8` + "External View"                                          |
 | **F7** (target)                | idem → code `9` + "Target View"                                            |
 | **TAKEOFF** (décollage)        | seg009, état de vol, `Kneeboard_SelectByID(0x59CD, "TAKEOFF")` quand `entité[+0x11] == word_722E6` |
-| **AUTOPILT**                   | `UIScript_ParseAndEvaluate_7A054` (ovr233) → `SelectByID("AUTOPILT")` + `Camera_DetachParent(word_72A8F)` + reset `word_7046E`/`dword_70468`/`byte_7046C` |
+| **AUTOPILT**                   | `Autopilot_JumpSequence_7A054` (ovr233) → `SelectByID("AUTOPILT")` + `Camera_DetachParent(word_72A8F)` + reset `word_7046E`/`dword_70468`/`byte_7046C` |
 | **script mission** (VM)        | `Expr_VM_OpcodeHelperA_53504`, opcode VM `+0xA38` : `Kneeboard_FindByID` + `Kneeboard_ApplySelection` |
 | **fin de séquence COMP**       | opcode `FE` → `word_72A8C = Kneeboard_FindByID(0x59CD, "<vue>")` → enchaîne  |
 
@@ -1058,7 +1059,7 @@ Base seg339 pour résoudre un tag : `vtable = 0x6D070 + tag` (vérifié `0x228A�
 - Jeu d'opcodes `COMP` complet (§5.2), champs objet, interpréteur par
   frame, `STARTCAM` décodé et rejoué dans le port.
 - Table de vues **cockpit** (`OBJECTS\*.IFF CKPT/INFO`) décodée sur le F-16
-  (§3bis) : œil pilote `(0, 7.875, 1.5625)` pieds, directions F3/F4/F5.
+  (§3bis) : œil pilote `(0, 7.875, 1.5625)` mètres, directions F3/F4/F5.
 - **Caméra orbitale `Camera_OrbitTrackCompute_1493A`** (§4bis, seg014
   propre) : `targetPos = subject.pos − distance · (orbitMat · rangée_orient)`,
   position lissée `+= diff/4` par frame, look-at sujet, orbite tournée par
@@ -1077,7 +1078,7 @@ Base seg339 pour résoudre un tag : `vtable = 0x6D070 + tag` (vérifié `0x228A�
 3. `loc_1493A` : `sub_58768` (transforme l'axe par `si+0x8B`) et
    `sub_2E08B` — sémantique exacte ; ordre des rangées de la matrice
    d'orientation du sujet (`R[+0x0C/+0x10/+0x14]` = quelle rangée ?).
-4. Le cluster **seg085/086/087** (`Camera_ComputeMountedPosition_3D31D`,
+4. Le cluster **seg085/086/087** (`WorldObject_IntegrateBodyMotion_3D31D`,
    intégrateur `cam.pos += v_mount·dt`) : caméra distincte (arme / missile /
    replay ?) ou chemin alternatif ? `cam[+0x12]` n'est jamais posé en
    absolu (offset relatif au mount ? accumulateur de force ?).

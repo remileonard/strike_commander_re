@@ -86,7 +86,7 @@ Debris_FindAndUnregister_9B700	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle une opération de conteneur (Container_Op_223C5).
+; far, appelle une opération de conteneur (WorldObjects_RemoveAndDelete_223C5).
 ; ==============================================================================================
 Debris_ContainerOpWrapperB_9B78D	proc far		; CODE XREF: VROOMM_StubThunk_6BFBFJ
 
@@ -115,7 +115,7 @@ loc_9B7A1:
 loc_9B7B1:
 		push	si
 		push	59C3h
-		call	Container_Op_223C5
+		call	WorldObjects_RemoveAndDelete_223C5
 
 loc_9B7BA:
 		add	sp, 4

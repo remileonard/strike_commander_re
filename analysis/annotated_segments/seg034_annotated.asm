@@ -84,7 +84,7 @@ loc_20001:
 		add	ax, [di+1Eh]
 		push	ax
 		push	bx
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		mov	bx, [di+1Ch]
 		mov	ax, [bx+5Ch]
@@ -515,7 +515,7 @@ loc_2033E:
 		push	word ptr [bp-34h]
 		push	word ptr [bp-32h]
 		push	word ptr [bp-2]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_20359:				; CODE XREF: seg034:0361j
@@ -691,7 +691,7 @@ loc_204A0:				; DATA XREF: seg339:0F28o
 		push	ax
 		push	large dword ptr	[bp-6]
 		push	word ptr [bp-2]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		xor	di, di
 		jmp	short loc_2056D
@@ -712,7 +712,7 @@ loc_20502:
 loc_20506:
 		mov	bx, [si+1Dh]
 		push	large dword ptr	[bx+5Eh]
-		call	Roster_FindByNameOrder
+		call	DamageSys_CompareDamageToMax_43D9B
 		add	sp, 8
 		or	al, al
 		jz	short loc_2051E
@@ -729,7 +729,7 @@ loc_2051E:				; CODE XREF: seg034:0587j
 		push	ax
 		mov	bx, [si+1Dh]
 		push	large dword ptr	[bx+5Eh]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jz	short loc_2056C
@@ -766,7 +766,7 @@ loc_2056D:				; CODE XREF: seg034:0566j
 		push	offset aFuel	; "FUEL"
 		mov	bx, [si+1Dh]
 		push	large dword ptr	[bx+5Eh]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jz	short loc_20598

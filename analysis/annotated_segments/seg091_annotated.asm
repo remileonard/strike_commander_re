@@ -8,11 +8,13 @@ seg091		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,153L — calcule la distance entre un point de proximité (arg_0+0x12) et un point de
-; référence (arg_2), la compare à un seuil : test de proximité (rayon de fuze) entre deux
-; points, utilisé pour la détection de leurre/verrouillage.
+; far, 153L, LUE 2026-09-25. (objet, point, direction, portee, cone) : d = |objet+0x12 -
+; point| ; faux si d <= 0 (exclut la reference elle-meme) ou si portee (entier, shl 8) < d ;
+; vrai si byte_7235D (seulement remis a 0 dans le code lu) ; sinon vrai si dot(normalise(objet
+; - point), direction) >= Math_CosDeg_5483F(cone). Le cone est donc tracking_cone en DEGRES,
+; demi-angle (AIM-9J 40, AIM-9M 45).
 ; ==============================================================================================
-Proximity_TestPoints	proc far		; CODE XREF: HUD_RenderSymbologyAlt+F25P
+Proximity_TestPoints	proc far		; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+F25P
 					; Proximity_TestOriented+2Cp
 
 var_26		= dword	ptr -26h
@@ -113,7 +115,7 @@ loc_42E21:
 loc_42E23:				; CODE XREF: Proximity_TestPoints+91j
 		lea	ax, [bp+var_26]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 
 loc_42E2D:
@@ -127,7 +129,7 @@ loc_42E34:
 		push	ss
 		lea	ax, [bp+var_10]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	ax, [bp+arg_A]
 		mov	[bp+var_16], ax
@@ -139,7 +141,7 @@ loc_42E34:
 		push	ss
 		lea	ax, [bp+var_14]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_10]
 		cmp	eax, [bp+var_14]
@@ -168,7 +170,12 @@ Proximity_TestPoints	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_42E80:				; DATA XREF: seg339:off_6F560o
+; ==============================================================================================
+; far (label, methode +0x18 des modeles MISS et de la famille seg339:off_6F608), LU
+; 2026-10-02. Renvoie dword_707F8/707FC/70800 (vecteur nul constant) :
+; AI_Sensor_WeaponVelocityCache retombe alors sur le nez de l'avion.
+; ==============================================================================================
+WeaponModel_InitialVelocityZero_42E80:				; DATA XREF: seg339:off_6F560o
 					; seg339:off_6F608o
 		push	bp
 
@@ -216,8 +223,10 @@ loc_42EBA:				; CODE XREF: seg091:0136j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,39L — appelle vtable[0x3C] pour résoudre l'orientation puis sub_42D8C avec un rayon
-; décalé (+0xC) : test de proximité orientée pour la détection de cible potentielle.
+; far, 39L, LUE 2026-09-25. (arme, candidat, reference) : 0 sans reference ; sinon
+; Proximity_TestPoints(candidat, position de la reference (+0x12), direction de la reference
+; ([vtable+0x3C]+0xC), portee = arme+0x50 (target_range WDAT), cone = arme+0x54 (tracking_cone
+; WDAT)).
 ; ==============================================================================================
 Proximity_TestOriented	proc far		; CODE XREF: seg088:1131P seg090:01E8P ...
 
@@ -341,7 +350,13 @@ Targeting_ReticleWindowTest	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_42F71:				; DATA XREF: seg339:off_6F540o
+; ==============================================================================================
+; far (label, methode +0x14 des modeles MISS, vtable seg339 0x6F540), LU 2026-09-28. (modele,
+; cible, lanceur) : faux sans cible ou lanceur ; VRAI si distance 3D(cible, lanceur) <
+; modele+0x56 << 8 (+0x56 = effective_range du chunk WDAT, metres entiers ; 15000 m pour
+; l'AGM-65D). Test de tir de l'AGM-65D dans GroundAttack_Phase3_WeaponRelease_776FB.
+; ==============================================================================================
+MissileModel_TestInRange_42F71:				; DATA XREF: seg339:off_6F540o
 					; seg339:24ACo	...
 		push	bp
 		mov	bp, sp
@@ -436,9 +451,14 @@ loc_4300F:				; CODE XREF: seg091:028Bj
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,141L — filtre par type d'arme (+0x4F ∈ {1..5}), parcourt la liste des objets candidats,
-; teste la compatibilité de type (+0x11) : filtrage des cibles compatibles avec le type d'arme
-; sélectionné pour l'acquisition.
+; far, 141L, LUE 2026-09-25. CANDIDAT DU CHERCHEUR : (arme, reference). Si weapon_aspec
+; (+0x4F) est dans 1..5, parcourt TOUS les objets du monde (World_IterateObjects liste 59C3h)
+; ; pour chacun dont la methode [0] rend un objet non nul, lit target_type (+0x11) et ne garde
+; que 1 (avion) ou 4 (leurre DECY) ; signature selon aspec : 1, 2, 5 -> methode
+; +0x7C(reference) (Aircraft_ComputeSeekerSignature_3E2F1 pour un avion), 3 ->
+; Debris_GetStateFlag (3e octet SIGN), 4 -> Debris_GetSubpartAttrib (2e octet SIGN). Retient
+; l'objet de PLUS FORTE signature (strictement superieure, depart 0) qui passe
+; Proximity_TestOriented(arme, objet, reference). Renvoie cet objet ou 0.
 ; ==============================================================================================
 Targeting_FilterByWeaponType	proc far		; CODE XREF: Targeting_SelectAndPrioritize+30p
 					; Targeting_SelectAndPrioritize+108p ...
@@ -594,15 +614,27 @@ off_430FD	dw offset loc_43094	; DATA XREF: Targeting_FilterByWeaponType+7Cr
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 327L, LUE (2026-09-20). MODELE DE VERROUILLAGE (seeker) selon weapon_aspec de l'arme
-; (+0x4F, 1 a 6). Filtre les candidats avec Targeting_FilterByWeaponType (cone/portee du
-; chercheur), garde la cible deja suivie (arg objet suivi) si elle est encore candidate, sinon
-; evalue la signature du candidat : aspec 1 : methode virtuelle +0x7C du candidat (signature)
-; > 0xD2 (210), avec un tirage Math_RandomScale_54DF4(10) compare a un poids (3, ou 5 si le
-; lanceur du candidat est le joueur) ; aspec 2 : Targeting_ReticleWindowTest (fenetre du
-; reticule) ; aspec 3 : Debris_GetSubpartAttrib > 0xF5 (245) avec le meme tirage ; aspec 4 :
-; Proximity_TestOriented ; renvoie la cible retenue ou 0. Les signatures sont les 3 octets du
-; chunk SIGN de l'objet (+0x12 a +0x14).
+; far, 327L, LUE (2026-09-20, table de sauts corrigée 2026-09-24). MODELE DE CHERCHEUR :
+; decide si le chercheur GARDE sa cible (arg_4) ou la PERD au profit d'un autre candidat
+; (leurre, autre avion). Arguments : (arme [modele WDAT], cible actuelle di, objet de
+; reference du chercheur arg_6, octet arg_8). Appelants : WeaponStation_TestTargetLock avant
+; tir (cible voulue, objet +0x0D du point d'emport) et le guidage du missile en vol (seg090 :
+; cible = missile+0x55, reference = le missile lui-meme, resultat re-range dans missile+0x55).
+; Aiguillage dec ax sur weapon_aspec (+0x4F) : index = aspec-1 (off_43319). ASPEC 1 (AIM-9J) :
+; candidat c = Targeting_FilterByWeaponType(arme, reference) ; c nul -> 0 ; c = di -> test
+; d'aspect ; sinon poids w = 3 (5 si c->vtable+0x38 == word_722E6), s =
+; c->vtable+0x7C(reference) : s > 0xD2 (210) et Math_RandomScale_54DF4(10) < w -> bascule sur
+; c ; s == 210 -> bascule ; sinon reste sur di. Si on reste sur di : ASPECT ARRIERE
+; OBLIGATOIRE, Math_DotProduct3D_5505B(vitesse reference, vitesse di) >=
+; Math_CosDeg_5483F(0x5A00 = 90.0) = cos 90 = 0, sinon renvoie 0 (les deux vitesses doivent
+; former un angle d'au plus 90 deg) (piste perdue). ASPEC 2 (AIM-9M) : meme candidat, bascule
+; si s >= 0xF5 (245) et tirage < w, sinon reste sur di ; PAS de test d'aspect (tous secteurs).
+; ASPEC 3 (aucune arme des fichiers WDAT) : di nul -> FilterByWeaponType ; sinon
+; Targeting_ReticleWindowTest(arme, di, reference, arg_8). ASPEC 4 (AIM-120, SA-2, SA-6) :
+; bascule si Debris_GetSubpartAttrib(c) (2e octet SIGN du modele, non virtuel) >= 245 et
+; tirage < w, sinon reste sur di. ASPEC 5/6 (AGM-65D, GBU-15) : Proximity_TestOriented(arme,
+; di, reference) non nul -> di, sinon 0. Aucun test du nombre de missiles en l'air. NB :
+; l'ancien resume decalait les aspecs 2 a 4 d'un cran.
 ; ==============================================================================================
 Targeting_SelectAndPrioritize	proc far		; CODE XREF: WeaponStation_TestTargetLock+78P
 					; seg090:006AP
@@ -727,7 +759,7 @@ loc_4319B:				; CODE XREF: Targeting_SelectAndPrioritize+8Fj
 		push	ss
 		lea	ax, [bp+var_4]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	[bp+var_C], 5A00h
 		lea	ax, [bp+var_C]
@@ -735,7 +767,7 @@ loc_4319B:				; CODE XREF: Targeting_SelectAndPrioritize+8Fj
 		push	ss
 		lea	ax, [bp+var_8]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_4]
 

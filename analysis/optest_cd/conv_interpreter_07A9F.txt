@@ -1,0 +1,326 @@
+07A9F  push bp
+07AA0  mov bp, sp
+07AA2  sub sp, 0x3c2
+07AA6  push si
+07AA7  push di
+07AA8  mov di, word ptr [bp + 6]
+07AAB  mov byte ptr [0x69d4], 0
+07AB0  mov byte ptr [bp - 0xc], 0
+07AB4  mov byte ptr [bp - 0x16], 0
+07AB8  mov byte ptr [bp - 0x17], 0
+07ABC  mov bx, word ptr [di + 0x2a]
+07ABF  mov byte ptr [bx], 0
+07AC2  mov byte ptr [bp - 0x1f], 0
+07AC6  lea ax, [bp - 0x260]
+07ACA  push ax
+07ACB  lcall 0x431f, 0x140  ; -> 43330
+07AD0  add sp, 2
+07AD3  mov word ptr [bp - 0x260], 0xc28
+07AD9  mov dword ptr [bp - 0x1ff], 0x100
+07AE2  mov dword ptr [bp - 0x203], 0
+07AEB  mov word ptr [bp - 0x260], 0xc40
+07AF1  mov word ptr [bp - 0x1e4], 0
+07AF7  xor ax, ax
+07AF9  mov word ptr [bp - 0x1e6], ax
+07AFD  movsx eax, ax
+07B01  mov dword ptr [bp - 0x1fb], eax
+07B06  mov dword ptr [bp - 0x1b8], 0
+07B0F  mov byte ptr [bp - 0x1b4], 2
+07B14  mov byte ptr [bp - 0x1b3], 0
+07B19  mov dword ptr [bp - 0x1b2], 0
+07B22  mov al, 0
+07B24  mov byte ptr [bp - 0x1ac], al
+07B28  mov byte ptr [bp - 0x1ad], al
+07B2C  mov byte ptr [bp - 0x1ae], al
+07B30  mov byte ptr [bp - 0x1a8], al
+07B34  push 0x1769  ; "voclist.iff"
+07B37  lea ax, [bp - 0x260]
+07B3B  push ax
+07B3C  lcall 0x4fc, 4  ; -> 04FC4
+07B41  add sp, 4
+07B44  mov byte ptr [bp - 0x28], al
+07B47  jmp 0xa3c6
+07B4A  mov byte ptr [bp - 0x29], 0
+07B4E  lcall 0x143f, 8  ; -> 143F8
+07B53  les bx, ptr [di + 4]
+07B56  inc word ptr [di + 4]
+07B59  mov al, byte ptr es:[bx]
+07B5C  mov ah, 0
+07B5E  mov bx, ax
+07B60  cmp bx, 0x12
+07B63  jbe 0x7b68
+07B65  jmp 0xa3bc
+07B68  shl bx, 1
+07B6A  jmp word ptr cs:[bx + 0x39f9]
+07B6F  jmp 0xa3be
+07B72  cmp byte ptr [0x69d4], 0
+07B77  je 0x7bde
+07B79  cmp byte ptr [bp - 0x1b3], 0
+07B7E  je 0x7ba1
+07B80  cmp dword ptr [bp - 0x1b8], 0
+07B86  je 0x7ba1
+07B88  push 0
+07B8A  mov al, byte ptr [bp - 0x1b4]
+07B8E  push ax
+07B8F  lea ax, [bp - 0x1b8]
+07B93  push ax
+07B94  push 0x6a62
+07B97  lcall 0x34ca, 0x17d  ; -> 34E1D
+07B9C  add sp, 8
+07B9F  jmp 0x7ba1
+07BA1  mov dword ptr [bp - 0x1b8], 0
+07BAA  mov byte ptr [bp - 0x1b3], 0
+07BAF  mov dword ptr [bp - 0x1b2], 0
+07BB8  mov word ptr [bp - 0x260], 0xc40
+07BBE  lea ax, [bp - 0x260]
+07BC2  push ax
+07BC3  lcall 0x4497, 0xa4  ; -> 44A14
+07BC8  add sp, 2
+07BCB  push 0
+07BCD  lea ax, [bp - 0x260]
+07BD1  push ax
+07BD2  lcall 0x4528, 0x121  ; -> 453A1
+07BD7  add sp, 4
+07BDA  pop di
+07BDB  pop si
+07BDC  leave 
+07BDD  retf 
+07BDE  mov word ptr [bp - 0x32], 0
+07BE3  mov word ptr [bp - 0x30], 0x98
+07BE8  mov word ptr [bp - 0x2e], 0x13f
+07BED  mov word ptr [bp - 0x2c], 0xc7
+07BF2  mov ax, di
+07BF4  add ax, 0x2c
+07BF7  push ax
+07BF8  push word ptr [0x4668]
+07BFC  sub sp, 8
+07BFF  mov ax, word ptr [bp - 0x32]
+07C02  mov word ptr [bp - 0x3d2], ax
+07C06  mov ax, word ptr [bp - 0x30]
+07C09  mov word ptr [bp - 0x3d0], ax
+07C0D  mov ax, word ptr [bp - 0x2e]
+07C10  mov word ptr [bp - 0x3ce], ax
+07C14  mov ax, word ptr [bp - 0x2c]
+07C17  mov word ptr [bp - 0x3cc], ax
+07C1B  lea ax, [bp - 0x282]
+07C1F  push ax
+07C20  lcall 0x4942, 0xca  ; -> 494EA
+07C25  add sp, 0xe
+07C28  mov word ptr [bp - 0x3a], 0x1914
+07C2D  mov byte ptr [bp - 0x38], 0xa
+07C31  mov word ptr [bp - 0x3a], 0x191c
+07C36  mov word ptr [bp - 0x36], 0
+07C3B  mov word ptr [bp - 0x34], 0
+07C40  push di
+07C41  lea ax, [bp - 0x3a]
+07C44  push ax
+07C45  lcall 0xc8c, 0x39f  ; -> 0CC5F
+07C4A  add sp, 4
+07C4D  push 0
+07C4F  lea ax, [bp - 0x282]
+07C53  push ax
+07C54  lcall 0x4942, 0x17d  ; -> 4959D
+07C59  add sp, 4
+07C5C  mov al, byte ptr [bp - 0x37]
+07C5F  mov byte ptr [bp - 0x3b], al
+07C62  lea ax, [bp - 0x3b]
+07C65  push ax
+07C66  mov ax, di
+07C68  add ax, 0x2c
+07C6B  push ax
+07C6C  mov bx, word ptr [di + 0x2c]
+07C6F  lcall [bx + 0x10]
+07C72  add sp, 4
+07C75  push word ptr [bp - 0x36]
+07C78  lea ax, [bp - 0x2fa]
+07C7C  push ax
+07C7D  lcall 0, 0x2e6f  ; -> 02E6F
+07C82  add sp, 4
+07C85  mov al, byte ptr [0x69d4]
+07C88  mov ah, 0
+07C8A  or ax, ax
+07C8C  je 0x7c91
+07C8E  jmp 0x7d22
+07C91  push word ptr [bp - 0x34]
+07C94  lcall 0, 0x2f09  ; -> 02F09
+07C99  add sp, 2
+07C9C  or ax, ax
+07C9E  je 0x7cb0
+07CA0  cmp word ptr [0x4031], 0
+07CA5  je 0x7cb0
+07CA7  mov al, byte ptr [bp - 0x28]
+07CAA  mov ah, 0
+07CAC  or ax, ax
+07CAE  jne 0x7d22
+07CB0  lea ax, [bp - 0x2fa]
+07CB4  push ax
+07CB5  lea ax, [bp - 0x282]
+07CB9  push ax
+07CBA  push di
+07CBB  push cs
+07CBC  call 0x6fa5
+07CBF  add sp, 6
+07CC2  xor eax, eax
+07CC5  mov dword ptr [bp - 0x40], eax
+07CC9  mov dword ptr [bp - 0x44], eax
+07CCD  lea ax, [bp - 0x2fa]
+07CD1  push ax
+07CD2  lcall 0, 0x2f09  ; -> 02F09
+07CD7  add sp, 2
+07CDA  or ax, ax
+07CDC  jne 0x7ce3
+07CDE  mov ax, 8
+07CE1  jmp 0x7ce6
+07CE3  mov ax, 0x32
+07CE6  mov word ptr [bp - 0x46], ax
+07CE9  lcall 0x143f, 8  ; -> 143F8
+07CEE  xor si, si
+07CF0  jmp 0x7d1a
+07CF2  lcall 0x143f, 0x4c7  ; -> 148B7
+07CF7  or al, al
+07CF9  je 0x7cfd
+07CFB  jmp 0x7d1f
+07CFD  mov dword ptr [bp - 0x40], 0xa
+07D05  mov eax, dword ptr [0x510f]
+07D09  mov dword ptr [bp - 0x44], eax
+07D0D  lea ax, [bp - 0x44]
+07D10  push ax
+07D11  lcall 0x4706, 0x21d  ; -> 4727D
+07D16  add sp, 2
+07D19  inc si
+07D1A  cmp si, word ptr [bp - 0x46]
+07D1D  jl 0x7cf2
+07D1F  jmp 0x7e78
+07D22  mov word ptr [bp - 0x314], 0x18f0
+07D28  mov dword ptr [bp - 0x304], 0
+07D31  mov byte ptr [bp - 0x300], 2
+07D36  mov byte ptr [bp - 0x2ff], 0
+07D3B  mov dword ptr [bp - 0x2fe], 0
+07D44  mov word ptr [bp - 0x312], 0
+07D4A  mov word ptr [bp - 0x314], 0x1900
+07D50  push word ptr [0x4031]
+07D54  lea ax, [bp - 0x314]
+07D58  push ax
+07D59  lcall 0xe67, 7  ; -> 0E677
+07D5E  add sp, 4
+07D61  push ds
+07D62  push 0x1778  ; ".voc"
+07D65  push ds
+07D66  push word ptr [bp - 0x34]
+07D69  push ds
+07D6A  push 0x1775  ; "f:"
+07D6D  lea ax, [bp - 0x158]
+07D71  push ax
+07D72  lcall 0x13d4, 0xbc  ; -> 13DFC
+07D77  add sp, 0xe
+07D7A  lea ax, [bp - 0x158]
+07D7E  push ax
+07D7F  lea ax, [bp - 0x260]
+07D83  push ax
+07D84  lcall 0x4fc, 0x374  ; -> 05334
+07D89  add sp, 4
+07D8C  or al, al
+07D8E  je 0x7da4
+07D90  lea ax, [bp - 0x1b8]
+07D94  push ax
+07D95  lea ax, [bp - 0x314]
+07D99  push ax
+07D9A  lcall 0xe67, 0xf66  ; -> 0F5D6
+07D9F  add sp, 4
+07DA2  jmp 0x7db6
+07DA4  lea ax, [bp - 0x158]
+07DA8  push ax
+07DA9  lea ax, [bp - 0x314]
+07DAD  push ax
+07DAE  lcall 0xe67, 0x100d  ; -> 0F67D
+07DB3  add sp, 4
+07DB6  push 1
+07DB8  lea ax, [bp - 0x158]
+07DBC  push ax
+07DBD  lea ax, [bp - 0x260]
+07DC1  push ax
+07DC2  lcall 0x4fc, 0xdf  ; -> 0509F
+07DC7  add sp, 6
+07DCA  push -1
+07DCC  lea ax, [bp - 0x314]
+07DD0  push ax
+07DD1  lcall 0xe67, 0x122c  ; -> 0F89C
+07DD6  add sp, 4
+07DD9  push 2
+07DDB  lea ax, [bp - 0x260]
+07DDF  push ax
+07DE0  lcall 0x4fc, 0x1e8  ; -> 051A8
+07DE5  add sp, 4
+07DE8  jmp 0x7e10
+07DEA  lcall 0x143f, 0x4c7  ; -> 148B7
+07DEF  or al, al
+07DF1  je 0x7e10
+07DF3  inc byte ptr [bp - 0x29]
+07DF6  cmp word ptr [bp - 0x312], 0
+07DFB  je 0x7e0e
+07DFD  mov bx, word ptr [bp - 0x312]
+07E01  push word ptr [bx + 4]
+07E04  lcall 0x31dc, 0xc13  ; -> 329D3
+07E09  add sp, 2
+07E0C  jmp 0x7e0e
+07E0E  jmp 0x7e21
+07E10  lea ax, [bp - 0x314]
+07E14  push ax
+07E15  lcall 0xe67, 0x153f  ; -> 0FBAF
+07E1A  add sp, 2
+07E1D  or al, al
+07E1F  jne 0x7dea
+07E21  lcall 0x4fc, 0x36a  ; -> 0532A
+07E26  mov word ptr [bp - 0x314], 0x18f0
+07E2C  lea ax, [bp - 0x314]
+07E30  push ax
+07E31  lcall 0xe67, 0x15e  ; -> 0E7CE
+07E36  add sp, 2
+07E39  cmp byte ptr [bp - 0x2ff], 0
+07E3E  je 0x7e61
+07E40  cmp dword ptr [bp - 0x304], 0
+07E46  je 0x7e61
+07E48  push 0
+07E4A  mov al, byte ptr [bp - 0x300]
+07E4E  push ax
+07E4F  lea ax, [bp - 0x304]
+07E53  push ax
+07E54  push 0x6a62
+07E57  lcall 0x34ca, 0x17d  ; -> 34E1D
+07E5C  add sp, 8
+07E5F  jmp 0x7e61
+07E61  mov dword ptr [bp - 0x304], 0
+07E6A  mov byte ptr [bp - 0x2ff], 0
+07E6F  mov dword ptr [bp - 0x2fe], 0
+07E78  lcall 0x143f, 8  ; -> 143F8
+07E7D  mov word ptr [bp - 0x3a], 0x191c
+07E82  push word ptr [bp - 0x36]
+07E85  lcall 0x3539, 0x240  ; -> 355D0
+07E8A  add sp, 2
+07E8D  push word ptr [bp - 0x34]
+07E90  lcall 0x3539, 0x240  ; -> 355D0
+07E95  add sp, 2
+07E98  lea ax, [bp - 0x280]
+07E9C  push ax
+07E9D  lcall 0x37cb, 0x25f  ; -> 37F0F
+07EA2  add sp, 2
+07EA5  jmp 0xa3be
+0A399  mov word ptr [bp - 0x40], 0x1914
+0A39E  mov byte ptr [bp - 0x3e], 0xc
+0A3A2  mov word ptr [bp - 0x40], 0x18b8
+0A3A7  push di
+0A3A8  lea ax, [bp - 0x40]
+0A3AB  push ax
+0A3AC  lcall 0xc8c, 0x4b1  ; -> 0CD71
+0A3B1  add sp, 4
+0A3B4  mov si, word ptr [bp - 0x3d]
+0A3B7  add word ptr [di + 4], si
+0A3BA  jmp 0xa3be
+0A3BC  jmp 0xa3be
+0A3BE  cmp byte ptr [bp - 0x17], 0
+0A3C2  je 0xa3c6
+0A3C4  jmp 0xa3e0
+0A3C6  mov ax, word ptr [di]
+0A3C8  add ax, word ptr [di + 8]
+0A3CB  cmp ax, word ptr [di + 4]
+0A3CE  ja 0xa3d5

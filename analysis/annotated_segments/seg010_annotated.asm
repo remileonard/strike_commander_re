@@ -703,7 +703,18 @@ Goal_ResetNeutralState	endp
 ; NULLES sont appliquees : 8 pour +0x97/+0x98/+0x99/+0x9A/+0x9D/+0x9E, 0xA (10) pour
 ; +0x96/+0x9B/+0x9C, 0 pour +0x9F - CONTREDIT l'hypothese de RSProf.cpp (tous a zero par
 ; defaut). Correction majeure pour le portage : format 10 octets avec reordonnancement et
-; defauts non nuls, pas 9 octets sequentiels a zero par defaut.
+; defauts non nuls, pas 9 octets sequentiels a zero par defaut. TRAITS ATRB CORRIGES
+; 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH,
+; CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B,
+; +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr
+; es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 =
+; FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 =
+; SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1,
+; LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table. | COMPLÉMENT 2026-10-12 : le
+; 10e octet (entité +0xB9, plafonné à 3) est le SORT DU PILOTE : 1 = s'éjecte toujours quand
+; son avion est détruit, 2 = ne s'éjecte jamais (Aircraft_OnDestroyed_9D770 ; 0 = tirage de 30
+; %), 3 = les impacts n'abîment aucun composant de son avion (Aircraft_OnCollision_9D910 saute
+; DamageSys_ApplyHit_9C9A0, seuls des débris sont créés).
 ; ==============================================================================================
 PilotProfile_LoadATRB_12E47:				; DATA XREF: seg339:0368o
 		push	bp
@@ -861,7 +872,20 @@ loc_12FC6:				; CODE XREF: seg010:072Dj seg010:078Dj
 ; le profil concerne par cet appel precis n'est pas confirme avec certitude, role exact a
 ; eclaircir si necessaire). PREMIERE CONFIRMATION D'USAGE REEL POUR AG ET AA, distincte du
 ; role de FL deja connu (bonus quadratique dans MVRS_ID14b) - ce mecanisme de difficulte
-; s'applique en amont, sur la valeur de base, avant toute consommation par le tournoi.
+; s'applique en amont, sur la valeur de base, avant toute consommation par le tournoi. TRAITS
+; ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du
+; fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A,
+; +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov
+; word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc
+; entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6
+; = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0,
+; CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table. | PRECISE
+; 2026-10-03 : appelee par Cockpit_ReadControlsFrame_8F720 pour CHAQUE objet de la liste
+; 0x59C3 de categorie 6 (avion) et de camp +0x50 == 0xFF (ennemi) : seuls les pilotes ennemis
+; sont affaiblis. word_7235F fait partie du bloc d'options byte_72358..byte_72367 (remis a 0
+; par ResourceFile_Helper_90923) ; 0 = competences intactes, 1 = moitie, 2 = quart ; le calcul
+; de note de mission (UIScreen_BuildWidgetTree_Recurse_53D92) retire 12 (niveau 1) ou 25
+; (niveau 2).
 ; ==============================================================================================
 PilotProfile_RescaleSkillByDifficulty_12FC9	proc far		; CODE XREF: Cockpit_ReadControlsFrame_8F720+1B8P
 

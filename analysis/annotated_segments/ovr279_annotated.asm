@@ -7,9 +7,11 @@ ovr279		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, aucun appel externe visible (19 lignes).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Met à zéro l'apparence POLY : +4
+; sommets, +28h table face→élément, +9Ah, +26h nombre de faces, +2 nombre de sommets, +84h,
+; +85h couleur du point lointain, +98h = FFFFh.
 ; ==============================================================================================
-AircraftComponent_Helper_962E0	proc far		; CODE XREF: VROOMM_StubThunk_6BA60J AircraftComponent_LoadMixedFieldsB_96321+10p
+Poly_InitFields_962E0	proc far		; CODE XREF: VROOMM_StubThunk_6BA60J Poly_LoadFromIFF_96321+10p
 
 arg_0		= dword	ptr  6
 
@@ -27,7 +29,7 @@ arg_0		= dword	ptr  6
 		mov	word ptr es:[bx+98h], 0FFFFh
 		pop	bp
 		retf
-AircraftComponent_Helper_962E0	endp
+Poly_InitFields_962E0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -35,9 +37,14 @@ AircraftComponent_Helper_962E0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ReadFinalField_64B51/ReadFieldGroupC_64A7E/ReadFieldGroupB_64A54 (132 lignes).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). LECTEUR DE FORM POLY (ex-
+; AircraftComponent_LoadMixedFieldsB). INFO : uint8 → +84h (si 0, l'objet n'est pas dessiné
+; quand l'œil est dans sa sphère, voir PolyInstance_Render_2BF6C). AINF : int32 → +8Eh et +92h
+; (période de l'animation de texture, défaut 0Ch), uint16 → +96h. Puis Poly_SizeBuffers_95800,
+; Poly_LoadVERT_96470, Poly_BuildFaceElements_94C80, et normalise la normale (+0Ch..+14h) de
+; chaque sommet (stride 18h, Vector_Normalize3D_559BB).
 ; ==============================================================================================
-AircraftComponent_LoadMixedFieldsB_96321	proc far		; CODE XREF: VROOMM_StubThunk_6BA65J
+Poly_LoadFromIFF_96321	proc far		; CODE XREF: VROOMM_StubThunk_6BA65J
 
 var_1C		= dword	ptr -1Ch
 var_18		= dword	ptr -18h
@@ -57,7 +64,7 @@ arg_4		= word ptr  0Ah
 		mov	si, [bp+arg_4]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr AircraftComponent_Helper_962E0
+		call	near ptr Poly_InitFields_962E0
 		add	sp, 4
 		push	0
 		push	large 4F464E49h
@@ -72,7 +79,7 @@ arg_4		= word ptr  0Ah
 		les	bx, [bp+arg_0]
 		mov	es:[bx+84h], al
 
-loc_9635B:				; CODE XREF: AircraftComponent_LoadMixedFieldsB_96321+29j
+loc_9635B:				; CODE XREF: Poly_LoadFromIFF_96321+29j
 		push	0
 		push	large 464E4941h
 		push	si
@@ -96,7 +103,7 @@ loc_9635B:				; CODE XREF: AircraftComponent_LoadMixedFieldsB_96321+29j
 		jmp	short loc_963B9
 ; ���������������������������������������������������������������������������
 
-loc_96395:				; CODE XREF: AircraftComponent_LoadMixedFieldsB_96321+4Dj
+loc_96395:				; CODE XREF: Poly_LoadFromIFF_96321+4Dj
 		mov	[bp+var_4], 0Ch
 		mov	eax, [bp+var_4]
 		mov	[bp+var_8], eax
@@ -107,7 +114,7 @@ loc_96395:				; CODE XREF: AircraftComponent_LoadMixedFieldsB_96321+4Dj
 loc_963B2:
 		mov	word ptr es:[bx+96h], 0
 
-loc_963B9:				; CODE XREF: AircraftComponent_LoadMixedFieldsB_96321+72j
+loc_963B9:				; CODE XREF: Poly_LoadFromIFF_96321+72j
 		les	bx, [bp+arg_0]
 		mov	eax, es:[bx+8Eh]
 
@@ -133,7 +140,7 @@ loc_963C2:
 		jmp	short loc_96458
 ; ���������������������������������������������������������������������������
 
-loc_963FF:				; CODE XREF: AircraftComponent_LoadMixedFieldsB_96321+13Ej
+loc_963FF:				; CODE XREF: Poly_LoadFromIFF_96321+13Ej
 		mov	ax, word ptr [bp+var_C+2]
 		mov	dx, word ptr [bp+var_C]
 		add	dx, 0Ch
@@ -160,7 +167,7 @@ loc_963FF:				; CODE XREF: AircraftComponent_LoadMixedFieldsB_96321+13Ej
 		inc	di
 		add	word ptr [bp+var_C], 18h
 
-loc_96458:				; CODE XREF: AircraftComponent_LoadMixedFieldsB_96321+DCj
+loc_96458:				; CODE XREF: Poly_LoadFromIFF_96321+DCj
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+2], di
 		jg	short loc_963FF
@@ -168,6 +175,6 @@ loc_96458:				; CODE XREF: AircraftComponent_LoadMixedFieldsB_96321+DCj
 		pop	si
 		leave
 		retf
-AircraftComponent_LoadMixedFieldsB_96321	endp
+Poly_LoadFromIFF_96321	endp
 
 ovr279		ends

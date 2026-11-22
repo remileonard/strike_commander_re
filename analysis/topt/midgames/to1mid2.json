@@ -1,0 +1,5050 @@
+{
+ "fonction": "MidgameTO2_Play_7ACD0",
+ "exécutable": "topt",
+ "parties": [
+  {
+   "fonction": "MidgameTO2_Play_7ACD0",
+   "scènes": [
+    {
+     "scène": 1,
+     "objet": "scène1",
+     "cadence": "20",
+     "ligne": 227805,
+     "calques": [
+      {
+       "nom": "c1",
+       "type": "ImageLayer",
+       "paramètres": "ressource=to1mid2 0, x=0, y=0, image=0",
+       "ligne": 227813
+      }
+     ],
+     "ajouts": [
+      {
+       "parent": "scène1",
+       "calque": "c1",
+       "ligne": 227840
+      }
+     ],
+     "opérations": [
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal2(to1mid2 1)"
+       ],
+       "ligne": 227823
+      },
+      {
+       "op": "palette_envoie",
+       "arguments": [
+        "palette=pal1",
+        "pas=0"
+       ],
+       "ligne": 227835
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène1"
+       ],
+       "ligne": 227852
+      },
+      {
+       "op": "Scene_Destruct",
+       "arguments": [
+        "scène=scène1",
+        "drapeaux=0"
+       ],
+       "ligne": 227875
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "to1mid2 2"
+       ],
+       "ligne": 227927
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "to1mid2 5"
+       ],
+       "ligne": 227939
+      },
+      {
+       "op": "palette_depuis",
+       "arguments": [
+        "pal2(to1mid2 5)"
+       ],
+       "ligne": 227946
+      }
+     ]
+    },
+    {
+     "scène": 2,
+     "objet": "scène2",
+     "cadence": "20",
+     "ligne": 227954,
+     "calques": [
+      {
+       "nom": "c2",
+       "type": "ImageLayer",
+       "paramètres": "ressource=to1mid2 2, x=0, y=0, image=0",
+       "ligne": 227962
+      }
+     ],
+     "ajouts": [
+      {
+       "parent": "scène2",
+       "calque": "c2",
+       "ligne": 227985
+      }
+     ],
+     "opérations": [
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal2(to1mid2 5)"
+       ],
+       "ligne": 227972
+      },
+      {
+       "op": "palette_envoie",
+       "arguments": [
+        "palette=pal1",
+        "pas=0"
+       ],
+       "ligne": 227980
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène2"
+       ],
+       "ligne": 227997
+      },
+      {
+       "op": "Scene_Destruct",
+       "arguments": [
+        "scène=scène2",
+        "drapeaux=0"
+       ],
+       "ligne": 228020
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "to1mid2 6"
+       ],
+       "ligne": 228072
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "to1mid2 8"
+       ],
+       "ligne": 228084
+      },
+      {
+       "op": "palette_depuis",
+       "arguments": [
+        "pal2(to1mid2 8)"
+       ],
+       "ligne": 228091
+      },
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal2(to1mid2 8)"
+       ],
+       "ligne": 228100
+      },
+      {
+       "op": "palette_envoie",
+       "arguments": [
+        "palette=pal1",
+        "pas=0"
+       ],
+       "ligne": 228108
+      },
+      {
+       "op": "dessine_image",
+       "arguments": [
+        "surface=surface1",
+        "x=0",
+        "y=27",
+        "données=données(to1mid2 6.+0)",
+        "image=0"
+       ],
+       "ligne": 228125
+      },
+      {
+       "op": "Path_BuildWithFolder_11166",
+       "arguments": [
+        "h1",
+        "\"OBJECTS\"",
+        "\"EJECT\"",
+        "\".PAK\""
+       ],
+       "ligne": 228152
+      },
+      {
+       "op": "pak_vide()→0.méthode20",
+       "arguments": [
+        "h1",
+        "1"
+       ],
+       "ligne": 228159
+      },
+      {
+       "op": "tableau_objets",
+       "arguments": [
+        "objets1 : 3 objets de 10 octets"
+       ],
+       "ligne": 228168
+      },
+      {
+       "op": "IndexedRecordReader_AdvanceIndex_436B6",
+       "arguments": [
+        "pak_vide()",
+        "di + 5"
+       ],
+       "ligne": 228183
+      },
+      {
+       "op": "Memory_TypedFreeWrapper_32871",
+       "arguments": [
+        "27668",
+        "v64",
+        "3",
+        "0",
+        "0"
+       ],
+       "ligne": 228205
+      },
+      {
+       "op": "IndexedRecordReader_ReadEntryInto_43519",
+       "arguments": [
+        "pak_vide()",
+        "di + 5",
+        "données(objets1[di]→0)"
+       ],
+       "ligne": 228287
+      }
+     ]
+    },
+    {
+     "scène": 3,
+     "objet": "scène3",
+     "cadence": "20",
+     "ligne": 228303,
+     "calques": [
+      {
+       "nom": "c3",
+       "type": "ImageLayer",
+       "paramètres": "ressource=objets1, x=0, y=0, image=0",
+       "ligne": 228311
+      }
+     ],
+     "ajouts": [
+      {
+       "parent": "scène3",
+       "calque": "c3",
+       "ligne": 228317
+      }
+     ],
+     "opérations": [
+      {
+       "op": "Memory_TypedFreeWrapper_32871",
+       "arguments": [
+        "27668",
+        "64000",
+        "3",
+        "0",
+        "1"
+       ],
+       "ligne": 228336
+      },
+      {
+       "op": "Surface_SaveRect_392F6",
+       "arguments": [
+        "word_4D36E",
+        "données(v90)",
+        "&v80"
+       ],
+       "ligne": 228359
+      },
+      {
+       "op": "dessine_image",
+       "arguments": [
+        "surface=surface1",
+        "x=0",
+        "y=0",
+        "données=données(objets1.+0)",
+        "image=0"
+       ],
+       "ligne": 228376
+      },
+      {
+       "op": "attend",
+       "arguments": [
+        "chronomètre=objet1"
+       ],
+       "ligne": 228383
+      },
+      {
+       "op": "Surface_RestoreRect_38CDA",
+       "arguments": [
+        "word_4D36E",
+        "données(v90)",
+        "&v80"
+       ],
+       "ligne": 228398
+      },
+      {
+       "op": "dessine_image",
+       "arguments": [
+        "surface=surface1",
+        "x=0",
+        "y=0",
+        "données=données(objets1.+10)",
+        "image=0"
+       ],
+       "ligne": 228415
+      },
+      {
+       "op": "attend",
+       "arguments": [
+        "chronomètre=objet1"
+       ],
+       "ligne": 228422
+      },
+      {
+       "op": "Surface_RestoreRect_38CDA",
+       "arguments": [
+        "word_4D36E",
+        "données(v90)",
+        "&v80"
+       ],
+       "ligne": 228437
+      },
+      {
+       "op": "dessine_image",
+       "arguments": [
+        "surface=surface1",
+        "x=0",
+        "y=0",
+        "données=données(objets1.+20)",
+        "image=0"
+       ],
+       "ligne": 228454
+      },
+      {
+       "op": "attend",
+       "arguments": [
+        "chronomètre=objet1"
+       ],
+       "ligne": 228461
+      },
+      {
+       "op": "Scene_Destruct",
+       "arguments": [
+        "scène=scène3",
+        "drapeaux=0"
+       ],
+       "ligne": 228484
+      },
+      {
+       "op": "CRT_Doprnt_Core",
+       "arguments": [
+        "objets1",
+        "10",
+        "3",
+        "1",
+        "sub_479E0"
+       ],
+       "ligne": 228511
+      },
+      {
+       "op": "Path_BuildWithFolder_11166",
+       "arguments": [
+        "h2",
+        "\"OBJECTS\"",
+        "\"EJECT\"",
+        "\".PAK\""
+       ],
+       "ligne": 228582
+      },
+      {
+       "op": "pak_vide()→0.méthode20",
+       "arguments": [
+        "h2",
+        "1"
+       ],
+       "ligne": 228589
+      },
+      {
+       "op": "Path_BuildWithFolder_11166",
+       "arguments": [
+        "h3",
+        "\"OBJECTS\"",
+        "\"EJECT\"",
+        "\".PAK\""
+       ],
+       "ligne": 228612
+      },
+      {
+       "op": "pak_vide()→0.méthode20",
+       "arguments": [
+        "h3",
+        "1"
+       ],
+       "ligne": 228619
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "to1mid2 7"
+       ],
+       "ligne": 228631
+      },
+      {
+       "op": "IndexedRecordReader_AdvanceIndex_436B6",
+       "arguments": [
+        "pak_vide()",
+        "2"
+       ],
+       "ligne": 228639
+      },
+      {
+       "op": "Memory_TypedFreeWrapper_32871",
+       "arguments": [
+        "27668",
+        "v52",
+        "3",
+        "0",
+        "0"
+       ],
+       "ligne": 228661
+      },
+      {
+       "op": "IndexedRecordReader_ReadEntryInto_43519",
+       "arguments": [
+        "pak_vide()",
+        "2",
+        "données(v48)"
+       ],
+       "ligne": 228686
+      },
+      {
+       "op": "tableau_objets",
+       "arguments": [
+        "objets2 : 5 objets de 10 octets"
+       ],
+       "ligne": 228706
+      },
+      {
+       "op": "IndexedRecordReader_AdvanceIndex_436B6",
+       "arguments": [
+        "pak_vide()",
+        "di"
+       ],
+       "ligne": 228714
+      },
+      {
+       "op": "Memory_TypedFreeWrapper_32871",
+       "arguments": [
+        "27668",
+        "v62",
+        "3",
+        "0",
+        "0"
+       ],
+       "ligne": 228736
+      },
+      {
+       "op": "IndexedRecordReader_ReadEntryInto_43519",
+       "arguments": [
+        "pak_vide()",
+        "di",
+        "données(objets2[di]→0)"
+       ],
+       "ligne": 228816
+      },
+      {
+       "op": "dessine_image",
+       "arguments": [
+        "surface=surface1",
+        "x=0",
+        "y=27",
+        "données=données(to1mid2 7.+0)",
+        "image=0"
+       ],
+       "ligne": 228844
+      },
+      {
+       "op": "dessine_image",
+       "arguments": [
+        "surface=surface1",
+        "x=0",
+        "y=0",
+        "données=données(v48)",
+        "image=0"
+       ],
+       "ligne": 228861
+      },
+      {
+       "op": "attend",
+       "arguments": [
+        "chronomètre=objet2"
+       ],
+       "ligne": 228868
+      },
+      {
+       "op": "dessine_image",
+       "arguments": [
+        "surface=surface1",
+        "x=0",
+        "y=0",
+        "données=données(objets2.+0)",
+        "image=0"
+       ],
+       "ligne": 228885
+      },
+      {
+       "op": "attend",
+       "arguments": [
+        "chronomètre=objet2"
+       ],
+       "ligne": 228892
+      },
+      {
+       "op": "dessine_image",
+       "arguments": [
+        "surface=surface1",
+        "x=0",
+        "y=0",
+        "données=données(objets2.+10)",
+        "image=0"
+       ],
+       "ligne": 228909
+      },
+      {
+       "op": "attend",
+       "arguments": [
+        "chronomètre=objet2"
+       ],
+       "ligne": 228916
+      },
+      {
+       "op": "dessine_image",
+       "arguments": [
+        "surface=surface1",
+        "x=0",
+        "y=0",
+        "données=données(objets2.+20)",
+        "image=0"
+       ],
+       "ligne": 228933
+      },
+      {
+       "op": "attend",
+       "arguments": [
+        "chronomètre=objet2"
+       ],
+       "ligne": 228940
+      },
+      {
+       "op": "dessine_image",
+       "arguments": [
+        "surface=surface1",
+        "x=0",
+        "y=0",
+        "données=données(objets2.+30)",
+        "image=0"
+       ],
+       "ligne": 228957
+      },
+      {
+       "op": "attend",
+       "arguments": [
+        "chronomètre=objet2"
+       ],
+       "ligne": 228964
+      },
+      {
+       "op": "dessine_image",
+       "arguments": [
+        "surface=surface1",
+        "x=0",
+        "y=0",
+        "données=données(objets2.+40)",
+        "image=0"
+       ],
+       "ligne": 228981
+      },
+      {
+       "op": "attend",
+       "arguments": [
+        "chronomètre=objet2"
+       ],
+       "ligne": 228988
+      },
+      {
+       "op": "CRT_Doprnt_Core",
+       "arguments": [
+        "objets2",
+        "10",
+        "5",
+        "1",
+        "sub_479E0"
+       ],
+       "ligne": 228997
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "to1mid2 4"
+       ],
+       "ligne": 229045
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "to1mid2 5"
+       ],
+       "ligne": 229057
+      },
+      {
+       "op": "palette_depuis",
+       "arguments": [
+        "pal2(to1mid2 5)"
+       ],
+       "ligne": 229064
+      }
+     ]
+    },
+    {
+     "scène": 4,
+     "objet": "scène4",
+     "cadence": "20",
+     "ligne": 229072,
+     "calques": [
+      {
+       "nom": "c4",
+       "type": "OverlayImageLayer",
+       "paramètres": "ressource=to1mid2 4, x=0, y=-27, image=0",
+       "ligne": 229080
+      }
+     ],
+     "ajouts": [
+      {
+       "parent": "scène4",
+       "calque": "c4",
+       "ligne": 229103
+      }
+     ],
+     "opérations": [
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal2(to1mid2 5)"
+       ],
+       "ligne": 229090
+      },
+      {
+       "op": "palette_envoie",
+       "arguments": [
+        "palette=pal1",
+        "pas=0"
+       ],
+       "ligne": 229098
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène4"
+       ],
+       "ligne": 229115
+      },
+      {
+       "op": "fondu_disparition",
+       "arguments": [
+        "palette=pal1",
+        "couleur=&v16",
+        "pas=3",
+        "premier=0",
+        "nombre=256"
+       ],
+       "ligne": 229142
+      },
+      {
+       "op": "Scene_Destruct",
+       "arguments": [
+        "scène=scène4",
+        "drapeaux=0"
+       ],
+       "ligne": 229147
+      },
+      {
+       "op": "flux_iff",
+       "arguments": [
+        "flux=flux1"
+       ],
+       "ligne": 229209
+      },
+      {
+       "op": "flux1.ouvre",
+       "arguments": [
+        "chemin1",
+        "1"
+       ],
+       "ligne": 229221
+      },
+      {
+       "op": "iff_form",
+       "arguments": [
+        "flux=flux1",
+        "balise=dword_4B119",
+        "x=0"
+       ],
+       "ligne": 229227
+      },
+      {
+       "op": "iff_form",
+       "arguments": [
+        "flux=flux1",
+        "balise=dword_4B11E",
+        "x=0"
+       ],
+       "ligne": 229233
+      },
+      {
+       "op": "iff_chunk",
+       "arguments": [
+        "flux=flux1",
+        "balise=dword_4B123",
+        "x=0"
+       ],
+       "ligne": 229239
+      },
+      {
+       "op": "Memory_TypedFreeWrapper_32871",
+       "arguments": [
+        "27668",
+        "v52",
+        "2",
+        "0",
+        "1"
+       ],
+       "ligne": 229248
+      },
+      {
+       "op": "ResourceRecord_ReadDwordFieldB_42B12",
+       "arguments": [
+        "flux1",
+        "données(v56)"
+       ],
+       "ligne": 229271
+      },
+      {
+       "op": "iff_ferme",
+       "arguments": [
+        "flux=flux1"
+       ],
+       "ligne": 229277
+      },
+      {
+       "op": "iff_form",
+       "arguments": [
+        "flux=flux1",
+        "balise=dword_4B128",
+        "x=0"
+       ],
+       "ligne": 229283
+      },
+      {
+       "op": "iff_chunk",
+       "arguments": [
+        "flux=flux1",
+        "balise=dword_4B12D",
+        "x=0"
+       ],
+       "ligne": 229289
+      },
+      {
+       "op": "Memory_TypedFreeWrapper_32871",
+       "arguments": [
+        "27668",
+        "v60",
+        "2",
+        "0",
+        "1"
+       ],
+       "ligne": 229298
+      },
+      {
+       "op": "ResourceRecord_ReadDwordFieldB_42B12",
+       "arguments": [
+        "flux1",
+        "données(v64)"
+       ],
+       "ligne": 229321
+      },
+      {
+       "op": "iff_ferme_form",
+       "arguments": [
+        "flux=flux1"
+       ],
+       "ligne": 229325
+      },
+      {
+       "op": "iff_ferme_form",
+       "arguments": [
+        "flux=flux1"
+       ],
+       "ligne": 229330
+      },
+      {
+       "op": "palette_depuis",
+       "arguments": [
+        "pal3(to1mid2 5)"
+       ],
+       "ligne": 229345
+      },
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal3(to1mid2 5)"
+       ],
+       "ligne": 229354
+      },
+      {
+       "op": "palette_alloue",
+       "arguments": [
+        "palette=pal4",
+        "premier=0",
+        "nombre=256"
+       ],
+       "ligne": 229360
+      },
+      {
+       "op": "palette_remplit",
+       "arguments": [
+        "palette=pal4",
+        "couleur=&v40",
+        "premier=v52",
+        "nombre=pal4.+0"
+       ],
+       "ligne": 229369
+      },
+      {
+       "op": "palette_envoie",
+       "arguments": [
+        "palette=pal4",
+        "pas=0"
+       ],
+       "ligne": 229381
+      },
+      {
+       "op": "GlyphObject_ConstructWithBuffer_36D56",
+       "arguments": [
+        "&scène4+10",
+        "to1mid2 4"
+       ],
+       "ligne": 229391
+      },
+      {
+       "op": "zone_texte",
+       "arguments": [
+        "zone=zone1",
+        "police=0"
+       ],
+       "ligne": 229397
+      },
+      {
+       "op": "TextFormat_ApplyStyleAttribute_357D1",
+       "arguments": [
+        "&objets2+2",
+        "v48"
+       ],
+       "ligne": 229404
+      },
+      {
+       "op": "Widget_ComputeBoundsExtent_372DC",
+       "arguments": [
+        "zone1",
+        "160",
+        "97"
+       ],
+       "ligne": 229413
+      },
+      {
+       "op": "texte_formaté",
+       "arguments": [
+        "zone=zone1",
+        "format=10066"
+       ],
+       "ligne": 229418
+      },
+      {
+       "op": "fondu_apparition",
+       "arguments": [
+        "palette=pal1",
+        "couleur=&v40",
+        "pas=2",
+        "premier=0",
+        "nombre=256"
+       ],
+       "ligne": 229427
+      },
+      {
+       "op": "vide_entrées",
+       "arguments": [],
+       "ligne": 229429
+      },
+      {
+       "op": "fondu_disparition",
+       "arguments": [
+        "palette=pal1",
+        "couleur=&v40",
+        "pas=2",
+        "premier=0",
+        "nombre=256"
+       ],
+       "ligne": 229472
+      }
+     ]
+    }
+   ],
+   "pseudo_code": [
+    "bp = sp                                                                                               ⟨227708⟩",
+    "v2 = word_4D36E                                                                                       ⟨227713⟩",
+    "v116 = 0                                                                                              ⟨227714⟩",
+    "TextFormat_ApplyStyleAttribute_357D1(&v116, v2)                                                       ⟨227719⟩",
+    "v130 = 0                                                                                              ⟨227721⟩",
+    "TextRenderer_ApplyFormatChange_3584E(&v130, 0)                                                        ⟨227730⟩",
+    "sub_3499B(&v6, &v130)                                                                                 ⟨227736⟩",
+    "palette_alloue(palette=pal1, premier=0, nombre=256)                                                   ⟨227742⟩",
+    "v16 = 0                                                                                               ⟨227748⟩",
+    "charge(to1mid2 0)                                                                                     ⟨227778⟩",
+    "charge(to1mid2 1)                                                                                     ⟨227790⟩",
+    "palette_depuis(pal2(to1mid2 1))                                                                       ⟨227797⟩",
+    "",
+    "──── scène1 ────",
+    "scène1 = Scene_Create(cadence=20, palette=255, surface=&v116)                                         ⟨227805⟩",
+    "c1 = ImageLayer(ressource=to1mid2 0, x=0, y=0, image=0)                                               ⟨227813⟩",
+    "di = c1                                                                                               ⟨227815⟩",
+    "palette_copie(destination=pal1, source=pal2(to1mid2 1))                                               ⟨227823⟩",
+    "palette_envoie(palette=pal1, pas=0)                                                                   ⟨227835⟩",
+    "ajoute c1 à scène1                                                                                    ⟨227840⟩",
+    "si = 0                                                                                                ⟨227842⟩",
+    "tant que (scène1.compteur < 62) et (scène1.terminée == 0) :",
+    "    v44 = si                                                                                          ⟨227846⟩",
+    "    c1.image = v44                                                                                    ⟨227848⟩",
+    "    si = si + 1                                                                                       ⟨227849⟩",
+    "    Scene_Tick(scène=scène1)                                                                          ⟨227852⟩",
+    "Scene_Destruct(scène=scène1, drapeaux=0)                                                              ⟨227875⟩",
+    "v30 = 0                                                                                               ⟨227898⟩",
+    "v20 = 0                                                                                               ⟨227916⟩",
+    "v20 = 0                                                                                               ⟨227920⟩",
+    "charge(to1mid2 2)                                                                                     ⟨227927⟩",
+    "v30 = 0                                                                                               ⟨227932⟩",
+    "charge(to1mid2 5)                                                                                     ⟨227939⟩",
+    "v39 = 0                                                                                               ⟨227941⟩",
+    "palette_depuis(pal2(to1mid2 5))                                                                       ⟨227946⟩",
+    "",
+    "──── scène2 ────",
+    "scène2 = Scene_Create(cadence=20, palette=255, surface=&v116)                                         ⟨227954⟩",
+    "c2 = ImageLayer(ressource=to1mid2 2, x=0, y=0, image=0)                                               ⟨227962⟩",
+    "di = c2                                                                                               ⟨227964⟩",
+    "palette_copie(destination=pal1, source=pal2(to1mid2 5))                                               ⟨227972⟩",
+    "palette_envoie(palette=pal1, pas=0)                                                                   ⟨227980⟩",
+    "ajoute c2 à scène2                                                                                    ⟨227985⟩",
+    "si = 0                                                                                                ⟨227987⟩",
+    "tant que (scène2.compteur < 15) et (scène2.terminée == 0) :",
+    "    v44 = si                                                                                          ⟨227991⟩",
+    "    c2.image = v44                                                                                    ⟨227993⟩",
+    "    si = si + 1                                                                                       ⟨227994⟩",
+    "    Scene_Tick(scène=scène2)                                                                          ⟨227997⟩",
+    "Scene_Destruct(scène=scène2, drapeaux=0)                                                              ⟨228020⟩",
+    "v30 = 0                                                                                               ⟨228043⟩",
+    "v20 = 0                                                                                               ⟨228061⟩",
+    "v20 = 0                                                                                               ⟨228065⟩",
+    "charge(to1mid2 6)                                                                                     ⟨228072⟩",
+    "v30 = 0                                                                                               ⟨228077⟩",
+    "charge(to1mid2 8)                                                                                     ⟨228084⟩",
+    "v39 = 0                                                                                               ⟨228086⟩",
+    "palette_depuis(pal2(to1mid2 8))                                                                       ⟨228091⟩",
+    "palette_copie(destination=pal1, source=pal2(to1mid2 8))                                               ⟨228100⟩",
+    "palette_envoie(palette=pal1, pas=0)                                                                   ⟨228108⟩",
+    "dessine_image(surface=surface1, x=0, y=27, données=données(to1mid2 6.+0), image=0)                    ⟨228125⟩",
+    "Path_BuildWithFolder_11166(h1, \"OBJECTS\", \"EJECT\", \".PAK\")                                            ⟨228152⟩",
+    "pak_vide()→0.méthode20(h1, 1)                                                                         ⟨228159⟩",
+    "tableau_objets(objets1 : 3 objets de 10 octets)                                                       ⟨228168⟩",
+    "v58 = 0                                                                                               ⟨228170⟩",
+    "v54 = 2                                                                                               ⟨228171⟩",
+    "v53 = 0                                                                                               ⟨228172⟩",
+    "v52 = 0                                                                                               ⟨228173⟩",
+    "v59 = 1                                                                                               ⟨228174⟩",
+    "di = 0                                                                                                ⟨228175⟩",
+    "tant que di < 3 :",
+    "    IndexedRecordReader_AdvanceIndex_436B6(pak_vide(), di + 5)                                        ⟨228183⟩",
+    "    v64 = ax                                                                                          ⟨228199⟩",
+    "    Memory_TypedFreeWrapper_32871(27668, v64, 3, 0, 0)                                                ⟨228205⟩",
+    "    v66 = ?                                                                                           ⟨228207⟩",
+    "    v68 = Memory_TypedFreeWrapper_32871(27668, v64, 3, 0, 0)                                          ⟨228208⟩",
+    "    si = objets1[di]                                                                                  ⟨228216⟩",
+    "    objets1[di]→2 = v66                                                                               ⟨228217⟩",
+    "    objets1[di]→0 = v68                                                                               ⟨228218⟩",
+    "    ((di·10) + &objets1+4)→0 = 3                                                                      ⟨228225⟩",
+    "    ((di·10) + &objets1+5)→0 = 1                                                                      ⟨228232⟩",
+    "    ((di·10) + &objets1+6)→0 = 0                                                                      ⟨228239⟩",
+    "    ((di·10) + &objets1+6)→0 = v64                                                                    ⟨228247⟩",
+    "    si pak_vide()→109 & 192 == 192 :",
+    "        v59 = 0                                                                                       ⟨228257⟩",
+    "        aller à loc_7B345                                                                             ⟨228258⟩",
+    "    IndexedRecordReader_ReadEntryInto_43519(pak_vide(), di + 5, données(objets1[di]→0))               ⟨228287⟩",
+    "    di = di + 1                                                                                       ⟨228289⟩",
+    "loc_7B345:                                                                                            ⟨228296⟩",
+    "",
+    "──── scène3 ────",
+    "scène3 = Scene_Create(cadence=20, palette=255, surface=surface1)                                      ⟨228303⟩",
+    "c3 = ImageLayer(ressource=objets1, x=0, y=0, image=0)                                                 ⟨228311⟩",
+    "ajoute c3 à scène3                                                                                    ⟨228317⟩",
+    "v80 = 0                                                                                               ⟨228320⟩",
+    "v74 = 175                                                                                             ⟨228323⟩",
+    "v90 = 0                                                                                               ⟨228324⟩",
+    "v86 = 2                                                                                               ⟨228325⟩",
+    "v85 = 0                                                                                               ⟨228326⟩",
+    "v84 = 0                                                                                               ⟨228327⟩",
+    "v94 = booléen                                                                                         ⟨228329⟩",
+    "v98 = booléen                                                                                         ⟨228330⟩",
+    "Memory_TypedFreeWrapper_32871(27668, 64000, 3, 0, 1)                                                  ⟨228336⟩",
+    "v100 = ?                                                                                              ⟨228338⟩",
+    "v102 = Memory_TypedFreeWrapper_32871(27668, 64000, 3, 0, 1)                                           ⟨228339⟩",
+    "v90 = v102                                                                                            ⟨228341⟩",
+    "v86 = 3                                                                                               ⟨228342⟩",
+    "v85 = 1                                                                                               ⟨228343⟩",
+    "v84 = 0                                                                                               ⟨228344⟩",
+    "v84 = -1536                                                                                           ⟨228345⟩",
+    "Surface_SaveRect_392F6(word_4D36E, données(v90), &v80)                                                ⟨228359⟩",
+    "dessine_image(surface=surface1, x=0, y=0, données=données(objets1.+0), image=0)                       ⟨228376⟩",
+    "v94 = 8                                                                                               ⟨228378⟩",
+    "attend(chronomètre=objet1)                                                                            ⟨228383⟩",
+    "Surface_RestoreRect_38CDA(word_4D36E, données(v90), &v80)                                             ⟨228398⟩",
+    "dessine_image(surface=surface1, x=0, y=0, données=données(objets1.+10), image=0)                      ⟨228415⟩",
+    "v94 = 8                                                                                               ⟨228417⟩",
+    "attend(chronomètre=objet1)                                                                            ⟨228422⟩",
+    "Surface_RestoreRect_38CDA(word_4D36E, données(v90), &v80)                                             ⟨228437⟩",
+    "dessine_image(surface=surface1, x=0, y=0, données=données(objets1.+20), image=0)                      ⟨228454⟩",
+    "v94 = 45                                                                                              ⟨228456⟩",
+    "attend(chronomètre=objet1)                                                                            ⟨228461⟩",
+    "v90 = 0                                                                                               ⟨228478⟩",
+    "v85 = 0                                                                                               ⟨228479⟩",
+    "v84 = 0                                                                                               ⟨228480⟩",
+    "Scene_Destruct(scène=scène3, drapeaux=0)                                                              ⟨228484⟩",
+    "v58 = 0                                                                                               ⟨228501⟩",
+    "v53 = 0                                                                                               ⟨228502⟩",
+    "v52 = 0                                                                                               ⟨228503⟩",
+    "CRT_Doprnt_Core(objets1, 10, 3, 1, sub_479E0)                                                         ⟨228511⟩",
+    "v30 = 0                                                                                               ⟨228534⟩",
+    "v20 = 0                                                                                               ⟨228552⟩",
+    "Path_BuildWithFolder_11166(h2, \"OBJECTS\", \"EJECT\", \".PAK\")                                            ⟨228582⟩",
+    "pak_vide()→0.méthode20(h2, 1)                                                                         ⟨228589⟩",
+    "Path_BuildWithFolder_11166(h3, \"OBJECTS\", \"EJECT\", \".PAK\")                                            ⟨228612⟩",
+    "pak_vide()→0.méthode20(h3, 1)                                                                         ⟨228619⟩",
+    "charge(to1mid2 7)                                                                                     ⟨228631⟩",
+    "v48 = 0                                                                                               ⟨228633⟩",
+    "v44 = 2                                                                                               ⟨228634⟩",
+    "v43 = 0                                                                                               ⟨228635⟩",
+    "pal2(to1mid2 8).+0 = 0                                                                                ⟨228636⟩",
+    "IndexedRecordReader_AdvanceIndex_436B6(pak_vide(), 2)                                                 ⟨228639⟩",
+    "v52 = ax                                                                                              ⟨228655⟩",
+    "Memory_TypedFreeWrapper_32871(27668, v52, 3, 0, 0)                                                    ⟨228661⟩",
+    "v54 = ?                                                                                               ⟨228663⟩",
+    "v56 = Memory_TypedFreeWrapper_32871(27668, v52, 3, 0, 0)                                              ⟨228664⟩",
+    "v48 = v56                                                                                             ⟨228666⟩",
+    "v44 = 3                                                                                               ⟨228667⟩",
+    "v43 = 1                                                                                               ⟨228668⟩",
+    "pal2(to1mid2 8).+0 = 0                                                                                ⟨228669⟩",
+    "si v48 != 0 :",
+    "    IndexedRecordReader_ReadEntryInto_43519(pak_vide(), 2, données(v48))                              ⟨228686⟩",
+    "si v48 != 0 :",
+    "    v57 = 1                                                                                           ⟨228692⟩",
+    "sinon :",
+    "    v57 = 0                                                                                           ⟨228696⟩",
+    "tableau_objets(objets2 : 5 objets de 10 octets)                                                       ⟨228706⟩",
+    "di = 0                                                                                                ⟨228708⟩",
+    "tant que di < 5 :",
+    "    IndexedRecordReader_AdvanceIndex_436B6(pak_vide(), di)                                            ⟨228714⟩",
+    "    v62 = ax                                                                                          ⟨228730⟩",
+    "    Memory_TypedFreeWrapper_32871(27668, v62, 3, 0, 0)                                                ⟨228736⟩",
+    "    v64 = ?                                                                                           ⟨228738⟩",
+    "    v66 = Memory_TypedFreeWrapper_32871(27668, v62, 3, 0, 0)                                          ⟨228739⟩",
+    "    si = objets2[di]                                                                                  ⟨228747⟩",
+    "    objets2[di]→2 = v64                                                                               ⟨228748⟩",
+    "    objets2[di]→0 = v66                                                                               ⟨228749⟩",
+    "    ((di·10) + &objets2+4)→0 = 3                                                                      ⟨228756⟩",
+    "    ((di·10) + &objets2+5)→0 = 1                                                                      ⟨228763⟩",
+    "    ((di·10) + &objets2+6)→0 = 0                                                                      ⟨228770⟩",
+    "    ((di·10) + &objets2+6)→0 = v62                                                                    ⟨228778⟩",
+    "    si pak_vide()→109 & 192 == 192 :",
+    "        v57 = 0                                                                                       ⟨228788⟩",
+    "        aller à loc_7B933                                                                             ⟨228789⟩",
+    "    IndexedRecordReader_ReadEntryInto_43519(pak_vide(), di, données(objets2[di]→0))                   ⟨228816⟩",
+    "    di = di + 1                                                                                       ⟨228818⟩",
+    "loc_7B933:                                                                                            ⟨228825⟩",
+    "v70 = booléen                                                                                         ⟨228827⟩",
+    "v74 = booléen                                                                                         ⟨228828⟩",
+    "dessine_image(surface=surface1, x=0, y=27, données=données(to1mid2 7.+0), image=0)                    ⟨228844⟩",
+    "dessine_image(surface=surface1, x=0, y=0, données=données(v48), image=0)                              ⟨228861⟩",
+    "v70 = 6                                                                                               ⟨228863⟩",
+    "attend(chronomètre=objet2)                                                                            ⟨228868⟩",
+    "dessine_image(surface=surface1, x=0, y=0, données=données(objets2.+0), image=0)                       ⟨228885⟩",
+    "v70 = 6                                                                                               ⟨228887⟩",
+    "attend(chronomètre=objet2)                                                                            ⟨228892⟩",
+    "dessine_image(surface=surface1, x=0, y=0, données=données(objets2.+10), image=0)                      ⟨228909⟩",
+    "v70 = 6                                                                                               ⟨228911⟩",
+    "attend(chronomètre=objet2)                                                                            ⟨228916⟩",
+    "dessine_image(surface=surface1, x=0, y=0, données=données(objets2.+20), image=0)                      ⟨228933⟩",
+    "v70 = 6                                                                                               ⟨228935⟩",
+    "attend(chronomètre=objet2)                                                                            ⟨228940⟩",
+    "dessine_image(surface=surface1, x=0, y=0, données=données(objets2.+30), image=0)                      ⟨228957⟩",
+    "v70 = 6                                                                                               ⟨228959⟩",
+    "attend(chronomètre=objet2)                                                                            ⟨228964⟩",
+    "dessine_image(surface=surface1, x=0, y=0, données=données(objets2.+40), image=0)                      ⟨228981⟩",
+    "v70 = 35                                                                                              ⟨228983⟩",
+    "attend(chronomètre=objet2)                                                                            ⟨228988⟩",
+    "CRT_Doprnt_Core(objets2, 10, 5, 1, sub_479E0)                                                         ⟨228997⟩",
+    "v48 = 0                                                                                               ⟨229014⟩",
+    "v43 = 0                                                                                               ⟨229015⟩",
+    "pal2(to1mid2 8).+0 = 0                                                                                ⟨229016⟩",
+    "v20 = 0                                                                                               ⟨229038⟩",
+    "charge(to1mid2 4)                                                                                     ⟨229045⟩",
+    "charge(to1mid2 5)                                                                                     ⟨229057⟩",
+    "v39 = 0                                                                                               ⟨229059⟩",
+    "palette_depuis(pal2(to1mid2 5))                                                                       ⟨229064⟩",
+    "",
+    "──── scène4 ────",
+    "scène4 = Scene_Create(cadence=20, palette=255, surface=surface1)                                      ⟨229072⟩",
+    "c4 = OverlayImageLayer(ressource=to1mid2 4, x=0, y=-27, image=0)                                      ⟨229080⟩",
+    "di = c4                                                                                               ⟨229082⟩",
+    "palette_copie(destination=pal1, source=pal2(to1mid2 5))                                               ⟨229090⟩",
+    "palette_envoie(palette=pal1, pas=0)                                                                   ⟨229098⟩",
+    "ajoute c4 à scène4                                                                                    ⟨229103⟩",
+    "si = 0                                                                                                ⟨229105⟩",
+    "tant que (scène4.compteur < 28) et (scène4.terminée == 0) :",
+    "    v44 = si                                                                                          ⟨229109⟩",
+    "    c4.image = v44                                                                                    ⟨229111⟩",
+    "    si = si + 1                                                                                       ⟨229112⟩",
+    "    Scene_Tick(scène=scène4)                                                                          ⟨229115⟩",
+    "fondu_disparition(palette=pal1, couleur=&v16, pas=3, premier=0, nombre=256)                           ⟨229142⟩",
+    "Scene_Destruct(scène=scène4, drapeaux=0)                                                              ⟨229147⟩",
+    "v30 = 0                                                                                               ⟨229170⟩",
+    "v20 = 0                                                                                               ⟨229188⟩",
+    "v20 = 0                                                                                               ⟨229192⟩",
+    "v30 = 0                                                                                               ⟨229196⟩",
+    "flux_iff(flux=flux1)                                                                                  ⟨229209⟩",
+    "flux1.ouvre(chemin1, 1)                                                                               ⟨229221⟩",
+    "iff_form(flux=flux1, balise=dword_4B119, x=0)                                                         ⟨229227⟩",
+    "iff_form(flux=flux1, balise=dword_4B11E, x=0)                                                         ⟨229233⟩",
+    "iff_chunk(flux=flux1, balise=dword_4B123, x=0)                                                        ⟨229239⟩",
+    "v52 = v434                                                                                            ⟨229242⟩",
+    "Memory_TypedFreeWrapper_32871(27668, v52, 2, 0, 1)                                                    ⟨229248⟩",
+    "v54 = ?                                                                                               ⟨229250⟩",
+    "v56 = Memory_TypedFreeWrapper_32871(27668, v52, 2, 0, 1)                                              ⟨229251⟩",
+    "v31 = 1                                                                                               ⟨229255⟩",
+    "v30 = 0                                                                                               ⟨229256⟩",
+    "v30 = v52                                                                                             ⟨229258⟩",
+    "ResourceRecord_ReadDwordFieldB_42B12(flux1, données(v56))                                             ⟨229271⟩",
+    "v447 = v430                                                                                           ⟨229274⟩",
+    "iff_ferme(flux=flux1)                                                                                 ⟨229277⟩",
+    "iff_form(flux=flux1, balise=dword_4B128, x=0)                                                         ⟨229283⟩",
+    "iff_chunk(flux=flux1, balise=dword_4B12D, x=0)                                                        ⟨229289⟩",
+    "v60 = v434                                                                                            ⟨229292⟩",
+    "Memory_TypedFreeWrapper_32871(27668, v60, 2, 0, 1)                                                    ⟨229298⟩",
+    "v62 = ?                                                                                               ⟨229300⟩",
+    "v64 = Memory_TypedFreeWrapper_32871(27668, v60, 2, 0, 1)                                              ⟨229301⟩",
+    "v21 = 1                                                                                               ⟨229305⟩",
+    "v20 = 0                                                                                               ⟨229306⟩",
+    "v20 = v60                                                                                             ⟨229308⟩",
+    "ResourceRecord_ReadDwordFieldB_42B12(flux1, données(v64))                                             ⟨229321⟩",
+    "iff_ferme_form(flux=flux1)                                                                            ⟨229325⟩",
+    "iff_ferme_form(flux=flux1)                                                                            ⟨229330⟩",
+    "palette_depuis(pal3(to1mid2 5))                                                                       ⟨229345⟩",
+    "palette_copie(destination=pal1, source=pal3(to1mid2 5))                                               ⟨229354⟩",
+    "palette_alloue(palette=pal4, premier=0, nombre=256)                                                   ⟨229360⟩",
+    "palette_remplit(palette=pal4, couleur=&v40, premier=v52, nombre=pal4.+0)                              ⟨229369⟩",
+    "palette_envoie(palette=pal4, pas=0)                                                                   ⟨229381⟩",
+    "GlyphObject_ConstructWithBuffer_36D56(&scène4+10, to1mid2 4)                                          ⟨229391⟩",
+    "zone_texte(zone=zone1, police=0)                                                                      ⟨229397⟩",
+    "v48 = word_4D36E                                                                                      ⟨229400⟩",
+    "TextFormat_ApplyStyleAttribute_357D1(&objets2+2, v48)                                                 ⟨229404⟩",
+    "Widget_ComputeBoundsExtent_372DC(zone1, 160, 97)                                                      ⟨229413⟩",
+    "texte_formaté(zone=zone1, format=10066)                                                               ⟨229418⟩",
+    "fondu_apparition(palette=pal1, couleur=&v40, pas=2, premier=0, nombre=256)                            ⟨229427⟩",
+    "vide_entrées()                                                                                        ⟨229429⟩",
+    "v52 = booléen                                                                                         ⟨229431⟩",
+    "v56_avant = v56                                                                                       ⟨229432⟩",
+    "v56 = booléen                                                                                         ⟨229432⟩",
+    "v52 = 300                                                                                             ⟨229433⟩",
+    "v57 = 0                                                                                               ⟨229436⟩",
+    "tant que booléen == 0 :",
+    "    v57 = 0                                                                                           ⟨229440⟩",
+    "    si touche_passer() != 0 : aller à loc_7C0C6                                                       ⟨229443⟩",
+    "si v57 != 0 : aller à loc_7C095                                                                       ⟨229462⟩",
+    "loc_7C0C6:                                                                                            ⟨229464⟩",
+    "fondu_disparition(palette=pal1, couleur=&v40, pas=2, premier=0, nombre=256)                           ⟨229472⟩",
+    "v30 = 0                                                                                               ⟨229508⟩",
+    "v20 = 0                                                                                               ⟨229526⟩",
+    "retour                                                                                                ⟨229551⟩"
+   ],
+   "arbre": [
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "bp"
+     },
+     "valeur": {
+      "glob": "sp",
+      "init": null
+     },
+     "ligne": 227708
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v2"
+     },
+     "valeur": {
+      "glob": "word_4D36E",
+      "init": 0
+     },
+     "ligne": 227713
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v116"
+     },
+     "valeur": 0,
+     "ligne": 227714
+    },
+    {
+     "t": "appel",
+     "nom": "TextFormat_ApplyStyleAttribute_357D1",
+     "args": [
+      {
+       "adresse": "v116"
+      },
+      {
+       "local": "v2"
+      }
+     ],
+     "texte": [
+      "&v116",
+      "v2"
+     ],
+     "ligne": 227719
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v130"
+     },
+     "valeur": 0,
+     "ligne": 227721
+    },
+    {
+     "t": "appel",
+     "nom": "TextRenderer_ApplyFormatChange_3584E",
+     "args": [
+      {
+       "adresse": "v130"
+      },
+      0
+     ],
+     "texte": [
+      "&v130",
+      "0"
+     ],
+     "ligne": 227730
+    },
+    {
+     "t": "appel",
+     "nom": "sub_3499B",
+     "args": [
+      {
+       "adresse": "v6"
+      },
+      {
+       "adresse": "v130"
+      }
+     ],
+     "texte": [
+      "&v6",
+      "&v130"
+     ],
+     "ligne": 227736
+    },
+    {
+     "t": "op",
+     "op": "palette_alloue",
+     "args": {
+      "palette": {
+       "objet": "pal1"
+      },
+      "premier": 0,
+      "nombre": 256
+     },
+     "texte": [
+      "palette=pal1",
+      "premier=0",
+      "nombre=256"
+     ],
+     "ligne": 227742
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v16"
+     },
+     "valeur": 0,
+     "ligne": 227748
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "to1mid2",
+      "entrée": 0,
+      "ressource": {
+       "objet": "r1"
+      }
+     },
+     "texte": [
+      "to1mid2 0"
+     ],
+     "ligne": 227778
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "to1mid2",
+      "entrée": 1,
+      "ressource": {
+       "objet": "r2"
+      }
+     },
+     "texte": [
+      "to1mid2 1"
+     ],
+     "ligne": 227790
+    },
+    {
+     "t": "op",
+     "op": "palette_depuis",
+     "args": {
+      "palette": {
+       "objet": "pal2"
+      },
+      "ressource": {
+       "objet": "r2"
+      }
+     },
+     "texte": [
+      "pal2(to1mid2 1)"
+     ],
+     "ligne": 227797
+    },
+    {
+     "t": "scène",
+     "nom": "scène1",
+     "cadence": "20",
+     "ligne": 227805
+    },
+    {
+     "t": "calque",
+     "nom": "c1",
+     "type": "ImageLayer",
+     "args": {
+      "ressource": {
+       "objet": "r1"
+      },
+      "x": 0,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 227813
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "di"
+     },
+     "valeur": {
+      "objet": "c1"
+     },
+     "ligne": 227815
+    },
+    {
+     "t": "op",
+     "op": "palette_copie",
+     "args": {
+      "destination": {
+       "objet": "pal1"
+      },
+      "source": {
+       "objet": "pal2"
+      },
+      "premier": {
+       "local": "v40"
+      },
+      "nombre": {
+       "champ": [
+        "pal2",
+        "+0"
+       ]
+      }
+     },
+     "texte": [
+      "destination=pal1",
+      "source=pal2(to1mid2 1)"
+     ],
+     "ligne": 227823
+    },
+    {
+     "t": "op",
+     "op": "palette_envoie",
+     "args": {
+      "palette": {
+       "objet": "pal1"
+      },
+      "premier": {
+       "local": "v10"
+      },
+      "nombre": {
+       "champ": [
+        "pal1",
+        "+0"
+       ]
+      },
+      "pas": 0
+     },
+     "texte": [
+      "palette=pal1",
+      "pas=0"
+     ],
+     "ligne": 227835
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène1",
+     "calque": "c1",
+     "ligne": 227840
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "si"
+     },
+     "valeur": 0,
+     "ligne": 227842
+    },
+    {
+     "t": "tant_que",
+     "cond": {
+      "et": [
+       {
+        "cmp": "<",
+        "a": {
+         "champ": [
+          "scène1",
+          "compteur"
+         ]
+        },
+        "b": 62
+       },
+       {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène1",
+          "terminée"
+         ]
+        },
+        "b": 0
+       }
+      ]
+     },
+     "corps": [
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v44"
+       },
+       "valeur": {
+        "local": "si"
+       },
+       "ligne": 227846
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "champ": [
+         "c1",
+         "image"
+        ]
+       },
+       "valeur": {
+        "local": "v44"
+       },
+       "ligne": 227848
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "si"
+       },
+       "valeur": {
+        "op": "+",
+        "a": {
+         "local": "si"
+        },
+        "b": 1
+       },
+       "ligne": 227849
+      },
+      {
+       "t": "op",
+       "op": "Scene_Tick",
+       "args": {
+        "scène": {
+         "objet": "scène1"
+        }
+       },
+       "texte": [
+        "scène=scène1"
+       ],
+       "ligne": 227852
+      }
+     ],
+     "ligne": 227843
+    },
+    {
+     "t": "op",
+     "op": "Scene_Destruct",
+     "args": {
+      "scène": {
+       "objet": "scène1"
+      },
+      "drapeaux": 0
+     },
+     "texte": [
+      "scène=scène1",
+      "drapeaux=0"
+     ],
+     "ligne": 227875
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v30"
+     },
+     "valeur": 0,
+     "ligne": 227898
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v20"
+     },
+     "valeur": 0,
+     "ligne": 227916
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v20"
+     },
+     "valeur": 0,
+     "ligne": 227920
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "to1mid2",
+      "entrée": 2,
+      "ressource": {
+       "objet": "r1"
+      }
+     },
+     "texte": [
+      "to1mid2 2"
+     ],
+     "ligne": 227927
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v30"
+     },
+     "valeur": 0,
+     "ligne": 227932
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "to1mid2",
+      "entrée": 5,
+      "ressource": {
+       "objet": "r2"
+      }
+     },
+     "texte": [
+      "to1mid2 5"
+     ],
+     "ligne": 227939
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v39"
+     },
+     "valeur": 0,
+     "ligne": 227941
+    },
+    {
+     "t": "op",
+     "op": "palette_depuis",
+     "args": {
+      "palette": {
+       "objet": "pal2"
+      },
+      "ressource": {
+       "objet": "r2"
+      }
+     },
+     "texte": [
+      "pal2(to1mid2 5)"
+     ],
+     "ligne": 227946
+    },
+    {
+     "t": "scène",
+     "nom": "scène2",
+     "cadence": "20",
+     "ligne": 227954
+    },
+    {
+     "t": "calque",
+     "nom": "c2",
+     "type": "ImageLayer",
+     "args": {
+      "ressource": {
+       "objet": "r1"
+      },
+      "x": 0,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 227962
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "di"
+     },
+     "valeur": {
+      "objet": "c2"
+     },
+     "ligne": 227964
+    },
+    {
+     "t": "op",
+     "op": "palette_copie",
+     "args": {
+      "destination": {
+       "objet": "pal1"
+      },
+      "source": {
+       "objet": "pal2"
+      },
+      "premier": {
+       "local": "v40"
+      },
+      "nombre": {
+       "champ": [
+        "pal2",
+        "+0"
+       ]
+      }
+     },
+     "texte": [
+      "destination=pal1",
+      "source=pal2(to1mid2 5)"
+     ],
+     "ligne": 227972
+    },
+    {
+     "t": "op",
+     "op": "palette_envoie",
+     "args": {
+      "palette": {
+       "objet": "pal1"
+      },
+      "premier": {
+       "local": "v10"
+      },
+      "nombre": {
+       "champ": [
+        "pal1",
+        "+0"
+       ]
+      },
+      "pas": 0
+     },
+     "texte": [
+      "palette=pal1",
+      "pas=0"
+     ],
+     "ligne": 227980
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène2",
+     "calque": "c2",
+     "ligne": 227985
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "si"
+     },
+     "valeur": 0,
+     "ligne": 227987
+    },
+    {
+     "t": "tant_que",
+     "cond": {
+      "et": [
+       {
+        "cmp": "<",
+        "a": {
+         "champ": [
+          "scène2",
+          "compteur"
+         ]
+        },
+        "b": 15
+       },
+       {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène2",
+          "terminée"
+         ]
+        },
+        "b": 0
+       }
+      ]
+     },
+     "corps": [
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v44"
+       },
+       "valeur": {
+        "local": "si"
+       },
+       "ligne": 227991
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "champ": [
+         "c2",
+         "image"
+        ]
+       },
+       "valeur": {
+        "local": "v44"
+       },
+       "ligne": 227993
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "si"
+       },
+       "valeur": {
+        "op": "+",
+        "a": {
+         "local": "si"
+        },
+        "b": 1
+       },
+       "ligne": 227994
+      },
+      {
+       "t": "op",
+       "op": "Scene_Tick",
+       "args": {
+        "scène": {
+         "objet": "scène2"
+        }
+       },
+       "texte": [
+        "scène=scène2"
+       ],
+       "ligne": 227997
+      }
+     ],
+     "ligne": 227988
+    },
+    {
+     "t": "op",
+     "op": "Scene_Destruct",
+     "args": {
+      "scène": {
+       "objet": "scène2"
+      },
+      "drapeaux": 0
+     },
+     "texte": [
+      "scène=scène2",
+      "drapeaux=0"
+     ],
+     "ligne": 228020
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v30"
+     },
+     "valeur": 0,
+     "ligne": 228043
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v20"
+     },
+     "valeur": 0,
+     "ligne": 228061
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v20"
+     },
+     "valeur": 0,
+     "ligne": 228065
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "to1mid2",
+      "entrée": 6,
+      "ressource": {
+       "objet": "r1"
+      }
+     },
+     "texte": [
+      "to1mid2 6"
+     ],
+     "ligne": 228072
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v30"
+     },
+     "valeur": 0,
+     "ligne": 228077
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "to1mid2",
+      "entrée": 8,
+      "ressource": {
+       "objet": "r2"
+      }
+     },
+     "texte": [
+      "to1mid2 8"
+     ],
+     "ligne": 228084
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v39"
+     },
+     "valeur": 0,
+     "ligne": 228086
+    },
+    {
+     "t": "op",
+     "op": "palette_depuis",
+     "args": {
+      "palette": {
+       "objet": "pal2"
+      },
+      "ressource": {
+       "objet": "r2"
+      }
+     },
+     "texte": [
+      "pal2(to1mid2 8)"
+     ],
+     "ligne": 228091
+    },
+    {
+     "t": "op",
+     "op": "palette_copie",
+     "args": {
+      "destination": {
+       "objet": "pal1"
+      },
+      "source": {
+       "objet": "pal2"
+      },
+      "premier": {
+       "local": "v40"
+      },
+      "nombre": {
+       "champ": [
+        "pal2",
+        "+0"
+       ]
+      }
+     },
+     "texte": [
+      "destination=pal1",
+      "source=pal2(to1mid2 8)"
+     ],
+     "ligne": 228100
+    },
+    {
+     "t": "op",
+     "op": "palette_envoie",
+     "args": {
+      "palette": {
+       "objet": "pal1"
+      },
+      "premier": {
+       "local": "v10"
+      },
+      "nombre": {
+       "champ": [
+        "pal1",
+        "+0"
+       ]
+      },
+      "pas": 0
+     },
+     "texte": [
+      "palette=pal1",
+      "pas=0"
+     ],
+     "ligne": 228108
+    },
+    {
+     "t": "op",
+     "op": "dessine_image",
+     "args": {
+      "surface": {
+       "objet": "surface1"
+      },
+      "x": 0,
+      "y": 27,
+      "données": {
+       "données": {
+        "champ": [
+         "r1",
+         "+0"
+        ]
+       }
+      },
+      "image": 0
+     },
+     "texte": [
+      "surface=surface1",
+      "x=0",
+      "y=27",
+      "données=données(to1mid2 6.+0)",
+      "image=0"
+     ],
+     "ligne": 228125
+    },
+    {
+     "t": "appel",
+     "nom": "Path_BuildWithFolder_11166",
+     "args": [
+      {
+       "objet": "h1"
+      },
+      {
+       "chaîne": "OBJECTS"
+      },
+      {
+       "chaîne": "EJECT"
+      },
+      {
+       "chaîne": ".PAK"
+      }
+     ],
+     "texte": [
+      "h1",
+      "\"OBJECTS\"",
+      "\"EJECT\"",
+      "\".PAK\""
+     ],
+     "ligne": 228152
+    },
+    {
+     "t": "appel",
+     "nom": "pak_vide()→0.méthode20",
+     "args": [
+      {
+       "objet": "h1"
+      },
+      1
+     ],
+     "texte": [
+      "h1",
+      "1"
+     ],
+     "ligne": 228159
+    },
+    {
+     "t": "op",
+     "op": "tableau_objets",
+     "args": {},
+     "texte": [
+      "objets1 : 3 objets de 10 octets"
+     ],
+     "ligne": 228168
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v58"
+     },
+     "valeur": 0,
+     "ligne": 228170
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v54"
+     },
+     "valeur": 2,
+     "ligne": 228171
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v53"
+     },
+     "valeur": 0,
+     "ligne": 228172
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v52"
+     },
+     "valeur": 0,
+     "ligne": 228173
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v59"
+     },
+     "valeur": 1,
+     "ligne": 228174
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "di"
+     },
+     "valeur": 0,
+     "ligne": 228175
+    },
+    {
+     "t": "tant_que",
+     "cond": {
+      "cmp": "<",
+      "a": {
+       "local": "di"
+      },
+      "b": 3
+     },
+     "corps": [
+      {
+       "t": "appel",
+       "nom": "IndexedRecordReader_AdvanceIndex_436B6",
+       "args": [
+        {
+         "retour": "pak_vide"
+        },
+        {
+         "op": "+",
+         "a": {
+          "local": "di"
+         },
+         "b": 5
+        }
+       ],
+       "texte": [
+        "pak_vide()",
+        "di + 5"
+       ],
+       "ligne": 228183
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v64"
+       },
+       "valeur": {
+        "local": "ax"
+       },
+       "ligne": 228199
+      },
+      {
+       "t": "appel",
+       "nom": "Memory_TypedFreeWrapper_32871",
+       "args": [
+        27668,
+        {
+         "local": "v64"
+        },
+        3,
+        0,
+        0
+       ],
+       "texte": [
+        "27668",
+        "v64",
+        "3",
+        "0",
+        "0"
+       ],
+       "ligne": 228205
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v66"
+       },
+       "valeur": {
+        "inconnu": "?"
+       },
+       "ligne": 228207
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v68"
+       },
+       "valeur": {
+        "résultat": "Memory_TypedFreeWrapper_32871(27668, v64, 3, 0, 0)"
+       },
+       "ligne": 228208
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "si"
+       },
+       "valeur": {
+        "op": "+",
+        "a": {
+         "op": "*",
+         "a": {
+          "local": "di"
+         },
+         "b": 10
+        },
+        "b": {
+         "objet": "objets1"
+        }
+       },
+       "ligne": 228216
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "objets1[di]→2"
+       },
+       "valeur": {
+        "local": "v66"
+       },
+       "ligne": 228217
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "objets1[di]→0"
+       },
+       "valeur": {
+        "local": "v68"
+       },
+       "ligne": 228218
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "((di·10) + &objets1+4)→0"
+       },
+       "valeur": 3,
+       "ligne": 228225
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "((di·10) + &objets1+5)→0"
+       },
+       "valeur": 1,
+       "ligne": 228232
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "((di·10) + &objets1+6)→0"
+       },
+       "valeur": 0,
+       "ligne": 228239
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "((di·10) + &objets1+6)→0"
+       },
+       "valeur": {
+        "local": "v64"
+       },
+       "ligne": 228247
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "op": "&",
+         "a": {
+          "déréf": {
+           "retour": "pak_vide"
+          },
+          "décalage": 109
+         },
+         "b": 192
+        },
+        "b": 192
+       },
+       "alors": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v59"
+         },
+         "valeur": 0,
+         "ligne": 228257
+        },
+        {
+         "t": "saut",
+         "cible": "loc_7B345",
+         "ligne": 228258
+        }
+       ],
+       "sinon": [],
+       "ligne": 228256
+      },
+      {
+       "t": "label",
+       "nom": "loc_7B2F6"
+      },
+      {
+       "t": "appel",
+       "nom": "IndexedRecordReader_ReadEntryInto_43519",
+       "args": [
+        {
+         "retour": "pak_vide"
+        },
+        {
+         "op": "+",
+         "a": {
+          "local": "di"
+         },
+         "b": 5
+        },
+        {
+         "données": {
+          "déréf": {
+           "op": "+",
+           "a": {
+            "op": "*",
+            "a": {
+             "local": "di"
+            },
+            "b": 10
+           },
+           "b": {
+            "objet": "objets1"
+           }
+          },
+          "décalage": 0
+         }
+        }
+       ],
+       "texte": [
+        "pak_vide()",
+        "di + 5",
+        "données(objets1[di]→0)"
+       ],
+       "ligne": 228287
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "di"
+       },
+       "valeur": {
+        "op": "+",
+        "a": {
+         "local": "di"
+        },
+        "b": 1
+       },
+       "ligne": 228289
+      }
+     ],
+     "ligne": 228176
+    },
+    {
+     "t": "label",
+     "nom": "loc_7B345"
+    },
+    {
+     "t": "scène",
+     "nom": "scène3",
+     "cadence": "20",
+     "ligne": 228303
+    },
+    {
+     "t": "calque",
+     "nom": "c3",
+     "type": "ImageLayer",
+     "args": {
+      "ressource": {
+       "objet": "objets1"
+      },
+      "x": 0,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 228311
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "c3",
+     "ligne": 228317
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v80"
+     },
+     "valeur": 0,
+     "ligne": 228320
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v74"
+     },
+     "valeur": 175,
+     "ligne": 228323
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v90"
+     },
+     "valeur": 0,
+     "ligne": 228324
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v86"
+     },
+     "valeur": 2,
+     "ligne": 228325
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v85"
+     },
+     "valeur": 0,
+     "ligne": 228326
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v84"
+     },
+     "valeur": 0,
+     "ligne": 228327
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v94"
+     },
+     "valeur": {
+      "inconnu": "booléen"
+     },
+     "ligne": 228329
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v98"
+     },
+     "valeur": {
+      "inconnu": "booléen"
+     },
+     "ligne": 228330
+    },
+    {
+     "t": "appel",
+     "nom": "Memory_TypedFreeWrapper_32871",
+     "args": [
+      27668,
+      64000,
+      3,
+      0,
+      1
+     ],
+     "texte": [
+      "27668",
+      "64000",
+      "3",
+      "0",
+      "1"
+     ],
+     "ligne": 228336
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v100"
+     },
+     "valeur": {
+      "inconnu": "?"
+     },
+     "ligne": 228338
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v102"
+     },
+     "valeur": {
+      "résultat": "Memory_TypedFreeWrapper_32871(27668, 64000, 3, 0, 1)"
+     },
+     "ligne": 228339
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v90"
+     },
+     "valeur": {
+      "local": "v102"
+     },
+     "ligne": 228341
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v86"
+     },
+     "valeur": 3,
+     "ligne": 228342
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v85"
+     },
+     "valeur": 1,
+     "ligne": 228343
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v84"
+     },
+     "valeur": 0,
+     "ligne": 228344
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v84"
+     },
+     "valeur": -1536,
+     "ligne": 228345
+    },
+    {
+     "t": "appel",
+     "nom": "Surface_SaveRect_392F6",
+     "args": [
+      {
+       "glob": "word_4D36E",
+       "init": 0
+      },
+      {
+       "données": {
+        "local": "v90"
+       }
+      },
+      {
+       "adresse": "v80"
+      }
+     ],
+     "texte": [
+      "word_4D36E",
+      "données(v90)",
+      "&v80"
+     ],
+     "ligne": 228359
+    },
+    {
+     "t": "op",
+     "op": "dessine_image",
+     "args": {
+      "surface": {
+       "objet": "surface1"
+      },
+      "x": 0,
+      "y": 0,
+      "données": {
+       "données": {
+        "champ": [
+         "objets1",
+         "+0"
+        ]
+       }
+      },
+      "image": 0
+     },
+     "texte": [
+      "surface=surface1",
+      "x=0",
+      "y=0",
+      "données=données(objets1.+0)",
+      "image=0"
+     ],
+     "ligne": 228376
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v94"
+     },
+     "valeur": 8,
+     "ligne": 228378
+    },
+    {
+     "t": "op",
+     "op": "attend",
+     "args": {
+      "chronomètre": {
+       "objet": "objet1"
+      }
+     },
+     "texte": [
+      "chronomètre=objet1"
+     ],
+     "ligne": 228383
+    },
+    {
+     "t": "appel",
+     "nom": "Surface_RestoreRect_38CDA",
+     "args": [
+      {
+       "glob": "word_4D36E",
+       "init": 0
+      },
+      {
+       "données": {
+        "local": "v90"
+       }
+      },
+      {
+       "adresse": "v80"
+      }
+     ],
+     "texte": [
+      "word_4D36E",
+      "données(v90)",
+      "&v80"
+     ],
+     "ligne": 228398
+    },
+    {
+     "t": "op",
+     "op": "dessine_image",
+     "args": {
+      "surface": {
+       "objet": "surface1"
+      },
+      "x": 0,
+      "y": 0,
+      "données": {
+       "données": {
+        "champ": [
+         "objets1",
+         "+10"
+        ]
+       }
+      },
+      "image": 0
+     },
+     "texte": [
+      "surface=surface1",
+      "x=0",
+      "y=0",
+      "données=données(objets1.+10)",
+      "image=0"
+     ],
+     "ligne": 228415
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v94"
+     },
+     "valeur": 8,
+     "ligne": 228417
+    },
+    {
+     "t": "op",
+     "op": "attend",
+     "args": {
+      "chronomètre": {
+       "objet": "objet1"
+      }
+     },
+     "texte": [
+      "chronomètre=objet1"
+     ],
+     "ligne": 228422
+    },
+    {
+     "t": "appel",
+     "nom": "Surface_RestoreRect_38CDA",
+     "args": [
+      {
+       "glob": "word_4D36E",
+       "init": 0
+      },
+      {
+       "données": {
+        "local": "v90"
+       }
+      },
+      {
+       "adresse": "v80"
+      }
+     ],
+     "texte": [
+      "word_4D36E",
+      "données(v90)",
+      "&v80"
+     ],
+     "ligne": 228437
+    },
+    {
+     "t": "op",
+     "op": "dessine_image",
+     "args": {
+      "surface": {
+       "objet": "surface1"
+      },
+      "x": 0,
+      "y": 0,
+      "données": {
+       "données": {
+        "champ": [
+         "objets1",
+         "+20"
+        ]
+       }
+      },
+      "image": 0
+     },
+     "texte": [
+      "surface=surface1",
+      "x=0",
+      "y=0",
+      "données=données(objets1.+20)",
+      "image=0"
+     ],
+     "ligne": 228454
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v94"
+     },
+     "valeur": 45,
+     "ligne": 228456
+    },
+    {
+     "t": "op",
+     "op": "attend",
+     "args": {
+      "chronomètre": {
+       "objet": "objet1"
+      }
+     },
+     "texte": [
+      "chronomètre=objet1"
+     ],
+     "ligne": 228461
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v90"
+     },
+     "valeur": 0,
+     "ligne": 228478
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v85"
+     },
+     "valeur": 0,
+     "ligne": 228479
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v84"
+     },
+     "valeur": 0,
+     "ligne": 228480
+    },
+    {
+     "t": "op",
+     "op": "Scene_Destruct",
+     "args": {
+      "scène": {
+       "objet": "scène3"
+      },
+      "drapeaux": 0
+     },
+     "texte": [
+      "scène=scène3",
+      "drapeaux=0"
+     ],
+     "ligne": 228484
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v58"
+     },
+     "valeur": 0,
+     "ligne": 228501
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v53"
+     },
+     "valeur": 0,
+     "ligne": 228502
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v52"
+     },
+     "valeur": 0,
+     "ligne": 228503
+    },
+    {
+     "t": "appel",
+     "nom": "CRT_Doprnt_Core",
+     "args": [
+      {
+       "objet": "objets1"
+      },
+      10,
+      3,
+      1,
+      {
+       "chaîne": "sub_479E0"
+      }
+     ],
+     "texte": [
+      "objets1",
+      "10",
+      "3",
+      "1",
+      "sub_479E0"
+     ],
+     "ligne": 228511
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v30"
+     },
+     "valeur": 0,
+     "ligne": 228534
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v20"
+     },
+     "valeur": 0,
+     "ligne": 228552
+    },
+    {
+     "t": "appel",
+     "nom": "Path_BuildWithFolder_11166",
+     "args": [
+      {
+       "objet": "h2"
+      },
+      {
+       "chaîne": "OBJECTS"
+      },
+      {
+       "chaîne": "EJECT"
+      },
+      {
+       "chaîne": ".PAK"
+      }
+     ],
+     "texte": [
+      "h2",
+      "\"OBJECTS\"",
+      "\"EJECT\"",
+      "\".PAK\""
+     ],
+     "ligne": 228582
+    },
+    {
+     "t": "appel",
+     "nom": "pak_vide()→0.méthode20",
+     "args": [
+      {
+       "objet": "h2"
+      },
+      1
+     ],
+     "texte": [
+      "h2",
+      "1"
+     ],
+     "ligne": 228589
+    },
+    {
+     "t": "appel",
+     "nom": "Path_BuildWithFolder_11166",
+     "args": [
+      {
+       "objet": "h3"
+      },
+      {
+       "chaîne": "OBJECTS"
+      },
+      {
+       "chaîne": "EJECT"
+      },
+      {
+       "chaîne": ".PAK"
+      }
+     ],
+     "texte": [
+      "h3",
+      "\"OBJECTS\"",
+      "\"EJECT\"",
+      "\".PAK\""
+     ],
+     "ligne": 228612
+    },
+    {
+     "t": "appel",
+     "nom": "pak_vide()→0.méthode20",
+     "args": [
+      {
+       "objet": "h3"
+      },
+      1
+     ],
+     "texte": [
+      "h3",
+      "1"
+     ],
+     "ligne": 228619
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "to1mid2",
+      "entrée": 7,
+      "ressource": {
+       "objet": "r3"
+      }
+     },
+     "texte": [
+      "to1mid2 7"
+     ],
+     "ligne": 228631
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v48"
+     },
+     "valeur": 0,
+     "ligne": 228633
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v44"
+     },
+     "valeur": 2,
+     "ligne": 228634
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v43"
+     },
+     "valeur": 0,
+     "ligne": 228635
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "pal2",
+       "+0"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 228636
+    },
+    {
+     "t": "appel",
+     "nom": "IndexedRecordReader_AdvanceIndex_436B6",
+     "args": [
+      {
+       "retour": "pak_vide"
+      },
+      2
+     ],
+     "texte": [
+      "pak_vide()",
+      "2"
+     ],
+     "ligne": 228639
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v52"
+     },
+     "valeur": {
+      "local": "ax"
+     },
+     "ligne": 228655
+    },
+    {
+     "t": "appel",
+     "nom": "Memory_TypedFreeWrapper_32871",
+     "args": [
+      27668,
+      {
+       "local": "v52"
+      },
+      3,
+      0,
+      0
+     ],
+     "texte": [
+      "27668",
+      "v52",
+      "3",
+      "0",
+      "0"
+     ],
+     "ligne": 228661
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v54"
+     },
+     "valeur": {
+      "inconnu": "?"
+     },
+     "ligne": 228663
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v56"
+     },
+     "valeur": {
+      "résultat": "Memory_TypedFreeWrapper_32871(27668, v52, 3, 0, 0)"
+     },
+     "ligne": 228664
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v48"
+     },
+     "valeur": {
+      "local": "v56"
+     },
+     "ligne": 228666
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v44"
+     },
+     "valeur": 3,
+     "ligne": 228667
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v43"
+     },
+     "valeur": 1,
+     "ligne": 228668
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "pal2",
+       "+0"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 228669
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "local": "v48"
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "appel",
+       "nom": "IndexedRecordReader_ReadEntryInto_43519",
+       "args": [
+        {
+         "retour": "pak_vide"
+        },
+        2,
+        {
+         "données": {
+          "local": "v48"
+         }
+        }
+       ],
+       "texte": [
+        "pak_vide()",
+        "2",
+        "données(v48)"
+       ],
+       "ligne": 228686
+      }
+     ],
+     "sinon": [],
+     "ligne": 228673
+    },
+    {
+     "t": "label",
+     "nom": "loc_7B7EB"
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "local": "v48"
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v57"
+       },
+       "valeur": 1,
+       "ligne": 228692
+      }
+     ],
+     "sinon": [
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v57"
+       },
+       "valeur": 0,
+       "ligne": 228696
+      }
+     ],
+     "ligne": 228691
+    },
+    {
+     "t": "label",
+     "nom": "loc_7B7FC"
+    },
+    {
+     "t": "op",
+     "op": "tableau_objets",
+     "args": {},
+     "texte": [
+      "objets2 : 5 objets de 10 octets"
+     ],
+     "ligne": 228706
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "di"
+     },
+     "valeur": 0,
+     "ligne": 228708
+    },
+    {
+     "t": "tant_que",
+     "cond": {
+      "cmp": "<",
+      "a": {
+       "local": "di"
+      },
+      "b": 5
+     },
+     "corps": [
+      {
+       "t": "appel",
+       "nom": "IndexedRecordReader_AdvanceIndex_436B6",
+       "args": [
+        {
+         "retour": "pak_vide"
+        },
+        {
+         "local": "di"
+        }
+       ],
+       "texte": [
+        "pak_vide()",
+        "di"
+       ],
+       "ligne": 228714
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v62"
+       },
+       "valeur": {
+        "local": "ax"
+       },
+       "ligne": 228730
+      },
+      {
+       "t": "appel",
+       "nom": "Memory_TypedFreeWrapper_32871",
+       "args": [
+        27668,
+        {
+         "local": "v62"
+        },
+        3,
+        0,
+        0
+       ],
+       "texte": [
+        "27668",
+        "v62",
+        "3",
+        "0",
+        "0"
+       ],
+       "ligne": 228736
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v64"
+       },
+       "valeur": {
+        "inconnu": "?"
+       },
+       "ligne": 228738
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v66"
+       },
+       "valeur": {
+        "résultat": "Memory_TypedFreeWrapper_32871(27668, v62, 3, 0, 0)"
+       },
+       "ligne": 228739
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "si"
+       },
+       "valeur": {
+        "op": "+",
+        "a": {
+         "op": "*",
+         "a": {
+          "local": "di"
+         },
+         "b": 10
+        },
+        "b": {
+         "objet": "objets2"
+        }
+       },
+       "ligne": 228747
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "objets2[di]→2"
+       },
+       "valeur": {
+        "local": "v64"
+       },
+       "ligne": 228748
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "objets2[di]→0"
+       },
+       "valeur": {
+        "local": "v66"
+       },
+       "ligne": 228749
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "((di·10) + &objets2+4)→0"
+       },
+       "valeur": 3,
+       "ligne": 228756
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "((di·10) + &objets2+5)→0"
+       },
+       "valeur": 1,
+       "ligne": 228763
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "((di·10) + &objets2+6)→0"
+       },
+       "valeur": 0,
+       "ligne": 228770
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "((di·10) + &objets2+6)→0"
+       },
+       "valeur": {
+        "local": "v62"
+       },
+       "ligne": 228778
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "op": "&",
+         "a": {
+          "déréf": {
+           "retour": "pak_vide"
+          },
+          "décalage": 109
+         },
+         "b": 192
+        },
+        "b": 192
+       },
+       "alors": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v57"
+         },
+         "valeur": 0,
+         "ligne": 228788
+        },
+        {
+         "t": "saut",
+         "cible": "loc_7B933",
+         "ligne": 228789
+        }
+       ],
+       "sinon": [],
+       "ligne": 228787
+      },
+      {
+       "t": "label",
+       "nom": "loc_7B8E9"
+      },
+      {
+       "t": "appel",
+       "nom": "IndexedRecordReader_ReadEntryInto_43519",
+       "args": [
+        {
+         "retour": "pak_vide"
+        },
+        {
+         "local": "di"
+        },
+        {
+         "données": {
+          "déréf": {
+           "op": "+",
+           "a": {
+            "op": "*",
+            "a": {
+             "local": "di"
+            },
+            "b": 10
+           },
+           "b": {
+            "objet": "objets2"
+           }
+          },
+          "décalage": 0
+         }
+        }
+       ],
+       "texte": [
+        "pak_vide()",
+        "di",
+        "données(objets2[di]→0)"
+       ],
+       "ligne": 228816
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "di"
+       },
+       "valeur": {
+        "op": "+",
+        "a": {
+         "local": "di"
+        },
+        "b": 1
+       },
+       "ligne": 228818
+      }
+     ],
+     "ligne": 228709
+    },
+    {
+     "t": "label",
+     "nom": "loc_7B933"
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v70"
+     },
+     "valeur": {
+      "inconnu": "booléen"
+     },
+     "ligne": 228827
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v74"
+     },
+     "valeur": {
+      "inconnu": "booléen"
+     },
+     "ligne": 228828
+    },
+    {
+     "t": "op",
+     "op": "dessine_image",
+     "args": {
+      "surface": {
+       "objet": "surface1"
+      },
+      "x": 0,
+      "y": 27,
+      "données": {
+       "données": {
+        "champ": [
+         "r3",
+         "+0"
+        ]
+       }
+      },
+      "image": 0
+     },
+     "texte": [
+      "surface=surface1",
+      "x=0",
+      "y=27",
+      "données=données(to1mid2 7.+0)",
+      "image=0"
+     ],
+     "ligne": 228844
+    },
+    {
+     "t": "op",
+     "op": "dessine_image",
+     "args": {
+      "surface": {
+       "objet": "surface1"
+      },
+      "x": 0,
+      "y": 0,
+      "données": {
+       "données": {
+        "local": "v48"
+       }
+      },
+      "image": 0
+     },
+     "texte": [
+      "surface=surface1",
+      "x=0",
+      "y=0",
+      "données=données(v48)",
+      "image=0"
+     ],
+     "ligne": 228861
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v70"
+     },
+     "valeur": 6,
+     "ligne": 228863
+    },
+    {
+     "t": "op",
+     "op": "attend",
+     "args": {
+      "chronomètre": {
+       "objet": "objet2"
+      }
+     },
+     "texte": [
+      "chronomètre=objet2"
+     ],
+     "ligne": 228868
+    },
+    {
+     "t": "op",
+     "op": "dessine_image",
+     "args": {
+      "surface": {
+       "objet": "surface1"
+      },
+      "x": 0,
+      "y": 0,
+      "données": {
+       "données": {
+        "champ": [
+         "objets2",
+         "+0"
+        ]
+       }
+      },
+      "image": 0
+     },
+     "texte": [
+      "surface=surface1",
+      "x=0",
+      "y=0",
+      "données=données(objets2.+0)",
+      "image=0"
+     ],
+     "ligne": 228885
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v70"
+     },
+     "valeur": 6,
+     "ligne": 228887
+    },
+    {
+     "t": "op",
+     "op": "attend",
+     "args": {
+      "chronomètre": {
+       "objet": "objet2"
+      }
+     },
+     "texte": [
+      "chronomètre=objet2"
+     ],
+     "ligne": 228892
+    },
+    {
+     "t": "op",
+     "op": "dessine_image",
+     "args": {
+      "surface": {
+       "objet": "surface1"
+      },
+      "x": 0,
+      "y": 0,
+      "données": {
+       "données": {
+        "champ": [
+         "objets2",
+         "+10"
+        ]
+       }
+      },
+      "image": 0
+     },
+     "texte": [
+      "surface=surface1",
+      "x=0",
+      "y=0",
+      "données=données(objets2.+10)",
+      "image=0"
+     ],
+     "ligne": 228909
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v70"
+     },
+     "valeur": 6,
+     "ligne": 228911
+    },
+    {
+     "t": "op",
+     "op": "attend",
+     "args": {
+      "chronomètre": {
+       "objet": "objet2"
+      }
+     },
+     "texte": [
+      "chronomètre=objet2"
+     ],
+     "ligne": 228916
+    },
+    {
+     "t": "op",
+     "op": "dessine_image",
+     "args": {
+      "surface": {
+       "objet": "surface1"
+      },
+      "x": 0,
+      "y": 0,
+      "données": {
+       "données": {
+        "champ": [
+         "objets2",
+         "+20"
+        ]
+       }
+      },
+      "image": 0
+     },
+     "texte": [
+      "surface=surface1",
+      "x=0",
+      "y=0",
+      "données=données(objets2.+20)",
+      "image=0"
+     ],
+     "ligne": 228933
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v70"
+     },
+     "valeur": 6,
+     "ligne": 228935
+    },
+    {
+     "t": "op",
+     "op": "attend",
+     "args": {
+      "chronomètre": {
+       "objet": "objet2"
+      }
+     },
+     "texte": [
+      "chronomètre=objet2"
+     ],
+     "ligne": 228940
+    },
+    {
+     "t": "op",
+     "op": "dessine_image",
+     "args": {
+      "surface": {
+       "objet": "surface1"
+      },
+      "x": 0,
+      "y": 0,
+      "données": {
+       "données": {
+        "champ": [
+         "objets2",
+         "+30"
+        ]
+       }
+      },
+      "image": 0
+     },
+     "texte": [
+      "surface=surface1",
+      "x=0",
+      "y=0",
+      "données=données(objets2.+30)",
+      "image=0"
+     ],
+     "ligne": 228957
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v70"
+     },
+     "valeur": 6,
+     "ligne": 228959
+    },
+    {
+     "t": "op",
+     "op": "attend",
+     "args": {
+      "chronomètre": {
+       "objet": "objet2"
+      }
+     },
+     "texte": [
+      "chronomètre=objet2"
+     ],
+     "ligne": 228964
+    },
+    {
+     "t": "op",
+     "op": "dessine_image",
+     "args": {
+      "surface": {
+       "objet": "surface1"
+      },
+      "x": 0,
+      "y": 0,
+      "données": {
+       "données": {
+        "champ": [
+         "objets2",
+         "+40"
+        ]
+       }
+      },
+      "image": 0
+     },
+     "texte": [
+      "surface=surface1",
+      "x=0",
+      "y=0",
+      "données=données(objets2.+40)",
+      "image=0"
+     ],
+     "ligne": 228981
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v70"
+     },
+     "valeur": 35,
+     "ligne": 228983
+    },
+    {
+     "t": "op",
+     "op": "attend",
+     "args": {
+      "chronomètre": {
+       "objet": "objet2"
+      }
+     },
+     "texte": [
+      "chronomètre=objet2"
+     ],
+     "ligne": 228988
+    },
+    {
+     "t": "appel",
+     "nom": "CRT_Doprnt_Core",
+     "args": [
+      {
+       "objet": "objets2"
+      },
+      10,
+      5,
+      1,
+      {
+       "chaîne": "sub_479E0"
+      }
+     ],
+     "texte": [
+      "objets2",
+      "10",
+      "5",
+      "1",
+      "sub_479E0"
+     ],
+     "ligne": 228997
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v48"
+     },
+     "valeur": 0,
+     "ligne": 229014
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v43"
+     },
+     "valeur": 0,
+     "ligne": 229015
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "pal2",
+       "+0"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 229016
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v20"
+     },
+     "valeur": 0,
+     "ligne": 229038
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "to1mid2",
+      "entrée": 4,
+      "ressource": {
+       "objet": "r1"
+      }
+     },
+     "texte": [
+      "to1mid2 4"
+     ],
+     "ligne": 229045
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "to1mid2",
+      "entrée": 5,
+      "ressource": {
+       "objet": "r2"
+      }
+     },
+     "texte": [
+      "to1mid2 5"
+     ],
+     "ligne": 229057
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v39"
+     },
+     "valeur": 0,
+     "ligne": 229059
+    },
+    {
+     "t": "op",
+     "op": "palette_depuis",
+     "args": {
+      "palette": {
+       "objet": "pal2"
+      },
+      "ressource": {
+       "objet": "r2"
+      }
+     },
+     "texte": [
+      "pal2(to1mid2 5)"
+     ],
+     "ligne": 229064
+    },
+    {
+     "t": "scène",
+     "nom": "scène4",
+     "cadence": "20",
+     "ligne": 229072
+    },
+    {
+     "t": "calque",
+     "nom": "c4",
+     "type": "OverlayImageLayer",
+     "args": {
+      "ressource": {
+       "objet": "r1"
+      },
+      "x": 0,
+      "y": -27,
+      "image": 0
+     },
+     "ligne": 229080
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "di"
+     },
+     "valeur": {
+      "objet": "c4"
+     },
+     "ligne": 229082
+    },
+    {
+     "t": "op",
+     "op": "palette_copie",
+     "args": {
+      "destination": {
+       "objet": "pal1"
+      },
+      "source": {
+       "objet": "pal2"
+      },
+      "premier": {
+       "local": "v40"
+      },
+      "nombre": {
+       "champ": [
+        "pal2",
+        "+0"
+       ]
+      }
+     },
+     "texte": [
+      "destination=pal1",
+      "source=pal2(to1mid2 5)"
+     ],
+     "ligne": 229090
+    },
+    {
+     "t": "op",
+     "op": "palette_envoie",
+     "args": {
+      "palette": {
+       "objet": "pal1"
+      },
+      "premier": {
+       "local": "v10"
+      },
+      "nombre": {
+       "champ": [
+        "pal1",
+        "+0"
+       ]
+      },
+      "pas": 0
+     },
+     "texte": [
+      "palette=pal1",
+      "pas=0"
+     ],
+     "ligne": 229098
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène4",
+     "calque": "c4",
+     "ligne": 229103
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "si"
+     },
+     "valeur": 0,
+     "ligne": 229105
+    },
+    {
+     "t": "tant_que",
+     "cond": {
+      "et": [
+       {
+        "cmp": "<",
+        "a": {
+         "champ": [
+          "scène4",
+          "compteur"
+         ]
+        },
+        "b": 28
+       },
+       {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène4",
+          "terminée"
+         ]
+        },
+        "b": 0
+       }
+      ]
+     },
+     "corps": [
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v44"
+       },
+       "valeur": {
+        "local": "si"
+       },
+       "ligne": 229109
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "champ": [
+         "c4",
+         "image"
+        ]
+       },
+       "valeur": {
+        "local": "v44"
+       },
+       "ligne": 229111
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "si"
+       },
+       "valeur": {
+        "op": "+",
+        "a": {
+         "local": "si"
+        },
+        "b": 1
+       },
+       "ligne": 229112
+      },
+      {
+       "t": "op",
+       "op": "Scene_Tick",
+       "args": {
+        "scène": {
+         "objet": "scène4"
+        }
+       },
+       "texte": [
+        "scène=scène4"
+       ],
+       "ligne": 229115
+      }
+     ],
+     "ligne": 229106
+    },
+    {
+     "t": "op",
+     "op": "fondu_disparition",
+     "args": {
+      "palette": {
+       "objet": "pal1"
+      },
+      "couleur": {
+       "adresse": "v16"
+      },
+      "pas": 3,
+      "premier": 0,
+      "nombre": 256
+     },
+     "texte": [
+      "palette=pal1",
+      "couleur=&v16",
+      "pas=3",
+      "premier=0",
+      "nombre=256"
+     ],
+     "ligne": 229142
+    },
+    {
+     "t": "op",
+     "op": "Scene_Destruct",
+     "args": {
+      "scène": {
+       "objet": "scène4"
+      },
+      "drapeaux": 0
+     },
+     "texte": [
+      "scène=scène4",
+      "drapeaux=0"
+     ],
+     "ligne": 229147
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v30"
+     },
+     "valeur": 0,
+     "ligne": 229170
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v20"
+     },
+     "valeur": 0,
+     "ligne": 229188
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v20"
+     },
+     "valeur": 0,
+     "ligne": 229192
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v30"
+     },
+     "valeur": 0,
+     "ligne": 229196
+    },
+    {
+     "t": "op",
+     "op": "flux_iff",
+     "args": {
+      "flux": {
+       "objet": "flux1"
+      }
+     },
+     "texte": [
+      "flux=flux1"
+     ],
+     "ligne": 229209
+    },
+    {
+     "t": "appel",
+     "nom": "flux1.ouvre",
+     "args": [
+      {
+       "objet": "chemin1"
+      },
+      1
+     ],
+     "texte": [
+      "chemin1",
+      "1"
+     ],
+     "ligne": 229221
+    },
+    {
+     "t": "op",
+     "op": "iff_form",
+     "args": {
+      "flux": {
+       "objet": "flux1"
+      },
+      "balise": {
+       "glob": "dword_4B119",
+       "init": 21059
+      },
+      "x": 0
+     },
+     "texte": [
+      "flux=flux1",
+      "balise=dword_4B119",
+      "x=0"
+     ],
+     "ligne": 229227
+    },
+    {
+     "t": "op",
+     "op": "iff_form",
+     "args": {
+      "flux": {
+       "objet": "flux1"
+      },
+      "balise": {
+       "glob": "dword_4B11E",
+       "init": 16720
+      },
+      "x": 0
+     },
+     "texte": [
+      "flux=flux1",
+      "balise=dword_4B11E",
+      "x=0"
+     ],
+     "ligne": 229233
+    },
+    {
+     "t": "op",
+     "op": "iff_chunk",
+     "args": {
+      "flux": {
+       "objet": "flux1"
+      },
+      "balise": {
+       "glob": "dword_4B123",
+       "init": 16708
+      },
+      "x": 0
+     },
+     "texte": [
+      "flux=flux1",
+      "balise=dword_4B123",
+      "x=0"
+     ],
+     "ligne": 229239
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v52"
+     },
+     "valeur": {
+      "local": "v434"
+     },
+     "ligne": 229242
+    },
+    {
+     "t": "appel",
+     "nom": "Memory_TypedFreeWrapper_32871",
+     "args": [
+      27668,
+      {
+       "local": "v52"
+      },
+      2,
+      0,
+      1
+     ],
+     "texte": [
+      "27668",
+      "v52",
+      "2",
+      "0",
+      "1"
+     ],
+     "ligne": 229248
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v54"
+     },
+     "valeur": {
+      "inconnu": "?"
+     },
+     "ligne": 229250
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v56"
+     },
+     "valeur": {
+      "résultat": "Memory_TypedFreeWrapper_32871(27668, v52, 2, 0, 1)"
+     },
+     "ligne": 229251
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v31"
+     },
+     "valeur": 1,
+     "ligne": 229255
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v30"
+     },
+     "valeur": 0,
+     "ligne": 229256
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v30"
+     },
+     "valeur": {
+      "local": "v52"
+     },
+     "ligne": 229258
+    },
+    {
+     "t": "appel",
+     "nom": "ResourceRecord_ReadDwordFieldB_42B12",
+     "args": [
+      {
+       "objet": "flux1"
+      },
+      {
+       "données": {
+        "local": "v56"
+       }
+      }
+     ],
+     "texte": [
+      "flux1",
+      "données(v56)"
+     ],
+     "ligne": 229271
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v447"
+     },
+     "valeur": {
+      "local": "v430"
+     },
+     "ligne": 229274
+    },
+    {
+     "t": "op",
+     "op": "iff_ferme",
+     "args": {
+      "flux": {
+       "objet": "flux1"
+      }
+     },
+     "texte": [
+      "flux=flux1"
+     ],
+     "ligne": 229277
+    },
+    {
+     "t": "op",
+     "op": "iff_form",
+     "args": {
+      "flux": {
+       "objet": "flux1"
+      },
+      "balise": {
+       "glob": "dword_4B128",
+       "init": 20294
+      },
+      "x": 0
+     },
+     "texte": [
+      "flux=flux1",
+      "balise=dword_4B128",
+      "x=0"
+     ],
+     "ligne": 229283
+    },
+    {
+     "t": "op",
+     "op": "iff_chunk",
+     "args": {
+      "flux": {
+       "objet": "flux1"
+      },
+      "balise": {
+       "glob": "dword_4B12D",
+       "init": 16708
+      },
+      "x": 0
+     },
+     "texte": [
+      "flux=flux1",
+      "balise=dword_4B12D",
+      "x=0"
+     ],
+     "ligne": 229289
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v60"
+     },
+     "valeur": {
+      "local": "v434"
+     },
+     "ligne": 229292
+    },
+    {
+     "t": "appel",
+     "nom": "Memory_TypedFreeWrapper_32871",
+     "args": [
+      27668,
+      {
+       "local": "v60"
+      },
+      2,
+      0,
+      1
+     ],
+     "texte": [
+      "27668",
+      "v60",
+      "2",
+      "0",
+      "1"
+     ],
+     "ligne": 229298
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v62"
+     },
+     "valeur": {
+      "inconnu": "?"
+     },
+     "ligne": 229300
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v64"
+     },
+     "valeur": {
+      "résultat": "Memory_TypedFreeWrapper_32871(27668, v60, 2, 0, 1)"
+     },
+     "ligne": 229301
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v21"
+     },
+     "valeur": 1,
+     "ligne": 229305
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v20"
+     },
+     "valeur": 0,
+     "ligne": 229306
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v20"
+     },
+     "valeur": {
+      "local": "v60"
+     },
+     "ligne": 229308
+    },
+    {
+     "t": "appel",
+     "nom": "ResourceRecord_ReadDwordFieldB_42B12",
+     "args": [
+      {
+       "objet": "flux1"
+      },
+      {
+       "données": {
+        "local": "v64"
+       }
+      }
+     ],
+     "texte": [
+      "flux1",
+      "données(v64)"
+     ],
+     "ligne": 229321
+    },
+    {
+     "t": "op",
+     "op": "iff_ferme_form",
+     "args": {
+      "flux": {
+       "objet": "flux1"
+      }
+     },
+     "texte": [
+      "flux=flux1"
+     ],
+     "ligne": 229325
+    },
+    {
+     "t": "op",
+     "op": "iff_ferme_form",
+     "args": {
+      "flux": {
+       "objet": "flux1"
+      }
+     },
+     "texte": [
+      "flux=flux1"
+     ],
+     "ligne": 229330
+    },
+    {
+     "t": "op",
+     "op": "palette_depuis",
+     "args": {
+      "palette": {
+       "objet": "pal3"
+      },
+      "ressource": {
+       "objet": "r2"
+      }
+     },
+     "texte": [
+      "pal3(to1mid2 5)"
+     ],
+     "ligne": 229345
+    },
+    {
+     "t": "op",
+     "op": "palette_copie",
+     "args": {
+      "destination": {
+       "objet": "pal1"
+      },
+      "source": {
+       "objet": "pal3"
+      },
+      "premier": {
+       "local": "v44"
+      },
+      "nombre": {
+       "objet": "h1"
+      }
+     },
+     "texte": [
+      "destination=pal1",
+      "source=pal3(to1mid2 5)"
+     ],
+     "ligne": 229354
+    },
+    {
+     "t": "op",
+     "op": "palette_alloue",
+     "args": {
+      "palette": {
+       "objet": "pal4"
+      },
+      "premier": 0,
+      "nombre": 256
+     },
+     "texte": [
+      "palette=pal4",
+      "premier=0",
+      "nombre=256"
+     ],
+     "ligne": 229360
+    },
+    {
+     "t": "op",
+     "op": "palette_remplit",
+     "args": {
+      "palette": {
+       "objet": "pal4"
+      },
+      "couleur": {
+       "adresse": "v40"
+      },
+      "premier": {
+       "local": "v52"
+      },
+      "nombre": {
+       "champ": [
+        "pal4",
+        "+0"
+       ]
+      }
+     },
+     "texte": [
+      "palette=pal4",
+      "couleur=&v40",
+      "premier=v52",
+      "nombre=pal4.+0"
+     ],
+     "ligne": 229369
+    },
+    {
+     "t": "op",
+     "op": "palette_envoie",
+     "args": {
+      "palette": {
+       "objet": "pal4"
+      },
+      "premier": {
+       "local": "v52"
+      },
+      "nombre": {
+       "champ": [
+        "pal4",
+        "+0"
+       ]
+      },
+      "pas": 0
+     },
+     "texte": [
+      "palette=pal4",
+      "pas=0"
+     ],
+     "ligne": 229381
+    },
+    {
+     "t": "appel",
+     "nom": "GlyphObject_ConstructWithBuffer_36D56",
+     "args": [
+      {
+       "adresse_champ": [
+        "scène4",
+        10
+       ]
+      },
+      {
+       "objet": "r1"
+      }
+     ],
+     "texte": [
+      "&scène4+10",
+      "to1mid2 4"
+     ],
+     "ligne": 229391
+    },
+    {
+     "t": "op",
+     "op": "zone_texte",
+     "args": {
+      "zone": {
+       "objet": "zone1"
+      },
+      "style": {
+       "glob": "word_4D36C",
+       "init": 0
+      },
+      "police": 0
+     },
+     "texte": [
+      "zone=zone1",
+      "police=0"
+     ],
+     "ligne": 229397
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v48"
+     },
+     "valeur": {
+      "glob": "word_4D36E",
+      "init": 0
+     },
+     "ligne": 229400
+    },
+    {
+     "t": "appel",
+     "nom": "TextFormat_ApplyStyleAttribute_357D1",
+     "args": [
+      {
+       "adresse_champ": [
+        "objets2",
+        2
+       ]
+      },
+      {
+       "local": "v48"
+      }
+     ],
+     "texte": [
+      "&objets2+2",
+      "v48"
+     ],
+     "ligne": 229404
+    },
+    {
+     "t": "appel",
+     "nom": "Widget_ComputeBoundsExtent_372DC",
+     "args": [
+      {
+       "objet": "zone1"
+      },
+      160,
+      97
+     ],
+     "texte": [
+      "zone1",
+      "160",
+      "97"
+     ],
+     "ligne": 229413
+    },
+    {
+     "t": "op",
+     "op": "texte_formaté",
+     "args": {
+      "zone": {
+       "objet": "zone1"
+      },
+      "format": 10066
+     },
+     "texte": [
+      "zone=zone1",
+      "format=10066"
+     ],
+     "ligne": 229418
+    },
+    {
+     "t": "op",
+     "op": "fondu_apparition",
+     "args": {
+      "palette": {
+       "objet": "pal1"
+      },
+      "couleur": {
+       "adresse": "v40"
+      },
+      "pas": 2,
+      "premier": 0,
+      "nombre": 256
+     },
+     "texte": [
+      "palette=pal1",
+      "couleur=&v40",
+      "pas=2",
+      "premier=0",
+      "nombre=256"
+     ],
+     "ligne": 229427
+    },
+    {
+     "t": "op",
+     "op": "vide_entrées",
+     "args": {},
+     "texte": [],
+     "ligne": 229429
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v52"
+     },
+     "valeur": {
+      "inconnu": "booléen"
+     },
+     "ligne": 229431
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v56_avant"
+     },
+     "valeur": {
+      "local": "v56"
+     },
+     "ligne": 229432
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v56"
+     },
+     "valeur": {
+      "inconnu": "booléen"
+     },
+     "ligne": 229432
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v52"
+     },
+     "valeur": 300,
+     "ligne": 229433
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v57"
+     },
+     "valeur": 0,
+     "ligne": 229436
+    },
+    {
+     "t": "tant_que",
+     "cond": {
+      "cmp": "==",
+      "a": {
+       "inconnu": "booléen"
+      },
+      "b": 0
+     },
+     "corps": [
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v57"
+       },
+       "valeur": 0,
+       "ligne": 229440
+      },
+      {
+       "t": "saut_si",
+       "cond": {
+        "cmp": "!=",
+        "a": {
+         "résultat": "touche_passer()"
+        },
+        "b": 0
+       },
+       "cible": "loc_7C0C6",
+       "ligne": 229443
+      }
+     ],
+     "ligne": 229437
+    },
+    {
+     "t": "saut_si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "local": "v57"
+      },
+      "b": 0
+     },
+     "cible": "loc_7C095",
+     "ligne": 229462
+    },
+    {
+     "t": "label",
+     "nom": "loc_7C0C6"
+    },
+    {
+     "t": "op",
+     "op": "fondu_disparition",
+     "args": {
+      "palette": {
+       "objet": "pal1"
+      },
+      "couleur": {
+       "adresse": "v40"
+      },
+      "pas": 2,
+      "premier": 0,
+      "nombre": 256
+     },
+     "texte": [
+      "palette=pal1",
+      "couleur=&v40",
+      "pas=2",
+      "premier=0",
+      "nombre=256"
+     ],
+     "ligne": 229472
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v30"
+     },
+     "valeur": 0,
+     "ligne": 229508
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v20"
+     },
+     "valeur": 0,
+     "ligne": 229526
+    },
+    {
+     "t": "retour",
+     "ligne": 229551
+    }
+   ]
+  }
+ ],
+ "tableaux": [],
+ "objets": {
+  "pal1": {
+   "genre": "palette",
+   "type": null,
+   "contenu": null,
+   "décalage": -12,
+   "pas": null
+  },
+  "chemin1": {
+   "genre": "path",
+   "type": null,
+   "contenu": "..\\..\\data\\midgames\\credits.iff",
+   "décalage": -210,
+   "pas": null
+  },
+  "pak1": {
+   "genre": "pak",
+   "type": null,
+   "contenu": "to1mid2",
+   "décalage": -330,
+   "pas": null
+  },
+  "r1": {
+   "genre": "res",
+   "type": null,
+   "contenu": "to1mid2 4",
+   "décalage": -26,
+   "pas": null
+  },
+  "r2": {
+   "genre": "res",
+   "type": null,
+   "contenu": "to1mid2 5",
+   "décalage": -36,
+   "pas": null
+  },
+  "pal2": {
+   "genre": "palette",
+   "type": null,
+   "contenu": "to1mid2 5",
+   "décalage": -42,
+   "pas": null
+  },
+  "scène1": {
+   "genre": "scene",
+   "type": null,
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "scène2": {
+   "genre": "scene",
+   "type": null,
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "surface1": {
+   "genre": "surface",
+   "type": null,
+   "contenu": null,
+   "décalage": -116,
+   "pas": null
+  },
+  "objets1": {
+   "genre": "objarray",
+   "type": null,
+   "contenu": null,
+   "décalage": -360,
+   "pas": 10
+  },
+  "scène3": {
+   "genre": "scene",
+   "type": null,
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "objet1": {
+   "genre": "other",
+   "type": null,
+   "contenu": null,
+   "décalage": -98,
+   "pas": null
+  },
+  "r3": {
+   "genre": "res",
+   "type": null,
+   "contenu": "to1mid2 7",
+   "décalage": -38,
+   "pas": null
+  },
+  "objets2": {
+   "genre": "objarray",
+   "type": null,
+   "contenu": null,
+   "décalage": -380,
+   "pas": 10
+  },
+  "objet2": {
+   "genre": "other",
+   "type": null,
+   "contenu": null,
+   "décalage": -74,
+   "pas": null
+  },
+  "scène4": {
+   "genre": "scene",
+   "type": null,
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "flux1": {
+   "genre": "stream",
+   "type": null,
+   "contenu": null,
+   "décalage": -548,
+   "pas": null
+  },
+  "pal3": {
+   "genre": "palette",
+   "type": null,
+   "contenu": "to1mid2 5",
+   "décalage": -46,
+   "pas": null
+  },
+  "pal4": {
+   "genre": "palette",
+   "type": null,
+   "contenu": null,
+   "décalage": -54,
+   "pas": null
+  },
+  "zone1": {
+   "genre": "widget",
+   "type": null,
+   "contenu": null,
+   "décalage": -380,
+   "pas": null
+  },
+  "c1": {
+   "genre": "layer",
+   "type": "ImageLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c2": {
+   "genre": "layer",
+   "type": "ImageLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "h1": {
+   "genre": "heap",
+   "type": null,
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c3": {
+   "genre": "layer",
+   "type": "ImageLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "h2": {
+   "genre": "heap",
+   "type": null,
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "h3": {
+   "genre": "heap",
+   "type": null,
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c4": {
+   "genre": "layer",
+   "type": "OverlayImageLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  }
+ }
+}

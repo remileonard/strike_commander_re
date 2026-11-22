@@ -172,9 +172,9 @@ loc_2DF03:				; DATA XREF: seg339:0498o
 ; liste 0x59CD. Séquence lue : PIT_ReadHighPrecision (jalons de profilage
 ; dword_72B7A/7E/82/86/8A/8E), Camera_CopyState(objet,0x5146), Camera_UpdateViewportClip,
 ; WorldObjects_CallSlot4OnAllThenRecompute_2214F(0x59C3, objet),
-; Widget_RefreshTextConditional(0x53FA), Collection_NotifyAllDestroy(0x53FA), slot +0x20 puis
-; slot +0x14 du sous-vtable à +0x50, puis slot +4 de l'objet à +0x5C. Anciennement
-; View_RenderFrame ('rendre cette vue' : non prouvé, nom neutralisé).
+; RenderList_SortByDepth_2AE7C(0x53FA), RenderList_DrawAll_2AD65(0x53FA), slot +0x20 puis slot
+; +0x14 du sous-vtable à +0x50, puis slot +4 de l'objet à +0x5C. Anciennement View_RenderFrame
+; ('rendre cette vue' : non prouvé, nom neutralisé).
 ; ==============================================================================================
 TrackedObject_FrameStep_2DF0D:				; DATA XREF: seg339:0478o seg339:049Co ...
 		push	bp
@@ -246,7 +246,7 @@ loc_2DF7E:
 		push	53FAh
 
 loc_2DF81:
-		call	Widget_RefreshTextConditional
+		call	RenderList_SortByDepth_2AE7C
 		pop	cx
 		call	PIT_ReadHighPrecision
 		push	dx
@@ -254,7 +254,7 @@ loc_2DF81:
 		pop	eax
 		mov	dword_72B86, eax
 		push	53FAh
-		call	Collection_NotifyAllDestroy
+		call	RenderList_DrawAll_2AD65
 		pop	cx
 		call	PIT_ReadHighPrecision
 		push	dx
@@ -419,7 +419,7 @@ Camera_TransformPoint	endp
 ; de test de clipping caméra sur un point d'objet.
 ; ==============================================================================================
 Camera_ClipTestWrapper	proc far		; CODE XREF: seg014:0191P
-					; MissionRecord_LoadEntityDatabase_7B035+BE6P ...
+					; Player_ShotDownSequence_7B035+BE6P ...
 
 var_8		= dword	ptr -8
 arg_0		= word ptr  6
@@ -458,7 +458,7 @@ Camera_ClipTestWrapper	endp
 ; caméra.
 ; ==============================================================================================
 Camera_FrustumClipTest	proc far		; CODE XREF: Camera_ClipTestWrapper+1Dp
-					; MissionRecord_LoadEntityDatabase_7B035+209FP ...
+					; Player_ShotDownSequence_7B035+209FP ...
 
 var_36		= dword	ptr -36h
 var_32		= dword	ptr -32h
@@ -503,7 +503,7 @@ loc_2E0D1:
 loc_2E0D3:
 		lea	ax, [bp+var_E]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	eax, [bp+var_E]
 
@@ -722,7 +722,7 @@ Camera_FrustumClipTest	endp
 ; far,20L — détache la référence de caméra parente (+0x5E), invalide le lien retour :
 ; détachement d'une caméra de son parent.
 ; ==============================================================================================
-Camera_DetachParent	proc far		; CODE XREF: UIScript_ParseAndEvaluate_7A054:loc_7A483P
+Camera_DetachParent	proc far		; CODE XREF: Autopilot_JumpSequence_7A054:loc_7A483P
 					; HUDSymbol_ConstructWithFullMatrix_83DD7+1E3P ...
 
 arg_0		= word ptr  6
@@ -810,7 +810,7 @@ arg_0		= word ptr  6
 		mov	[bp+var_78], eax
 		lea	ax, [bp+var_80]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp+var_7C]
 		mov	[bp+var_8C], eax
@@ -909,7 +909,7 @@ loc_2E3E3:
 		push	ax
 
 loc_2E3F1:
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 
 loc_2E3F6:
 		add	sp, 4
@@ -926,7 +926,7 @@ loc_2E401:
 		push	ax
 		lea	ax, [bp+var_8C]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	[bp+var_28], 0E6h ; '�'
 
@@ -1302,7 +1302,7 @@ loc_2E72F:
 		push	ax
 		push	ds
 		push	offset dword_6E9AE
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		leave
 		retf

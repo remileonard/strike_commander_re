@@ -18,7 +18,7 @@ stru_6BB90	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:09AEo
 ; far, thunk fixe VROOMM (jmp sub_97370) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=252F0h, codesize=1C4h, nentries=2.
 ; ==============================================================================================
-VROOMM_StubThunk_6BBB0	proc far		; CODE XREF: MissionText_LoadSubtitleRecordB_94710+265P
+VROOMM_StubThunk_6BBB0	proc far		; CODE XREF: Appearance_CreateFromIFF_94710+265P
 		jmp	HudIcon_ConstructAndLoadFromIFF_97370
 VROOMM_StubThunk_6BBB0	endp
 

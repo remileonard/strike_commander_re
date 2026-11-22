@@ -17,7 +17,18 @@ loc_3DEEA:				; DATA XREF: seg216:off_6A15Eo
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_3DEFB:				; DATA XREF: seg339:27CCo
+; ==============================================================================================
+; far (label), LUE PARTIELLEMENT 2026-10-12. Méthode +0x10 (mise à jour) de l'instance JETP
+; (vtable 0x27BC). Après Camera_ResolvePositionVelocity_3DDC4 : si +0x73 bit 0 → renvoie 0.
+; TRAIN D'ATTERRISSAGE (si +0x73 bit 1) : quand l'ordre de train de la dynamique (JDYN +0x75
+; bit 2) diffère de l'état +0x73 bit 2, une séquence démarre (+0x73 bit 3) : toutes les 25/256
+; s (word_6F902 = 0x19, horloge +0x71 += dt) le sous-objet suivant de la plage JINF [champ 2,
+; champ 2 + champ 3) est affiché (méthode +4 avec 1) ou masqué (0), index +0x62 ; sons 4
+; (rentrée) / 5 (sortie) pour le joueur en vue cockpit (byte_72A8E == 4). Sous-objet spécial
+; +0x65 (JINF champs 6-7) : désactivé après 3 images actives. Puis secousse d'écran (+0x68
+; minuteur) pour le joueur.
+; ==============================================================================================
+Aircraft_Update_3DEFB:				; DATA XREF: seg339:27CCo
 		push	bp
 		mov	bp, sp
 		sub	sp, 6
@@ -96,7 +107,7 @@ loc_3DF6E:				; CODE XREF: seg087:0089j
 		push	0
 		push	large 0
 		push	4
-		call	Weapon_HUDBox_TimerCaseH_5A8DC
+		call	SoundFX_Play_5A8DC
 		add	sp, 8
 
 loc_3DFA1:				; CODE XREF: seg087:009Cj seg087:00A3j ...
@@ -144,7 +155,7 @@ loc_3DFD3:
 		push	0
 		push	large 0
 		push	5
-		call	Weapon_HUDBox_TimerCaseH_5A8DC
+		call	SoundFX_Play_5A8DC
 		add	sp, 8
 
 loc_3DFFC:				; CODE XREF: seg087:00F7j seg087:00FEj ...
@@ -185,7 +196,7 @@ loc_3E036:				; CODE XREF: seg087:014Cj
 		mov	[bp-4],	dx
 		push	word ptr [bp-4]
 		push	word ptr [si+1Eh]
-		call	Container_Op_22E27
+		call	WorldObject_GetNthChild_22E27
 		add	sp, 4
 		mov	[si+63h], ax
 		cmp	word ptr [si+63h], 0
@@ -296,7 +307,7 @@ loc_3E115:				; DATA XREF: seg339:off_6F880o
 
 loc_3E12F:				; CODE XREF: seg087:024Aj
 		push	si
-		call	Camera_ComputeMountedPosition_3D31D
+		call	WorldObject_IntegrateBodyMotion_3D31D
 		pop	cx
 		cmp	word_722E6, si
 		jnz	short loc_3E15D
@@ -440,7 +451,7 @@ loc_3E225:				; CODE XREF: seg087:0340j
 		push	ax
 		lea	ax, [bp-22h]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	eax, [bp-1Eh]
 		mov	[bp-0Ah], eax
@@ -472,7 +483,7 @@ loc_3E2C6:
 		push	ax
 
 loc_3E2CA:
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 
 loc_3E2D2:
@@ -504,17 +515,20 @@ loc_3E2ED:				; CODE XREF: seg087:0409j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, LUE (2026-09-20). Methode virtuelle +0x7C de la classe d'objet piloté (constructeur
-; seg087 loc_3E4AC, composant pilote en +0x55) : SIGNATURE vue par un chercheur, appelee par
-; Targeting_SelectAndPrioritize (weapon_aspec 1) et WeaponStation_TestTargetLock avec (cible,
-; objet suivi). Sans objet suivi (arg nul) : renvoie l'octet modele +0x12 (1er octet du chunk
-; SIGN). Avec objet suivi : v = |vecteur de vtable+0x4C de la cible| * 256 / 0x25A00 (=
-; vitesse / 602) ; A = produit Targeting_ComputeGeometryHelperA_5505B(vitesse du chercheur,
-; vitesse de la cible) > 0 (aspect arriere) ; sig = v*100 si A sinon v*50 ; sig += 0xA00 (10)
-; ; si l'octet +0x1E de l'enregistrement renvoye par [si+0x55]->vtable+8 est > 5 : sig +=
-; 0x6400 (100) si A sinon 0x3200 (50) ; renvoie sig>>8 (octet). Le 1er octet SIGN du modele
-; n'entre donc PAS dans ce cas. Sens de l'octet +0x1E (poussee > 5 ?) et unité de la vitesse
-; non prouvés.
+; far, LUE (2026-09-20, completee 2026-09-24). Methode virtuelle +0x7C de la classe d'objet
+; pilote (vtable seg339 0x6F86C, slot 0x6F8E8) : SIGNATURE IR vue par un chercheur, appelee
+; (this = cible, arg = objet de reference du chercheur : missile en vol ou objet +0x0D du
+; point d'emport). Sans reference : renvoie l'octet modele +0x12 (1er octet SIGN). Avec
+; reference : v = |cible->vtable+0x4C| / 602 (vitesse, loc_3D246 = copie de [+0x51]+8 ;
+; division en virgule fixe par 0x25A00 = 602,0) ; A = Math_DotProduct3D_5505B(vitesse
+; reference, vitesse cible) > 0 (meme sens = chercheur dans le secteur arriere) ; sig = v*100
+; si A sinon v*50 ; sig += 10 (0xA00, constante, PAS l'octet SIGN) ; si l'octet +0x1E de
+; l'enregistrement de commandes ([+0x55]->vtable+8) est > 5 : sig += 100 si A sinon 50. Cet
+; octet est le CRAN DE MANETTE DES GAZ (0-10) : WorldObject_UpdateWithAIEntity_3D9FB passe ce
+; meme enregistrement a [+0x51]->vtable+0x40 = thunk loc_3B669 -> PhysicsTicks, qui lit
+; es:[bx+1Eh] comme cran et teste cmp byte ptr [bp-2Ch],5 / jg pour la consommation post-
+; combustion (0x4C au lieu de 0x33) : > 5 = POST-COMBUSTION. Renvoie la partie entiere de sig,
+; tronquee a l'octet, donc repasse par 0 au-dela de 255 (arriere + PC : v > ~812).
 ; ==============================================================================================
 Aircraft_ComputeSeekerSignature_3E2F1:				; DATA XREF: seg339:2838o
 		push	bp
@@ -569,7 +583,7 @@ loc_3E306:				; CODE XREF: seg087:0421j
 		push	ss
 		lea	ax, [bp-10h]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	dword ptr [bp-16h], 0
 
@@ -681,7 +695,7 @@ loc_3E419:				; DATA XREF: seg339:off_6F8F4o
 ; vtable[4]) et efface un flag (+0x67) : nettoyage/notification de destruction d'un sous-
 ; composant lié au pilotage.
 ; ==============================================================================================
-Pilot_NotifySubcomponentDestroy	proc far		; CODE XREF: HUD_RenderSymbologyMain+FD4P
+Pilot_NotifySubcomponentDestroy	proc far		; CODE XREF: WeaponSystem_LaunchFromStation_3E744+FD4P
 
 arg_0		= word ptr  6
 
@@ -719,7 +733,7 @@ Pilot_NotifySubcomponentDestroy	endp
 ; la chaîne sub_49242 déjà en cours d'investigation.
 ; ==============================================================================================
 Pilot_LowLevelControlCommand	proc far		; CODE XREF: Pilot_IssueControlCommand_79DA0+16BP
-					; UIScript_ParseAndEvaluate_7A054+3C6P ...
+					; Autopilot_JumpSequence_7A054+3C6P ...
 
 var_6		= dword	ptr -6
 arg_0		= word ptr  6
@@ -746,7 +760,7 @@ loc_3E487:
 		push	ax
 
 loc_3E48E:
-		call	Pilot_SteeringCommandToTarget
+		call	JDYN_JumpToPoint_49242
 		add	sp, 0Ah
 		push	large dword ptr	[si+55h]
 		call	Goal_ResetNeutralState
@@ -879,12 +893,17 @@ loc_3E5A3:				; CODE XREF: seg087:064Cj seg087:06A6j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,178L — calcule un angle via sin/cos (sub_57C67/sub_57C3A) avec des constantes fixes
-; (0x6D9/0x62C, probable dimensions d'écran), produit une série de projections
-; trigonométriques successives : calcul de position d'une aiguille/élément graphique
-; d'instrument de bord (cadran complexe), même famille que le seg019.
+; far, LUE 2026-09-26 (ex-'Gauge_ComputeNeedlePosition' : rien a voir avec une jauge). GARDE
+; AU SOL de l'avion : hauteur de l'origine de l'objet (arg_4, matrice +0x2C) au-dessus du
+; terrain selon son attitude, sur trois points de contact a constantes fixes communes a tous
+; les avions. r = -Matrix_RollAngle_57C67, p = Matrix_NosePitchAngle_57C3A ; A = 6,17 (62Ch) *
+; cos(p + 34,27 deg (2245h)) ; h1 = A * cos(r - 39,43 deg (D892h)) ; h2 = A * cos(r + 39,43
+; deg (276Eh)) ; h3 = 6,85 (6D9h) * cos(p - 45,37 deg (D2A1h)) ; renvoie max(h1, h2, h3) (4,81
+; m a plat). Utilisee par PhysicsTicks (drapeau 'au sol' efface si altitude > terrain + garde
+; + 10 m), Collision_SelectCandidates et Landing_Phase5_Stop_76E67 (altitude de l'avion
+; arrete).
 ; ==============================================================================================
-Gauge_ComputeNeedlePosition	proc far		; CODE XREF: Collision_SelectCandidates+B9P
+Aircraft_GroundClearance_3E5A6	proc far		; CODE XREF: Collision_SelectCandidates+B9P
 					; seg103:loc_4A8C2P ...
 
 var_74		= dword	ptr -74h
@@ -944,7 +963,7 @@ loc_3E5C0:
 		push	ss
 		lea	ax, [bp+var_24]
 		push	ax
-		call	AI_ComputeGeometrySolution_57C67
+		call	Matrix_RollAngle_57C67
 		add	sp, 6
 		mov	eax, [bp+var_24]
 		neg	eax
@@ -956,7 +975,7 @@ loc_3E5C0:
 		push	ss
 		lea	ax, [bp+var_2C]
 		push	ax
-		call	AI_ApplyAngleBetweenVectors_57C3A
+		call	Matrix_NosePitchAngle_57C3A
 		add	sp, 6
 		mov	eax, [bp+var_1C]
 		add	eax, [bp+var_2C]
@@ -967,7 +986,7 @@ loc_3E5C0:
 		push	ss
 		lea	ax, [bp+var_44]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_44]
 		mov	[bp+var_30], eax
@@ -987,7 +1006,7 @@ loc_3E5C0:
 		push	ss
 		lea	ax, [bp+var_50]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_30]
 
@@ -1005,7 +1024,7 @@ loc_3E687:
 		push	ss
 		lea	ax, [bp+var_5C]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 
 loc_3E6B5:
 		add	sp, 6
@@ -1027,7 +1046,7 @@ loc_3E6C3:
 		push	ss
 		lea	ax, [bp+var_68]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_4]
 		mov	edx, [bp+var_68]
@@ -1044,13 +1063,13 @@ loc_3E6C3:
 		jle	short loc_3E723
 		mov	[bp+var_74], eax
 
-loc_3E723:				; CODE XREF: Gauge_ComputeNeedlePosition+177j
+loc_3E723:				; CODE XREF: Aircraft_GroundClearance_3E5A6+177j
 		mov	eax, [bp+var_38]
 		cmp	eax, [bp+var_74]
 		jle	short loc_3E731
 		mov	[bp+var_74], eax
 
-loc_3E731:				; CODE XREF: Gauge_ComputeNeedlePosition+185j
+loc_3E731:				; CODE XREF: Aircraft_GroundClearance_3E5A6+185j
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_74]
 		mov	[bx], eax
@@ -1061,6 +1080,6 @@ loc_3E73E:
 		pop	si
 		leave
 		retf
-Gauge_ComputeNeedlePosition	endp
+Aircraft_GroundClearance_3E5A6	endp
 
 seg087		ends

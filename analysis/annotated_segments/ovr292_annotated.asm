@@ -294,7 +294,12 @@ Terrain_AllocateSectorBuffers_99650	endp
 ; terrain+0x0B dessus. Le blob .TRI est un PAK imbrique de 324 cellules (grille 18x18) ;
 ; cellules non vides = u16 count + count x record 70 o de placement d'objet d'aerodrome (nom
 ; modele + variante detail + X/Z/Y + flags). Detail : analysis/DATA_MODEL.md §6.8 / §6.8bis.
-; Nom IDA 'Heightmap' trompeur.
+; Nom IDA 'Heightmap' trompeur. | PRÉCISÉ 2026-10-12 : en-tête ATRI 53 o = u16 dimension de la
+; grille, u32 taille d'une cellule (m, → +0x8A), u16 nombre de groupes de détail (→ +0x8E, 4
+; au plus), 4 u32 rayon de chaque groupe (m, → +0x90), 4 u32 hauteur de visibilité de chaque
+; groupe (m, → +0xA0), string[13] nom du .TRI. Un triangle .TRI de groupe g n'est dessiné que
+; si l'observateur est plus bas que la hauteur du groupe et que le triangle est à moins du
+; rayon du groupe (TriOverlay_RenderRegion_31BFF).
 ; ==============================================================================================
 Terrain_LoadATRIChunk_998C0	proc far		; CODE XREF: VROOMM_StubThunk_6BD65J
 

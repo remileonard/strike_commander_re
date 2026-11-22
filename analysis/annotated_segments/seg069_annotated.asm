@@ -17,7 +17,7 @@ seg069		segment	byte public 'CODE' use16
 ; jeu. Bien trop volumineuse pour une passe rapide ; priorité absolue pour une session
 ; d'analyse dédiée.
 ; ==============================================================================================
-Render_ObjectPipelineMain	proc far		; CODE XREF: Model_ResetTransformCache+11EP
+Render_ObjectPipelineMain	proc far		; CODE XREF: TriOverlay_RenderRegion_31BFF+11EP
 					; Model_RenderWithSubcomponents+150P
 
 var_534		= dword	ptr -534h
@@ -141,7 +141,7 @@ loc_2FFB4:
 		push	ax
 		lea	ax, [bp+var_534]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		pop	bx
 		pop	cx
@@ -2395,7 +2395,7 @@ loc_318E7:				; CODE XREF: Render_ObjectPipelineMain+19FCj
 		xor	ah, ah
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		mov	ah, al
 		xor	al, al
@@ -2412,7 +2412,7 @@ loc_318E7:				; CODE XREF: Render_ObjectPipelineMain+19FCj
 		xor	ah, ah
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		lea	si, [bp+var_2B0]
 		mov	ah, al
@@ -2450,7 +2450,7 @@ loc_31960:				; CODE XREF: Render_ObjectPipelineMain+1A75j
 		xor	ah, ah
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		pop	es
 		pop	di

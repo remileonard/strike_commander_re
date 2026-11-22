@@ -506,8 +506,13 @@ ResourceRecord_ComputeRecordBoundsB_6470F	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 100 lignes, NON DÉTAILLÉE — combine sub_64BF8 (positionnement), sub_64BC1 (bornes)
-; et sub_64DB3 (lecture).
+; far, LUE 2026-10-12. CHERCHE UN CHUNK par son tag dans le niveau courant (FORM courant) :
+; arg_6 == 0 → ResourceRecord_SeekToStart_64BF8 (repart du DÉBUT du FORM courant, +0x0C après
+; son en-tête) ; sinon continue depuis la position courante. Parcourt les chunks
+; (ResourceRecord_ComputeAlignedBounds_64BC1) jusqu'à trouver [rr+0x6D] == tag ou la fin du
+; FORM. Renvoie 1 si trouvé (positionné au début des données). Tous les lecteurs de chunks
+; passent 0 : l'ordre des chunks dans un FORM est donc LIBRE, et un tag présent deux fois
+; n'est lu qu'une fois (la première occurrence).
 ; ==============================================================================================
 ResourceRecord_SeekAndRead_64743	proc far		; CODE XREF: seg009:03DBP seg010:067FP ...
 
@@ -616,8 +621,12 @@ ResourceRecord_SeekAndRead_64743	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 99 lignes, NON DÉTAILLÉE — combine sub_64BF8,
-; ResourceRecord_ComputeRecordBounds_646DB, sub_64C21, sub_64DB3.
+; far, LUE 2026-10-12. ENTRE DANS UN FORM de type donné : comme
+; ResourceRecord_SeekAndRead_64743 (arg_6 == 0 → recherche depuis le début du FORM courant),
+; mais ne retient que les chunks 'FORM' (ResourceRecord_ComputeRecordBounds_646DB teste
+; 4D524F46h) dont le type vaut le tag ; trouvé → ResourceRecord_AllocateAndDecode_64C21 empile
+; le niveau (on lit ensuite à l'intérieur ; sortie par ResourceRecord_ReleaseAndClear_64D25).
+; Renvoie 1 si trouvé.
 ; ==============================================================================================
 ResourceRecord_SeekAndReadB_647B2	proc far		; CODE XREF: seg009:038AP seg009:03A6P ...
 
@@ -1147,7 +1156,9 @@ ResourceRecord_ReadFieldGroupA_64A19	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, lit un groupe de champs via StreamReader_ReadTyped_63FA1.
+; far, lit un groupe de champs via StreamReader_ReadTyped_63FA1. | PRÉCISÉ 2026-10-12 : lit 2
+; octets (StreamReader_ReadTyped_63FA1 taille 2) à la position courante et avance de 2 =
+; uint16/int16.
 ; ==============================================================================================
 ResourceRecord_ReadFieldGroupB_64A54	proc far		; CODE XREF: seg009:03ECP seg009:03FEP ...
 
@@ -1180,7 +1191,9 @@ ResourceRecord_ReadFieldGroupB_64A54	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, lit un groupe de champs via StreamReader_ReadTyped_63FA1. Référencée par sub_8DF49.
+; far, lit un groupe de champs via StreamReader_ReadTyped_63FA1. Référencée par sub_8DF49. |
+; PRÉCISÉ 2026-10-12 : lit 4 octets (taille 4) et avance de 4 = uint32/int32 (24.8 selon
+; l'usage).
 ; ==============================================================================================
 ResourceRecord_ReadFieldGroupC_64A7E	proc far		; CODE XREF: ResourceRecord_ReadStructured_648E3+45p
 					; ResourceRecord_ReadStructured_648E3:loc_6494Fp	...
@@ -1358,9 +1371,10 @@ ResourceRecord_ReadDwordFieldB_64AFF	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, lit un champ final via StreamReader_ReadTyped_63FA1. Référencée par sub_3C942.
+; far, lit un champ final via StreamReader_ReadTyped_63FA1. Référencée par sub_3C942. |
+; PRÉCISÉ 2026-10-12 : lit 1 octet (taille 1) et avance de 1 = uint8.
 ; ==============================================================================================
-ResourceRecord_ReadFinalField_64B51	proc far		; CODE XREF: IFF_LoadAngleParam+3AP
+ResourceRecord_ReadFinalField_64B51	proc far		; CODE XREF: Object_LoadCommonAndAllegiance_3C942+3AP
 					; IFF_LoadInfoChunk+36P ...
 
 var_1		= byte ptr -1

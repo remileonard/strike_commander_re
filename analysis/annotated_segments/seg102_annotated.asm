@@ -500,10 +500,10 @@ loc_46C9F:				; CODE XREF: seg082:072BJ seg082:0DD8J ...
 
 ; ==============================================================================================
 ; far, seg102 L500-570. Cache frame (byte_6FFBB -> dword_6FFB7). |v|^2
-; (Targeting_ComputeGeometryHelperA_5505B(A.vel,A.vel)) * rho(altitude)
-; (Atmosphere_AirDensityAtAltitude via FlightControl_CacheNamedParam) >>8 ; /2 ; borne >=0.
-; Renvoie q = 1/2*rho(h)*v^2 = pression dynamique, echelle de force aero maitresse (portance,
-; trainee, forces de controle). Detail: DATA_MODEL.md 6.2.
+; (Math_DotProduct3D_5505B(A.vel,A.vel)) * rho(altitude) (Atmosphere_AirDensityAtAltitude via
+; FlightControl_CacheNamedParam) >>8 ; /2 ; borne >=0. Renvoie q = 1/2*rho(h)*v^2 = pression
+; dynamique, echelle de force aero maitresse (portance, trainee, forces de controle). Detail:
+; DATA_MODEL.md 6.2.
 ; ==============================================================================================
 Aero_DynamicPressure_46D13	proc far		; CODE XREF: FlightControl_ComputeWindComponent+5Ap
 					; Aero_ComputeForcesMain_4791E+21p ...
@@ -533,7 +533,7 @@ arg_4		= word ptr  0Ah
 		push	ss
 		lea	ax, [bp+var_8]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp+var_8]
 		mov	[bp+var_4], eax
@@ -838,7 +838,7 @@ loc_46F75:				; CODE XREF: FlightControl_ComputeWindComponent+12j
 		add	sp, 6
 		lea	ax, [bp+var_14]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [si+10h]
 		neg	eax
@@ -1414,7 +1414,7 @@ loc_472FD:				; CODE XREF: seg082:0BAFJ seg082:0C50J
 ; h=[[[jdyn+0x24]+2]+0x1A]=ALTITUDE). jdyn[0x2C]=poussee AF max ; jdyn[0x30/31/32] = les 3 u8
 ; du chunk THRS. Detail: DATA_MODEL.md 6.2.
 ; ==============================================================================================
-Aero_ThrottleThrustCurve_4730F	proc far		; CODE XREF: Pilot_SteeringCommandToTarget+259P
+Aero_ThrottleThrustCurve_4730F	proc far		; CODE XREF: JDYN_JumpToPoint_49242+259P
 					; seg103:loc_494C6P ...
 
 var_36		= dword	ptr -36h

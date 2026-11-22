@@ -31,7 +31,7 @@ VROOMM_StubThunk_6D090	endp
 ; far, thunk fixe VROOMM (jmp sub_ABBEF) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=3A990h, codesize=38Fh, nentries=4.
 ; ==============================================================================================
-VROOMM_StubThunk_6D095	proc far		; CODE XREF: Widget_Helper_5AAD7+24P
+VROOMM_StubThunk_6D095	proc far		; CODE XREF: Speech_PlayClip_5AAD7+24P
 		jmp	AudioQueue_MainProcessEntry_ABBEF
 VROOMM_StubThunk_6D095	endp
 
@@ -44,7 +44,7 @@ VROOMM_StubThunk_6D095	endp
 ; far, thunk fixe VROOMM (jmp sub_ABDAF) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=3A990h, codesize=38Fh, nentries=4.
 ; ==============================================================================================
-VROOMM_StubThunk_6D09A	proc far		; CODE XREF: Widget_Helper_5AB2C+1BP
+VROOMM_StubThunk_6D09A	proc far		; CODE XREF: Speech_QueryStatus_5AB2C+1BP
 		jmp	AudioQueue_OpcodeHelper_ABDAF
 VROOMM_StubThunk_6D09A	endp
 
@@ -57,7 +57,7 @@ VROOMM_StubThunk_6D09A	endp
 ; far, thunk fixe VROOMM (jmp sub_ABDEC) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=3A990h, codesize=38Fh, nentries=4.
 ; ==============================================================================================
-VROOMM_StubThunk_6D09F	proc far		; CODE XREF: Weapon_HUDBox_FullUpdateCycle_5AB79+30P
+VROOMM_StubThunk_6D09F	proc far		; CODE XREF: Sound_FrameUpdate_5AB79+30P
 		jmp	AudioQueue_FinalizeAndRelease_ABDEC
 VROOMM_StubThunk_6D09F	endp
 

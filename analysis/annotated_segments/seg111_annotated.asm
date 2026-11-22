@@ -58,7 +58,7 @@ Anim_AdvanceFrameCycle_4FB84	endp
 ; appelle Anim_AdvanceFrameCycle sur chacun. Référencé depuis seg077 (terrain streaming/LOD)
 ; et sub_2BD51 — probable cyclage de texture animée (eau, lumières) sur éléments de terrain.
 ; ==============================================================================================
-Anim_UpdateFrameCycleArray_4FBC3	proc far		; CODE XREF: Damage_CheckTimer+3CP
+Anim_UpdateFrameCycleArray_4FBC3	proc far		; CODE XREF: PolyAppearance_AnimTimerTick_2BD51+3CP
 					; seg077:0240P
 
 arg_0		= dword	ptr  6

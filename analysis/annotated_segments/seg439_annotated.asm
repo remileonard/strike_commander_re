@@ -7,11 +7,15 @@ seg439		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine sub_3C942, sub_6C5A0 (stub voisin), ResourceRecord_SeekAndRead_64743,
-; sub_2B007, ReadFinalField_64B51, ReadFieldGroupB_64A54 (seg193), gestion d'erreur — motif
-; standard de chargement de champs IFF.
+; far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldsWithRetryD'. Lecteur de la classe PODR
+; (nacelle de roquettes) : Object_LoadCommonAndAllegiance_3C942, Weapon_LoadWDATWrapper
+; (WDAT), puis chunk DATA (obligatoire, sinon erreur C01Ch) : string → +0x5F nom de l'objet
+; tiré (la roquette, instanciée par WeaponSystem_LaunchFromStation_3E744) ; uint8 → +0x5E
+; recopié dans l'instance +0x2C (0 : la méthode +0x10 de l'instance renvoie faux, la nacelle
+; disparaît) ; uint16 → +0x68 vitesse de départ (m/s, entier : << 8 dans la prédiction
+; d'impact loc_45CEA).
 ; ==============================================================================================
-PlayerComponent_LoadFieldsWithRetryD_A0FB0	proc far		; CODE XREF: VROOMM_StubThunk_6C6A0J
+PodModel_LoadDATAChunk_A0FB0	proc far		; CODE XREF: VROOMM_StubThunk_6C6A0J
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -22,7 +26,7 @@ arg_4		= word ptr  0Ah
 		mov	si, [bp+arg_4]
 		push	si
 		push	large [bp+arg_0]
-		call	IFF_LoadAngleParam
+		call	Object_LoadCommonAndAllegiance_3C942
 		add	sp, 6
 		push	si
 		push	large [bp+arg_0]
@@ -69,15 +73,15 @@ loc_A1003:
 		jmp	short loc_A1020
 ; ���������������������������������������������������������������������������
 
-loc_A1017:				; CODE XREF: PlayerComponent_LoadFieldsWithRetryD_A0FB0:loc_A0FE4j
+loc_A1017:				; CODE XREF: PodModel_LoadDATAChunk_A0FB0:loc_A0FE4j
 		push	0C01Ch
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_A1020:				; CODE XREF: PlayerComponent_LoadFieldsWithRetryD_A0FB0+65j
+loc_A1020:				; CODE XREF: PodModel_LoadDATAChunk_A0FB0+65j
 		pop	si
 		pop	bp
 		retf
-PlayerComponent_LoadFieldsWithRetryD_A0FB0	endp
+PodModel_LoadDATAChunk_A0FB0	endp
 
 seg439		ends

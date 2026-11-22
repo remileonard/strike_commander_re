@@ -16,9 +16,18 @@ seg435		segment	para public 'OVERLAY' use16
 ; target_domain (+0x4E ; 1 = missile guide anti-avion, 2 = autre ; nom infere), byte
 ; weapon_aspec (+0x4F ; deja liste), byte weapon_aspec (+0x4F), valeur 'group C' target_range
 ; (+0x50), byte tracking_cone (+0x54), valeur 'group C' effective_range (+0x56), valeur 'group
-; C' (+0x5A). +0x4B est le masque teste par WeaponStation_FindLoadedCompatible et
+; C' (+0x5A) = INTERVALLE DE TIR (dword 24.8, secondes ; minuteur de
+; WeaponSystem_LaunchFromStation_3E744 : AIM-9 et AIM-120 1,0 s, SA-2 15 s, SA-6 10 s, canons
+; 0). +0x4B est le masque teste par WeaponStation_FindLoadedCompatible et
 ; Targeting_AcquireBestThreat (masques 1, 3, 0x700, 0x83C = ensembles d'identifiants d'arme,
-; bit = id-1). Pose aussi byte_6E33B=1 (comme IFF_LoadModelMain).
+; bit = id-1). Pose aussi byte_6E33B=1 (comme IFF_LoadModelMain). | COMPLÉMENT 2026-10-12
+; (consommateurs) : +0x46 dégâts : lu seulement pour les traçantes
+; (Tracer_CollisionDamage_4E0E5) ; missiles et bombes infligent les dégâts de leur EXPL. +0x48
+; rayon : rôle non établi. +0x4A = catégorie de l'objet tiré (8 missile, 9 bombe, 10 nacelle,
+; 13 traçante) : WeaponSystem_LaunchFromStation_3E744 aiguille sur (+0x4A − 8). +0x4E domaine
+; : 1 = missile air-air (byte_6E4C6 → réveille Targeting_AcquireBestThreat). +0x50 portée de
+; verrouillage (m entiers) et +0x54 demi-cône (°) : Proximity_TestOriented. +0x56 portée
+; efficace (m entiers). +0x5A intervalle de tir (float s).
 ; ==============================================================================================
 Weapon_LoadWDATChunk_A0700	proc far		; CODE XREF: VROOMM_StubThunk_6C5A0J Weapon_LoadWDATWrapper_A07ED+1Ap
 

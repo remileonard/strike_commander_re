@@ -1861,8 +1861,7 @@ GaugeWidget_RebuildAndRelease_A36BD	endp
 
 ; ==============================================================================================
 ; far, encadré par le verrou d'ownership (seg442), combine Rect_ComputeIntersection_60F02
-; (seg164), sub_A3A40, Memory_TypedAllocDispatchB_5C832, Render_MeasureOrDrawTextString_61F52
-; (seg174).
+; (seg164), sub_A3A40, Memory_TypedAllocDispatchB_5C832, Shape_DrawSpans_61F52 (seg174).
 ; ==============================================================================================
 GaugeWidget_MeasureAndDraw_A377D	proc far		; CODE XREF: VROOMM_StubThunk_6C99BJ
 
@@ -1926,7 +1925,7 @@ loc_A37C8:				; CODE XREF: GaugeWidget_MeasureAndDraw_A377D+47j
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_A37F8:				; CODE XREF: GaugeWidget_MeasureAndDraw_A377D+4Dj

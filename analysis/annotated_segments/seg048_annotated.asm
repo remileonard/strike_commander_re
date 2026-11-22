@@ -953,7 +953,7 @@ loc_278BE:				; CODE XREF: TextRenderer_Main+442j
 
 loc_2792F:				; CODE XREF: TextRenderer_Main+56Cj
 		push	di
-		call	TextRenderer_InputFieldHandler_5A0F3
+		call	Sound_LoadDriverAndTimbreCache_5A0F3
 		add	sp, 0Ch
 		mov	ax, di
 		jmp	loc_279E8
@@ -1104,7 +1104,7 @@ loc_27A55:
 
 loc_27ABA:				; CODE XREF: TextRenderer_Main+6F2j
 		push	di
-		call	TextRenderer_InputFieldHandler_5A0F3
+		call	Sound_LoadDriverAndTimbreCache_5A0F3
 		add	sp, 0Ch
 		mov	ax, di
 		jmp	loc_27B6E
@@ -1295,11 +1295,11 @@ loc_27C68:				; CODE XREF: TextRenderer_Main+7CBj
 		mov	word_70852, ax
 		push	ax
 		push	5BE3h
-		call	Sequencer_ReleaseSlot_59F87
+		call	Music_ChannelInit_59F87
 		add	sp, 4
 		push	word_70852
 		push	5BF5h
-		call	Sequencer_ReleaseSlot_59F87
+		call	Music_ChannelInit_59F87
 		add	sp, 4
 		push	di
 		call	VROOMM_StubThunk_6CFB9
@@ -1672,7 +1672,7 @@ loc_27F90:				; DATA XREF: seg339:12A2o
 ; (sub_2075B référencé) et l'INT15 AH=12h fonction 0x4355h (calibration périphérique) :
 ; gestionnaire de calibration de périphérique d'entrée (joystick/manche), à approfondir.
 ; ==============================================================================================
-Input_CalibrationHandler	proc far		; CODE XREF: Config_ReadCalibration:loc_27065P
+Input_CalibrationHandler	proc far		; CODE XREF: Input_AltKeyCommands_26F7E:loc_27065P
 
 var_150		= word ptr -150h
 var_F3		= dword	ptr -0F3h
@@ -2011,7 +2011,7 @@ loc_28296:				; CODE XREF: Input_CalibrationHandler+2F4j
 		push	ax
 		push	large 870005h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		lea	ax, [bp+var_9A]
 		push	ax
@@ -2421,7 +2421,7 @@ loc_285FD:				; DATA XREF: seg339:13A2o
 		mov	bp, sp
 		mov	ax, [bp+6]
 		push	ax
-		call	TextObject_CloseAndLog_5A856
+		call	Music_ShutdownDriver_5A856
 		pop	cx
 		pop	bp
 		retf

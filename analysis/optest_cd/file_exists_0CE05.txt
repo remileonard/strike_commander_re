@@ -1,0 +1,34 @@
+0CE05  push bp
+0CE06  mov bp, sp
+0CE08  sub sp, 0x50
+0CE0B  push word ptr [bp + 8]
+0CE0E  push word ptr [bp + 6]
+0CE11  push ss
+0CE12  lea ax, [bp - 0x50]
+0CE15  push ax
+0CE16  lcall 0, 0x38e9  ; -> 038E9
+0CE1B  add sp, 8
+0CE1E  lea ax, [bp - 0x50]
+0CE21  push ax
+0CE22  lcall 0x42f0, 0x155  ; -> 43055
+0CE27  add sp, 2
+0CE2A  or ax, ax
+0CE2C  je 0xce34
+0CE2E  mov al, 1
+0CE30  leave 
+0CE31  retf 
+0CE32  jmp 0xce4f
+0CE34  push 0
+0CE36  lea ax, [bp - 0x50]
+0CE39  push ax
+0CE3A  lcall 0, 0x2187  ; -> 02187
+0CE3F  add sp, 4
+0CE42  or ax, ax
+0CE44  jne 0xce4b
+0CE46  mov ax, 1
+0CE49  jmp 0xce4d
+0CE4B  xor ax, ax
+0CE4D  leave 
+0CE4E  retf 
+0CE4F  leave 
+0CE50  retf 

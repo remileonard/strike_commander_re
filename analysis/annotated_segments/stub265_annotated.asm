@@ -31,7 +31,7 @@ VROOMM_StubThunk_6B740	endp
 ; far, thunk fixe VROOMM (jmp sub_8EEBC) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=1C780h, codesize=87Dh, nentries=6.
 ; ==============================================================================================
-VROOMM_StubThunk_6B745	proc far		; CODE XREF: Config_ReadCalibration+11FP
+VROOMM_StubThunk_6B745	proc far		; CODE XREF: Input_AltKeyCommands_26F7E+11FP
 					; TextRenderer_Main:loc_27C5DP
 		jmp	Config_LoadAndApplySettings_8EEBC
 VROOMM_StubThunk_6B745	endp

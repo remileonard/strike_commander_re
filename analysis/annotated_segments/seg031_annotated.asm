@@ -408,7 +408,7 @@ loc_1ECAF:				; CODE XREF: RadioQueue_RegisterMessage+65j
 		or	al, al
 		jnz	short loc_1ECBF
 		push	2
-		call	Widget_Helper_5AB2C
+		call	Speech_QueryStatus_5AB2C
 		pop	cx
 		or	al, al
 		jz	short loc_1ECC6
@@ -1114,7 +1114,7 @@ loc_1F110:				; CODE XREF: Audio_LoadSpeechClip+Dj
 		push	ax
 		lea	ax, [bp+var_50]
 		push	ax
-		call	Widget_Helper_5AAD7
+		call	Speech_PlayClip_5AAD7
 		add	sp, 8
 		or	al, al
 		jz	short loc_1F1B9
@@ -1443,7 +1443,7 @@ loc_1F328:				; DATA XREF: seg339:0754o
 		push	ds
 		push	offset aRadio_1	; "RADIO"
 		push	large dword ptr	[di+5Eh]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		mov	ah, 0
 		or	ax, ax

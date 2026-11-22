@@ -22,7 +22,7 @@ loc_460E9:				; DATA XREF: seg216:03E6o
 		mov	bp, sp
 		push	[bp+arg_4]
 		push	large [bp+arg_0]
-		call	IFF_LoadAngleParam
+		call	Object_LoadCommonAndAllegiance_3C942
 		add	sp, 6
 		pop	bp
 		retf

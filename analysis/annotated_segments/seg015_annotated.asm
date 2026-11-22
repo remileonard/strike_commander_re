@@ -18,18 +18,17 @@ seg015		segment	byte public 'CODE' use16
 ; prendre pour acquis tant que non trace. si=objet controleur (memes offsets que
 ; Camera_ExternalView_VtSlotC_14FD7, l appelant), di=&si+2 (buffer texte embarque). (1) si
 ; si[+0x135]==0 -> rien, sortie immediate. (2) sinon resout la ressource texte si[+0x135] via
-; Memory_TypedAllocDispatchB_5C832(5C44h) puis rend/mesure via
-; Render_MeasureOrDrawTextString_61F52 (meme couple d appels que le moteur de rendu des
-; messages journal/kneeboard). (3) si si[+0x21C]==0xFF (sentinelle termine) -> sortie. (4) si
-; si[+0x21E] : choisit une 2e source de chaine selon si[+0x140] (0 -> si[+0x208]/[+0x20C],
-; sinon -> si[+0x212]/[+0x216]), meme resolution+rendu si la source est non nulle. (5)
-; si[+0x21C]++ ; si >=2 -> si[+0x21C]=0xFF (fige l affichage). PRECISION (2026-09-12, Remi) :
-; Betty (cf. Cockpit_LoadBettyPack) est une banque SON pour les avertissements, sans rapport
-; avec ce widget texte -- toute mention anterieure de Betty ici etait un lien errone. RESTE
-; OUVERT : lien exact entre si[+0x135] et word_72A94, si le widget sert aussi aux messages
-; radio, semantique exacte de si[+0x140] et si[+0x21E]/[+0x21F]. Lu ligne a ligne le
-; 2026-09-12 sur demande de Remi (le nom precedent "DrawPilotPortrait" etait faux, aucun
-; portrait n existe dans la simulation).
+; Memory_TypedAllocDispatchB_5C832(5C44h) puis rend/mesure via Shape_DrawSpans_61F52 (meme
+; couple d appels que le moteur de rendu des messages journal/kneeboard). (3) si
+; si[+0x21C]==0xFF (sentinelle termine) -> sortie. (4) si si[+0x21E] : choisit une 2e source
+; de chaine selon si[+0x140] (0 -> si[+0x208]/[+0x20C], sinon -> si[+0x212]/[+0x216]), meme
+; resolution+rendu si la source est non nulle. (5) si[+0x21C]++ ; si >=2 -> si[+0x21C]=0xFF
+; (fige l affichage). PRECISION (2026-09-12, Remi) : Betty (cf. Cockpit_LoadBettyPack) est une
+; banque SON pour les avertissements, sans rapport avec ce widget texte -- toute mention
+; anterieure de Betty ici etait un lien errone. RESTE OUVERT : lien exact entre si[+0x135] et
+; word_72A94, si le widget sert aussi aux messages radio, semantique exacte de si[+0x140] et
+; si[+0x21E]/[+0x21F]. Lu ligne a ligne le 2026-09-12 sur demande de Remi (le nom precedent
+; "DrawPilotPortrait" etait faux, aucun portrait n existe dans la simulation).
 ; ==============================================================================================
 Cockpit_CaptionTextRenderStep_14EFA	proc far		; CODE XREF: seg015:014Dp
 
@@ -69,7 +68,7 @@ loc_14F1B:				; CODE XREF: Cockpit_CaptionTextRenderStep_14EFA+1Cj
 		push	ax
 		push	large 0
 		push	di
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		cmp	byte ptr [si+21Ch], 0FFh
 		jnz	short loc_14F4B
@@ -132,7 +131,7 @@ loc_14FA7:				; CODE XREF: Cockpit_CaptionTextRenderStep_14EFA+85j
 		push	ax
 		push	large 0
 		push	di
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_14FC0:				; CODE XREF: Cockpit_CaptionTextRenderStep_14EFA+56j
@@ -361,11 +360,11 @@ Resource_InitTwoChannels	proc far		; CODE XREF: Video_InitShakeEffect_85D95+7P
 		mov	bp, sp
 		push	0
 		push	6
-		call	Weapon_HUDBox_TimerCaseJ_5A95E
+		call	SoundFX_Stop_5A95E
 		add	sp, 4
 		push	0
 		push	7
-		call	Weapon_HUDBox_TimerCaseJ_5A95E
+		call	SoundFX_Stop_5A95E
 		add	sp, 4
 		pop	bp
 		retf
@@ -412,12 +411,12 @@ arg_0		= byte ptr  6
 		push	0
 		lea	ax, [bp+var_50]
 		push	ax
-		call	Widget_Helper_5AAD7
+		call	Speech_PlayClip_5AAD7
 		add	sp, 8
 		or	al, al
 		jz	short locret_1519C
 		push	1
-		call	Widget_Helper_5AB09
+		call	Speech_SetField49_5AB09
 		pop	cx
 
 locret_1519C:				; CODE XREF: Cockpit_LoadBettyPack+Bj
@@ -453,7 +452,7 @@ Cockpit_LoadBettyPack	endp
 ; Input_ReadMouseAndAxes_7AAF0 / Input_ReadJoystick* -> pan joueur via
 ; AIManeuver_BuildRotationAndLookup_7A800 ; (9) Cockpit_ViewPanTransitionMain_15B67. NB :
 ; remplace le modèle 'corps rigide debris' des passes 2026-09-06
-; (Camera_ComputeMountedPosition_3D31D seg085) qui concerne une AUTRE caméra
+; (WorldObject_IntegrateBodyMotion_3D31D seg085) qui concerne une AUTRE caméra
 ; (arme/cinématique), pas la chase F2. Détail : DATA_MODEL.md §6.6b-ter.
 ; ==============================================================================================
 Camera_ExternalViewComputeMain_1519E:				; DATA XREF: seg339:0770o
@@ -535,11 +534,11 @@ loc_15234:				; CODE XREF: seg015:033Fj
 		mov	[bp-9Ah], eax
 		lea	ax, [bp-0A2h]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		lea	ax, [bp-0A2h]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	ax, [bp-12h]
 		add	ax, 0Ch
@@ -549,7 +548,7 @@ loc_15234:				; CODE XREF: seg015:033Fj
 		push	ss
 		lea	ax, [bp-30h]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		cmp	dword ptr [bp-30h], 100h
 		jle	short loc_152D5
@@ -592,7 +591,7 @@ loc_15312:				; CODE XREF: seg015:03FBj seg015:0410j
 		push	ss
 		lea	ax, [bp-3Ch]
 		push	ax
-		call	Math_ArcSin_5493E
+		call	Math_AcosDeg_5493E
 		add	sp, 6
 		mov	eax, [di+60h]
 		cmp	eax, [bp-3Ch]
@@ -614,21 +613,21 @@ loc_1533B:				; CODE XREF: seg015:0446j
 		push	word ptr [bp-12h]
 		lea	ax, [bp-0A2h]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		lea	ax, [bp-0A2h]
 		push	ax
 		push	ss
 		lea	ax, [bp-40h]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		lea	ax, [bp-0A2h]
 		push	ax
 		push	ss
 		lea	ax, [bp-44h]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	byte_6D8AC, 0
 		cmp	dword ptr [bp-44h], 0
@@ -1004,7 +1003,7 @@ loc_15649:				; CODE XREF: seg015:0754j
 		mov	ax, si
 		add	ax, 143h
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		jmp	loc_158D0
 ; ���������������������������������������������������������������������������
@@ -1134,7 +1133,7 @@ loc_15853:				; CODE XREF: seg015:095Fj
 		push	ax
 		lea	ax, [bp-0AEh]
 		push	ax
-		call	UI_ApplyLineOfSightCheck_55A9E
+		call	Vector_SetLength_55A9E
 		add	sp, 4
 
 loc_15870:				; CODE XREF: seg015:08CCj seg015:0965j
@@ -1211,7 +1210,7 @@ loc_158D0:				; CODE XREF: seg015:0756j seg015:07C7j ...
 		push	word ptr [bp-12h]
 		lea	ax, [bp-7Eh]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	ax, [bp-10h]
 		add	ax, 12h
@@ -1318,7 +1317,7 @@ loc_15A1D:				; CODE XREF: seg015:0B28j
 		push	word ptr [bp-12h]
 		lea	ax, [bp-0A2h]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	di, [bp-10h]
 		add	di, 12h
@@ -1496,16 +1495,15 @@ Radar_ToggleTracking	endp
 ; (6B099/6B08F/6B094) -- ressemble a une animation zoom/transition MFD en 2 etapes, PAS un
 ; calcul camera 3D. (5) bloc cle (garde byte_72365) : relit si[+0x14F] (LE MEME champ vecteur
 ; avant que Camera_ExternalViewComputeMain_1519E rate-limite a 6.0u/frame), le fait tourner
-; via Math_ApplyRotationHelperB_58828(forward, subject->vtable[0x3C]()), calcule
-; bearing/elevation via Targeting_ComputeBearingElevation_55B1A(5AA7h,&forward) ; si
-; si[+0x1EC] >= bearing_elev -> declenche un VRAI pan de camera
-; Camera_PanTransitionExtended(541Ah,&value,si[+0x1E5..E7]) (value = si[+0x1F0]*bearing_elev +
-; si[+0x1E8]), sinon si si[+0x1E4] etait actif -> retour neutre
-; Cockpit_PanAzimuthUpdate(541Ah,&1.0). C EST DONC UN MECANISME DE RATTRAPAGE/SNAP DE REGARD
-; quand la cible sort du cadre, reutilisant directement le vecteur avant de la camera chase --
-; pertinent pour le mecanisme padlock/TARGET. (6) bloc similaire (garde byte_6E4CF) avec une
-; constante fixe 4Ch (76) au lieu du calcul bearing/elevation -- probable retour a une
-; position fixe. RESTE OUVERT : semantique exacte de vtable[0x34]()/vtable[0x3C](),
+; via Matrix_LocalToWorld_58828(forward, subject->vtable[0x3C]()), calcule bearing/elevation
+; via Targeting_ComputeBearingElevation_55B1A(5AA7h,&forward) ; si si[+0x1EC] >= bearing_elev
+; -> declenche un VRAI pan de camera Camera_PanTransitionExtended(541Ah,&value,si[+0x1E5..E7])
+; (value = si[+0x1F0]*bearing_elev + si[+0x1E8]), sinon si si[+0x1E4] etait actif -> retour
+; neutre Cockpit_PanAzimuthUpdate(541Ah,&1.0). C EST DONC UN MECANISME DE RATTRAPAGE/SNAP DE
+; REGARD quand la cible sort du cadre, reutilisant directement le vecteur avant de la camera
+; chase -- pertinent pour le mecanisme padlock/TARGET. (6) bloc similaire (garde byte_6E4CF)
+; avec une constante fixe 4Ch (76) au lieu du calcul bearing/elevation -- probable retour a
+; une position fixe. RESTE OUVERT : semantique exacte de vtable[0x34]()/vtable[0x3C](),
 ; Targeting_ComputeBearingElevation_55B1A et Camera_PanTransitionExtended non tracees en
 ; detail, stubs VROOMM 6B099/6B08F/6B094/6B080/6B085 non resolus. Lu integralement ligne a
 ; ligne le 2026-09-12 (demande explicite de verification, ancien resume issu d une passe
@@ -1923,7 +1921,7 @@ loc_15EA7:				; CODE XREF: Cockpit_ViewPanTransitionMain_15B67+33Bj
 		push	ax
 		lea	ax, [bp+var_3C]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		push	5AA7h
 		lea	ax, [bp+var_3C]
@@ -2249,13 +2247,13 @@ loc_1614E:				; CODE XREF: Cockpit_DetectPlayerMissile+171j
 		push	0
 		mov	al, byte ptr [bp+var_E+2]
 		push	ax
-		call	Weapon_HUDBox_TimerCaseJ_5A95E
+		call	SoundFX_Stop_5A95E
 		add	sp, 4
 		push	0
 		push	large 0
 		mov	al, byte ptr [bp+var_A]
 		push	ax
-		call	Weapon_HUDBox_TimerCaseI_5A906
+		call	SoundFX_PlayOrUpdate_5A906
 		add	sp, 8
 		jmp	short loc_16187
 ; ���������������������������������������������������������������������������
@@ -2264,13 +2262,13 @@ loc_1616F:				; CODE XREF: Cockpit_DetectPlayerMissile+14Dj
 					; Cockpit_DetectPlayerMissile:loc_16127j
 		push	0
 		push	6
-		call	Weapon_HUDBox_TimerCaseJ_5A95E
+		call	SoundFX_Stop_5A95E
 		add	sp, 4
 		push	0
 		push	7
 
 loc_1617F:
-		call	Weapon_HUDBox_TimerCaseJ_5A95E
+		call	SoundFX_Stop_5A95E
 		add	sp, 4
 
 loc_16187:				; CODE XREF: Cockpit_DetectPlayerMissile+19Aj

@@ -160,7 +160,7 @@ loc_4D801:
 		mov	[bp-82h], eax
 		lea	ax, [bp-8Ah]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp-8Ah]
 		mov	edx, [bp-14h]
@@ -219,7 +219,7 @@ loc_4D89F:				; CODE XREF: seg107:01FAj
 		push	ax
 		lea	ax, [bp-8Ah]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	dword ptr [bp-1Eh], 0
 		mov	dword ptr [bp-22h], 0
@@ -235,7 +235,7 @@ loc_4D900:
 		push	ax
 		lea	ax, [bp-0AEh]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		add	di, 12h
 		add	si, 12h
@@ -252,7 +252,7 @@ loc_4D900:
 		push	ax
 		lea	ax, [bp-0BAh]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		cmp	dword ptr [bp-0AAh], 0
 		jnz	short loc_4D971
@@ -669,7 +669,7 @@ loc_4DC95:				; CODE XREF: seg107:05F0j
 		mov	[bp-5Eh], eax
 		lea	ax, [bp-66h]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp-66h]
 		mov	edx, [bp-14h]
@@ -784,7 +784,7 @@ loc_4DDCE:				; CODE XREF: seg107:0708j
 		push	ax
 		lea	ax, [bp-66h]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	si, [bp+6]
 		or	si, si
@@ -918,7 +918,7 @@ loc_4DF0D:				; CODE XREF: seg107:0868j
 		shl	eax, 8
 		mov	[bp-30h], eax
 		push	si
-		call	Debris_ConfigureByTargetType
+		call	Explosion_ApplyRadiusAndDamage_4BDFD
 		add	sp, 0Ah
 		push	di
 		mov	bx, [di]
@@ -965,7 +965,7 @@ loc_4DFA0:				; CODE XREF: seg107:08FBj
 		push	0
 		push	large 0
 		push	9
-		call	Weapon_HUDBox_TimerCaseH_5A8DC
+		call	SoundFX_Play_5A8DC
 		add	sp, 8
 		jmp	short loc_4E03B
 ; ���������������������������������������������������������������������������
@@ -1005,7 +1005,7 @@ loc_4DFC1:				; CODE XREF: seg107:0907j seg107:090Ej
 		push	0
 		push	eax
 		push	0Ah
-		call	Weapon_HUDBox_TimerCaseH_5A8DC
+		call	SoundFX_Play_5A8DC
 		add	sp, 8
 
 loc_4E03B:				; CODE XREF: seg107:08FDj seg107:091Fj
@@ -1127,7 +1127,13 @@ ParticleEmitter_InitAttached	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_4E0E5:				; DATA XREF: seg339:off_702DAo
+; ==============================================================================================
+; far (label), LUE 2026-10-12. Méthode +0x84 de l'instance TRCR (vtable 0x31A6) : dégâts =
+; WDAT dégâts (modèle +0x46) × INFO champ 9 (uint16, modèle +0x80) × (0,5 + temps restant
+; (+0x3C) / (2 × durée de vie INFO champ 5, modèle +0x6A)) : de 100 % au départ à 50 % en fin
+; de vie.
+; ==============================================================================================
+Tracer_CollisionDamage_4E0E5:				; DATA XREF: seg339:off_702DAo
 		push	bp
 		mov	bp, sp
 		sub	sp, 18h
@@ -1226,7 +1232,7 @@ arg_6		= word ptr  0Ch
 		mov	si, [bp+arg_0]
 		mov	di, [bp+arg_2]
 		push	[bp+arg_6]
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		push	di
 		push	ss
@@ -1419,7 +1425,7 @@ Particle_ComputeSpawnJitter	endp
 ; HUD_RenderSymbologyMain (probable effet de fumée/étincelle du réticule ou d'un composant
 ; endommagé affiché au HUD).
 ; ==============================================================================================
-Particle_ComputeSpawnAtAttachPoint	proc far		; CODE XREF: HUD_RenderSymbologyMain+F0DP
+Particle_ComputeSpawnAtAttachPoint	proc far		; CODE XREF: WeaponSystem_LaunchFromStation_3E744+F0DP
 
 var_C		= dword	ptr -0Ch
 var_8		= dword	ptr -8
@@ -1841,7 +1847,7 @@ loc_4E758:				; DATA XREF: seg339:off_7026Ao
 		lea	ax, [bp-14h]
 		push	ax
 		push	si
-		call	Debris_BodyIntegrateForces
+		call	WorldObject_TranslateBy_37D54
 		add	sp, 8
 		mov	di, si
 		add	di, 38h	; '8'

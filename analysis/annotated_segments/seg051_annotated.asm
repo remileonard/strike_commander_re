@@ -56,7 +56,10 @@ RadioFlags_ResetBank	endp
 ; frame' (byte_6E4BC a byte_6E4C7) vers des emplacements 'historique' (byte_6E4C8 a
 ; byte_6E4D8), PUIS remet les drapeaux source a zero. Ne decide rien elle-meme - juste un
 ; registre a decalage. Mapping confirme : byte_6E4BF (source) -> byte_6E4CB (consomme par
-; Radio_CombatChatterDispatch pour le message de destruction 0x0D).
+; Radio_CombatChatterDispatch pour le message de destruction 0x0D). | 2026-09-27 : decale
+; aussi les references word_722EA -> word_722EE (SetReference16 0x523A/0x523E) : word_722EE =
+; l'ennemi dans les six heures du joueur detecte au cycle precedent par
+; AI_SelectWeaponMask_9665. Appelee une fois par frame par CombatTarget_WeaponActionSubsystem.
 ; ==============================================================================================
 RadioFlags_ShiftHistory	proc far		; CODE XREF: RadioFlags_ResetBank+4Dp
 					; RadioFlags_ResetBank+52p ...

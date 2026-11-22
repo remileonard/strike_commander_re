@@ -1,0 +1,69 @@
+//
+//  precomp.h
+//  libRealSpace
+//
+//  Created by Fabien Sanglard on 1/25/2014.
+//  Copyright (c) 2014 Fabien Sanglard. All rights reserved.
+//
+
+#pragma once
+
+//libspace include
+#include "../engine/precomp.h"
+#include "../realspace/precomp.h"
+#include "../engine/MessageBus.h"
+
+
+#include "../realspace/AssetManager.h"
+#include "SCenums.h"
+#include "PaletteIDs.h"
+#include "ShapeIDs.h"
+
+
+#include "SCState.h"
+#include "../engine/SCMouse.h"
+#include "../engine/SCButton.h"
+#include "../engine/SCZone.h"
+#include "../engine/IActivity.h"
+#include "../engine/GameEngine.h"
+#include "../realspace/ConvAssetManager.h"
+
+// Simulation
+#include "SCSmokeSet.h"
+#include "SCExplosion.h"
+#include "SCSimulatedObject.h"
+#include "SCPlane.h"
+#include "SCJdynPlane.h"
+#include "SCSimplePlane.h"
+#include "SCVectorPlane.h"
+#include "SCJetpPlane.h"
+#include "SCPilot.h"
+
+#include "SCMissionEvent.h"
+#include "SCMissionScene.h"
+#include "SCMissionActors.h"
+
+#include "SCMission.h"
+#include "SCProg.h"
+#include "SCCameraEvent.h"
+#include "SCCameraSequence.h"
+#include "SCCameraDirector.h"
+
+#include "SCFileRequester.h"
+
+//Activities
+#include "SCConvPlayer.h"
+#include "SCAnimationPlayer.h"
+#include "SCFlicPlayer.h"
+#include "SCRegister.h"
+
+#include "SCNavMap.h"
+#include "SCCockpit.h"
+#include "SCStrike.h"
+#include "SCObjectViewer.h"
+#include "SCDogFightMenu.h"
+#include "SCTrainingMenu.h"
+#include "SCMainMenu.h"
+#include "SCShot.h"
+#include "SCScene.h"
+#include "SCGameFlow.h"

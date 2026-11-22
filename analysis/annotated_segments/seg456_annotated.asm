@@ -7,7 +7,9 @@ seg456		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle MissionScenario_ResolveFieldChain_A8BD1.
+; far. Renvoie 1 si l'objet de mission doit etre DESACTIVE au saut de pilote automatique
+; (Autopilot_JumpSequence_7A054) : objet monde +0x1D et controleur +0x52 presents et bit 5 de
+; +0x39 efface (0xB9) ; ou (byte_6E4D5 et objet = celui resolu depuis word_706A0).
 ; ==============================================================================================
 MissionScenario_QueryFieldWrapper_A7FF0	proc far		; CODE XREF: VROOMM_StubThunk_6CE1AJ
 
@@ -299,10 +301,9 @@ MissionScenario_ConstructFieldChain_A8124	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine sub_6CDC3, MissionScenario_ConstructFieldChain_A8124,
-; Widget_ApplyLayoutHelper_5A88F (seg125), MissionScenario_LoadFromIFF_A8C44,
-; PagedResourceB_Helper_5D859 (seg138) — construction et liaison à l'interface d'un scénario
-; de mission chargé.
+; far, combine sub_6CDC3, MissionScenario_ConstructFieldChain_A8124, Sound_StopAll_5A88F
+; (seg125), MissionScenario_LoadFromIFF_A8C44, PagedResourceB_Helper_5D859 (seg138) —
+; construction et liaison à l'interface d'un scénario de mission chargé.
 ; ==============================================================================================
 MissionScenario_ConstructAndBindUI_A81E0	proc far		; CODE XREF: VROOMM_StubThunk_6CE3DJ
 
@@ -317,7 +318,7 @@ arg_0		= word ptr  6
 		push	cs
 		call	near ptr MissionScenario_ConstructFieldChain_A8124
 		pop	cx
-		call	Widget_ApplyLayoutHelper_5A88F
+		call	Sound_StopAll_5A88F
 		cmp	byte_7070E, 0
 		jz	short loc_A8207
 		push	si
@@ -515,7 +516,7 @@ MissionScenario_ReleaseAndStoreField_A82B0	endp
 ; NUMS(sub_6CEF4@si+0x24) MSGS(sub_6CF03@si+0x28) FLAG(sub_6CE9F@si+0x48)
 ; PROG(sub_6CEB3@si+0x40, bytecode scripté) PART(sub_6CF35@si+0x34) TEAM(count=size/2<=8
 ; @si+0x84, dwords @si+0x74) PLAY(FORM 'la piece' -> MissionPlay_LoadScenes_AA595, contient N
-; chunks SCNE ; objet @si+0x3A) LOAD(A8225) HOME(index AREA via GeomNode_SumAndCount_53034 ->
+; chunks SCNE ; objet @si+0x3A) LOAD(A8225) HOME(index AREA via PtrList_GetAt_53034 ->
 ; si+0x58, + vecteur pos u32 si+0x5C/60/64). Puis câblage Expr VM :
 ; Expr_Node_Accessor_532AD(si+0x3A)->si+0x4E, ConvertFieldValue_A8B8F->si+0x54, flags
 ; +0x39|=0x10|0x20, SetReference16(5236h), HOME recalculé depuis le nœud si [si+0x50]!=0.
@@ -1113,7 +1114,7 @@ loc_A8857:				; CODE XREF: MissionScenario_LoadMainRecord_A8331+508j
 		mov	ax, si
 		add	ax, 1Ah
 		push	ax
-		call	GeomNode_SumAndCount_53034
+		call	PtrList_GetAt_53034
 		add	sp, 4
 		mov	[si+5Ah], dx
 		mov	[si+58h], ax
@@ -1179,7 +1180,7 @@ loc_A8908:				; CODE XREF: MissionScenario_LoadMainRecord_A8331+5CDj
 		mov	ax, si
 		add	ax, 3Ah	; ':'
 		push	ax
-		call	Expr_Node_Accessor_532AD
+		call	Scene_FindByArea_532AD
 		add	sp, 6
 		mov	[si+4Eh], ax
 		cmp	word ptr [si+4Eh], 0
@@ -2070,16 +2071,16 @@ MissionScenario_LoadFromIFF_A8C44	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,492L — pont mission->campagne (ÉCRITURE). Écrit DATA\MISN2OP.IFF, FORM racine 'INVN',
-; via les primitives d'écriture ResourceRecord (WriteFieldGroupA/B, StreamReader_WriteTyped,
-; AllocateAndDecodeVariant). Chunks écrits : INFO(8o de si) STAT(8×u16 de si+0xA1) JETS(par
-; participant : marqueur si nœud +0x39 bit ET type +0x00=='F-16' 0x36312D46) KILL(par
-; participant : u16 +0x3E, u16 +0x40, descripteur 8o via Expr_LookupBuiltinFuncDesc_52C5F)
-; EXIT(1o de byte_706AF) DIED(par équipe : Expr_Node_LookupAndConvert_52D69(si+0x34))
-; SCOR(score). Sauvegarde du résultat de mission pour la campagne. Détail : DATA_MODEL.md
-; §6.6a.
+; far, LUE 2026-10-22 (ex-MissionScenario_ResolveAndBindExpressions_A8F22). Écrit le compte
+; rendu de vol DATA\MISN2OP.IFF lu par OPTEST (Gameflow_ReadMissionResult_4B544 d'OPTEST.EXE)
+; : FORM 'INVN', chunks INFO (8 octets depuis si : nom de la mission), STAT (8 × u16 recopiés
+; de [si+0A1h + 2i] : variables de résultat posées par le script de mission, opcode 14h
+; d'Expr_VM_Interpreter_51106, remises à 0 par MissionScenario_ReleaseAndStoreField_A82B0),
+; JETS (nombre de participants dont le nœud a le bit +39h et dont le type vaut 'F-16'), KILL
+; (par participant : u16 +3Eh, u16 +40h, nom par Mission_GetCastName_52C5F), EXIT (1 octet,
+; byte_706AF), DIED (par équipe), SCOR. Voir GAMEFLOW_SYSTEM.md § 6 et DATA_MODEL.md §6.6a.
 ; ==============================================================================================
-MissionScenario_ResolveAndBindExpressions_A8F22	proc far		; CODE XREF: VROOMM_StubThunk_6CE56J MissionScenario_RecomputeFields_A9382+4Cp
+Mission_WriteResultReport_A8F22	proc far		; CODE XREF: VROOMM_StubThunk_6CE56J MissionScenario_RecomputeFields_A9382+4Cp
 
 var_12C		= word ptr -12Ch
 var_CF		= dword	ptr -0CFh
@@ -2205,7 +2206,7 @@ loc_A8FC4:
 		jmp	short loc_A906E
 ; ���������������������������������������������������������������������������
 
-loc_A9042:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+14Fj
+loc_A9042:				; CODE XREF: Mission_WriteResultReport_A8F22+14Fj
 		mov	bx, di
 		shl	bx, 1
 		mov	ax, [bx+si+0A1h]
@@ -2234,7 +2235,7 @@ loc_A9067:
 		add	[bp+var_C7], 2
 		inc	di
 
-loc_A906E:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+11Ej
+loc_A906E:				; CODE XREF: Mission_WriteResultReport_A8F22+11Ej
 		cmp	di, 8
 		jl	short loc_A9042
 		lea	ax, [bp+var_12C]
@@ -2252,7 +2253,7 @@ loc_A906E:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+11Ej
 		jmp	short loc_A90DF
 ; ���������������������������������������������������������������������������
 
-loc_A909D:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+1C0j
+loc_A909D:				; CODE XREF: Mission_WriteResultReport_A8F22+1C0j
 		mov	bx, di
 		shl	bx, 2
 		lea	ax, [bp+var_84]
@@ -2282,11 +2283,11 @@ loc_A90C0:
 		jnz	short loc_A90DE
 		inc	[bp+var_8]
 
-loc_A90DE:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+1AAj
-					; MissionScenario_ResolveAndBindExpressions_A8F22+1B7j
+loc_A90DE:				; CODE XREF: Mission_WriteResultReport_A8F22+1AAj
+					; Mission_WriteResultReport_A8F22+1B7j
 		inc	di
 
-loc_A90DF:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+179j
+loc_A90DF:				; CODE XREF: Mission_WriteResultReport_A8F22+179j
 		cmp	di, [bp+var_2]
 		jl	short loc_A909D
 		mov	ax, [bp+var_8]
@@ -2309,7 +2310,7 @@ loc_A90DF:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+179j
 		jmp	short loc_A9136
 ; ���������������������������������������������������������������������������
 
-loc_A9119:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+217j
+loc_A9119:				; CODE XREF: Mission_WriteResultReport_A8F22+217j
 		mov	ax, si
 		add	ax, 0B1h ; '�'
 		push	ax
@@ -2322,7 +2323,7 @@ loc_A9119:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+217j
 		add	sp, 6
 		inc	di
 
-loc_A9136:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+1F5j
+loc_A9136:				; CODE XREF: Mission_WriteResultReport_A8F22+1F5j
 		cmp	di, [bp+var_2]
 		jl	short loc_A9119
 		lea	ax, [bp+var_12C]
@@ -2348,7 +2349,7 @@ loc_A9161:
 		jmp	loc_A9203
 ; ���������������������������������������������������������������������������
 
-loc_A9169:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+2E6j
+loc_A9169:				; CODE XREF: Mission_WriteResultReport_A8F22+2E6j
 		mov	bx, di
 		shl	bx, 2
 		lea	ax, [bp+var_84]
@@ -2394,7 +2395,7 @@ loc_A91C4:
 		add	sp, 0Eh
 		add	[bp+var_C7], 2
 		push	large dword ptr	[bp-0Ch]
-		call	Expr_LookupBuiltinFuncDesc_52C5F
+		call	Mission_GetCastName_52C5F
 		add	sp, 4
 		mov	[bp+var_12], dx
 		mov	[bp+var_14], ax
@@ -2409,13 +2410,13 @@ loc_A91C4:
 		add	[bp+var_C7], 8
 		inc	di
 
-loc_A9203:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+244j
+loc_A9203:				; CODE XREF: Mission_WriteResultReport_A8F22+244j
 		cmp	di, [bp+var_2]
 		jge	short loc_A920B
 		jmp	loc_A9169
 ; ���������������������������������������������������������������������������
 
-loc_A920B:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+2E4j
+loc_A920B:				; CODE XREF: Mission_WriteResultReport_A8F22+2E4j
 		lea	ax, [bp+var_12C]
 		push	ax
 		call	ResourceRecord_WriteFieldWrapper_64FD8
@@ -2458,7 +2459,7 @@ loc_A9274:
 		jmp	short loc_A92DD
 ; ���������������������������������������������������������������������������
 
-loc_A9276:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+3BEj
+loc_A9276:				; CODE XREF: Mission_WriteResultReport_A8F22+3BEj
 		mov	ax, di
 		imul	ax, 9
 		mov	dx, si
@@ -2501,11 +2502,11 @@ loc_A92C8:
 		add	sp, 0Eh
 		add	[bp+var_C7], 8
 
-loc_A92DC:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+37Fj
-					; MissionScenario_ResolveAndBindExpressions_A8F22+390j
+loc_A92DC:				; CODE XREF: Mission_WriteResultReport_A8F22+37Fj
+					; Mission_WriteResultReport_A8F22+390j
 		inc	di
 
-loc_A92DD:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22:loc_A9274j
+loc_A92DD:				; CODE XREF: Mission_WriteResultReport_A8F22:loc_A9274j
 		cmp	di, 3
 		jl	short loc_A9276
 		lea	ax, [bp+var_12C]
@@ -2522,7 +2523,7 @@ loc_A92DD:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22:loc_A
 		jge	short loc_A9314
 		mov	dword_706AB, 0
 
-loc_A9314:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+3E7j
+loc_A9314:				; CODE XREF: Mission_WriteResultReport_A8F22+3E7j
 		mov	eax, dword_706AB
 		mov	[bp-0Ch], eax
 		sar	eax, 8
@@ -2570,7 +2571,7 @@ loc_A9369:
 		pop	si
 		leave
 		retf
-MissionScenario_ResolveAndBindExpressions_A8F22	endp
+Mission_WriteResultReport_A8F22	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2578,20 +2579,14 @@ MissionScenario_ResolveAndBindExpressions_A8F22	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 58 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Appelee CHAQUE
-; FRAME directement depuis Simulator_MainLoop_53896 (via VROOMM_StubThunk_6CE5B) — chemin
-; SEPARE et PARALLELE a MAIN_GAME_TICK_536F7, pas decouvert avant.   Declenche
-; Scene_TriggerMissionUpdateEvent_53211 sur DEUX pointeurs de SceneRecord stockes sur
-; MissionScenario : +0x50 et +0x4E. CORRIGE DATA_MODEL.md : ces deux champs ne sont PAS
-; 'handle de noeud Expr'/'flag HOME depuis noeud' comme documente precedemment — ce sont des
-; pointeurs de SceneRecord (+0x50 correspond exactement au champ rempli par
-; Scene_DetectAndActivateChange_532EA).   Verifie ensuite une condition de fin de mission
-; (position comparee a dword_70718/dword_7071C, une cible/checkpoint global) — si atteinte,
-; POSE byte_706AF = 5 -- LE MEME OCTET QUI CONTROLE LA BOUCLE PRINCIPALE DE Simulator_MainLoop
-; (condition de sortie == 6). Lien direct entre logique de scenario et controle du jeu a ce
-; niveau.   Appelle enfin MissionScenario_ResolveAndBindExpressions_A8F22 (ecrit MISN2OP.IFF,
-; resultats de fin de mission) — a chaque frame, sans garde visible ici (garde probablement
-; interne a A8F22, non verifiee). Appelle aussi sub_A8124 et sub_6CDBE, non identifiees.
+; far, 58 lignes, lue intégralement. Appelée UNE SEULE FOIS, en fin de mission : par
+; STRIKE_EXE_MAIN_LOOP après la sortie de la boucle de jeu (VROOMM_StubThunk_6CE5B, juste
+; avant Music_Stop_5A9E6), et non à chaque image (corrigé 2026-10-30). Lance
+; Scene_RunLeavingScript_53211 sur la scène courante (MissionScenario+80) puis sur la scène
+; globale (+78). Vérifie ensuite une position comparée à dword_70718/dword_7071C et pose
+; byte_706AF = 5 si elle est atteinte, puis appelle
+; MissionScenario_ResolveAndBindExpressions_A8F22 (écrit MISN2OP.IFF). Appelle aussi sub_A8124
+; et sub_6CDBE, non identifiées.
 ; ==============================================================================================
 MissionScenario_RecomputeFields_A9382	proc far		; CODE XREF: VROOMM_StubThunk_6CE5BJ
 
@@ -2604,14 +2599,14 @@ arg_0		= word ptr  6
 		cmp	word ptr [si+50h], 0
 		jz	short loc_A9398
 		push	word ptr [si+50h]
-		call	Scene_TriggerMissionUpdateEvent_53211
+		call	Scene_RunLeavingScript_53211
 		pop	cx
 
 loc_A9398:				; CODE XREF: MissionScenario_RecomputeFields_A9382+Bj
 		cmp	word ptr [si+4Eh], 0
 		jz	short loc_A93A7
 		push	word ptr [si+4Eh]
-		call	Scene_TriggerMissionUpdateEvent_53211
+		call	Scene_RunLeavingScript_53211
 		pop	cx
 
 loc_A93A7:				; CODE XREF: MissionScenario_RecomputeFields_A9382+1Aj
@@ -2641,7 +2636,7 @@ loc_A93C3:				; CODE XREF: MissionScenario_RecomputeFields_A9382+3Dj
 loc_A93CC:				; CODE XREF: MissionScenario_RecomputeFields_A9382+43j
 		push	si
 		push	cs
-		call	near ptr MissionScenario_ResolveAndBindExpressions_A8F22
+		call	near ptr Mission_WriteResultReport_A8F22
 		pop	cx
 		push	si
 		push	cs

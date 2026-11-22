@@ -90,7 +90,7 @@ InfoWidget_Helper_A459A	endp
 
 ; ==============================================================================================
 ; far, encadré par le verrou d'ownership (seg442), combine Memory_TypedAllocDispatchB_5C832,
-; Render_MeasureOrDrawTextString_61F52 (seg174) — mesure/rendu de texte du widget.
+; Shape_DrawSpans_61F52 (seg174) — mesure/rendu de texte du widget.
 ; ==============================================================================================
 InfoWidget_MeasureAndDrawA_A45AC	proc far		; CODE XREF: VROOMM_StubThunk_6CA3FJ
 
@@ -128,7 +128,7 @@ loc_A45CF:				; CODE XREF: InfoWidget_MeasureAndDrawA_A45AC+1Ej
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	si
 		call	VROOMM_StubThunk_6C7BC
@@ -210,7 +210,7 @@ loc_A4644:				; CODE XREF: InfoWidget_MeasureAndDrawB_A4621+1Ej
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	si
 		call	VROOMM_StubThunk_6C7BC
@@ -298,7 +298,7 @@ InfoWidget_Method_Dispatch0CB_A4696	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 110 lignes, NON DÉTAILLÉE — combine TextFormat_ApplyStyleAttribute_5E2D0 (×2), le
-; verrou d'ownership, Memory_TypedAllocDispatchB_5C832, Render_MeasureOrDrawTextString_61F52,
+; verrou d'ownership, Memory_TypedAllocDispatchB_5C832, Shape_DrawSpans_61F52,
 ; TextFormat_ReleaseStyleList_5E526.
 ; ==============================================================================================
 InfoWidget_MeasureAndDrawStyled_A46C1	proc far		; CODE XREF: VROOMM_StubThunk_6CA58J
@@ -380,7 +380,7 @@ loc_A4742:				; CODE XREF: InfoWidget_MeasureAndDrawStyled_A46C1+7Cj
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	word_6FEDC
 		push	0FFh
@@ -856,7 +856,7 @@ loc_A49BB:				; CODE XREF: InfoWidget_MeasureAndDrawC_A499D+19j
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	si
 		call	VROOMM_StubThunk_6C7BC

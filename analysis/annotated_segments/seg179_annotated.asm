@@ -13,6 +13,9 @@ seg179		segment	byte public 'CODE' use16
 ; traitement d'angle de rotation. Référencée depuis seg063 et seg106 (émetteur de particules)
 ; — probable variante « avec rotation » de la primitive de rendu de sprite/icône. Candidat
 ; prioritaire pour session dédiée (aucune lecture de détail effectuée, fonction volumineuse).
+; | PRÉCISÉ 2026-10-12 : appelé par le rendu des particules en MODE 1 avec (surface, x, y,
+; forme, n° d'image, largeur, hauteur) — 16 octets d'arguments, PAS de table de remappage ni
+; de A/B : sprite dessiné opaque, la teinte ne s'applique pas.
 ; ==============================================================================================
 Render_DrawRotatedScaledSprite_62800	proc far		; CODE XREF: seg063:loc_2DDE0P
 					; seg106:0A5FP

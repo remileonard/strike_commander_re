@@ -16,10 +16,12 @@ appels**, plusieurs gros chargeurs restant `⚠️ NON DÉTAILLÉE` ligne à lig
 (voir § « Zones non lues » en fin de document).
 
 > **Convention d'axes (cf. `CLAUDE.md`)** : les vecteurs position/vitesse sont
-> `3× i32` en virgule fixe 24.8 (`val / 256` = pieds). La **3ᵉ composante (le
+> `3× i32` en virgule fixe 24.8 (`val / 256` = mètres). La **3ᵉ composante (le
 > dernier i32, offset le plus élevé) est l'altitude**. Côté ASM/jeu = **Z-up**,
 > composantes `(X, Y, Z)` avec **Z = altitude** ; libRealSpace = **Y-up**,
-> `(X, Y, Z)` avec **Y = altitude** → le portage **échange les composantes 1 et 2**.
+> `(X, Y, Z)` avec **Y = altitude** → le portage **échange les composantes 1 et 2 et inverse
+> la profondeur** (`libRS.z = −c1`) : sans ce signe, le repère devient indirect et le rendu
+> OpenGL de libRealSpace affiche le monde en miroir (raison détaillée dans `CLAUDE.md`).
 > Les tables ci-dessous nomment donc la 3ᵉ composante `Z` (= altitude).
 
 ---
@@ -199,7 +201,7 @@ form-type (4 o, copié via `sub_2B6D`) · `+0x0F` **offset de fin du conteneur**
 
 Contrepartie en écriture (seg194) : `WriteField_64E1D`, `WriteFieldGroupA/B/C/D`,
 `ReadAndWriteBridge` — le format est **relisible/réinscriptible** (utilisé par
-`sc.cfg`, l'éditeur de scénario `MissionScenario_ResolveAndBindExpressions_A8F22`,
+`sc.cfg`, le compte rendu de vol `Mission_WriteResultReport_A8F22` (MISN2OP.IFF),
 `TextRenderer_SaveResourceFile`).
 
 ### 5.4 Packs compressés — `IndexedRecordReader` (seg196) + `LZW` (seg197)
@@ -237,7 +239,7 @@ Consommateurs : `MissionRecord_LoadEntityDatabase`, `TextCycler`, `TerrainSector
 | FourCC | Taille struct | Vtable finale | Catégorie (`vtable+8`) | Type d'objet |
 |---|---|---|---|---|
 | `BOBJ` | 0x35 | `1B6F` | 0 | basic object |
-| `ORNT` | 0x36 | `1B6F` (non retracé au-delà) | 0 ? | objet de décor orienté : immeuble, etc. (fait vérifié côté données) (+ chunk `ANGL` via `IFF_LoadAngleParam` → angle `+0x35`) |
+| `ORNT` | 0x36 | **`2578`** (`IFF_LoadModelMain` : `mov word ptr es:[bx], 2578h` après la base `1B6F`) | **1** (vtable `0x6F628`, slot +8 = `mov al, 1`, corrigé 2026-10-06) | objet de décor orienté : immeuble, etc. (fait vérifié côté données) (+ chunk `ALGN` via `IFF_LoadAngleParam` → angle `+0x35`) |
 | `TRCR` | 0x82 | `255C` | 0x0D | tracer / traçante |
 | `AFTB` | 0x36 | `2518` | 0x0E | afterburner (tuyère) |
 | `MOBL` | 0x37 | `2504` | 2 | objet mobile |
@@ -254,13 +256,221 @@ Consommateurs : `MissionRecord_LoadEntityDatabase`, `TextCycler`, `TerrainSector
 | `DECY` | 0x3B | `2430` | 0x10 | leurres (fait vérifié côté données) |
 | `SWPN` | 0x51 | `241C` | **0x13** | **défenses fixes : AA, batteries, SAM, navires** (fait vérifié côté données : objets chargés et codés dans libRealSpace) |
 | `GRND` | 0x46 | `2408` | 0x14 | objet au sol |
-| `RNWY` | 0x36 | non lue | non lue | piste de décollage (fait vérifié côté données) |
-| `EXPL` | 0x3E | non lue | non lue | explosion |
-| `DEBR` | 0x3B | non lue | non lue | débris |
+| `RNWY` | 0x36 | `23F4` (base `2578` = `ORNT`) | **17** (`loc_460FC` : `mov al, 11h`) | piste de décollage (fait vérifié côté données) — chunks communs + `ALGN` (`IFF_LoadAngleParam_Wrapper`) |
+| `EXPL` | 0x3E | `23E0` (base `2578`) | **15** (`loc_4BD81` : `mov al, 0Fh`) | explosion — chunks communs, `DAMG` recopié en `+0x38` (`Explosion_LoadFromIFF_4BCD5`) |
+| `DEBR` | 0x3B | `23CC` (base `2504` = `MOBL`) | **11** (`loc_4BA42` : `mov al, 0Bh`) | débris — `INFO` (`IFF_LoadInfoChunk`) + chunks communs et dynamique `DYNM` (`JDYN_LoadChunkWrapper_9D0C0`, qui appelle `Object_LoadCommonChunks_9BA85` avant la dynamique) |
+| `SMKG` | 0x46 | `23B8` (base `2578`) | **18** (`loc_4C050` : `mov al, 12h`) | **générateur de fumée** (`SmokeGen_LoadFromIFF_A5F89`) : chunk `INFO` obligatoire (format ci-dessous) + chunks communs + `ALGN` |
+| `EJEC` | 0x5B | `23A4` (base `252C` = `OMOB`) | **22** (`ClassStub_ReturnConst16h_4F2BA`) | objet qui en **libère un autre** après un délai et sous une hauteur (siège éjectable → parachute, d'après le tag) : chunk `DATA` (`EjectSeat_LoadFromIFF_A6CA0`) + `MobileObject_LoadDynamicsAndSmoke_9D189` ; aucun FORM reconnu → erreur `C015h` |
 
 **Catégorie d'un objet (établi le 2026-09-20).** La classe d'un objet est fixée par le **premier chunk présent** dans l'ordre de probe de `IFF_LoadModelMain` (`BOBJ, ORNT, TRCR, AFTB, MOBL, OMOB, GUID, ARMG, JETP, XMIT, WEAP, MISS, PODR, BOMB, DURD, DECY, SWPN, GRND, RNWY, …`). Chaque bloc alloue une taille (`Memory_TypedFreeWrapper_5C6F3`, tag `0x5C44`) et écrit une **suite de mots de vtable** (constructeurs chaînés, le dernier gagne). Le **troisième pointeur (`vtable+8`) est, dans chaque classe lue, un `mov al, <constante> ; retf`** : la constante est la catégorie. Elle est lue par `Targeting_AcquireBestThreat` (6 = avion, 8 = missile, 0x13 = défense fixe) pour choisir les cibles et menaces de l'IA (voir `AI_TICK_CALL_GRAPH.md`). Le mapping chunk → vtable est celui du dernier `mov word ptr es:[bx], …` de chaque bloc.
 
 **Base des vtables de `seg339`.** Les XREF d'IDA donnent **adresse linéaire = tag + `0x6D0B0`** (ex. `seg339:24D0` référence `loc_3E4A5`, la catégorie de `JETP`, à `0x6F580` = `0x6D0B0 + 0x24C8 + 8`). L'ancienne base `0x6D070` (§6.2) est décalée de `0x40`.
+
+**`SMKG` · chunk `INFO`** (obligatoire, erreur `B004h` ; tick `SmokeGen_Tick_4C057`) :
+
+| Disque | → modèle | Sens |
+|---|---|---|
+| uint8 | `+0x36` | **type de fumée** = index dans le jeu de fumées du monde (`Particle_SpawnWithColor` : `imul ax, 2Ah`, modèles de 42 o de `word_70483`) |
+| int32 24.8 | `+0x37` | durée d'émission (s) |
+| int32 24.8 | `+0x3B` | vitesse de montée des particules (composante d'altitude seule) |
+| int32 24.8 | `+0x3F` | intervalle entre deux particules (s) |
+| uint16 | `+0x43` | chance d'être actif à la création (`Math_RandomChance_54E4F`, échelle ~100) |
+| uint8 | `+0x45` | ≠ 0 : l'objet se supprime à la fin de la durée ; 0 : il s'arrête seulement |
+
+**`EJEC` · chunk `DATA`** (facultatif ; tick `EjectSeat_TickReleaseObject_4F351`) :
+
+| Disque | → modèle | Sens |
+|---|---|---|
+| int32 | `+0x46` | rôle non établi |
+| int32 24.8 | `+0x57` | délai avant libération (s) |
+| int32 | `+0x53` | hauteur de libération (entier, `<< 8` → m), comparée à la hauteur donnée par `Terrain_QueryAltitudeAt` |
+| chaîne C | `+0x4A` | nom de l'objet libéré (créé une seule fois, même position, orientation et vitesse) |
+
+`MobileObject_LoadDynamicsAndSmoke_9D189` (objets mobiles orientés : `OMOB`, `EJEC`…) lit aussi une
+dynamique `DYNM` et un chunk **`SMOK` = traînée de fumée** (facultatif, lu 2026-10-12) :
+
+| Disque | → modèle | Sens |
+|---|---|---|
+| uint8 | `+0x39` | **type de fumée** : index dans le jeu de fumées du monde (recopié en instance `+0x54` par `Camera_InitAttachedWithTarget_3DC3D`) |
+| int32 24.8 | `+0x3A` | point d'émission c0 → libRS **X** (repère de l'objet) |
+| int32 24.8 | `+0x3E` | point d'émission c1 (axe du nez) → libRS **Z** |
+| int32 24.8 | `+0x42` | point d'émission c2 → libRS **Y** |
+
+Présence du chunk → `+0x38 = 1`. F-16 : `(0, −3584, 0)` brut = `(0, −14, 0)` → 14 m derrière le centre.
+
+- **Allumage** : `SmokeTrail_EnableIfModelHasSmok_3D566` pose instance `+0x53 = 1` si le modèle a un `SMOK`.
+  Appelée notamment par `Debris_SpawnOrchestratorVariant_9D770` juste après `World_OnObjectDestroyed_53A94`
+  (l'objet détruit se met à fumer, son type de fumée y est remplacé par une valeur de l'objet appelant),
+  ainsi que par `Collision_OnTerrainContact_9D910`.
+- **Chaque image** : `SmokeTrail_Tick_3D57E` calcule le point d'émission courant (position + matrice de
+  l'objet · S, `Matrix_LocalToWorld_58828`) et sa position à l'image précédente (déplacement de l'ancre
+  pendant l'image, `vitesse · dword_7045E`), puis `Particles_SpawnAlongSegment_4D1C9(jeu, type, A, B, dt)`
+  répartit les particules **le long du segment parcouru** : la traînée est continue quelle que soit la
+  vitesse. Le nombre de particules = longueur du segment ÷ espacement lu dans le modèle de fumée (`+1`).
+- **Jeu de fumées** : le chunk `WRLD/SMOK` du monde (`"SMOKESET"`) charge les modèles de fumée (42 o
+  chacun) dans `word_70483` (`World_LoadSmokeSet_A7CA1`). Sans jeu chargé, ni `SMOK` ni `SMKG`
+  n'émettent.
+
+**Arborescence d'un fichier objet (lue 2026-10-12, `IFF_LoadModelMain`)** :
+
+```
+FORM REAL
+ ├─ FORM OBJT
+ │   ├─ FORM <classe>    une seule (ordre d'essai du tableau) — chunks selon la classe, ci-dessous
+ │   └─ EXTE             facultatif (Object_LoadExteChunk_9BDE9) : int32, uint16 n, uint8, puis n volumes
+ │                       commençant par 'S' / 'B' / 'L' + nom + int32 (format non détaillé)
+ └─ FORM APPR            apparence 3D (Model_LoadAppearance_94A86) : FILE, ou FORM POLY (INFO, AINF, VERT,
+                         FORM TRIS/VTRI, FORM LINS/VLIN, FORM SPRS/VSPR, FORM TXMS…)
+```
+
+**Apparence 3D `FORM POLY` (lue 2026-10-16)** — format des chunks, tel que le lit
+`Poly_LoadFromIFF_96321` ; comportement du rendu : `OBJECT_RENDER.md`. Tailles en octets, petit-boutiste.
+
+| Chunk | Contenu |
+|---|---|
+| `INFO` | `uint8` (lu seul ; le chunk du F-16 fait 2 o, `00 56`, le 2e octet n'est pas lu) : ≠ 0 = objet dessiné même quand l'œil est dans sa sphère |
+| `AINF` | `int32` période de l'animation de texture (défaut 0Ch sans chunk), `uint16` (rangé en +96h) |
+| `VERT` | 12 o par sommet : 3 `int32` 24.8 (c0, c1, c2 ; ÷ 256 = mètres ; libRS `x = c0`, `y = c2`, `z = −c1`) |
+| `FORM DETA` | chunks `LVL0` … `LVL7` : `uint32` distance (mètres, entier), puis des `uint16` numéros de face (jusqu'à la fin du chunk) |
+| `FORM TRIS` / `VTRI` | 8 o par face, tableau ci-dessous |
+| `FORM TRIS` / `FORM TXMS` / `INFO` | `uint16` nombre de `TXMP`, puis (si le chunk fait plus de 2 o) `uint16` nombre de `TXMA` |
+| `FORM TXMS` / `TXMP` | `char[8]` nom, `uint16` largeur, `uint16` hauteur, puis largeur × hauteur octets (index de palette, ligne après ligne ; `0xFF` = transparent) |
+| `FORM TXMS` / `TXMA` | texture animée : en-tête de 14 o (8 o, `uint16` largeur, `uint16` hauteur, `uint16` nombre d'images), puis les images, largeur × hauteur octets chacune (relevé sur `SMOKEGEN.IFF` : 67 × 25, 10 images ; lecteur non lu). Version CD : la suite de l'en-tête est compressée (`LZ`, `uint32` taille, LZW) |
+| `FORM TRIS` / `UVXY` | 8 o : `uint8` numéro de face, `uint8` numéro de texture (≥ nombre de `TXMP` → `TXMA` n° − nombre de `TXMP`), puis 3 × (`uint8` u = colonne, `uint8` v = ligne) dans l'ordre des sommets de la face |
+| `FORM LINS` / `VLIN` | 7 o par ligne (contenu non lu) |
+| `FORM SPRS` / `VSPR` | 8 o par sprite (contenu non lu) |
+
+Une face `VTRI` (8 o) :
+
+| Octet | Contenu |
+|---|---|
+| 0 | type de face, 0 à 9 (mode d'éclairage et de dessin, `OBJECT_RENDER.md` §4) |
+| 1, 2, 3 | numéros des 3 sommets (`uint8`) |
+| 4 | couleur (index de palette) ; type 2 : numéro de table de translucidité |
+| 5 | bit 0 rangé avec la face ; rôle non établi (0 sur tout le F-16) |
+| 6 | 1, 2, 4 ou 8 observés sur le F-16 ; non lu par la préparation des faces |
+| 7 | bit 0 = face double (dessinée des deux côtés) |
+
+Constat sur `F-16DES.IFF` : 164 sommets, 263 faces, `LVL0` (0 m, 135 faces), `LVL1` (500 m, 99),
+`LVL2` (1000 m, 25), `LVL3` (1500 m, 4), 15 textures (`JETEXHST` 40 × 40…), 73 entrées `UVXY`
+(faces de types 6, 7, 8).
+
+Lecteurs de classe, chacun reprenant celui de sa base (« communs » = `Object_LoadCommonChunks_9BA85`) :
+
+| Classe | Lecteur | Chunks |
+|---|---|---|
+| `BOBJ` 0 | `Object_LoadCommonChunks_9BA85` | communs |
+| `ORNT` 1 | `IFF_LoadAngleParam` | communs + `ALGN` (uint8 → `+0x35` ; octets disque `A L G N`, `push large 4E474C41h` — **l'ancien « ANGL » était une erreur de lecture du tag**) |
+| `MOBL` 2 | `JDYN_LoadChunkWrapper_9D0C0` | communs + `FORM DYNM` |
+| `OMOB` 3 | `MobileObject_LoadDynamicsAndSmoke_9D189` | `ORNT` + `FORM DYNM` (→ `+0x36`) + `SMOK` |
+| `GUID` 4 | `Guided_LoadFromIFF_9D286` | `OMOB` + entité pilote (`Guided_CreatePilotEntity_9CF55`, exige catégorie 6 sinon erreur `C013h`) |
+| `ARMG` 5 | `Armed_LoadFromIFF_9D380` | `GUID` + `FORM WEAP` (`INFO`, `HPTS`, `DCOY`, `WPNS`) |
+| `JETP` 6 | `Aircraft_LoadEJECAndJINF_9D4F0` | `ARMG` + `FORM DAMG`/`SYSM` + `EJEC` + `JINF` |
+| `WEAP` 7 | `Weapon_LoadWDATWrapper_A07ED` | `OMOB` + `WDAT` |
+| `MISS` 8 | `MissileModel_LoadDATAChunk_A0340` | `WEAP` + `DATA` |
+| `BOMB` 9 | `BombModel_LoadDATAChunk_9FAD0` | `WEAP` + `DATA` |
+| `DURD` 9 | `PlayerComponentVariantB_ConstructAndInit_9FBDE` | `BOMB` + `FORM DAPR` (seconde apparence, `Model_LoadAppearance_94A86` → `+0x63`) |
+| `PODR` 10 | `PlayerComponent_LoadFieldsWithRetryD_A0FB0` | `ORNT` + `WDAT` + `DATA` |
+| `DEBR` 11 | `IFF_LoadInfoChunk` | `INFO` + `MOBL` |
+| `TRCR` 13 | `PlayerComponent_LoadFieldsWithRetryM_A66F0` | `ORNT` + `WDAT` + `INFO` |
+| `AFTB` 14 | `PlayerComponent_InitBaseClassMinimal_A6BD7` | `ORNT` |
+| `EXPL` 15 | `Explosion_LoadFromIFF_4BCD5` | communs |
+| `DECY` 16 | `DecoyModel_LoadDATALifetime_9C810` | `MOBL` + `DATA` |
+| `RNWY` 17 | `IFF_LoadAngleParam_Wrapper` | `ORNT` |
+| `SMKG` 18 | `SmokeGen_LoadFromIFF_A5F89` | `INFO` + `ORNT` |
+| `SWPN` 19 | `SwpnModel_LoadDataChunk_A0A00` | `ORNT` + `DATA` |
+| `GRND` 20 | `PlayerComponent_ApplyFlagsAndReleaseRef_A0D80` | `OMOB` puis second `JDYN_LoadChunkAndConstruct_3A49C(+0x36)` (deuxième `FORM DYNM` ? à vérifier) |
+| `XMIT` 21 | `PlayerComponent_InitBaseClass_A1030` | `ORNT` |
+| `EJEC` 22 | `EjectSeat_LoadFromIFF_A6CA0` | `DATA` + `OMOB` |
+
+**`JETP` · `EJEC`** (facultatif) : chaîne → `+0x5A` = nom de l'objet siège éjectable (`+0x63 = 1`).
+**`JETP` · `JINF`** (facultatif) : uint8 `+0x53`, uint16 `+0x54`, uint16 `+0x56`, uint8 `+0x52` (classe de
+combat, ≥ 9 chasseurs), uint16 `+0x64`, uint8 `+0x59`, uint16 `+0x66`, uint8 `+0x58` (type de fumée de la traînée d'un avion abattu, `SMOKE_SYSTEM.md` § 3.3), uint16 `+0x68` ; absent →
+`+0x53 = 0`, `+0x52 = 2`, `+0x64 = 5`, `+0x59 = 0`, `+0x58 = 6`, `+0x68 = 30`.
+
+**Jeu de fumées — `SmokeSet_LoadFromIFF_A636C`** (seg450, lu 2026-10-12). Le chunk `WRLD/SMOK` d'un
+monde donne un nom (ex. `"SMOKESET"`) ; `World_LoadSmokeSet_A7CA1` charge `OBJECTS\<nom>.IFF` et range
+l'objet jeu de fumées dans `word_70483`. Racine **`FORM SMOK`** obligatoire (erreur `B007h`).
+
+| Bloc | Contenu |
+|---|---|
+| `INFO` | 3× uint16 : nombre de modèles de fumée (tableau de 42 o, `+0x0B`/`+0x0D`) ; nombre de formes (tableau de 12 o, `+0x0F`/`+0x11`) ; nombre max de particules actives (réserve circulaire de 48 o par particule, `+0x13`) — tableau vide → erreur `B006h` |
+| `FORM TYPE` | sous-FORM dans l'ordre : chaque `FORM SMOK` = modèle de fumée suivant (`SmokeSet_LoadSmokeModel_A61D0`), chaque `FORM SHAP` = forme suivante (`SmokeSet_LoadShape_A60AC`). **Index d'un modèle = rang parmi les `FORM SMOK`** ; index d'une forme = rang parmi les `FORM SHAP` |
+
+**Modèle de fumée (`FORM SMOK`)** — chunk `INFO` de 25 o (`push large 19h`) :
+
+| Disque | → modèle | Sens |
+|---|---|---|
+| uint8 | `+0x00` | mode de rendu : 0 = disque dont la taille varie ; 1 ou 2 = forme `SHAP` (sprite) |
+| int32 24.8 | `+0x01` | espacement entre deux particules le long d'une traînée (m) |
+| int32 24.8 | `+0x0D` | taille au début (m) |
+| int32 24.8 | — | taille à la fin (m) → `+0x09` = (fin − début) ÷ durée |
+| int32 24.8 | `+0x05` | durée de vie (s) |
+| int32 24.8 | `+0x1B` | dispersion de position à la création (m ; mot bas pris par `Math_RandomJitter_54E1C`) |
+| uint8 | `+0x15` | teinte au début |
+| uint8 | `+0x17` | teinte à la fin → `+0x11` = (fin − début) ÷ durée |
+| uint8 | `+0x19` | paramètre de dessin passé à `Render_DrawScaledSprite_621A2` (rôle non établi) |
+| uint8 | `+0x1A` | idem |
+
+Chunk **`ANIM`** facultatif (8 o) : uint8 forme A (`+0x27`) ; uint8 chance de A en % (`+0x28`, 100 =
+toujours A) ; uint8 forme B (`+0x29`) ; uint8 mode (`+0x1F`) ; int16 images par seconde (`+0x21`) ; int16
+pas (`+0x23` : 1, −1, 0 = pas d'animation). Absent → formes = 255 (aucune). Modes (`switch` sur
+`mode − 'R'`, table `off_4C70E`) : **`R`** aller-retour, **`S`** s'arrête sur la dernière image, **`T`**
+la particule disparaît après la dernière image, **`W`** boucle ; `U`/`V` sans effet. ⚠️ En mode `R`, le
+jeu inverse le pas **dans le modèle** (`mov word ptr [bx+23h], 0FFFFh`) : toutes les particules du
+modèle changent de sens ensemble.
+
+Chunk **`SCRI`** facultatif : n octets = ordre des images (n = taille du chunk) ; sinon les images de la
+forme dans l'ordre.
+
+**Forme (`FORM SHAP`)** : chunk `SHAP` obligatoire (erreur `B005h`), copié brut = image(s) de sprite ;
+le jeu en déduit une demi-taille moyenne ((hauteur + largeur) ÷ 4).
+
+Comportement complet (émission, vie, projection, tri, dessin) : `SMOKE_SYSTEM.md`.
+
+**Vie d'une particule** (`Particle_InitFromSmokeModel_4C168`, `Particle_UpdateLifeSizeShadeFrame_4C413`) :
+créée avec la taille et la teinte de début, position + aléa ±dispersion ; à chaque image, durée −= dt
+(≤ 0 → supprimée), taille et teinte interpolées **linéairement** de début à fin sur la durée de vie,
+image d'animation avancée. Au rendu, la taille est projetée (× focale `dword_72202` ÷ profondeur) et la
+teinte sert d'index (`>> 8`, `shl bx, 8`) dans une **table de remappage de palette** de 256 o
+(`dword_72528`) : niveau d'ombre / de transparence de la fumée. Pour une forme : forme A avec la chance
+du modèle, sinon forme B (`Math_RandomChance_54E4F`).
+
+**Chunks communs d'un objet — `Object_LoadCommonChunks_9BA85`** (ovr302, lu 2026-10-12 ; appelé par
+les lecteurs de classe via `VROOMM_StubThunk_6BFFF` — `ORNT`/`RNWY` par `IFF_LoadAngleParam`, `EXPL`
+par `Explosion_LoadFromIFF_4BCD5`…). Chunks cherchés par tag (`ResourceRecord_SeekAndRead_64743`),
+tous facultatifs ; repère Y-up dans la colonne « sens » (triplets rangés X, Z, Y) :
+
+| Chunk | Disque | → modèle | Sens |
+|---|---|---|---|
+| `DAMG` | uint16 | `+0x06` | points de dégâts encaissables ; 65535 → `+0x03 = 1` (indestructible) ; absent → 10 |
+| `TRGT` | uint16 (octet bas gardé) | `+0x11` | type de cible (nom d'après le tag, consommateur non lu) ; absent → 0 |
+| `SIGN` | 3× uint8 | `+0x12/+0x13/+0x14` | signatures (radar / IR / visuelle ? consommateur non lu) ; absent → 0 |
+| `EXPL` | 12 o : char[8] modèle, int16 rayon (m), int16 dégâts max | `+0x19` (far ptr) | explosion créée à la destruction |
+| `DEBR` | uint16 nombre de débris à créer, puis n × 26 o (n = (taille − 2) ÷ 26) | `+0x1D`, `+0x1F` n, `+0x21` tableau | débris éjectés (format ci-dessous) |
+| `DEST` | n × 14 o (n = taille ÷ 14) : char[8] modèle, 3× int16 décalage (m) | `+0x25` n, `+0x27` tableau | objets laissés à la destruction (épave), posés sans aléa |
+| `CHLD` | n × 32 o (n = taille ÷ 32) : char[8] nom, 3× int32 24.8 position, 3× int32 angles | `+0x0F` n, `+0x0D` tableau (records mémoire 0x39 o) | sous-objets attachés ; angles → `Matrix_BuildFullOrientation_575B2` (ordre cap/tangage/roulis non vérifié) |
+
+Enregistrement `DEBR` (26 o) : char[8] modèle ; 3× int16 dispersion de position ; 3× int16 vitesse de
+base ; 3× int16 dispersion de vitesse (tous entiers, `<< 8` dans le code).
+
+**À la destruction — `Object_SpawnDestructionEffects_3863A`** (seg079) :
+1. `EXPL` : crée l'objet nommé, à la position de la source, puis
+   `Explosion_ApplyRadiusAndDamage_4BDFD` (instance `+0x51` = rayon, `+0x55` = dégâts max) ; son
+   `SoundFX_Play_5A8DC(3, distance caméra)`.
+2. `DEBR` : `Debris_SpawnFromDebrList_3844F` crée `+0x1D` débris, chacun tiré au hasard dans la liste
+   (`Math_RandomScale_54DF4` / `imul ax, 1Ah`) : position = source + aléa [−d, +d] par axe
+   (`Math_RandomJitter_54E1C`) ; vitesse = 0,6 × vitesse source (`0x99/256`, `Utility_Helper_55A62`) +
+   vitesse de base + aléa. Gardé par `DisplayCache_ComputeChecksum_5D43F > 6144` (budget, rôle exact non
+   tranché).
+3. `DEST` : si `Registry_LookupForTextRenderer_5B5D9 > 150000` (garde mémoire probable), chaque objet à
+   source + décalage exact, orientation de la source, vitesse = 0,6 × vitesse source.
+
+**Dégâts d'une explosion — `Explosion_DamageAtDistance_4BE51`** : `d` = distance 3D explosion–cible moins
+la taille de la cible (bornée à 0) ; si `rayon > d` : `dégâts = dégâts_max × (rayon − d) / rayon`, sinon 0 ;
+partie entière. **Décroissance linéaire.** L'instance (`Explosion_SpawnInstance_4BCF4`) prend d'abord les
+valeurs de la classe `EXPL` (`DAMG` = dégâts), remplacées ensuite par celles du chunk `EXPL` de l'objet
+détruit.
 
 Chunk transverse **`INFO`** (`IFF_LoadInfoChunk`, seg104) : `+0x37` (w) =
 **rayon de collision** (défaut `0x14` = 20), `+0x39` (b) flag, `+0x3A` (b) flag2.
@@ -269,6 +479,135 @@ Cache & instanciation : `Debris_FindModelByID_38A79` / `Debris_LoadAndInstantiat
 (seg079) — chargement paresseux d'un modèle par identifiant, réutilisé pour tout
 objet. Pièces d'objet / hardpoints confirmés (seg339) : `FUSELAGE`, `LWING`,
 `RWING`, `LOWEJECT`, `CHAFF`, `FLARE`, `HARDPT#`, `POD`, `GUN`, `BIGSPHER`.
+
+### 6.1b Compléments objets (lus le 2026-10-12) : variante de dynamique, armes, volumes, avion
+
+Repère : Y-up, mètres. Un « float » = int32 du fichier ÷ 256 ; un « entier » se lit tel quel.
+
+**Recherche des chunks.** `ResourceRecord_SeekAndRead_64743` et `ResourceRecord_SeekAndReadB_647B2`
+sont toujours appelées avec arg 0, ce qui mène à `ResourceRecord_SeekToStart_64BF8` : la recherche
+repart du début du FORM courant. L'ordre des chunks est donc libre. Un tag présent deux fois n'est lu
+qu'une fois.
+
+**FORM DYNM** (`JDYN_LoadChunkAndConstruct_3A49C`).
+- Priorité des variantes : JDYN > MISS > GBMB > DURD > AGRV > SURF > PARA.
+- Erreurs : pas de FORM DYNM → C011h ; FORM DYNM sans variante connue → C010h.
+- Slot +0x48 de la vtable DYNM = `DYNM_AsJDYN_Base_46922`. Il renvoie 0, sauf pour JDYN
+  (`JDYN_AsJDYN_4B093`).
+- Contraintes posées par le code :
+  - JETP → JDYN obligatoire : `Aircraft_OnCollision_9D910` fait `[AsJDYN()+0x75]` sans test.
+  - Classe MISS → variante MISS : `Missile_UpdateSeekerAndFuse_42458` écrit `dyn+0x39`.
+  - Variantes MISS et GBMB : elles lisent la cible (instance +0x55) et le lanceur (méthode +0x38) →
+    réservées aux armes.
+  - GRND : la dynamique n'est jamais « tickée » (`GroundObj_IntegrateMotion_458C8`). Le second appel
+    de `GroundObj_LoadFromIFF_A0D80` relit le même FORM.
+- Formats des variantes :
+
+  | Variante | Contenu du chunk |
+  |---|---|
+  | MISS | 5 float : taux de virage max (°/s), vitesse max (m/s), accélération (m/s²), vitesse de croisière X (m/s), vitesse de croisière Y (m/s, repère du missile) |
+  | GBMB | 1 float : taux de virage max (°/s) |
+  | DURD | uint16 distance de freinage (m) ; int32 entier vitesse de chute min (m/s) |
+  | SURF | 2 int32 (rôle non établi) |
+  | AGRV, PARA | vides : seul le tag compte |
+
+- Au sol (`Aero_ControlOrchestrator_48FC2`) : JDYN champs 12 à 16 = vitesse verticale max (m/s),
+  vitesse horizontale max (m/s), roulis max, cabré max, piqué max (uint8, en °).
+
+**Communs.**
+
+| Chunk | Contenu |
+|---|---|
+| ALGN | int8 camp : 1 joueur, −1 adverse, 0 neutre. Va dans l'instance +0x50. |
+| TRGT | type de cible : 0 aucun, 1 avion, 2 sol, 4 leurre |
+| SIGN | octet 1 = IR, octet 2 = radar (chercheur 4), octet 3 = chercheur 3 et présence sur le RWR du cockpit (`Cockpit_RwrUpdate_1F561` : non nul = affiché) |
+| CHLD | angles = float (degrés), appliqués dans l'ordre tangage (autour de X), roulis (autour de Z = nez), cap (autour de Y) |
+| DEBR | vitesses en m/s |
+
+**EXTE** (`Object_LoadExteChunk_9BDE9`, `Exte_LoadVolume_9BFB0`).
+- En-tête : float rayon de l'objet (défaut 1500 m), uint16 n, uint8 « collisions dès la création ».
+- Puis n volumes, chacun commence par un `unsigned char` :
+  - `S` : string nom, 4 int32 entiers (centre X, Z, Y ; rayon) ;
+  - `B` : string nom, 6 int32 entiers (bornes X, X, Z, Z, Y, Y) ;
+  - `L` : string nom seul.
+- Les noms sont les zones de dégâts : FUSELAGE, LWING, RWING, BIGSPHER.
+
+**Dégâts.**
+- Points d'un impact = méthode +0x84 du projectile :
+  - choc : DAMG × min(v²/200, 10) ;
+  - missile : choc + EXPL × (60 à 100 %) ;
+  - canon : WDAT × INFO champ 9 × (de 100 % à 50 % au fil de la vie).
+- Contre le joueur, les points sont divisés par 2.
+- `DamageSys_ApplyHit_9C9A0` répartit les points sur les composants SYSM dont la **zone** (second
+  nom) est celle du volume touché. BIGSPHER → zone tirée au hasard : FUSELAGE 50 %, LWING 25 %,
+  RWING 25 %.
+- Avion perdu quand `DamageSys_DamagePercent_9CB2C` ≥ JINF champ 9.
+
+**JINF** (9 champs), dans l'ordre :
+1. bit 0 : train escamotable ;
+2. rang du premier sous-objet CHLD du train ;
+3. nombre de sous-objets du train ;
+4. classe de combat ;
+5. chance (%) d'explosion immédiate ;
+6. drapeau du sous-objet spécial ;
+7. rang de ce sous-objet ;
+8. type de fumée de la chute ;
+9. seuil de perte (%).
+
+Valeurs par défaut des champs 1, 4, 5, 6, 8 et 9 : 0, 2, 5, 0, 6 et 30.
+
+**WDAT** (22 octets), dans l'ordre :
+1. dégâts (seulement pour TRCR) ;
+2. rayon (rôle non établi) ;
+3. catégorie tirée (8 / 9 / 10 / 13) ;
+4. identifiant 1..12 ;
+5. famille ;
+6. domaine (1 = air-air) ;
+7. chercheur 1..6 ;
+8. portée d'accrochage (int32, m) ;
+9. demi-cône (°) ;
+10. portée de tir (int32, m) ;
+11. intervalle de tir (float, s).
+
+**DATA selon la classe.**
+
+| Classe | Contenu |
+|---|---|
+| MISS | int32 durée de vol (s ; à 0 le missile explose — corrigé 2026-10-15, ex « délai du chercheur ») ; uint8 (rôle non établi) ; uint16 rayon de l'allumeur (m) |
+| BOMB | uint8 guidée ; uint8 délai d'armement (s) ; uint8 (rôle non établi) ; uint16 ouverture du cône (°/s) |
+| PODR | string roquette ; uint8 présence ; uint16 vitesse de départ (m/s) |
+| SWPN | int32 munitions ; int32 portée de détection (m) ; int32 portée de tir (m) ; uint16 dispersion ; float cadence (s) ; uint8 lance-missiles ; uint16 quantité puis string[8] arme (entrée d'arme, format WPNS) ; int32 décalage de départ (m) |
+| EJEC | premier int32 : rôle non établi |
+
+**TRCR INFO** (7 float puis 2 uint16), dans l'ordre :
+1. vitesse de départ ;
+2. rôle non établi ;
+3. dispersion au départ ;
+4. dispersion à la fin ;
+5. durée de vie ;
+6. dispersion de vitesse ;
+7. part héritée de la vitesse du tireur ;
+8. rôle non établi ;
+9. multiplicateur de dégâts.
+
+**FORM WEAP** (`WeaponSys_LoadFromIFF_9ED62`). S'il manque, un FORM WFIL contient le nom d'un fichier
+dont la racine est un FORM WEAP.
+
+| Chunk | Contenu |
+|---|---|
+| INFO | int32 portée du capteur (m), uint16 demi-angle (°) |
+| HPTS | n × 13 octets : uint8 type 0..4, puis 3 float de position (X, Z, Y) |
+| DCOY | uint16 CHAFF, uint16 FLARE |
+| WPNS | n × 10 octets : uint16 quantité, string[8] objet |
+
+Capacités par type de point d'emport : voir `WeaponSys_LoadStoresOnHardpoint_9EA2E`.
+
+**Mission et fumées.**
+- PART : vitesse initiale en m/s. Le 3ᵉ nom désigne l'armement imposé (FORM WEAP). Le camp remplace
+  celui d'ALGN.
+- SCNE : octets 9 à 23 = point d'arrivée du pilote automatique (drapeau, cap, position), lu par `Autopilot_JumpSequence_7A054`.
+- Fumées : mode 0 = disque ombré ; mode 1 = sprite opaque ; mode 2 = sprite avec les couleurs
+  A..A+B−1 translucides, peintes par table[teinte + c − A][fond].
 
 ### 6.2 Modèle de vol / dynamique — `JDYN_LoadChunk` (`sub_3A49C`, seg082, 577 L)
 
@@ -370,11 +709,10 @@ Deux allocations distinctes reliées par pointeur, calquées sur l'IFF :
   **Correction 2026-09-20 :** cette base est probablement décalée de `0x40`. Les XREF d'IDA (`seg339:24D0` ↔ `loc_3E4A5`, `seg339:2534` ↔ `loc_3DBBA`) donnent **tag + `0x6D0B0`**. La conversion de `0x228A` en `0x6F2FA` est à refaire (`0x6F33A` avec la base corrigée).
 - `PhysicsTicks` / `Aero_SumLinearForces` opèrent sur l'objet **0xC5**
   (`si = [playerCtx+0x0B]`), via `[si+2]` = `0x228A`.
-- **Point ouvert** : le slot `+0x3C` de la vtable `0x228A` (diviseur de masse
-  appelé par `Aero_SumLinearForces`) et le slot `+0x34` (tête de `PhysicsTicks`)
-  pointent tous deux, en lecture statique, vers des **stubs no-op partagés**
-  (`loc_4692C` / `loc_4691A`, 8 o, `mov ax,[bp+6] / retf`). Voir « Le diviseur de
-  masse `m` » plus bas.
+- **Résolu (2026-09-26)** : avec la base `seg339` corrigée (`0x6D0B0`), la vtable `0x228A`
+  est à `0x6F33A`. Slots vérifiés : `+0x24` = `PhysicsTicks`, `+0x34` = `JDYN_UpdateDamageGains_494DD`,
+  `+0x3C` = **`JDYN_TotalMass_47FF8`** (masse totale). Les « stubs no-op » `loc_4692C`/`loc_4691A`
+  venaient de l'ancienne base décalée de `0x40`. Voir « Le diviseur de masse `m` » plus bas.
 - **Investigation 2026-09-05 :**
   - `IFF_LoadModelMain` (`seg083`, `loc_3BE4D`) construit bien l'objet `JETP`
     de `0x6A` octets, chaîne de constructeurs `1B6F→2578→252C→24F0→24DC→24C8`
@@ -424,7 +762,7 @@ offsets non contigus de la struct 0xC5. **Payload disque = 73 octets (`0x49`)**.
 
 Chunk absent → erreur `0xA005`. Avant lecture, `PlayerComponent_ResetVisualStateDefaults_A5620`
 pose les défauts (colonne ci-dessus) + `[si+0x68]=0xFF`, `[si+0x7C]=0`, `flags`
-`[si+0x75]` = bit4|bit7, et remet **7 gains globaux** (`dword_72A14/18/1C/20/24/28/2C`) à `0x100` (1.0 en 8.8).
+`[si+0x75]` = bit4|bit7, et remet **7 gains de dégâts** (`dword_72A14/18/1C/20/24/28/2C`) à 1,0. Ils sont ensuite recalculés à chaque tick par `JDYN_UpdateDamageGains_494DD` (voir `PHYSICS.md` §5.9).
 
 #### Sémantique des champs (tracée seg103, avec sites de lecture)
 
@@ -432,29 +770,29 @@ pose les défauts (colonne ci-dessus) + `[si+0x68]=0xFF`, `[si+0x7C]=0`, `flags`
 |---|---|---|
 | `+0x69` | **capacité carburant** (24.8) — *fait vérifié côté données* | copié en `+0x6D`, jamais lu en calcul |
 | `+0x6D` | **carburant courant** (24.8, copie runtime de `+0x69`) | `sub_49242` L2560 `sub [si+6Dh],eax` ; clamp `≥0` L2554/L5118 ; `≤0` → `[si+0x28]=0` (**flameout**) L5121 |
-| `+0x33` | **coefficient de consommation carburant** | `sub_49242` L2543-2549 : `burn = (0xA00·throttle) × [+0x33] >> 8` puis `[+0x6D] -= burn` |
+| `+0x33` | **coefficient de consommation carburant** | `PhysicsTicks` : `burn = (10 − 9·g_fuel) · [+0x33] · facteur de cran · dt` ; `JDYN_JumpToPoint_49242` : même facteur × durée du trajet (relu 2026-09-25, `PHYSICS.md` §4.4) |
 | `+0x37` | **traînée aérofreins sortis** | `Aero_ComputeDragFromFlags75` L146 : `if flags_75 bit0: drag += [+0x37]` |
 | `+0x3B` | **traînée train sorti** | id. L157 : `if flags_75 bit2: drag += [+0x3B]` |
 | `+0x3F` | coeff. de traînée **au sol** (roulage/réaction sol) | `Aero_ComputeDragWithFeedback` L724, gaté par `[A+0x20]` (flag « au sol ») |
 | `+0x43` | id. + extra si aérofrein sorti | id. L736 (`+ flags_75 bit0`) |
-| `+0x47` | **limite symétrique ±** d'un delta rate-limité | `Aero_ComputeControlFlags75Bit5C` L1855-1867 (clamp) |
+| `+0x47` | **limite symétrique ±** d'un delta rate-limité — côté IA (2026-09-25) : **accélération de roulis max** (deg/s²), `JDYN_RollStickFromError_4B09D` (`add di, 47h` puis `imul dword_70458`, × dt) | `Aero_ComputeControlFlags75Bit5C` L1855-1867 (clamp) |
 | `+0x4B` | **α de décrochage / Cl max** (u8) — (A) borne SYMÉTRIQUE `α_eff` ∈ `±(0x4B<<8)` **et** coupe la force latérale si `|β|` dépasse, toujours actif ; (B) départ franc (portance = 0 + `flags_75` bit6) seulement si `|α_eff|>seuil` ET `word_70466>10` ET `byte_72354≠0` ET objet = joueur (`word_722E6`) | `Aero_ComputeLiftAndSideForce` `loc_481C1`/`loc_48211`/`loc_482E7` |
 | `+0x4C` | **angle de calage d'aile / α de portance nulle** (u8, non signé, `×256`) — **toujours** ajouté à α. *Pas un trim pilote* (jeu en accès direct sur les axes) : constante de cellule | `Aero_ComputeAoAWithTrim` L219 |
 | `+0x4D` | **incrément de portance des volets** (u8) — ajouté si `flags_75` bit1 (volets sortis) | id. L230 |
 | `+0x4E` | borne ± d'enveloppe **contact-sol** | bloc « au sol » L2213/2268 |
 | `+0x52` | distance/vitesse max pour état « au sol » | id. L2252 (`if [+0x52] ≤ dist → bail`) |
 | `+0x56`/`+0x57`/`+0x58` | bornes d'attitude 3 axes (i8, `<<8`) pour « au sol » | id. L2221/2231/2245 |
-| `+0x59` | **altitude plafond de l'effet de sol** | `Aero_ApplyGroundEffect` L1546 (`if alt < [+0x59]` → `-0x1400`) |
+| `+0x59` | ✅ **vitesse, pas une altitude** (confirmé 2026-09-25 ; F-16 = 50,0 m/s dans `F-16DES.IFF`) : comparé à `|v|` dans `Aero_MaxRollRate_4AF35` (taux de roulis × `|v|/[+0x59]` en dessous), et dans `Aero_ApplyGroundEffect` à une composante de la vitesse air (`var_18`), au sol → tangage `-0x1400`. Ancienne lecture : « altitude plafond de l'effet de sol ». Dans `Aero_ApplyGroundEffect`, `var_18` est la composante « nez » de la vitesse en repère corps (`Physics_ResolveWindVectorCached_4643B`). | `Aero_ApplyGroundEffect` L1546, `Aero_MaxRollRate_4AF35` |
 | `+0x61` | **gain de portance / d'agilité de la cellule** (aussi utilisé ÷4 pour la force latérale) | `Aero_ComputeLiftAndSideForce` L343 |
-| `+0x65` | coeff./borne × gain global `dword_72A1C` | `Aero_ComputeControlFlags75Bit5B` L1457 |
+| `+0x65` | coeff./borne × gain global `dword_72A1C` | `Aero_ComputeAoACommand_48862` L1457 |
 | `+0x66` | valeur de reset de l'accumulateur `[jdyn+0x1A]` × gain `dword_72A18` | `Aero_ResetAccumulatorFlags75Bit5` L1972 |
-| `+0x67` | → `[jdyn+0x78]` (échelle 8-bit) | `Aero_ComputeControlFlags75Bit5B` L1158 |
-| `+0x71` | **taux de rotation/cap max** (intégré par `dt` `dword_70458`) | `JDYN_TickSubcalcB` L3441 |
-| `+0x80` (u16, déf. 500) | **Vitesse de poursuite MAX de l'IA** — consigne haute quand la cible est loin ; l'IA interpole/plafonne sa vitesse de consigne vers `jdyn[0x80]<<8`, et la passe telle quelle à `AI_ThrottleCmd_HUD`. | `AI_InterceptSpeedControlLaw` `sub_5F9B` (seg003) `loc_60DF`/`loc_610A`/`loc_61AB` ; `AI_SpeedManeuverDecision` `sub_68D4` `loc_691C` |
+| `+0x67` | → `[jdyn+0x78]` (échelle 8-bit) | `Aero_ComputeAoACommand_48862` L1158 |
+| `+0x71` | **taux de rotation/cap max** (intégré par `dt` `dword_70458`) — **taux de roulis max** (deg/s) lu par `Aero_MaxRollRate_4AF35` (`add di, 71h`), réduit près du décrochage, à basse vitesse et à l'état 2 de `flags_75` bits 7-8 | `Autopilot_BankForTurn_49A7C` L3441 |
+| `+0x80` (u16, déf. 500) | **Vitesse de poursuite MAX de l'IA** — consigne haute quand la cible est loin ; l'IA interpole/plafonne sa vitesse de consigne vers `jdyn[0x80]<<8`, et la passe telle quelle à `AI_ThrottleCmd_HUD`. | `AI_InterceptSpeedControlLaw` `sub_5F9B` (seg003) `loc_60DF`/`loc_610A`/`loc_61AB` ; `AI_RegainSpeed_68D4` `sub_68D4` `loc_691C` |
 | `+0x82` (u16, déf. 100) | **Vitesse de poursuite MIN de l'IA** — plancher : `var_4 = max(var_4, jdyn[0x82]<<8)` sur la consigne de vitesse. | `AI_InterceptSpeedControlLaw` `sub_5F9B` L2044-2070 |
-| `+0x84` (i16, déf. 231) | **Vitesse de croisière / manœuvre de l'IA** — passée directement à `AI_ThrottleCmd_HUD` comme consigne de manette ; entre aussi dans un seuil de distance de manœuvre `(jdyn[0x84]+dword_72039)/2` (au-delà → maintien de vitesse, en-deçà → ajuste manette + vire). | `AI_IssueTurnAndThrottle_77171` (ovr231) ; `AI_SpeedManeuverDecision` `sub_68D4` L3124-3134 |
+| `+0x84` (i16, déf. 231) | **Vitesse de croisière / manœuvre de l'IA** — passée directement à `AI_ThrottleCmd_HUD` comme consigne de manette ; entre aussi dans un seuil de distance de manœuvre `(jdyn[0x84]+dword_72039)/2` (au-delà → maintien de vitesse, en-deçà → ajuste manette + vire). | `GroundAttack_Phase4_PullUp_77171` (ovr231) ; `AI_SpeedManeuverDecision` `sub_68D4` L3124-3134 |
 | `+0x86` (u32, déf. 11005) | **Seuil de distance/portée IA** — comparé `<<8` à `[cible+0x1A]` dans un évaluateur de critère de combat (slot de vtable IA). | seg002 `loc_4A99` (réf. `seg339:01B4o`) L1585-1605 |
-| `+0x8A` (u8, déf. 3) | Paramètre de décision IA — **consommateur exact non localisé** (voisin de `+0x8B`, probablement même bloc d'évaluation seg002 ; pas d'accès `[ptr+0x8A]` trouvé via `[ctx+0x0B]`). | — |
+| `+0x8A` (u8, déf. 3) | **Jamais lu** (vérifié 2026-09-26 sur les 462 segments annotés : les seuls accès à l'octet `+0x8A` d'une JDYN sont la valeur par défaut `mov byte ptr [si+8Ah],3` (seg449), la lecture du chunk et la copie `PlayerComponent_Helper_A5B8F` ; aucune lecture mot/double mot ne le recouvre). Champ chargé mais sans effet. | — |
 | `+0x8B` (u8, déf. 2) | Pondère une contribution à un **score de décision IA** : `contrib = ((jdyn[0x8B]-2)·3)/2 + 3` (branche `< 2` → `contrib = 2`). | seg002 `loc_434E` L875-895 (gaté par `byte_720DF`) |
 
 Accès **toujours** via `[pilotCtx + 0x0B]` = pointeur JDYN (même chemin que `PhysicsTicks`), depuis le **code IA** (seg002 = évaluateurs de décision / slots de vtable, seg003 = lois vitesse/manœuvre, ovr231 = émission ordre virage+manette). **Jamais** lus par la physique du joueur (seg102/103) ni par `PhysicsTicks` — d'où l'échec des recherches précédentes limitées à seg101-103/seg109. Ces 6 valeurs sont quasi constantes entre avions car elles règlent le comportement générique de l'IA, pas la cellule.
@@ -511,32 +849,33 @@ vtable** (seg339 ~`0x1CFE`), utilisée par **3 classes `DYNM` plus simples**
 
 ```
 1. Terrain_QueryAltitudeAt([[si]+2]+0x12, word_70474)      détection sol
-   → [A+0x20] (flag « au sol ») posé/effacé selon difficulté word_70466
+   → [A+0x20] (flag « au sol ») posé/effacé selon word_70466 (compteur de frames depuis le début de mission, PAS la difficulté — corrigé 2026-10-03)
 2. FlightControl_InvalidateAllCachesGlobal(si)              reset des caches aéro
 3. MANETTE DES GAZ → POUSSÉE
-   cran es:[obj2+0x1E] (0-10 : MIL 0-5 / AFT 1-5), rate-limité (× dword_72A2C·10)
+   cran es:[obj2+0x1E] (0-10 : MIL 0-5 / AFT 1-5), PLAFONNÉ à arrondi(10·dword_72A2C) et réécrit
    → Aero_ComputeCoeffSaturating(si+0x22, cran) → [si+0x28] = poussée courante
      (× gain dword_72A2C)
 4. CONSOMMATION CARBURANT
    facteur 0x33 (51) si MIL (cran ≤ 5) sinon 0x4C (76) en AFT (post-comb. ≈ 1,5×)
-   burn = base · dword_72A14 · [si+0x33](SFC) · cran · dt
-   [si+0x6D] -= burn ;  flameout ([si+0x28] = 0) si [si+0x6D] ≤ 0
+   burn = (10 − 9·dword_72A14) · [si+0x33](SFC) · (cran·0,199 si cran ≤ 5, cran·0,297 sinon) · dt
+   (multiplication par le facteur de cran SAUTÉE s'il vaut 0 : au cran 0, burn = SFC·dt)
+   [si+0x6D] -= burn ;  si [si+0x6D] ≤ 0 avant le bloc : carburant = 0, poussée [si+0x28] = 0
 5. ÉTAT volets/aérofrein/train  ← bits du sous-objet contrôle es:[obj2+0x1C/0x1D]
    + Roster("FLAPS"/"LANDGEAR") ; agit sur flags_75 [si+0x75]
 6. vitesse = |A.velocity([A+8/+C/+10])|                     auto-comportements bas niveau
 7. SI [si+0x68] ≠ 0xFF ET !flags_75.bit5 :
-      Guidance_HomingVelocityUpdate(si, arg_2)     ← AUTOPILOTE / homing (cinématique)
+      Autopilot_FlyToPointKinematic_49C2E(si, arg_2)     ← AUTOPILOTE / homing (cinématique)
    SINON (vol manuel) :
       Aero_SumLinearForces_48639(si) → [A+0x14/+0x18/+0x1C] = ACCÉLÉRATION LINÉAIRE (net des forces)
       Aero_ControlOrchestrator(si, arg_2) → vecteur moment (tangage,roulis,lacet)
           — relu intégralement, session 2026-09-05 (seg103 L2099-2185), 5 sous-appels :
-          1. Aero_ComputeControlFlags75Bit5B(si) : calcule la CONSIGNE de tangage (loi de charge,
-             var_30=cos(tangage)) et l'écrit dans si[0x16] — PAS de retour capturé ici.
+          1. Aero_ComputeAoACommand_48862(si) : calcule la CONSIGNE D'INCIDENCE (loi de charge,
+             var_30=cos(tangage), relue 2026-09-24) et l'écrit dans si[0x16] — PAS de retour capturé ici.
           2. Aero_ResetAccumulatorFlags75Bit5(si) : calcule la CONSIGNE de lacet (palonnier seul,
              confirmé indépendant du roulis/alpha) et l'écrit dans si[0x1A] — pas de retour capturé.
           3. Aero_ApplyGroundEffect(si) → slot TANGAGE : appelle Aero_ComputeForcesMain_4791E(si)
              qui lit si[0x16] comme consigne et calcule EN INTERNE un triplet (m_alpha,0,m_beta) ;
-             extrait m_alpha (+0), puis si au sol et sous ground_effect_ceiling (si[0x59],
+             extrait m_alpha (+0), puis si au sol et sous control_speed (si[0x59], vitesse — ex-« ground_effect_ceiling »,
              JDYN#17) : m_alpha -= 20.0 (24.8).
           4. Aero_ComputeControlFlags75Bit5C(si) → slot ROULIS : loi directe manche (confirmée
              correcte par Rémi, non retracée en détail cette session).
@@ -562,7 +901,7 @@ vtable** (seg339 ~`0x1CFE`), utilisée par **3 classes `DYNM` plus simples**
           diff = A.vitesse − proj ; diff.z = max(diff.z, 0) (jamais négatif → pas d'enfoncement sol)
           si |diff| < 5 (24.8, seuil quasi nul) → diff = (0,0,0)
           A.vitesse [A+8/+C/+10] = diff        (vitesse projetée hors du plan défini par l'orientation)
-          limite = AI_ApplyAngleBetweenVectors_57C3A(buf) · dword_70454  (angle du vecteur
+          limite = Matrix_NosePitchAngle_57C3A(buf) · dword_70454  (angle du vecteur
                    d'orientation par rapport à l'axe Z monde, mis à l'échelle)
           [si+4] = max([si+4], −limite)   (plancher sur l'accumulateur de tangage — empêche
                    de piquer du nez plus vite que ne le permet l'assiette courante : anti
@@ -657,7 +996,7 @@ seuil  = si[0x4B] << 8                                = α de décrochage (u8, e
 (B) DÉPART FRANC → vecteur portance = (0,0,0) (loc_481C1..loc_48211, sortie loc_482E7), SEULEMENT si
     les 4 conditions, évaluées dans cet ordre (chaîne de `jbe/jz/jnz short loc_48211` = sinon on retombe sur (A)) :
       |α_eff| > seuil                                 test sur α_eff NON borné (loc_481C1)
-      && word_70466 > 10                              niveau de difficulté / réalisme global (loc_481CF)
+      && word_70466 > 10                              compteur de frames depuis le début de mission (corrigé 2026-10-03 : pas la difficulté) (loc_481CF)
       && byte_72354 != 0                              option de jeu, = 1 par défaut (init ovr266) (loc_481DB)
       && handle_objet == word_722E6                   UNIQUEMENT l'avion du joueur — jamais les IA
     →  flags_75.bit6 = (obj[+0x20] == 0)   (drapeau d'alerte HUD/son) ; la force latérale reste calculée normalement
@@ -765,17 +1104,17 @@ fLapse(h) :   h ≤ href :  1 − (h/href) · (1 − jdyn[0x31])
 C'est un **lapse de poussée avec l'ALTITUDE** (moins d'air en altitude), pas avec
 la vitesse. `jdyn[0x2C]` = poussée PC max (N), `jdyn[0x30]` = fraction MIL,
 `jdyn[0x31]` = fraction de poussée à 11 000 m, `jdyn[0x32]` = altitude de coupure
-÷100. **Les gains globaux `dword_72A14..72A2C` valent tous `1.0`** (`0x100`,
-`sub_A5620`) — ignorables.
+÷100. **Gains `dword_72A14..72A2C`** — **corrigé 2026-09-25 : ils valent 1,0 seulement quand le composant est intact** ; `JDYN_UpdateDamageGains_494DD` (en tête de `PhysicsTicks`) les recalcule chaque tick comme rapports de santé des composants FUEL, RUDDER, ELEVATOR, AILERON, LWING/RWING et ENGINE.
 
 ##### `Aero_ControlOrchestrator` (`sub_48FC2`, seg103 L2056-2142) : moments de contrôle
 
 Assemble le **vecteur de moment** passé à `Physics_IntegrateSecondaryPosition`
 (→ orientation `[si+4]`). Deux pré-appels à effet de bord :
-`Aero_ComputeControlFlags75Bit5B` (calcule la **consigne d'angle de tangage
+`Aero_ComputeAoACommand_48862` (calcule la **consigne d'incidence
 `si[0x16]`** depuis le manche pilote `[ctrl+0x1F]`, le gain `si[0x61]`, le coeff
-`si[0x65]·dword_72A1C`, le plafond d'effet de sol `si[0x59]`, le calage d'aile
-`si[0x4C]` et les volets `si[0x4D]`) puis `Aero_ResetAccumulatorFlags75Bit5`.
+`si[0x65]·dword_72A1C`, le calage d'aile `si[0x4C]` et les volets `si[0x4D]` ;
+**ne lit pas** `si[0x59]` — loi complète relue le 2026-09-24, voir plus bas
+« Loi de charge ») puis `Aero_ResetAccumulatorFlags75Bit5`.
 
 | Composante sortie | Producteur | Contenu |
 |---|---|---|
@@ -824,36 +1163,26 @@ en **m/s**, `dt` en **s**, le tout ×256 (24.8). Corollaires :
 - `jdyn[0x7C] = −accel_corps.c2 / dword_6FFD7` = **facteur de charge en G**
   (division par g) — confirme l'interprétation « G-mètre ».
 
-##### Le diviseur de masse `m` — trace bloquée en statique
+##### Le diviseur de masse `m` — `JDYN_TotalMass_47FF8` (résolu 2026-09-26)
 
-`m` vient d'un **appel virtuel `[[si+2] + 0x3C]`** (this = `si` = objet 0xC5),
-scalaire 24.8 lu ensuite dans le paramètre de sortie (`>>8`).
+`m` vient de l'appel virtuel `[[si+2] + 0x3C]` (this = `si` = objet 0xC5). Avec la base
+`seg339` corrigée, ce slot est `off_6F376 → loc_47FF8` = **`JDYN_TotalMass_47FF8`** (seg103) :
 
-- Le constructeur `JDYN_LoadChunkAndConstruct_3A49C` (`enter_form('DYNM')`,
-  `malloc(0xC5)`) écrit les vptr finaux : **`[si+2] = 0x228A`** (objet
-  principal), `[[si]] = 0x2312` (sous-objet A / dynamique), `[[si+0x10]]+2 =
-  0x2362`. (strike.asm ~116908.)
-- Base seg339 = `0x6D070` (vérifié). `seg339:0x228A` = vtable linéaire
-  `0x6F2FA` ; slot `+0x3C` = `off_6F336 → loc_4692C` = **stub partagé de 8
-  octets** (`mov ax,[bp+6] / retf`, strike.asm:141797) qui **n'écrit rien**
-  dans le paramètre de sortie. Le slot `+0x34` (appelé en tête de
-  `PhysicsTicks`) = `loc_4691A`, même stub.
-- Or `Aero_SumLinearForces` lit ce paramètre de sortie (`var_4`, `[bp-4]`,
-  **non initialisé** avant l'appel dans la lecture statique) et s'en sert
-  comme diviseur pour les 3 composantes. **Contradiction** : soit l'avion
-  reçoit à l'exécution un `[si+2]` différent de `0x228A` (probable — Rémi
-  confirme qu'il existe une **classe wrapper `DYNM`** au niveau de la
-  structure IFF `JETP → FORM DYNM → {DYNM, THRS, JDYN}` ; le wrapper `JETP`
-  lui-même fait 0x6A o, vtable `0x24C8`, alloué par `IFF_LoadModelMain` via
-  `sub_5C6F3(0x5C44, 0x6A, …)`), soit la sémantique de retour par buffer
-  échappe à l'analyse statique.
-- **À confirmer par trace d'exécution** (DOSBox : point d'arrêt dans
-  `sub_48639` sur le `call [bx+3Ch]`, lire `bx` et la valeur écrite dans
-  `var_4`).
-- Conceptuellement, la masse divisée reste **le chunk `DYNM`** :
-  `AircraftDynamics_ReadMassChunk_A4A20` (seg447) — FourCC `'DYNM'` →
-  `ResourceRecord_ReadFieldGroupC_64A7E` (u32) → `[massSubobj+0x04]` (24.8,
-  kg) ; erreur `0xA001` si absent.
+```
+mov bx,[si] / mov bx,[bx+2] / mov ax,[bx+5Ch] / mov dx,[bx+5Ah] / add dx,20h   ; &emport+0x20
+les bx,[bp-8] / mov eax,es:[bx] / mov [bp-4],eax                               ; masse d'emport
+mov bx,[si] / mov eax,[bx+4] / add eax,[si+6Dh] / add eax,[bp-4]               ; + à vide + carburant
+```
+
+**masse = masse à vide (chunk `DYNM`, `[[si]]+4`) + carburant restant (`si[0x6D]`) + masse d'emport**, en kg.
+
+- **Masse d'emport** : l'objet monde de l'avion (`[[si]]+2`) porte en `+0x5A` un pointeur far vers la
+  structure d'emport. Son `+0x20` = somme sur les stations (tableau `+0x34`, pas `0x23`, nombre `+0x38`)
+  de *nombre d'armes* (`station+0x13`) × *masse d'une arme* (objet `DYNM` de l'arme, méthode `+0x10`)
+  — `PlayerComponent_OrchestrateComplex_9F286`. Chaque tir retire la masse d'une arme
+  (`WeaponStation_DecrementCounter` : `sub es:[bx+20h], eax`).
+- La masse varie donc en vol : elle baisse avec le carburant brûlé et à chaque arme tirée ou larguée.
+- La même valeur est le `X` de l'incidence par g dans `Aero_ComputeAoACommand_48862`.
 
 ##### Chunk `THRS` et champs restants
 
@@ -894,7 +1223,7 @@ tick(struct JDYN) :
   vitesse_monde += transform_corps→monde(accel_corps) · dt  Physics_IntegratePosition([A], [A]+0x14)
   si au sol : projeter la vitesse hors du plan sol, v_alt ≥ 0, deadband, drag roulage
   orientation : Aero_ControlOrchestrator → moments (mα, ?, mβ) → Physics_IntegrateSecondaryPosition
-    consigne α  si[0x16] ← manche [ctrl+0x1F]  (Aero_ComputeControlFlags75Bit5B, PAS de trim)
+    consigne α  si[0x16] ← manche [ctrl+0x1F]  (Aero_ComputeAoACommand_48862, PAS de trim)
     mα = ±2·√(q'·|consigne − α|), rate-limité ±err·dt, nul si |err| ≥ 56°
 ```
 
@@ -954,7 +1283,7 @@ clavier) ; (3) la conversion touche-curseur → axe virtuel dans `word_72E68/6A`
 `OpenAndLoadSubrecord_98670` : `Path_ResolveDataFile` → StreamReader →
 `ResourceRecord_AllocateAndDecode` → champs mixtes (`ReadFieldGroupB/C`) +
 `Fmemcpy` du bloc pixels. `SelectMipLevel_980F0` = choix du niveau de mipmap
-(`String_FromPtrLen` + `Texture_SelectMipLevel`). Familles
+(`String_FromPtrLen` + `Palette_SelectFogRow_2EA80`). Familles
 `LoadWithDwordFields*` / `LoadMixedFields*` = variantes selon le format d'en-tête.
 
 ### 6.4 Polices — `Font_*` (ovr241-242)
@@ -999,7 +1328,7 @@ Campagne  ──►  MissionScenario_LoadFromIFF_A8C44   (lit  DATA\OP2MISN.IFF,
                      │            + câblage Expr VM (nœud PLAYER  si+0x3A)
                      └─ bind des enregistrements PLYR  →  nœuds participants
 
-Fin de mission  ──►  MissionScenario_ResolveAndBindExpressions_A8F22
+Fin de mission  ──►  Mission_WriteResultReport_A8F22
                           └─ ÉCRIT  DATA\MISN2OP.IFF  (FORM INVN : INFO/STAT/JETS/KILL/EXIT/DIED/SCOR)
 ```
 
@@ -1022,25 +1351,26 @@ pour la passe de liaison `ExprSlot` :
 | 4 | `WRLD` | `enter_form` | — | sous-FORM monde (**obligatoire**, erreur `9015h`) |
 | 4a | ↳ `FILE` | `ReadFieldGroupA` 8 o | (local) → `sub_6CDCD` | nom du fichier monde à charger |
 | 4b | ↳ (sinon) | `sub_6CDC8` | — | monde inline |
-| 5 | `CAST` | `sub_6CF0D` | `si+0x2E` | acteurs / personnages |
-| 6 | `AREA` | `sub_6CED6` | `si+0x1A` | zones géographiques |
-| 7 | `SPOT` | `sub_6CEE5` | `si+0x1E` | points nommés |
+| 5 | `CAST` | `sub_6CF0D` → `PLAY_LoadCASTTeamNames_A9956` | `si+0x2E` | noms de pilotes (`PLAYER`, IA → profil `INTEL\<nom>.IFF`, ailiers `TEAMn`) — format ci-dessous |
+| 6 | `AREA` | `sub_6CED6` → `ExprSlot_ConstructMain_A974A` | `si+0x1A` | zones géographiques nommées (sphère / cylindre / boîte) — format ci-dessous |
+| 7 | `SPOT` | `sub_6CEE5` → `Mission_LoadSpotList_AA6C9` | `si+0x1E` | points relatifs à une zone `AREA` — format ci-dessous |
 | 8 | `NUMS` | `sub_6CEF4` | `si+0x24` | variables numériques de mission |
 | 9 | `MSGS` | `sub_6CF03` | `si+0x28` | messages / dialogues |
 | 10 | `FLAG` | `sub_6CE9F` | `si+0x48` | flags d'événement de mission |
 | 11 | `PROG` | `sub_6CEB3` (assert `size` pair) | `si+0x40` | **programme scripté** (bytecode Expr VM) |
-| 12 | `PART` | `sub_6CF35` → `A9CC3` | `si+0x34` | participants / factions |
+| 12 | `PART` | `sub_6CF35` → `PartEntry_AllocateArray_AA23D` | `si+0x34` | objets de la mission (type, pilote, placement, camp, scripts) — format ci-dessous |
 | 13 | `TEAM` | count = `size/2` (≤8) ; `ReadDwordFieldB` | `si+0x84` count, `si+0x74` tableau | équipes (dwords) |
 | 14 | `PLAY` | `enter_form('PLAY')` → `sub_6CF58` → `MissionPlay_LoadScenes_AA595(si+0x3A)` → `pop` | `si+0x3A` | **la « pièce » : FORM contenant N chunks `SCNE`** (voir plus bas) |
-| 15 | `LOAD` | `MissionScenario_LoadFieldGroup_A8225` | — | emport (loadout) |
-| 16 | `HOME` | `ReadFieldGroupB` u16 → `GeomNode_SumAndCount_53034(si+0x1A)` → `si+0x58` ; puis 3× `ReadFieldGroupC` u32 → `si+0x5C/0x60/0x64` | `si+0x58`, `si+0x5C/60/64` | base de départ : index dans la liste `AREA` + **vecteur position** (X, Y, Z ; Z = altitude, fixed-point) |
+| 15 | `LOAD` | `MissionScenario_LoadFieldGroup_A8225` | — | modèles chargés d'avance : enregistrements de 9 octets (char[8] nom, uint8 rangé dans le modèle à `+2`, rôle non établi), chacun passé à `IFF_LoadModelMain` (leurres, explosions, débris, avion) |
+| 16 | `HOME` | `ReadFieldGroupB` u16 → `PtrList_GetAt_53034(si+0x1A)` → `si+0x58` ; puis 3× `ReadFieldGroupC` u32 → `si+0x5C/0x60/0x64` | `si+0x58`, `si+0x5C/60/64` | base de départ : index dans la liste `AREA` + **vecteur position** (X, Y, Z ; Z = altitude, fixed-point) |
+| — | `CACH` | lecteur pas trouvé (tag absent du chargeur de mission) | — | enregistrements de 10 octets lus dans les fichiers : char[8] nom d'un modèle d'`OBJECTS` (véhicules, versions détruites, bâtiments, obus), uint16 (1 ou 0) ; rôle non établi |
 
 > **Modèle « théâtre »** : la narration scriptée d'une mission est structurée comme
 > une pièce de théâtre. `CAST` = distribution (personnages), `PLAY` = la pièce
 > (script), qui contient une suite de `SCNE` = **scènes**. `PROG` = programme /
 > didascalies. Ce ne sont pas des données « joueur ».
 
-Puis câblage Expr sur `si+0x3A` (l'objet PLAY) : `Expr_Node_Accessor_532AD(si+0x3A)`
+Puis câblage Expr sur `si+0x3A` (l'objet PLAY) : `Scene_FindByArea_532AD(si+0x3A)`
 → nœud `si+0x4E` (erreur `9019h` si nul) ; `Expr_Node_RecomputeFieldA_531CD` ;
 `ConvertFieldValue_A8B8F` → objet résolu `si+0x54` (far ptr) ; on pose sur cet
 objet les flags `+0x39 |= 0x10|0x20`, on lit son id `+0x52`, `SetReference16`
@@ -1048,6 +1378,224 @@ objet les flags `+0x39 |= 0x10|0x20`, on lit son id `+0x52`, `SetReference16`
 (`si+0x5C/60/64`) est **recalculée** via `Expr_Node_StoreResultVector_52C9C`.
 Enfin `Expr_Node_RecomputeAllFields_532EA(si+0x3A)` (évalue toutes les scènes) et
 `Lexer_CountTokensAndFormat(si+0x68)`.
+
+##### `CAST` → noms de pilotes — `PLAY_LoadCASTTeamNames_A9956` (seg457)
+
+Liste des **noms de pilotes** de la mission. Chaque objet `PART` y renvoie par son index
+(disque `0x00` → entrée `+0x1B`) ; le nom décide **qui pilote** l'objet.
+
+Enregistrements de **9 octets**, sans compteur : nombre = taille ÷ 9 (`mov bx, 9 / div bx`),
+**sans contrôle** du reste (contrairement à `SPOT` / `PART`). Le chunk entier est lu brut
+(`push large dword ptr [di+72h]` / `ResourceRecord_ReadDwordFieldB_64AFF`).
+
+| Disque | Type | Champ |
+|---|---|---|
+| `0x00` | char[8] | nom, complété par des zéros (`PLAYER`, `STERN`, `NULL`, `TEAM0`…) |
+| `0x08` | u8 | zéro de fin (réécrit à 0 après un remplacement) |
+
+En mémoire : `MissionScenario+0x2E` = `[+0]` u16 nombre, `[+2]` far ptr vers le buffer.
+Accès depuis une entrée `PART` : `Mission_GetCastName_52C5F` = `&CAST[entrée+0x1B]`, ou nul si
+l'index ≥ nombre (`cmp [bx+2Eh], dx / jbe`, puis `imul ax, 9`).
+
+**Noms spéciaux `TEAMn` = ailiers choisis dans la campagne.** À la lecture, tout nom commençant
+par `TEAM` (`cmp dword ptr es:[bx], 4D414554h`) est remplacé **sur place** ; n = 5ᵉ caractère
+− `'0'` (`add ax, 0FFD0h`) :
+
+- mission lancée depuis la campagne (`byte_7070E = 1`, posé par
+  `MissionScenario_LoadFromIFF_A8C44`) et n < 3 → n-ième nom du chunk `TEAM` de
+  `DATA\OP2MISN.IFF` (écrit par `OPTEST.EXE` ; 3 noms de 9 o rangés en `MissionScenario+0x86` :
+  `imul ax, 9` / `add dx, 86h`) ; n ≥ 3 → inchangé ;
+- mission chargée directement (`byte_7070E = 0`) → **`BILLY`** (`push offset aBilly`).
+
+Copie de 8 octets en tête d'enregistrement puis `+0x08 = 0` : pas de débordement sur l'entrée
+suivante.
+
+**Usage à l'activation** (`AIAircraft_SpawnAndConditionalLoadProfile_53363`) : comparaison sur
+8 caractères avec `PLAYER` → type 2 (joueur), `NETWORK` → type 3, sinon type 1 (IA) ; le pointeur
+du nom est rangé dans l'entité (`mov [di+6], eax`). Pour un objet piloté qui n'est pas le joueur
+(`and ax, 6Fh / cmp ax, 4Eh` et type ≠ 2), le **profil de comportement** est chargé depuis
+**`INTEL\<nom CAST>.IFF`** (`PilotProfile_LoadFromPROF_73B4F` : `push offset aIntel_0` /
+`push large dword ptr [bx+6]` / `push offset a_iff`) — chunks `GOAL` / `MVRS` / `ATRB`… Ex. `STERN`
+→ `INTEL\STERN.IFF` ; `TEAM0` remplacé par `BILLY` → `INTEL\BILLY.IFF`. Le joueur n'a jamais de
+profil. Le nom `CAST` est aussi écrit dans le chunk `KILL` de `MISN2OP.IFF`.
+
+##### `AREA` → zones géographiques — `ExprSlot_ConstructMain_A974A` (seg457)
+
+Liste de **zones nommées**, chacune une forme 3D (sphère, cylindre vertical ou boîte) qui
+sert à savoir **dans quelle zone se trouve le joueur**. Le chunk est une suite
+d'enregistrements collés, **sans compteur** : la 1ʳᵉ lettre de chaque enregistrement donne
+la forme, et donc sa taille.
+
+Entiers i32 **little-endian lus bruts** (`ResourceRecord_ReadFieldGroupC_64A7E` :
+`push large 4` / `add dword ptr [si+65h], 4`, pas d'inversion). Toutes les distances sont en
+24.8 → **÷ 256 = mètres**. Colonne « libRealSpace » : repère **Y-up** (Y = altitude,
+Z = profondeur) — la 2ᵉ coordonnée du fichier est Z, la 3ᵉ est Y.
+
+**En-tête commun** (`ExprSlot_LoadFieldGroup_A9450` : `push large 20h` +
+`ResourceRecord_ReadFieldGroupA_64A19`, puis 3× `ReadFieldGroupC`) :
+
+| Off. disque | Type | Champ (asm, Z-up) | libRealSpace | → objet |
+|---|---|---|---|---|
+| `0x00` | u8 | forme `'S'` / `'C'` / `'B'` | — | (classe : vtable) |
+| `0x01` | char[32] | nom de la zone (ex. « Strike Base ») | — | `+0x02` |
+| `0x21` | i32 | c0 | **X** | `+0x22` |
+| `0x25` | i32 | c1 | **Z** (profondeur) | `+0x26` |
+| `0x29` | i32 | c2 = altitude | **Y** | `+0x2A` |
+
+**Queue selon la forme :**
+
+| Forme | Lecteur | Off. disque → objet | Sens (libRealSpace) | Taille disque | Alloc. objet |
+|---|---|---|---|---|---|
+| `'S'` sphère | `ExprSlot_ReleaseAndLoad_A94E9` | `0x2D` → `+0x2E` | rayon | 49 o (1 + `30h`) | `0x32` |
+| `'C'` cylindre vertical | `ExprSlot_ReleaseAndLoadB_A9690` | `0x2D` → `+0x2E` ; `0x31` → `+0x32` | **hauteur** (le long de Y) ; **rayon** (plan X/Z) | 53 o (1 + `34h`) | `0x36` |
+| `'B'` boîte | `ExprSlot_ReleaseAndLoadExtended_A9565` | `0x2D` → `+0x2E` ; `0x31` → `+0x32` ; `0x35` → `+0x36` ; `0x39` → `+0x3A` ; `0x3D` → `+0x3E` | étendue **+X** ; **−X** ; **+Z** ; **−Z** ; **hauteur** (le long de Y) | 65 o (1 + `40h`) | `0x42` |
+
+Tailles prouvées par la passe de comptage : `add dword ptr [bx+65h], 30h` (`'S'`), `40h`
+(`'B'`), `34h` (`'C'`). Lettre inconnue : erreur `900Dh` (comptage) / `900Fh` (lecture).
+Fin de chunk de taille impaire : l'octet de bourrage IFF est sauté (`test word ptr [bx+72h],1`
+puis `inc dword ptr [bx+65h]` si on est sur le dernier octet).
+
+**Test d'appartenance** (méthode `+4` de la vtable de chaque forme, `seg339:off_70791…off_707A5` ;
+méthode `+0` = lettre de la forme). Point testé = position monde (mêmes unités). **Bornes
+incluses.** Écrit en repère libRealSpace :
+
+- **Sphère** — `HitShape_Sphere_ContainsPoint_52E91` : la référence est le **centre** ;
+  dedans si `distance3D(point, centre) ≤ rayon` (`Math_VectorLength3D_Raw_5828E` puis
+  `cmp eax, es:[bx+2Eh] / jg` → dehors).
+- **Cylindre** — `HitShape_Radial2D_ContainsPoint_52F99` : le Y de référence est le
+  **plancher** ; dedans si `Y ≤ y ≤ Y + hauteur` **et** distance dans le plan X/Z ≤ rayon
+  (composante d'altitude mise à 0 : `mov dword ptr [bp-0Ch], 0`, puis `cmp eax, es:[bx+32h]`).
+- **Boîte** — `HitShape_Box_ContainsPoint_52F0F` : boîte alignée sur les axes, étendues
+  **asymétriques**, Y de référence = **plancher** :
+  `X − (−X) ≤ x ≤ X + (+X)`, `Z − (−Z) ≤ z ≤ Z + (+Z)`, `Y ≤ y ≤ Y + hauteur`
+  (`mov eax, es:[bx+22h] / add eax, es:[bx+2Eh] / cmp eax, [si] / jge` ;
+  `sub eax, es:[bx+32h] / cmp eax, [si] / jg` ; altitude : `add eax, es:[bx+3Eh] / cmp eax, [si+8] / jl`,
+  puis `mov eax, [si+8] / cmp eax, es:[bx+2Ah] / jl`).
+
+**En mémoire** : `MissionScenario+0x1A` = `[+0]` u16 nombre de zones, `[+2]` near ptr vers un
+tableau de **far ptr** (4 o) vers les objets zone (allocation `shl ax, 2` après la passe de
+comptage). L'**index d'une zone = son rang dans le chunk** (à partir de 0) ;
+`PtrList_GetAt_53034(liste, i)` renvoie l'élément i, ou un pointeur **nul** si
+`i ≥ nombre` (`cmp [si], dx / jbe`) — d'où `area_id = −1` = « pas de zone ».
+
+**Utilisateurs** :
+- `SCNE.area_id` (ci-dessous) : à chaque tick, `MAIN_GAME_TICK` passe la position du joueur
+  (`MissionScenario+0x54`, à défaut le vecteur global `dword_707F8`) à
+  `Scene_DetectAndActivateChange_532EA` → `Scene_FindMatchingByAreaContainment_53236`, qui renvoie
+  la **première** scène active dont la zone contient ce point (`call dword ptr [bx+4]`) ;
+- `PART` : `PartEntry_LoadAndResolveNames_A9E3C` convertit un index de zone en pointeur (entrée `+0x1D`) ;
+- `HOME` : index de la zone de la base de départ (`si+0x58`) ;
+- opcodes de script `0x80` / `0x81` / `0x82` (`Expr_VM_Interpreter_51106`) : prennent un index
+  de zone et retrouvent la scène rattachée (`Scene_FindByArea_532AD`) ; `0x80` met son
+  `is_enabled` à 1, `0x82` le teste, `0x81` non détaillé.
+
+##### `SPOT` → points rattachés à une zone — `Mission_LoadSpotList_AA6C9` (seg457)
+
+Un `SPOT` est un **point défini relativement à une zone `AREA`** (la zone ne référence
+jamais de spot : c'est le spot qui pointe vers la zone). Les ordres de mission (`0xA1`,
+`0xA2`… via `MissionScript_CallNativeHandler_52513`) s'en servent comme destinations.
+
+Enregistrements fixes de **14 octets**, sans compteur : nombre = taille ÷ 14
+(`mov bx, 0Eh / div bx`) ; erreur `9114h` si la taille n'est pas un multiple de 14
+(`imul ax, 0Eh / cmp eax, [di+72h]`). Lecture brute en un bloc
+(`push large 0Eh` / `ResourceRecord_ReadFieldGroupA_64A19`), little-endian.
+
+| Off. disque | Type | Champ (asm, Z-up) | libRealSpace | → record mémoire (16 o) |
+|---|---|---|---|---|
+| `0x00` | u16 | index de la zone `AREA` | — | `+0x00` far ptr zone (`PtrList_GetAt_53034(scénario+0x1A, index)`, **nul** si index hors liste) |
+| `0x02` | i32 | décalage c0 | **X** (÷ 256 → m) | `+0x04` |
+| `0x06` | i32 | décalage c1 | **Z** (profondeur) | `+0x08` |
+| `0x0A` | i32 | décalage c2 = altitude | **Y** | `+0x0C` |
+
+En mémoire (`MissionScenario+0x1E`) : `[+0]` u16 nombre, `[+2]` far ptr vers le tableau de
+records de 16 o (`shl ax, 4` pour l'allocation, `add word ptr [bp+var_4], 10h` par record).
+
+**Position monde d'un spot** — `AreaRelPos_ToWorld_50EEB` (appelée par
+`Mission_GetSpotWorldPosition_5305A`, qui renvoie (0, 0, 0) si le numéro de spot est hors liste) :
+
+```
+position = décalage + point_de_référence(zone)   si la zone existe
+position = décalage                               sinon (index 0xFFFF ou hors liste → absolu)
+```
+
+Preuve : copie du décalage (`mov eax, es:[si]` sur `rec+4`…), test du pointeur de zone
+(`cmp dword ptr es:[bx], 0 / jz`), puis `add [bp+var_10], es:[bx+22h]` / `+26h` / `+2Ah`.
+Le point de référence est celui du chunk `AREA` : **centre** pour une sphère, **centre du
+plancher** pour un cylindre ou une boîte — un décalage (0, 0, 0) tombe exactement dessus.
+
+La même fonction calcule la position des entrées `PART` : `Expr_Node_StoreResultVector_52C9C`
+lui passe `part+0x1D` (pointeur de zone en `+0x1D`, décalage en `+0x21`), même structure.
+
+##### `PART` → objets de la mission — `PartEntry_AllocateArray_AA23D` (seg457)
+
+Liste des **objets de la mission** (avions, véhicules, bases, repères de piste) : quel modèle
+charger, quel pilote, où et comment le faire apparaître, son camp et ses 4 scripts. Un objet
+n'existe dans le monde qu'une fois **activé** (opcode `0x90` ou activation de sa scène).
+
+Enregistrements **fixes de 62 octets** (pas de taille variable) : nombre = taille ÷ 62
+(`mov bx, 3Eh / div bx`) ; erreur `9036h` si la taille n'est pas un multiple de 62. En mémoire,
+`MissionScenario+0x34` = `[+0]` u16 nombre, `[+2]` far ptr vers un tableau d'**entrées de 85 o**
+(`imul ax, 55h`) ; accès par index : `Expr_LookupTableEntry85B_52D45` (nul si hors liste).
+Chaque entrée est remplie par `PartEntry_LoadAndResolveNames_A9E3C` : `PartEntry_ResetState_A9DFD`,
+lecture brute des 62 o (`push large 3Eh` / `ResourceRecord_ReadFieldGroupA_64A19`), puis copie.
+
+| Disque | Type | Champ (libRealSpace : Y-up, mètres) | → entrée |
+|---|---|---|---|
+| `0x00` | u16 | index `CAST` = rôle / pilote (`PLAYER`, `STERN`, `NULL`…) ; seul l'octet bas est gardé (`mov al, byte ptr [bp+var_4A]`) | `+0x1B` |
+| `0x02` | char[8] | **type d'objet** (modèle chargé, ex. `F-16DES`, `MIG21`, `RWYEXT18`) | `+0x00` (+ nul en `+0x08`) |
+| `0x0A` | char[8] | **type de remplacement une fois détruit** | `+0x09` (+ nul en `+0x11`) |
+| `0x12` | char[8] | nom chargé dans le composant `+0x5A` de l'entité (`PlayerComponent_ConstructFromStream_9EFBE`) — **rôle non tranché** ; vide = rien | `+0x12` (+ nul en `+0x1A`) |
+| `0x1A` | u16 | index de la zone `AREA` (`PtrList_GetAt_53034`) | `+0x1D` (far ptr) |
+| `0x1C` | u8 | **mode de placement** : 0 = relatif à la zone, ≠ 0 = relatif au joueur | `+0x1C` |
+| `0x1D` | i32 | décalage **X** (÷ 256 → m) | `+0x21` |
+| `0x21` | i32 | décalage **Z** (profondeur) | `+0x25` |
+| `0x25` | i32 | décalage **Y** (altitude) | `+0x29` |
+| `0x29` | i16 | **cap** en degrés (entier tel quel : `movsx` puis `shl eax, 8`) | `+0x2D` |
+| `0x2B` | i16 | **vitesse initiale** en m/s le long du nez (0 = à l'arrêt) : `AIAircraft_SpawnAndConditionalLoadProfile_53363` multiplie par le pas de temps, la méthode `+0x48` par son inverse | `+0x2F` |
+| `0x2D` | u8 | **camp** : 1 = allié, 255 = ennemi | `+0x31` |
+| `0x2E` | u8 | **allié par défaut** (index `PART`, 255 = aucun) : devient le chef de l'objet à l'activation ; c'est l'allié que désigne `OP_SET_OBJ_FOLLOW_ALLY` avec 255 | `+0x32` |
+| `0x2F` | u8 | pas recopié par le chargeur ; rôle non établi | — |
+| `0x30` / `0x32` / `0x34` | i16 ×3 | **poste en formation** de l'ordre « suivre » : côté (X), avant (Z), haut (Y), mètres, entiers (session 2026-09-27, non relu ici) | `+0x33` / `+0x35` / `+0x37` |
+| `0x36` / `0x38` / `0x3A` / `0x3C` | u16 ×4 | scripts `PROG` : `on_is_activated`, `on_mission_update`, `on_is_destroyed`, `on_missions_init` (`Expr_LookupNamedValue_51E4A(scénario+0x40, id)`) | `+0x42` / `+0x46` / `+0x4A` / `+0x4E` (far ptr résolus) |
+
+**Champs d'exécution** (pas sur disque) : `+0x39` drapeaux — bit 0 actif, bit 1 **détruit**
+(posé par `World_OnObjectDestroyed_53A94`), bit 4 visible sur la carte de navigation (`0xB6`/`0xB7`),
+bit 5 accompagne le joueur au pilote automatique (`0xB8`/`0xB9`) ; `+0x3A` dword ; `+0x3E`/`+0x40`
+remis à 0 au chargement ; `+0x52` **entité créée** (contrôleur, nul tant que l'objet n'est pas
+activé) ; `+0x32` vaut 0xFF puis l'allié lu ; `+0x54` = 0xFF.
+
+**Activation** — `PartEntry_ResolveSpawnPositionAndActivate_51EDC` (opcode `0x90`,
+`Scene_EnsureUnitsSpawned_530FF`) :
+
+1. **Modèle.** Rien si l'objet est déjà actif (bit 0) ou a déjà une entité (`+0x52`). S'il a été
+   **détruit** (bit 1), on prend le **type de remplacement** (`+0x09`) et on efface les 4 scripts ;
+   sinon le type `+0x00`. Nom vide → rien n'apparaît (`cmp byte ptr es:[bx], 0`).
+2. **Position et cap** (`cmp byte ptr es:[bx+1Ch], 0`) :
+   - **mode 0 (zone)** : `AreaRelPos_ToWorld_50EEB(entrée+0x1D)` = point de référence de la zone +
+     décalage, exactement comme un `SPOT` ; cap = `+0x2D` (absolu) ;
+   - **mode ≠ 0 (joueur)** : le décalage est exprimé dans le **repère de l'avion du joueur**
+     (X = côté, Z = avant/nez, Y = haut de l'avion) : position = position du joueur
+     (`Expr_Node_GetFocusedNode_543BA`, `+0x12`) + décalage tourné par la matrice d'orientation du
+     joueur (copie `AI_ComputeGeometryHelper_56E29`, puis 3× `imul edx / shrd eax, edx, 8`) ; cap =
+     cap du nez du joueur (`Math_HeadingAngle_553CF`) + `+0x2D`.
+   - Dans les deux cas l'objet apparaît **à plat** : matrice = rotation autour de la verticale
+     seulement (`Matrix_BuildAxisZ_572BC` avec −cap, puis `Matrix_OrthonormalizeKeepRow1_57660`).
+3. **Création** : `AIAircraft_SpawnAndConditionalLoadProfile_53363(scénario, type, CAST[+0x1B],
+   position, matrice, vitesse +0x2F)` ; le nom `CAST` décide `PLAYER` / `NETWORK` / IA. Si la
+   vitesse ≠ 0 : vitesse = `vitesse · dword_7045E` (pas de temps) le long du nez de l'objet
+   (`shl eax, 8`, `imul … dword_7045E`, appel vtable `+0x48`).
+4. **Avion à vitesse nulle** (catégorie 6 et `+0x2F == 0`) : posé **au sol, train sorti**
+   (`mov [bx+20h], al` = indicateur « au sol » ; `or byte ptr [bx+75h], 4` = bit 2 de `flags_75`).
+5. **Si l'objet n'est pas détruit** : nom `+0x12` chargé (si non vide), camp `+0x31` copié dans
+   l'entité (`+0x50`), ordre natif 179 vers l'allié `+0x32` s'il existe
+   (`Expr_LookupNamedValue_52DDB(scénario+0x34, …)` puis appel vtable `+0x88`, `push 0B3h`) :
+   `Goal_SetObjective_A307` (cas 179) range l'allié comme **chef** (`SetReference` sur `+0x145`, même
+   champ que `OP_SET_OBJ_FOLLOW_ALLY`) **sans changer l'ordre en cours** (`+0x11D` pas écrit) ni le poste
+   en formation (`+0x14A`…`+0x152`) — corrigé 2026-10-30, ce n'est pas un ordre de suivre ; compteur d'objets
+   actifs du camp incrémenté (`word_706A3` camp 1, `word_706A7` camp 0xFF — lus par l'ordre
+   « défendre la zone »). Enfin `Shared_TriggerExprInstruction_5247D`.
+
+Désactivation : opcode `0x91`, `PartEntry_Deactivate_5242A`.
 
 ##### `PLAY` → chunks `SCNE` (scènes) — `MissionPlay_LoadScenes_AA595` (seg457)
 
@@ -1068,16 +1616,16 @@ Layout confirmé (croisé avec le code + `MISSIONS\MISN-1A.IFF`) :
 
 | Off. disque | Taille | Champ | Résolution moteur | → record (0x27 o) |
 |---|---|---|---|---|
-| `0x00` | u8 | `is_active` | copié tel quel | `+0x00` |
-| `0x01` | u16 | `area_id` (index dans `AREA`, `-1` = scène globale) | `GeomNode_SumAndCount_53034(ctx+0x1A, area_id)` | `+0x04` (handle 32 b) |
-| `0x03` | i16 | `on_is_activated` (ref `PROG`, `-1` = aucun) | `Expr_LookupNamedValue_51E4A(ctx+0x40, …)` | `+0x08` (far ptr) |
-| `0x05` | i16 | `on_leaving` | idem | `+0x0C` |
-| `0x07` | i16 | `on_mission_update` | idem | `+0x10` |
-| `0x09` | u8 | `has_own_coord` (1 = position explicite ci-dessous ; 0 = déclenche sur le volume de l'aire) | — | `+0x18` |
-| `0x0A` | u16 | `heading` — **candidat : cap en degrés** (0–359). Dans MISN-1A : `180` pour les scènes ancrées à une aire, `0` pour celles à `pos` explicite. Rôle non tracé dans le code ; à confirmer sur d'autres missions (valeurs ≠ 0/180 attendues si c'est bien un cap). | — | `+0x19` |
-| `0x0C` | i32 | `pos_x` — fixed-point ÷256 | — | `+0x1B` |
-| `0x10` | i32 | `pos_y` — fixed-point ÷256 | — | `+0x1F` |
-| `0x14` | i32 | `pos_z` — fixed-point ÷256 (**Z = altitude**, pieds) | — | `+0x23` |
+| `0x00` | u8 | `is_enabled` (ex-`is_active`) | copié tel quel | `+0x00` |
+| `0x01` | u16 | `area_id` (index dans `AREA` ; `-1` ou hors liste = pas de zone : la 1re telle scène est la scène globale) | `PtrList_GetAt_53034(ctx+0x1A, area_id)` | `+0x04` (handle 32 b) |
+| `0x03` | i16 | 1er script : quand la scène devient courante, après l'apparition de ses objets (ref `PROG`, `-1` = aucun ; `Scene_TriggerActivation_531CD`) | `Expr_LookupNamedValue_51E4A(ctx+0x40, …)` | `+0x08` (far ptr) |
+| `0x05` | i16 | 2e script : **à chaque image**, pour la scène globale et la scène courante (`MAIN_GAME_TICK` → `Scene_RunUpdateScript_531F2`) | idem | `+0x0C` |
+| `0x07` | i16 | 3e script : **quand la scène cesse d'être courante, et en fin de mission** (`Scene_RunLeavingScript_53211`) | idem | `+0x10` |
+| `0x09` | u8 | **point d'arrivée du pilote automatique** défini (0 ou 1) | copié tel quel | `+0x18` |
+| `0x0A` | i16 | **cap d'arrivée** en degrés, −1 = aucun (valeurs des données : 0, 90, 135, 180, 270) | copié tel quel | `+0x19` |
+| `0x0C` | i32 | position d'arrivée c0 ÷ 256 → libRealSpace **X** | copié tel quel | `+0x1B` |
+| `0x10` | i32 | position d'arrivée c1 ÷ 256 → libRealSpace **Z** = −c1 | copié tel quel | `+0x1F` |
+| `0x14` | i32 | position d'arrivée c2 ÷ 256 → libRealSpace **Y** (altitude) | copié tel quel | `+0x23` |
 | `0x18…` | u16 × `(taille−24)/2` | **liste d'unités** de la scène | `malloc` + copie brute | `+0x14` count, `+0x16` ptr |
 
 Le record en mémoire ajoute `+0x02` = back-ptr vers l'objet `PLAY` (contexte, = `arg`).
@@ -1086,9 +1634,9 @@ Le record en mémoire ajoute `+0x02` = back-ptr vers l'objet `PLAY` (contexte, =
 
 Chaque valeur `u16` (octet haut = 0) est un **index dans le chunk `PART`, dans son
 ordre de stockage** — **ni un id d'entité, ni un index `CAST`, sans offset**.
-`PART` est une liste de records de taille variable, chacun commençant par
-`<u16 entity_id> <char[8] type>` ; **l'ordre de stockage ≠ l'ordre des
-`entity_id`**. Résolution : `slot → PART[slot].entity_id → CAST[entity_id]` (nom).
+`PART` est une liste de records **fixes de 62 octets** (format plus haut), chacun
+commençant par `<u16 index CAST> <char[8] type>` ; **l'ordre de stockage ≠ l'ordre des
+index `CAST`**. Résolution : `slot → PART[slot].cast → CAST[cast]` (nom).
 
 `CAST` (chunk séparé, records de 9 o, noms `PLAYER`/`STERN`/`NULL`/…) n'est **pas**
 indexé par les scènes : il sert vraisemblablement à associer des scripts / rôles
@@ -1103,9 +1651,9 @@ repère de piste `RWYEXT18`).
 | SCNE | `area_id` → zone | `prog` (act / leav / upd) | `pos` ÷256 | queue (slots `PART`) → unités |
 |--:|---|---|---|---|
 | 0 | `-1` (globale) | –, –, **1** | — | `[0,3,1]` → PLAYER, STRIBASE, STERN |
-| 1 | 0 Strike Base | – | (-70762, 126343, **3580 ft**) | `[7]` → RWYEXT18 (runway) |
+| 1 | 0 Strike Base | – | (-70762, 126343, **3580 m**) | `[7]` → RWYEXT18 (runway) |
 | 2 | 1 Restricted Airspace | – | — | `[4,5,6]` → MiG-21R ×3 |
-| 3 | 3 Nouakchott | – | (-130000, -56500, **1000 ft**) | `[]` |
+| 3 | 3 Nouakchott | – | (-130000, -56500, **1000 m**) | `[]` |
 | 4 | 2 Cargo Destination | – | — | `[8]` → RWYEXT18 (runway) |
 | 5 | 4 Rendezvous | **13**, –, – | — | `[]` (le C-130 est activé ici par `PROG` 13) |
 
@@ -1134,7 +1682,7 @@ par script.
 | `+0x68` | scratch tokens / formatage (Lexer) |
 | `+0x74` | tableau `TEAM` (dwords, ≤8) |
 | `+0x84` | nombre d'équipes (word) |
-| `+0xA1` | (par MISN2OP) 8× u16 de stats par équipe |
+| `+0xA1` | 8× u16 : variables de résultat posées par le script de mission (opcode 14h d'`Expr_VM_Interpreter_51106`), remises à 0 en début de mission, écrites dans `STAT` de MISN2OP |
 | `+0xB1` | tableau d'objets joueur `PLYR` (lié par OP2MISN) |
 
 ##### `DATA\OP2MISN.IFF` — FORM `INVN` (par `LoadFromIFF_A8C44`) — pont campagne → mission
@@ -1160,9 +1708,9 @@ Utilise les primitives **d'écriture** (`WriteFieldGroupA/B`, `WriteTyped`,
 | FourCC | Contenu écrit |
 |---|---|
 | `INFO` | 8 o depuis `si` |
-| `STAT` | 8× u16 depuis `si+0xA1` (stats par équipe) |
+| `STAT` | 8× u16 depuis `si+0xA1` (variables de résultat du script de mission) |
 | `JETS` | par participant : marqueur si nœud `+0x39` bit posé **et** type `+0x00` == `"F-16"` (`0x36312D46`) |
-| `KILL` | par participant : u16 `+0x3E`, u16 `+0x40`, descripteur 8 o via `Expr_LookupBuiltinFuncDesc_52C5F` |
+| `KILL` | par participant : u16 `+0x3E`, u16 `+0x40`, descripteur 8 o via `Mission_GetCastName_52C5F` |
 | `EXIT` | 1 o depuis `byte_706AF` |
 | `DIED` | par équipe : résolution via `Expr_Node_LookupAndConvert_52D69(si+0x34)`, test du bit `+0x39` |
 | `SCOR` | score (suite non détaillée) |
@@ -1253,15 +1801,15 @@ fichier `0x18E`, `FORM CAMR` = 882 o) — en-tête commun aux caméras simples :
 +0x08  u16       flags = 0     (CHASECAM : 14 o à 0 ici — slot look-at secondaire vide)
 +0x0A  char[8]   sujet         entité porteuse = "PLAYER"
        (CKPT)  +0x12 char[8]   nom d'art cockpit = "F16-CKPT"
-+..    u32       farClip = 50000 (0xC350)   — constant, pieds
++..    u32       farClip = 50000 (0xC350)   — constant, mètres
 +..    u16       fov     = 40 (0x28)        — constant
 +..    u8/u16    nearClip (contient 0x0A = 10)
 +..    u32       0
 +..    u16,u16   viewport = 319, 199 (0x13F, 0xC7) = rect de rendu (w-1, h-1)
-+..    i32[]     (VICT / WEAP)  table d'offsets — FIXED-POINT 24.8 (val/256 = pieds)
++..    i32[]     (VICT / WEAP)  table d'offsets — FIXED-POINT 24.8 (val/256 = mètres)
 ```
 
-Table d'offsets `WEAPON` (÷256, pieds) : `-10, 20, -30, -8, 1.5, [153], -4, [307],
+Table d'offsets `WEAPON` (÷256, mètres) : `-10, 20, -30, -8, 1.5, [153], -4, [307],
 0, -6, 10, 2.5, 20, 5, [153], 2.5, 6, 0.5, [-153], -0.5, 102` — vecteurs de
 keyframe/boîte relatifs au sujet ; les valeurs entre `[]` (octet bas non nul, ex.
 `0x99`=153, `0x66`=102) sont de petits params séparés (angles / marqueurs), **pas**
@@ -1294,12 +1842,12 @@ Le loader **ne décode pas** les paramètres — seuls les 8 octets d'ID et le t
 lus. Le payload (offsets 24.8, script `COMP`) est consommé à l'activation.
 
 **Objet caméra runtime — `word_72A8F`** (caméra active courante ;
-`DATA XREF: Player_MainUpdate`). Layout partiel vérifié (`HUD_RenderSymbologyMain`/
-`…Alt` seg088, `Debris_SpawnOrchestrator` seg079) :
+`DATA XREF: Player_MainUpdate`). Layout partiel vérifié (`WeaponSystem_LaunchFromStation_3E744`/
+`…Alt` seg088, `Object_SpawnDestructionEffects_3863A` seg079) :
 
 | off | type | rôle |
 |---|---|---|
-| `+0x14` / `+0x18` / `+0x1C` | i32 | **position X / Y / Z** monde (Z = altitude), **fixed-point 24.8** (÷256 = pieds) |
+| `+0x14` / `+0x18` / `+0x1C` | i32 | **position X / Y / Z** monde (Z = altitude), **fixed-point 24.8** (÷256 = mètres) |
 | `+0x11` | u8 | code d'état (via `[vtable+0x14]` ; `4` = mode spécial) |
 | `+0x50` | far ptr | **vtable** — `[0x00]` tick/avance keyframe, `[0x04]` stop précédente, `[0x10]` start (parse le script), `[0x14]` get state |
 | `+0x5C` | ptr | sous-objet (cible secondaire) |
@@ -1312,7 +1860,7 @@ position en `+0x12/+0x16/+0x1A`, la caméra a 2 octets de plus avant.
 **Chaîne d'activation** (tracée) : `Kneeboard_SelectByID(0x59CD, "<nom>")`
 (`sub_23C4F`) sélectionne par nom 8 c —
 `"TAKEOFF"` ← état de vol seg009 (`entité[+0x11] == word_722E6`),
-`"AUTOPILT"` ← `UIScript_ParseAndEvaluate_7A054` (ovr233) puis
+`"AUTOPILT"` ← `Autopilot_JumpSequence_7A054` (ovr233) puis
 `Camera_DetachParent(word_72A8F)` + reset `word_7046E`/`dword_70468`/`byte_7046C`,
 par state-code ← `Player_MainUpdate` (`Kneeboard_SelectByStateCode(0x59CD, 4)`),
 par script mission ← `Expr_VM_OpcodeHelperA_53504` (opcode VM `+0xA38` :
@@ -1358,7 +1906,7 @@ fait `shl …,8` pour sa maths interne 24.8 (noté « `<<8` »). `raw` = stocké
 | `0E` | 13 | `i32 x,y,z` | **position relative à l'entité liée** : `<<8`, tourné par l'orientation de `obj+92` + position de `obj+92` → `obj+14/18/1C` |
 | `0F` | 5 | `i16 h ; i16 k` | `obj+F0=h` (raw) ; `obj+F2=k` (`<<8`) ; angles d'approche → `obj+F6/FA` |
 | `10` | 1 | — | si `obj+92` : `AI_ComputeGeometryHelper(obj+20, entité)` |
-| `11` | 7 | `i16 a,b,c` | axes d'orientation (`Matrix_BuildAxisZ/X/Y`, `<<8`) + `Matrix_ApplyToVectorY` |
+| `11` | 7 | `i16 a,b,c` | axes d'orientation (`Matrix_BuildAxisZ/X/Y`, `<<8`) + `Matrix_OrthonormalizeKeepRow1_57660` |
 | `12` | 13 | `i32 x,y,z` | `obj+94/98/9C` (raw) |
 | `13` | 1 | — | `obj+FF=1 ; obj+100=0` |
 | `14` | 5 | `i32 s` | `obj+C0/C4/C8 = lignes_orientation(obj+2C) × s` (24.8) |
@@ -1417,8 +1965,8 @@ en file (posée par `FE`).
      mode `0xFF` ; sinon tourne de `erreur/A0 · dword_70458`.
    - **8** — pas de handler ; intégrateur générique seul.
    - **0xB — visée/poursuite d'un point** : `dir = obj+0xB0.. − pos` ;
-     `ligne_orient(obj+0x2C) ← dir` (+ `dir/A0`/frame) ; `Targeting_LineOfSightCheck` ;
-     `Matrix_ApplyToVectorY`.
+     `ligne_orient(obj+0x2C) ← dir` (+ `dir/A0`/frame) ; `Vector_NormalizeInPlace_5593A` (normalisation) ;
+     `Matrix_OrthonormalizeKeepRow1_57660`.
    - **0x1D — déplacement sur segment** vers `rotate(obj+0xE4.., orient_entité)` :
      `pas = ((cible − obj+0xB0..)<<8)/obj+0xA0 · dword_70458` ; `obj+0xB0.. += pas` ;
      `pos_monde = obj+0xB0.. + pos_entité`. Snap + mode `0xFF` si `obj+0xA0 ≤ 0` ou
@@ -1498,9 +2046,9 @@ de corps rigide attaché à l'avion**, pas une formule position/lookat/distance.
   | `+0x04` | bitfield d'état (bit1 = flag parent, bit2 = recalc, bit4 = attaché, bit6 = mode cible sec.) | `Debris_BodyAttachToSubpart` (37C89), `Camera_MarkRecalc` (or `[si+4],4`) |
   | `+0x0A` | weak ref A (dd far) | `Debris_BodyReset` (37C4C) |
   | `+0x0E` | **corps rigide parent** (dd far ; l'avion) | `Debris_BodyAttachToSubpart` : `[si+0Eh]=arg_2` ; `loc_37CF4` renvoie `[si+0E:10]` |
-  | `+0x12/16/1A` | **position monde** (i32×3, 24.8) — **sortie** | `Debris_BodyGetPosition` (37D04) : `out = [si+12h..]` ; `Debris_BodyIntegrateForces` (37D54) : `[si+12h] += *arg` |
+  | `+0x12/16/1A` | **position monde** (i32×3, 24.8) — **sortie** | `Debris_BodyGetPosition` (37D04) : `out = [si+12h..]` ; `WorldObject_TranslateBy_37D54` (37D54) : `[si+12h] += *arg` |
   | `+0x20` | copie d'un champ du parent (`parent[+8][+0x10]`) | `Debris_BodyAttachToSubpart` |
-  | `+0x24` | sous-composant (couple) | `Debris_BodyIntegrateForces` → `Debris_ComputeTorque` si `≠0` |
+  | `+0x24` | sous-composant (couple) | `WorldObject_TranslateBy_37D54` → `Debris_ComputeTorque` si `≠0` |
   | `+0x28/29` | 2 octets copiés du parent (`[+0x12]`, `[+0x14]`) | `Debris_BodyAttachToSubpart` |
   | `+0x2C` | **matrice d'orientation 3×3** (lignes `+0x2C`/`+0x38`/`+0x44`) | `Matrix_BuildFromAngle_56D72(cam+0x2C)` ; `AI_ComputeGeometryHelper_56E29(&buf, si+0x2C)` |
   | `+0x50` | octet copié de la cible (`cible[+0x35]`) | `Camera_InitAttachedWithTarget` |
@@ -1528,9 +2076,9 @@ de corps rigide attaché à l'avion**, pas une formule position/lookat/distance.
   → `Camera_ChaseComputeMain` (traînée).
 - **`Camera_ComputeMountedPosition` (`sub_3D31D`, seg085, appelée depuis `seg087:0250`)** :
   1. `V = mount[+8] × (dword_7045E/256)` (ou `(0,0,0)` si pas de mount) ;
-  2. `Debris_BodyIntegrateForces(cam, &V…)` → `cam.pos(+0x12) += V` puis `cam->vtable[8]` (no-op) ;
+  2. `WorldObject_TranslateBy_37D54(cam, &V…)` → `cam.pos(+0x12) += V` puis `cam->vtable[8]` (no-op) ;
   3. `Ta = mount->vtable[0x2C](out)` ; rotation 2D horizontale de `(Ta.x, Ta.z)` par
-     l'angle `θ = Ta.y × (dword_70458/256)` (`Math_Cos/Sin_Raw`, `Math_FixedMultiply`,
+     l'angle `θ = Ta.y × (dword_70458/256)` (`Math_Cos/Sin_Raw` — ⚠️ noms inversés, voir `Math_CosRaw_580A7` / `Math_SinRaw_58063`, `Math_FixedMultiply`,
      seg085:1075-1120) ; `cam->vtable[0x30](&Ta×dt)` et `mount->vtable[0x30](&Ta_rot)`.
   → rattrapage **partiel par frame** du cap du mount = le « lag » angulaire.
 
@@ -1540,7 +2088,7 @@ de corps rigide attaché à l'avion**, pas une formule position/lookat/distance.
   `seg339:off_6F880`) l'appelle à chaque tick si `[cam+0x73] & 1 == 0`, puis fait
   tourner un timer à `cam+0x68` (`Timer_SetAbsolute_4F9A2` / `Timer_Tick_4F9E6`) avec
   `[cam+0x6D] << 8`.
-- **Câblage** : `Camera_InitAttachWithModeFlags` (seg105:157) = `[cam+0x59]=1`,
+- **Câblage** : `Explosion_AttachToSource_4BDDA` (seg105:157) = `[cam+0x59]=1`,
   `[cam+4] |= 5`, `Debris_BodyAttachToSubpart(cam, parent)`. Le constructeur seg105
   (`loc_4BD1x`) fait ensuite `cam[+0x51] = *(parent + 0x3A)` (un **pointeur** — il est
   déréférencé comme objet à vtable dans `Camera_ComputeMountedPosition`),
@@ -1551,7 +2099,7 @@ de corps rigide attaché à l'avion**, pas une formule position/lookat/distance.
   de temps 24.8 (`/256` → ~0.04–0.07 s).
 - **Paradoxe de dérive** : `Camera_ComputeMountedPosition` fait
   `cam[+0x12] += mount[+8..0x10] × (dword_7045E/256)` **par frame** via
-  `Debris_BodyIntegrateForces`. Si `+0x12` était la position monde absolue, elle
+  `WorldObject_TranslateBy_37D54`. Si `+0x12` était la position monde absolue, elle
   dériverait sans borne (mount.pos ~1e5 × 0.05 = +5000/frame). Résolution probable :
   **`cam[+0x12/16/1A]` est un accumulateur de FORCE**, pas la position — consommé et
   remis à zéro chaque frame par le parent (`Debris_TransferForceToParent` `sub_37F18`,
@@ -1575,7 +2123,7 @@ de corps rigide attaché à l'avion**, pas une formule position/lookat/distance.
   renvoie `[si+0x26]+0x24` ; sinon renvoie `si+0x12`.
 - `Debris_TransferForceToParent` (37F18) : `parent[+0x24/28/2C] = child[+0x12/16/1A]` ;
   `child[+0x24]->vtable[0x78](parent+0x24)` (transforme la force enfant→repère parent) ;
-  `Math_ApplyRotationHelperB_58828(parent+0x24)` ; récursion sur `[si+0x24]` ;
+  `Matrix_LocalToWorld_58828(parent+0x24)` ; récursion sur `[si+0x24]` ;
   `parent[+0x24] += force_sous-composant` ; `parent[+0x30] |= 1`.
 
 **Modèle résultant** : la caméra externe est un **corps rigide de faible masse
@@ -1590,7 +2138,7 @@ d'un ressort amorti** (masse `+0x20`, force de rappel, pas de temps `dword_7045E
    constante de rappel) — c'est ce qui fixe la « raideur » du lag ;
 2. les corps `mount->vtable[0x2C]` (renvoie `Ta`) et `mount->vtable[0x30]`, plus
    `sub[+0x24]->vtable[0x78]` ;
-3. `Math_VectorLength3D_Raw_5828E` / `Math_ApplyRotationHelperB_58828` (math exacte) ;
+3. `Math_VectorLength3D_Raw_5828E` / `Matrix_LocalToWorld_58828` (math exacte) ;
 4. quel objet est `parent` (avion JDYN ? rig ?) et le sens de la rotation 2D.
 
 **Complément (2026-09-06, 4ᵉ passe) — thunks vtable de base `WorldObject` (seg084) :**
@@ -1602,7 +2150,7 @@ d'un ressort amorti** (masse `+0x20`, force de rappel, pas de temps `dword_7045E
   confirmer par analyse de frame précise.
 - `vtable[0x1C]` = `loc_3CB0B` : `WorldObject_BuildOrientationMatrix_56E8A(this+0x2C)` +
   `Debris_BodyDetach`.
-- `loc_3CB78` : `r = this->vtable[0x3C]() ; Math_ApplyRotationHelperB_58828(r, arg)` —
+- `loc_3CB78` : `r = this->vtable[0x3C]() ; Matrix_LocalToWorld_58828(r, arg)` —
   « récupère un repère via `vtable[0x3C]`, y fait tourner `arg` ».
 - `loc_3CB3A` : si `this[+0x26]` (parent de force) → `this->vtable[0x74]()` puis renvoie
   `[+0x26]` ; sinon renvoie `this+0x2C`.
@@ -1614,7 +2162,7 @@ un détail : il faut (a) l'intégration force→position et ses constantes
 (masse `+0x20`, amortissement) — probablement dans le tick physique parent
 (`Damage_SimulationTick` seg060 / `PhysicsTicks` seg103) ; (b) la classe exacte du
 nœud de montage `+0x51` et le sens réel de ses thunks vtable (analyse de frame
-far-ptr) ; (c) `Math_VectorLength3D_Raw_5828E` / `Math_ApplyRotationHelperB_58828`.
+far-ptr) ; (c) `Math_VectorLength3D_Raw_5828E` / `Matrix_LocalToWorld_58828`.
 C'est un **décodage de sous-système soutenu** (plusieurs sessions, comme
 l'interpréteur COMP en a demandé), pas quelque chose qui converge en quelques
 tours. Cette section est le point d'appui ; le portage C++ vient après.
@@ -1626,7 +2174,7 @@ tours. Cette section est le point d'appui ; le portage C++ vient après.
 **Complément (2026-09-06, 5ᵉ passe) — chemin F2 RÉSOLU : la vue chase n'est PAS
 le « corps rigide debris ».**
 
-Les 4 passes ci-dessus traçaient `Camera_ComputeMountedPosition_3D31D` (seg085) :
+Les 4 passes ci-dessus traçaient `WorldObject_IntegrateBodyMotion_3D31D` (seg085) :
 c'est une **autre caméra** (arme/cinématique). La caméra **chase F2** passe par un
 tout autre code, dans **seg015** (segment cockpit/vue), beaucoup plus simple —
 pas de solveur de force.
@@ -1681,7 +2229,7 @@ hook de vue externe. Le slot `[0x14]` est la partie caméra.)
    `si[+0x183/+0x185/+0x187]`, puis **porté à `0x6400` = 100.0 unités** (distance chase).
 5. **Le « lag » = un simple rate-limit** : le vecteur avant `si[+0x14F]` est ramené
    vers la cible avec un **pas maximum de `0x600` = 6.0 unités/frame**
-   (`UI_ApplyLineOfSightCheck_55A9E` = clamp de longueur de vecteur). Pas de force,
+   (`Vector_SetLength_55A9E` = clamp de longueur de vecteur). Pas de force,
    pas de ressort amorti, pas d'intégration.
 6. Matrice d'orientation `si[+0x143]` (3×3) reconstruite via
    `Matrix_BuildFromAngle_56D72` / `Matrix_BuildAxisZ_572BC` / `Matrix_BuildAxisX_56EC3`
@@ -1713,30 +2261,37 @@ hook de vue externe. Le slot `[0x14]` est la partie caméra.)
 
 #### c) Base d'entités — `MissionRecord_*` (ovr239-257)
 
-`MissionRecord_LoadEntityDatabase_7B035` (**3103 L, plus grosse fonction du
-binaire**) : `Path_ResolveDataFile` + `IndexedRecordReader` (variantes A/C) —
-charge en masse une base d'entités depuis un fichier indexé (potentiellement LZW).
+`Player_ShotDownSequence_7B035` (**3103 L, plus grosse fonction du
+binaire**, ex-`MissionRecord_LoadEntityDatabase_7B035`) : `Path_ResolveDataFile` + `IndexedRecordReader` (variantes A/C) —
+**ce n'est pas un chargeur de base d'entités** : c'est la séquence jouée quand l'avion du
+joueur est détruit (lancée par `STRIKE_EXE_MAIN_LOOP` sur `byte_6E4B4`), qui charge
+`OBJECTS\EJECT.PAK` (voir `MUSIC_SYSTEM.md` §5.4).
 Tags ASCII vus : `EJECT`, chunk générique **`DATA`** (`0x41544144`, cf.
-`PlayerComponent_LoadDataChunk_A6CA0`). `MissionRecord_LoadFullDatabase_86B53`
+`EjectSeat_LoadFromIFF_A6CA0`). `MissionRecord_LoadFullDatabase_86B53`
 (816 L, ovr249) = variante `Path_ResolveDataFile` + `InitAndValidate` + lecture
-massive de champs. `MissionRecord_LoadAndBuildWidgetTree_7D31A` (1081 L, ovr240) =
-même motif + construction de l'arbre de widgets (`UIScreen_BuildWidgetTree_53A94`,
-seg114). Les ~50 `MissionRecord_LoadWithDwordFields*` / `LoadFieldGroupMix*` sont
+massive de champs. `Player_EjectSequence_7D31A` (1081 L, ovr240, ex-`MissionRecord_LoadAndBuildWidgetTree_7D31A`) =
+séquence d'éjection volontaire (lancée sur `byte_6E4B8`, Ctrl+E), même chargement de `EJECT.PAK`,
+puis destruction de l'avion abandonné via `World_OnObjectDestroyed_53A94` (ex-`UIScreen_BuildWidgetTree_53A94`). Les ~50 `MissionRecord_LoadWithDwordFields*` / `LoadFieldGroupMix*` sont
 des lecteurs de sous-enregistrements selon la disposition de champs.
 
 ### 6.7 Composants d'avion & dégâts
 
-- `AircraftDamageModel_LoadComponents_73B4F` (440 L, ovr228) : StreamReader + IFF,
-  **boucle ×8** (`ReleaseComponentArray_742FC`) = les 8 composants confirmés
-  (seg339) : `RUDDER`, `ELEVATOR`, `AILERON`, `LWING`, `RWING`, `ENGINE`,
-  `LANDGEAR`, `FLAPS`. `LoadFromIFF_73FB4` (293 L) = ~15 champs u32.
-- `PlayerComponent_Load*` (seg432-453, ~40 fonctions) : chargement IFF des
-  composants d'état / visuels du joueur (`LoadFromResourceRecord_9DF63` appelle
-  même `IFF_LoadModelMain`). `LoadFieldsMassive_A5D18` = ~30 champs
-  matériau/visuels. `LoadDataChunk_A6CA0` : chunk **`DATA`** + 3 champs u32.
-- `AircraftComponent_Load*` (ovr272-285, ~14 fonctions) : sous-enregistrements de
-  composants (variantes par disposition de champs — `LoadWithDwordFields`,
-  `LoadFieldSequence`, `LoadFieldGroupPair`, …).
+**Corrigé 2026-10-12.** L'ancien paragraphe citait `AircraftDamageModel_LoadComponents_73B4F` : ce nom
+n'existe plus, `sub_73B4F` est `PilotProfile_LoadFromPROF_73B4F` (profil IA). Les composants de dégâts
+sont lus par **`Aircraft_LoadDamageSystems_9CCE5`** (classe `JETP`) : `FORM DAMG` (obligatoire, erreur
+`C00Dh`) → chunk **`SYSM`** (obligatoire, erreur `C00Ch`) = uint16 nombre puis, par composant
+(`DamageSys_LoadRecord_9CBE0`, record mémoire 20 o) : uint8 résistance (`+0`), uint8 dégâts subis (`+1`),
+chaîne nom (`+2`, ≤ 9 o : `FUEL`, `RUDDER`, `ELEVATOR`, `AILERON`, `LWING`, `RWING`, `ENGINE`, `LANDGEAR`,
+`FLAPS`…), chaîne second nom (`+0x0B`, rôle non établi). Accès par nom : `DamageSys_IsDamaged_43D43`,
+`DamageSys_DamageOf_43DF5`, `DamageSys_MaxPointsOf_43E47`, `DamageSys_SumDamage_43D0F`,
+`DamageSys_SumMaxPoints_43CDC`, `DamageSys_CompareDamageToMax_43D9B` (ex-`Roster_*`, « pilotes » à tort).
+Gain d'efficacité = (résistance − dégâts) / résistance (`JDYN_UpdateDamageGains_494DD`, `PHYSICS.md` §5.9).
+Format détaillé et arborescence par classe : `DATA_MODEL.html` (fiches « Arborescence » et « Avion JETP »).
+
+- `PlayerComponent_Load*` (seg432-453, ~40 fonctions) : lecteurs génériques de paramètres (dynamiques,
+  armes) — voir §6.2.
+- `AircraftComponent_Load*` (ovr272-285) : lecteurs de l'apparence 3D (`FORM POLY` : `VERT`, `TRIS`…),
+  appelés par `Model_LoadAppearance_94A86`.
 
 ### 6.8 Terrain / carte — `DATA\<nom>.PAK` + seg071-077 + ovr290-299
 
@@ -1769,12 +2324,44 @@ tables de stubs VROOMM.) Vérifié sur `MAURITAN.PAK` (1 044 396 o, 7 sous-resso
 
 | # | nom | taille | format |
 |---|---|---|---|
-| `[1]` | `.ELV` | 778 900 o | **PAK imbriqué de 324 cellules (grille 18×18)** ; chaque cellule = 2400 o = **20×20 sommets × 6 o** (`u16 a, u16 h (hauteur), u16 c`) |
+| `[1]` | `.ELV` | 778 900 o | **PAK imbriqué de 324 cellules (grille 18×18)** ; chaque cellule = 2400 o = **20×20 sommets × 6 o**. **Corrigé 2026-10-12 d'après le code** (`Terrain_LoadElevCell_99B7F`, `Render_TerrainPipelineMain`) : `i16 hauteur @+0` (min/max/moyenne de la cellule ; × axes caméra au rendu), `u8 éclairage @+2`, `u8 couleur @+3` (le triangle prend celle de son sommet le plus **haut**, comparaison non signée — corrigé 2026-10-14, voir « Couleur affichée » ci-dessous), `u8 texture du 1er triangle @+4`, `u8 texture du 2e @+5` (0xFF = aucune ; sommet (ligne i, colonne j) : 1er triangle = (i,j),(i,j+1),(i+1,j+1), 2e = (i,j),(i+1,j+1),(i+1,j), diagonale commune (i,j)–(i+1,j+1) ; constaté par Rémi dans libRealSpace, textures justes à l'écran). **Ordre vérifié sur `ALASKA.PAK` (2026-10-14)** : sous les 3 pistes, `i16 @+0` = 2520 / 1575 / 455 m pour des pistes à 2521 / 1576 / 456 m ; le mot `@+2` donne 1716 / 1716 / 1204. L'ancienne lecture `u16 a, u16 h, u16 c` est fausse. |
 | `[2]` | `.MED` | 195 700 o | idem, LOD moyen |
 | `[3]` | `.LOW` | 49 900 o | idem, LOD bas |
 | `[4]` | `.AVG` | 15 196 o | PAK imbriqué de 324 cellules (quasi toutes « vides » → valeur moyenne/couleur uniforme par cellule) |
 | `[5]` | `.TRI` | 3 480 o | **PAK imbriqué de 324 cellules** ; cellules non vides = régions de géométrie de piste/aire, parsées par `sub_99120` (§6.8bis) |
-| `[6]` | `.OBJ` | 648 o | **tableau plat de 324 `u16`** (1 par cellule 18×18), champ lisse ~0→6510 — candidat : altitude/couleur de base par cellule |
+| `[6]` | `.OBJ` | 648 o | **tableau plat de 324 `u16`** (1 par cellule 18×18) = **altitude plafond de la cellule** (m, entier) : lu en entier par `Terrain_LoadHeightmapFromIFFB_99CEF` dans `[lod+0x8A]`, renvoyé par `Terrain_HeightSample` ; `Terrain_QueryAltitudeAt` ne calcule le relief exact que sous ce plafond. |
+
+**Constaté sur `ALASKA.PAK` (2026-10-14, 506 671 o, lu par `tools/terrain_map.py` et `tools/terrain_viewer.py`, écrits d'après `DATA_MODEL.html` sans l'assembleur)** :
+
+| # | taille | contenu constaté |
+|---|---|---|
+| `[0]` | 504 o | `FORM TERA` : `VERS`, `INFO`, `FORM BLOX` (`ELEV` 3 × 46 o, `ATRI` 53 o, `OBJS` 27 o), `FORM TXMS` (`INFO`, `MAPS`) |
+| `[1]` | 351 330 o | PAK de 324 cellules **compressées**, 20 × 20 sommets de 6 o (espacement 1000 m) |
+| `[2]` | 101 941 o | idem, 10 × 10 sommets (2000 m) |
+| `[3]` | 35 226 o | idem, 5 × 5 sommets (4000 m) |
+| `[4]` | 15 196 o | **identique octet pour octet à `ALASKA.TRI`** : PAK de 324 régions de pistes (cellules 92, 189, 200) |
+| `[5]` | 1 794 o | PAK de 324 **listes d'objets posés** (cellules 189 et 200) : `u16 nombre` puis enregistrements de 70 o = `string[13]` nom (`HANGAR3`, `TOWA24`, `DRUMD24`, `HANGB22`, `DRUMB16`, `RDRSTL2`), `string[9]` second nom (`HANGAR3D`, `DRUM1D`…, 9ᵉ octet pas toujours nul ; instancié à la place du 1er nom quand l'objet a été retiré par une collision, `TerrainCell_LoadPlacedObjects_9A95A` / `Terrain_MarkPlacedObjectGone_37C33`), `3 × dd` X, Z, Y (÷ 256, coordonnées monde, Y = sol de l'aérodrome), `9 × dd` matrice 3 × 3 (÷ 256 ; identité ×6, quart de tour pour `HANGAR3` ; lignes 0, 1, 2 de la matrice d'orientation dans l'ordre du fichier, `TerrainCell_LoadPlacedObjects_9A95A`) |
+| `[6]` | 648 o | 324 `u16` : maximum d'altitude des sommets `.ELV` de la cellule pour 320 cellules sur 324 (5 m de moins pour les 4 autres) |
+
+- **Compression** : les 3 bits de poids fort d'une adresse valent `111` (entrée telle quelle) ou `001` (entrée compressée : `dd taille décompressée` puis flux LZW). LZW : bits lus du poids faible vers le fort (ordre GIF), largeur n + 1 quand la table atteint 2ⁿ entrées, 256 = remise à zéro, 257 = fin. Le nombre d'entrées d'un PAK n'est pas écrit : la table s'arrête à la 1ʳᵉ adresse. Entrée vide = même adresse que la suivante.
+- **Disposition** : cellule c = ligne c ÷ 18, colonne c mod 18 ; colonnes vers +X depuis X = −180 000 m, lignes vers −Z depuis Z = +180 000 m (en libRS : X et Z horizontaux). Dans une cellule n × n, sommet k = ligne k ÷ n, colonne k mod n, même sens ; raccord sans saut entre cellules voisines.
+- **`ELEV`** (46 o × 3) : `dw 15` (?), `dw espacement` (1000/2000/4000), `dd 8` (?), `dd 6000/12000/24000` (?), `dw 18`, `dw n` (20/10/5), `dd 20000`, `string[13]` fichier d'altitudes, `string[13]` `ALASKA.AVG`. **`OBJS`** (27 o) : `dw 18`, `dd 20000`, `dd 9000`, `dd 20000`, `string[13]` `ALASKA.OBJ`.
+- ⚠️ **Désaccord avec la correspondance extension → index ci-dessous** (`.AVG`→4, `.TRI`→5, lue dans `Terrain_HeightmapAllocate_33346`) : dans les données, la ressource `[4]` est le `.TRI` et la `[5]` les listes d'objets. Non tranché (sémantique exacte de `IndexedRecordReader.AdvanceIndex` à relire). La ligne `[4] .AVG 15 196 o` de MAURITAN ci-dessus a d'ailleurs la taille d'un `.TRI` à 3 régions.
+
+**Au-delà des bords de la carte (lu 2026-10-15, `Terrain_ComputeLODMesh` et `Terrain_BuildVertexWindow_3266E`)** : la fenêtre de sommets autour de l'observateur continue au-delà de la grille ; pour chaque sommet, l'indice de cellule est **borné à [0, 17]** en colonne et en ligne, mais la position dans la cellule continue de 0 à n−1. La cellule du bord est donc **répétée en entier**, toutes les 20 km, dans la direction de sortie (la cellule de coin dans les deux directions). Les sommets gardent leur vraie position monde : seules les données (hauteur, éclairage, couleur, textures) viennent de la cellule bornée.
+
+**Couleur affichée d'un triangle de terrain (lu 2026-10-14 dans `Render_TerrainPipelineMain` et `Palette_ShadeIndexWithFog_2F24E`)** :
+1. **Couleur de base du triangle** = octet +3 du sommet dont la hauteur (+0) est la plus grande en comparaison **non signée** (`cmp dx, fs:[bx]` / `ja` : on garde le plus grand ; à égalité, le dernier ; une hauteur négative passe devant toute hauteur positive).
+2. **Intensité du sommet** = octet +2 × 256 (`mov ah, fs:[bx+2]` / `xor al, al`), interpolée par le découpage du polygone.
+3. **Index de palette de chaque sommet** = `Palette_ShadeIndexWithFog_2F24E(table 541Ah, couleur, intensité ÷ 256, profondeur)` :
+   - entrée de la couleur dans la table : enregistrements de 15 octets ; `+6` = première teinte, `+0Bh` = nombre de teintes n, `+0Dh` = teinte de brouillard ;
+   - teinte = première + arrondi(intensité × n ÷ 256) ;
+   - avec la distance (profondeur ÷ 256), la teinte glisse vers la teinte de brouillard, par paliers lus dans une table de seuils de la même structure (rien sous le 1er seuil, maximum au-delà du dernier).
+4. **Remplissage** : si `byte_6EB21` = 1 (valeur par défaut ; réglage lu par `Cockpit_ReadControlsFrame_8F720`), chaque sommet garde son index et la face est dégradée ; sinon les 3 sommets reçoivent la moyenne des 3 index (face unie).
+5. **Tracé** (lu 2026-10-14) : chaque triangle devient un objet de la liste de primitives (`dword_724AE`) ; classe `193Ah` = triangle ombré, `1A76h` / `1A72h` = triangle texturé (dessine d'abord le triangle ombré, puis la texture). `Render_DispatchFlatOrPerspective` : 3 teintes égales → `Render_PolygonPrimitive_20848` (face unie, index = teinte ÷ 256 tronqué) ; sinon `Render_MeshPrimitive_21085` = **Gouraud sur l'index de palette** : teinte interpolée linéairement le long des bords puis de chaque ligne (virgule fixe 16.16), et **tramage en damier** : sur un pixel sur deux (parité de x XOR y), on ajoute ½ teinte avant de prendre la partie entière. Les pixels alternent donc entre deux teintes voisines là où la teinte tombe entre deux.
+6. **La table `541Ah` est la palette** (`DATA\PALETTE.IFF`, lue par `TextureLoader_LoadMixedFields_983FB`) : `INFO` → `+68h` précision du brouillard (16), `+4Eh` log₂ seuils par ligne (5), `+46h` lignes (20), `+7Ah` pas (9) ; `RANG` (`TextureLoader_FormatAndLoad_985F6`) → `+58h` nombre de couleurs, `+5Ah` entrées de 15 o converties depuis les enregistrements de 13 o par `TextureLoader_Allocate_97F40` (`+0`→`e+6` première teinte, `+2`→`e+0Bh` n, `+4`→`e+0Dh` décalage de brouillard, `+6..8`→`e+8..A`, `+9..12`→`e+2..5`, `e+0` = la palette). Seuils de brouillard : 20 lignes × 32 `dd` lues par `TextureLoader_LoadWithDwordFieldsC_98956` (taille contrôlée = 20 << 5 × 4 = 2 560 o) dans le fichier nommé par `TABL` (« palfade », absent du dépôt). `Palette_SelectFogRow_2EA80` choisit la ligne : valeur ÷ 512, dernière ligne au-delà de 10 240, et range son 1er et son dernier seuil dans `+72h` / `+76h` ; appelée par `Terrain_UpdateLODPerFrame`.
+   **Couleurs de base de `PALETTE.IFF`** (première..dernière teinte, brouillard = première + décalage, RVB × 4) : 0 = 160..166 (bleu, (24,56,76)→(16,96,124)) ; 1 = 32..54 ((52,40,24)→(196,160,96)) ; 2 = 96..118 ((32,28,20)→(120,100,76)) ; 3 = 64..86 ((32,36,20)→(116,136,68)) ; 4 = 128..150 ((16,24,8)→(60,92,36)) ; 5 = 1..22 (gris (36)→(144)) ; 6 = 176..198 ((64)→(244), blanc). Brouillard : première + 31 (+15 pour la 0) = gris (192,192,192) pour les 7. ALASKA n'utilise que 0, 4 et 6. **Appartenance d'une couleur à une gamme** (`Table_LookupByRange_2E975`, lu 2026-10-16) : première ≤ couleur ≤ première + 3e champ (le décalage de brouillard), bornes comprises — la gamme 1 couvre donc 32..63, la 5 couvre 1..31.
+- Non établi : la valeur passée à `Palette_SelectFogRow_2EA80` (altitude de l'observateur ?), et la profondeur exacte utilisée (`[si+12h]` du sommet transformé).
 
 **PAK imbriqué** : `dd taille` puis `dd (offset|0xE0000000) × 324` ; les cellules
 vides pointent toutes vers le même offset (fin de table). 18×18 = 324 = grille de
@@ -1824,10 +2411,12 @@ sur `sub_99120`) :
 | 3 | table param3 | `param3 × 2` o | suite de runs `[count, polyIdx_0 … polyIdx_{count-1}]` ; `0xFFFF` = « liste vide » |
 | 4 | grille | `param2² × 2` o | chaque case = index (en mots) dans la table param3 |
 
-- **Coordonnées sommet = fixed-point 24.8** : `valeur / 256` = pieds monde (même
+- **Coordonnées sommet = fixed-point 24.8** : `valeur / 256` = mètres monde (même
   système que `SCNE` / `JDYN` / `HOME`). Ordre **X, Y, Z** (Z = altitude, 3ᵉ composante).
-  `pad` @+0xC : per-vertex, valeurs observées `0` / `0x4C` / `0xB1` — rôle non figé
-  (corrélé texturé/bord).
+  `pad` @+0xC = **éclairage du sommet** (→ sommet +0x1D, octet haut de l'intensité dans
+  `Render_ObjectPipelineMain`) ; valeurs observées `0` / `0x4C` / `0xB1`. `flag0` @+0 du polygone =
+  **groupe de détail** (→ +0x1C) : `TriOverlay_RenderRegion_31BFF` ne dessine le triangle que si
+  l'observateur est sous la hauteur du groupe et à moins de son rayon (tables de l'en-tête `ATRI`).
 - **Polygone** : `stride 16 o`, **toujours 3 indices** — le format Strike Commander
   n'a **pas** de mix triangle/quad (le pointeur source avance de `0x10` sans
   condition ; le mix quad est une évolution *Pacific Strike*). Les indices sont
@@ -1861,10 +2450,12 @@ sur `sub_99120`) :
 **Vérifié sur `ALASKA.TRI`** (15 196 o, standalone) : PAK imbriqué de 324 entrées,
 **3 régions distinctes** de 4 632 o, chacune `numvertice=192 nbpoly=118 param2=1
 param3=119`, `param3Table = [118, 0, 1, 2, … , 117]`, `grille = [0]`. Y = 2521 /
-1576 / 456 ft → 3 aérodromes ; géométrie **strictement identique** aux 3 (même
+1576 / 456 m → 3 aérodromes ; géométrie **strictement identique** aux 3 (même
 modèle de piste réinstancié), seul l'octet `type` diffère. Le parseur générique
 `scratchpad/tri_parse_general.py` consomme les 3 régions exactement.
 
+> **Réglé côté données (2026-10-14)** : ces enregistrements de ~70 o sont ceux de la ressource `[5]` du PAK (listes d'objets posés, tableau ci-dessus), distincte des régions `.TRI` (ressource `[4]`). Le lien avec le chunk `OBJS` dans le code reste à tracer. Texte d'origine :
+>
 > **Point ouvert** — un passage antérieur avait lu `MAURITAN.TRI` comme une liste
 > de placement d'objets (runs `[u16 count]` + records ~70 o portant des **noms de
 > modèles** ASCII : `HANGB22`, `TOWA24`, `OILOF23`, `OFFA10`, `FAC14`, variantes
@@ -1875,26 +2466,33 @@ modèle de piste réinstancié), seul l'octet `type` diffère. Le parseur géné
 > chunk distinct (candidat : `OBJS` → `<théâtre>.OBJ`), soit format spécifique à un
 > théâtre. Les bâtiments eux-mêmes restent des `OBJECTS\*.IFF` (§6.1).
 
+#### 6.8ter Lumières `WRLD/LGHT` (lu 2026-10-14)
+
+Lecteur : `World_LoadLGHTChunk_A7A10` objet jeu de lumières `5A9Ah` (fonctions de seg058, `LightSet_*`).
+- Chunk : `uint16` poids ambiant ; `uint16` pourcentage (borné à 100, puis × 255 ÷ 100, puis passé à une fonction qui borne encore à 100 : un pourcentage ≥ 40 donne une intensité de 1,0) ; puis enregistrements de 10 o jusqu'à la fin : `uint16` poids, 3 `int16` direction (ordre fichier X, Z, Y ; libRS : `x = c0`, `y = c2`, `z = −c1`), `uint8` normaliser (≠ 0 → longueur 1), 1 octet non référencé par le lecteur.
+- Parts : total = poids ambiant + Σ poids ; part d'une lumière = poids × intensité ÷ total ; part ambiante = poids ambiant × intensité ÷ total.
+- **Usage : modèles 3D uniquement** dans ce qui a été lu. `LightSet_FaceIntensity_2B54A`, appelée par `Mesh_FacePrepareIndirect` et les autres méthodes d'éclairage des éléments de face : intensité = part ambiante + max(0, A · normale) × part de la **première** lumière, bornée à 255. La normale est celle des données du modèle (non transformée dans ces fonctions ; inversée pour une face vue de dos). A est un vecteur passé par l'appelant de ces méthodes, dont l'origine n'est pas tracée : la direction rangée dans les lumières n'est pas lue dans ce calcul (corrigé 2026-10-14). Le terrain, lui, prend l'octet d'éclairage précalculé de ses sommets (§6.8, « Couleur affichée »).
+- Non établi : l'origine du vecteur A (et donc dans quel repère la lumière est exprimée), et l'usage des lumières au-delà de la première.
+
 ### 6.9 Config & sauvegarde
 
 - `Config_LoadOrCreate_26F2B` (seg047) + `Config_LoadAndApplySettings_8EEBC`
   (610 L, ovr265) : fichier **`sc.cfg`** (confirmé seg339) via StreamReader typé ;
-  `Config_ReadCalibration_26F7E` = calibration joystick selon le mode
-  (`byte_722D0/D1/D3`). `Config_ReadSettingsField_8FBE7` /
-  `WriteSettingsField_8FB73` = champ typé r/w.
+  ~~`Config_ReadCalibration_26F7E`~~ : ce sont les **touches ALT du vol**, renommé
+  `Input_AltKeyCommands_26F7E` (2026-11-03, `OPTIONS_SCREEN.md`). `Config_ReadSettingsField_8FBE7` ;
+  `Options_SaveConfig_8FB73` écrit `OPTIONS.CFG`.
 - `SaveGame_ReadFile_A1173` / `WriteFile_A10C0` (seg441) : bascule mode vidéo →
   `File_Open/Create` → `File_Read/WriteOrDelegateToPaged` (support gros fichier via
   mémoire paginée) → `Close`. **Pas de format IFF** : blob binaire direct.
-- `Cockpit_LoadAndInitFull_90D20` (1390 L, ovr267) : `COCKPITS\*` + `EMS_MapPage`
-  (le cockpit vit en mémoire paginée) + `UI_ApplyEncodingHelper` + StreamReader.
-  Écrans d'options `.shp` (seg339) : `joycalib`, `mouse`, `flitopt`, `mainopt`,
-  `detlopt`, `restart`, `gameopt`, `cockopt`, `camropt`, `audiopt`.
+- ~~`Cockpit_LoadAndInitFull_90D20`~~ : c'est le **panneau CONFIGURATION** (ALT+O), renommé
+  `Options_ConfigurationScreen_90D20` ; il charge `FONTS\MAINOPT.SHP`, pas `COCKPITS`. Écrans
+  d'options `.shp` (seg339) : `joycalib`, `mouse`, `flitopt`, `mainopt`, `detlopt`, `restart`,
+  `gameopt`, `cockopt`, `camropt`, `audiopt` — voir `OPTIONS_SCREEN.md` (2026-11-03).
 
 ### 6.10 Textes / dialogues / audio
 
-- `MissionText_LoadAndFormatFromIFF_A636C` (392 L, seg450) : IFF compressé →
-  `TextLabel_LoadFieldsExtended_A61D0` + mesure multi-ligne
-  (`Text_ComputeMaxLineWidth_5E6BF` / `…Height_5E706`) + `ReadPayload`.
+- ~~`MissionText_LoadAndFormatFromIFF_A636C`~~ : **ce n'est pas un texte** — c'est le lecteur du jeu de
+  fumées, renommé `SmokeSet_LoadFromIFF_A636C` (voir §6.1, « Jeu de fumées », 2026-10-12).
 - `MissionText_LoadSubtitleRecord_87A60` (ovr251), `…B_94710` (ovr270),
   `MissionText_DrawTypewriterSynced_975CC` (ovr287) : sous-titres synchronisés
   audio/vidéo (`AV_SyncComputeOffset`, `Text_TypewriterDrawChar`).
@@ -1912,10 +2510,9 @@ modèle de piste réinstancié), seul l'octet `type` diffère. Le parseur géné
 - `UIWidget_LoadDefinitionFromIFF_8D66C` (394 L, ovr258) /
   `UIWidget_LoadFieldsFromIFF_8DB90` (ovr259) : définitions de widgets (IFF,
   `ReadFinalField` répété).
-- `ResourceFile_LoadTypeA…G` (ovr266-269) : **7 grosses fonctions quasi
-  identiques** (470–1400 L), même ouverture (`Path_ResolveDataFile` +
-  `StreamReader_ConstructVariantA` + `GetCapacity`) — à quels 7 types de fichiers
-  elles correspondent reste à établir.
+- ~~`ResourceFile_LoadTypeA…G`~~ (ovr266-269) : ce sont les **sous-écrans du panneau CONFIGURATION**
+  (FLIGHT, DETAIL, EXIT GAME, GAMEPLAY, COCKPIT, CAMERAS, AUDIO), renommés `Options_*Screen_*`
+  (2026-11-03, `OPTIONS_SCREEN.md`) ; leur ouverture commune est le chargement de leur `.SHP`.
 
 ---
 
@@ -1961,7 +2558,7 @@ Fichier .IFF
   WorldObjectModel          MissionScenario ──(champs numériques)──► Expr VM / Nodes (seg114)
    ├─ vtable/type (BOBJ … DEBR)  ├─ MISN: VERS/NAME/CAST/TEAM/PLYR/LOAD/FLAG/PROG/STAT…
    ├─ INFO: rayon de collision   └─ WRLD: INFO/TERA/PALT/LGHT/SKYS/HORZ/SMOK/SCAL
-   ├─ ANGL: angle d'attache            │
+   ├─ ALGN: angle d'attache            │
    ├─ DYNM/JDYN ──► FlightModel        ├── entités ──► MissionLoader_SpawnEntity
    │     (197 o, fixed 24.8)           │      ├─ position   (LoadPosition)
    ├─ géométrie 3D (chunks OBJT)       │      ├─ waypoints   (LoadWaypoint)
@@ -2031,13 +2628,13 @@ Fichier .IFF
    **degrés**, `Cα = 180/π` ; `q = ½·ρ(h)·v²`) ; **courbe manette→poussée**
    `Aero_ThrottleThrustCurve` (piecewise MIL/AF + lapse vitesse) ; asservissement
    d'attitude `±2·√(q'·err)`, `q' = q·jdyn[0x12]/100` ; `g = −9.8 m/s²`
-   (`dword_6FFD7`) ; gains globaux `dword_72A14..2C = 1.0` ; carte des entrées
+   (`dword_6FFD7`) ; gains de dégâts `dword_72A14..2C` (1,0 si intact, `PHYSICS.md` §5.9) ; carte des entrées
    (accès direct sur les axes, pas de trim ; `flags_75` bits 0/1/2).
-   **Restent** : ligne exacte des overrides `vtable[+0x3C]` (masse ≈ chunk `DYNM`)
-   / `vtable[+0x34]` (intégration position) dans la vtable `JDYN` primaire ; les
+   Masse (`vtable[+0x3C]`) = `JDYN_TotalMass_47FF8` (à vide + carburant + emport) ;
+   `vtable[+0x34]` = `JDYN_UpdateDamageGains_494DD` (tranché 2026-09-26). **Restent** : les
    **valeurs de la table `Cd/Cl vs vitesse-air`** (ressource indexée par
    atmosphère `dword_72A0A`, hors binaire) ; le bloc supplémentaire du chunk
-   `ATMO` quand `dword_72A0A≠0` ; `JDYN +0x80..+0x8B` ;
+   `ATMO` quand `dword_72A0A≠0` ;
    `Aero_ComputeControlFlags75Bit5C` (composante `c1` du moment) ; le dispatcher
    clavier de la manette des gaz ; layout complet des sous-objets A/B.
 2. **Sous-chunks de `OBJT`** — la géométrie 3D elle-même (sommets / faces / LOD /
@@ -2049,9 +2646,9 @@ Fichier .IFF
    interne de `AREA`/`SPOT`/`PART`/`CAST`/`NUMS`/`MSGS`/`FLAG`/`PLYR` (fonctions
    `A9956`/`A974A`/`AA6C9`/… seg457), le contenu du chunk `PROG` (bytecode Expr VM),
    le rôle exact de `SCNE.heading` (`+0x0A`, candidat cap), et
-   `MissionRecord_LoadEntityDatabase_7B035` (3103 L, base d'entités indexée).
-4. **`ResourceFile_LoadTypeA…G`** (ovr266-269, 7 fonctions 470–1400 L quasi
-   identiques) — identifier les 7 types de fichiers correspondants.
+   `Player_ShotDownSequence_7B035` (3103 L, séquence « avion du joueur détruit », corps à lire).
+4. ~~**`ResourceFile_LoadTypeA…G`**~~ : identifiés (sous-écrans d'options, `OPTIONS_SCREEN.md`) ;
+   leurs corps restent à lire.
 5. **LZW** — la table de dictionnaire n'a pas été tracée (seul le paramétrage
    9 → 12 bits, clear `0x100`, EOD `0x101` est confirmé).
 6. **Format `.shp`** des écrans d'options — non analysé.
@@ -2059,3 +2656,26 @@ Fichier .IFF
 8. **Cluster `PlayerComponent` (seg432-453)** — confirmé comme lecteur générique
    de paramètres de véhicule/dynamique (§6.2) ; les ~40 variantes de
    constructeurs/lecteurs de champs restent à cartographier une par une.
+
+
+#### Loi de charge — `Aero_ComputeAoACommand_48862` (`sub_48862`, relue intégralement 2026-09-24)
+
+Produit `si[0x16]`, la **consigne d'incidence** que `Aero_ComputeForcesMain` compare à α (`errα = si[0x16] − α`). Tout est en 24.8 (256 = 1.0).
+
+```
+si FLAGS75.bit5 ou q < 1.0 :  si[0x16] = 0 ; fin               q = Aero_DynamicPressure(si[0x10])
+d  = (si[0x67] << 8) × manche / 16     (÷3 de plus si manche < 0)     manche = dword [ctrl+0x1F]
+A  = 0 ; si bit4 ET pas au sol ET !bit6 : A = α ; si α < 0 : A = α × |cos(roulis)|
+c  = −si[0x4C] (− si[0x4D] si bit1, volets)                          octets → << 8
+θ  = tangage du nez (Matrix_NosePitchAngle_57C3A) ; g1 = cos θ, négatif si l'avion est sur le dos
+n  = d + g1                                                          facteur de charge demandé (1 g·cos θ au neutre)
+k  = −( X / q / si[0x61] × 1.5 × dword_6FFD7 )                       incidence par g ; X = [si+2]->vtable+0x3C(si)
+si n ≠ 0 : T = n·k + c ; B = g1·k + c   sinon T = B = c
+si T est entre A et B (inclus) : garder A ; sinon A = T
+si[0x16] = clamp(A, ±(si[0x65] << 8)·dword_72A1C)
+```
+
+- `X` a la forme d'une **masse** (portance = `si[0x61]·α·q`, donc α pour 1 g = m·g/(si[0x61]·q)). **Non prouvé** : c'est la méthode `+0x3C` de la vtable `[si+2]`, question ouverte n°5 de `CLAUDE.md`.
+- `|α|` est calculé (`var_A`) puis **jamais utilisé**.
+- Le terme `g1 = cos θ` est exact. L'ancienne note (« ≈ cos(tangage) par identité ») donnait le bon résultat par deux erreurs qui s'annulaient : un angle pris pour « l'angle avec Z », et un sinus qui était en fait un cosinus.
+- Fonctions lues pour cette relecture : `Matrix_NosePitchAngle_57C3A`, `Math_ElevationAngle_552E1`, `Matrix_RollAngle_57C67`, les arcs et les tables `seg213` (cos, acos et tan, vérifiées valeur par valeur).

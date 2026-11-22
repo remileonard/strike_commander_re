@@ -7,9 +7,12 @@ ovr277		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 165 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndReadB_647B2 (×2).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). FORM TRIS (ex-
+; AircraftComponent_LoadSubrecord) : VTRI → Poly_LoadVTRI_94D40 ; FORM TXMS →
+; Poly_LoadTXMS_95E20 (sinon chunks TXMS, 8 o par entrée, et ANMS, 10 o, via
+; VROOMM_StubThunk_6CD62 puis 6BAC0/6BAF0) ; UVXY → Poly_LoadUVXY_96650.
 ; ==============================================================================================
-AircraftComponent_LoadSubrecord_95FD0	proc far		; CODE XREF: VROOMM_StubThunk_6BA00J
+Poly_LoadTRIS_95FD0	proc far		; CODE XREF: VROOMM_StubThunk_6BA00J
 
 var_2		= word ptr -2
 arg_0		= dword	ptr  6
@@ -31,7 +34,7 @@ arg_4		= word ptr  0Ah
 		jmp	loc_96130
 ; ���������������������������������������������������������������������������
 
-loc_95FF3:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+1Ej
+loc_95FF3:				; CODE XREF: Poly_LoadTRIS_95FD0+1Ej
 		push	0
 		push	large 49525456h
 		push	si
@@ -47,7 +50,7 @@ loc_95FF3:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+1Ej
 		mov	[si+65h], eax
 		mov	byte ptr [si+6Dh], 0
 
-loc_96021:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+36j
+loc_96021:				; CODE XREF: Poly_LoadTRIS_95FD0+36j
 		push	0
 		push	large 534D5854h
 		push	si
@@ -65,7 +68,7 @@ loc_96021:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+36j
 		jmp	loc_96107
 ; ���������������������������������������������������������������������������
 
-loc_9604D:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+64j
+loc_9604D:				; CODE XREF: Poly_LoadTRIS_95FD0+64j
 		xor	di, di
 		push	0
 		push	large 534D5854h
@@ -82,7 +85,7 @@ loc_96060:
 		idiv	ebx
 		mov	di, ax
 
-loc_96075:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+92j
+loc_96075:				; CODE XREF: Poly_LoadTRIS_95FD0+92j
 		mov	[bp+var_2], 0
 		push	0
 		push	large 534D4E41h
@@ -97,13 +100,13 @@ loc_96075:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+92j
 		idiv	ebx
 		mov	[bp+var_2], ax
 
-loc_960A1:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+BDj
+loc_960A1:				; CODE XREF: Poly_LoadTRIS_95FD0+BDj
 		or	di, di
 		jnz	short loc_960AB
 		cmp	[bp+var_2], 0
 		jz	short loc_960C1
 
-loc_960AB:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+D3j
+loc_960AB:				; CODE XREF: Poly_LoadTRIS_95FD0+D3j
 		push	[bp+var_2]
 		push	di
 		mov	ax, word ptr [bp+arg_0]
@@ -119,7 +122,7 @@ loc_960B9:
 		call	VROOMM_StubThunk_6CD62
 		add	sp, 8
 
-loc_960C1:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+D9j
+loc_960C1:				; CODE XREF: Poly_LoadTRIS_95FD0+D9j
 		or	di, di
 		jz	short loc_960E3
 
@@ -136,7 +139,7 @@ loc_960C7:
 		call	VROOMM_StubThunk_6BAC0
 		add	sp, 6
 
-loc_960E3:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+F3j
+loc_960E3:				; CODE XREF: Poly_LoadTRIS_95FD0+F3j
 		cmp	[bp+var_2], 0
 		jz	short loc_96107
 		push	0
@@ -149,8 +152,8 @@ loc_960E3:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+F3j
 		call	VROOMM_StubThunk_6BAF0
 		add	sp, 6
 
-loc_96107:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+7Aj
-					; AircraftComponent_LoadSubrecord_95FD0+117j
+loc_96107:				; CODE XREF: Poly_LoadTRIS_95FD0+7Aj
+					; Poly_LoadTRIS_95FD0+117j
 		push	0
 		push	large 59585655h
 		push	si
@@ -163,16 +166,16 @@ loc_96107:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+7Aj
 		call	VROOMM_StubThunk_6BB20
 		add	sp, 6
 
-loc_96129:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+14Aj
+loc_96129:				; CODE XREF: Poly_LoadTRIS_95FD0+14Aj
 		push	si
 		call	ResourceRecord_ReleaseAndClear_64D25
 		pop	cx
 
-loc_96130:				; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+20j
+loc_96130:				; CODE XREF: Poly_LoadTRIS_95FD0+20j
 		pop	di
 		pop	si
 		leave
 		retf
-AircraftComponent_LoadSubrecord_95FD0	endp
+Poly_LoadTRIS_95FD0	endp
 
 ovr277		ends

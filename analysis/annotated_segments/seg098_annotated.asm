@@ -119,7 +119,12 @@ loc_45B6C:				; CODE XREF: seg098:0087j seg098:0090j ...
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_45B76:				; DATA XREF: seg339:off_6FD54o
+; ==============================================================================================
+; far (label), LUE 2026-10-15. Slot +0x88 de l'instance XMIT (categorie 0x15, seg339 0x6FD54)
+; : opcode 0xAB (message) avec l'octet +0x5D non nul -> RadioQueue_AllocateSlot(+0x51,
+; message) ; renvoie 1 pour tout opcode.
+; ==============================================================================================
+Xmit_OnScriptOpcode_45B76:				; DATA XREF: seg339:off_6FD54o
 		push	bp
 		mov	bp, sp
 		sub	sp, 6

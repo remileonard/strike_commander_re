@@ -616,7 +616,7 @@ loc_443A3:				; CODE XREF: Collision_ComputeConnectionVector+1C2j
 		push	ss
 		lea	ax, [bp+var_1E]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp+var_A]
 		mov	edx, [bp+var_1E]
@@ -637,7 +637,7 @@ loc_443DD:				; CODE XREF: Collision_ComputeConnectionVector+1FCj
 		push	ss
 		lea	ax, [bp+var_2A]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_A]
 		mov	edx, [bp+var_2A]
@@ -1721,7 +1721,7 @@ loc_44C7E:				; CODE XREF: Collision_SelectCandidates+A5j
 		push	ss
 		lea	ax, [bp+var_1C]
 		push	ax
-		call	Gauge_ComputeNeedlePosition
+		call	Aircraft_GroundClearance_3E5A6
 		add	sp, 6
 		mov	eax, [bp+var_A]
 		add	eax, [bp+var_1C]
@@ -2341,11 +2341,11 @@ loc_45130:				; CODE XREF: Collision_MainLoop+1A0j
 		jz	short loc_45153
 		push	[bp+var_6]
 		push	59C3h
-		call	Container_Op_223C5
+		call	WorldObjects_RemoveAndDelete_223C5
 		add	sp, 4
 		push	[bp+var_6]
 		push	word_70474
-		call	Picking_FindSelectableTyped
+		call	Terrain_MarkPlacedObjectGone_37C33
 		add	sp, 4
 
 loc_45153:				; CODE XREF: Collision_MainLoop+22Cj
@@ -2353,11 +2353,11 @@ loc_45153:				; CODE XREF: Collision_MainLoop+22Cj
 		jz	short loc_45176
 		push	[bp+var_8]
 		push	59C3h
-		call	Container_Op_223C5
+		call	WorldObjects_RemoveAndDelete_223C5
 		add	sp, 4
 		push	[bp+var_8]
 		push	word_70474
-		call	Picking_FindSelectableTyped
+		call	Terrain_MarkPlacedObjectGone_37C33
 		add	sp, 4
 
 loc_45176:				; CODE XREF: Collision_MainLoop+180j

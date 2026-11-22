@@ -19,7 +19,7 @@ stru_6BDA0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:09EEo
 ; d'overlay actuellement charge en memoire. fileoff=27BC0h, codesize=4CEh, nentries=7.
 ; ==============================================================================================
 VROOMM_StubThunk_6BDC0	proc far		; CODE XREF: Terrain_ComputeLODMesh+361P
-		jmp	IndexedRecordReader_ScanAndReadTypedB_99B7F
+		jmp	Terrain_LoadElevCell_99B7F
 VROOMM_StubThunk_6BDC0	endp
 
 

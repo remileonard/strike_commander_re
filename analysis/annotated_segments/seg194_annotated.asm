@@ -123,7 +123,7 @@ ResourceRecord_WriteFieldGroupA_64E50	endp
 ; far, combine sub_6568F (×2) et ResourceRecord_WriteField_64E1D.
 ; ==============================================================================================
 ResourceRecord_WriteFieldGroupB_64EC0	proc far		; CODE XREF: ResourceRecord_CopyOrTransform_652D5+28p
-					; MissionScenario_ResolveAndBindExpressions_A8F22+ADP
+					; Mission_WriteResultReport_A8F22+ADP
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -199,7 +199,7 @@ ResourceRecord_WriteFieldGroupB_64EC0	endp
 ; Runtime_FatalErrorHandlerWithTag (sub_5F4A9), même motif que
 ; ResourceRecord_AllocateAndDecode_64C21 (seg193).
 ; ==============================================================================================
-ResourceRecord_AllocateAndDecodeVariant_64F56	proc far		; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+BAP
+ResourceRecord_AllocateAndDecodeVariant_64F56	proc far		; CODE XREF: Mission_WriteResultReport_A8F22+BAP
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -273,8 +273,8 @@ ResourceRecord_AllocateAndDecodeVariant_64F56	endp
 ; ==============================================================================================
 ; far, enveloppe appelant sub_6501E. Référencée par sub_A8F22.
 ; ==============================================================================================
-ResourceRecord_WriteFieldWrapper_64FD8	proc far		; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+100P
-					; MissionScenario_ResolveAndBindExpressions_A8F22+156P ...
+ResourceRecord_WriteFieldWrapper_64FD8	proc far		; CODE XREF: Mission_WriteResultReport_A8F22+100P
+					; Mission_WriteResultReport_A8F22+156P ...
 
 arg_0		= word ptr  6
 
@@ -299,7 +299,7 @@ ResourceRecord_WriteFieldWrapper_64FD8	endp
 ; far, combine sub_65073 et ResourceRecord_ReleaseAndClear_64D25.
 ; ==============================================================================================
 ResourceRecord_SeekAndRelease_64FE7	proc far		; CODE XREF: seg194:01FAp
-					; MissionScenario_ResolveAndBindExpressions_A8F22+436P
+					; Mission_WriteResultReport_A8F22+436P
 
 arg_0		= word ptr  6
 

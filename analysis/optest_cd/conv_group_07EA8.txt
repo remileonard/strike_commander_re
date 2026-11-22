@@ -1,0 +1,775 @@
+07EA8  mov byte ptr [bp - 0x3c], 1
+07EAC  cmp byte ptr [0x69d4], 0
+07EB1  je 0x7f18
+07EB3  cmp byte ptr [bp - 0x1b3], 0
+07EB8  je 0x7edb
+07EBA  cmp dword ptr [bp - 0x1b8], 0
+07EC0  je 0x7edb
+07EC2  push 0
+07EC4  mov al, byte ptr [bp - 0x1b4]
+07EC8  push ax
+07EC9  lea ax, [bp - 0x1b8]
+07ECD  push ax
+07ECE  push 0x6a62
+07ED1  lcall 0x34ca, 0x17d  ; -> 34E1D
+07ED6  add sp, 8
+07ED9  jmp 0x7edb
+07EDB  mov dword ptr [bp - 0x1b8], 0
+07EE4  mov byte ptr [bp - 0x1b3], 0
+07EE9  mov dword ptr [bp - 0x1b2], 0
+07EF2  mov word ptr [bp - 0x260], 0xc40
+07EF8  lea ax, [bp - 0x260]
+07EFC  push ax
+07EFD  lcall 0x4497, 0xa4  ; -> 44A14
+07F02  add sp, 2
+07F05  push 0
+07F07  lea ax, [bp - 0x260]
+07F0B  push ax
+07F0C  lcall 0x4528, 0x121  ; -> 453A1
+07F11  add sp, 4
+07F14  pop di
+07F15  pop si
+07F16  leave 
+07F17  retf 
+07F18  mov ax, di
+07F1A  add ax, 0x1a
+07F1D  mov word ptr [bp - 0x42], ax
+07F20  push word ptr [bp - 0x42]
+07F23  lea ax, [bp - 0x40]
+07F26  push ax
+07F27  lcall 0x36e8, 3  ; -> 36E83
+07F2C  add sp, 4
+07F2F  push 0x100
+07F32  push 0
+07F34  lea ax, [bp - 0x48]
+07F37  push ax
+07F38  lcall 0x36f0, 2  ; -> 36F02
+07F3D  add sp, 6
+07F40  mov ax, di
+07F42  add ax, 0xc
+07F45  push ax
+07F46  push 0
+07F48  push 0xa
+07F4A  lea ax, [bp - 0x31a]
+07F4E  push ax
+07F4F  lcall 0x35ef, 0x2aa  ; -> 3619A
+07F54  add sp, 8
+07F57  mov word ptr [bp - 0x50], 0
+07F5C  mov word ptr [bp - 0x4e], 0x98
+07F61  mov word ptr [bp - 0x4c], 0x13f
+07F66  mov word ptr [bp - 0x4a], 0xc7
+07F6B  mov ax, di
+07F6D  add ax, 0x2c
+07F70  push ax
+07F71  push word ptr [0x4668]
+07F75  sub sp, 8
+07F78  mov ax, word ptr [bp - 0x50]
+07F7B  mov word ptr [bp - 0x3d2], ax
+07F7F  mov ax, word ptr [bp - 0x4e]
+07F82  mov word ptr [bp - 0x3d0], ax
+07F86  mov ax, word ptr [bp - 0x4c]
+07F89  mov word ptr [bp - 0x3ce], ax
+07F8D  mov ax, word ptr [bp - 0x4a]
+07F90  mov word ptr [bp - 0x3cc], ax
+07F94  lea ax, [bp - 0x33c]
+07F98  push ax
+07F99  lcall 0x4942, 0xca  ; -> 494EA
+07F9E  add sp, 0xe
+07FA1  push 0
+07FA3  lea ax, [bp - 0x33c]
+07FA7  push ax
+07FA8  lcall 0x4942, 0x17d  ; -> 4959D
+07FAD  add sp, 4
+07FB0  mov word ptr [bp - 0x348], 0x1914
+07FB6  mov byte ptr [bp - 0x346], 0
+07FBB  mov word ptr [bp - 0x348], 0x18e8
+07FC1  push di
+07FC2  lea ax, [bp - 0x348]
+07FC6  push ax
+07FC7  lcall 0xc8c, 8  ; -> 0C8C8
+07FCC  add sp, 4
+07FCF  lea ax, [bp - 0x345]
+07FD3  mov word ptr [bp - 0x52], ax
+07FD6  lea ax, [bp - 0x58]
+07FD9  push ax
+07FDA  lea ax, [bp - 0x56]
+07FDD  push ax
+07FDE  lea ax, [bp - 0x54]
+07FE1  push ax
+07FE2  push word ptr [bp - 0x52]
+07FE5  push di
+07FE6  push cs
+07FE7  call 0x7537
+07FEA  add sp, 0xa
+07FED  mov byte ptr [bp - 0x59], al
+07FF0  mov word ptr [bp - 0x5c], 0
+07FF5  jmp 0x8033
+07FF7  mov ax, word ptr [bp - 0x5c]
+07FFA  shl ax, 1
+07FFC  mov bx, word ptr [bp - 0x58]
+07FFF  add bx, ax
+08001  push word ptr [bx]
+08003  push 0
+08005  mov ax, word ptr [bp - 0x5c]
+08008  mov dx, 0xa
+0800B  imul dx
+0800D  mov dx, word ptr [bp - 0x54]
+08010  add dx, ax
+08012  push dx
+08013  push 0
+08015  lcall 0x35ef, 0x5df  ; -> 364CF
+0801A  add sp, 8
+0801D  mov word ptr [bp - 0x62], ax
+08020  push word ptr [bp - 0x62]
+08023  lea ax, [bp - 0x31a]
+08027  push ax
+08028  lcall 0x35ef, 0x1c8  ; -> 360B8
+0802D  add sp, 4
+08030  inc word ptr [bp - 0x5c]
+08033  mov al, byte ptr [bp - 0x59]
+08036  mov ah, 0
+08038  cmp ax, word ptr [bp - 0x5c]
+0803B  jg 0x7ff7
+0803D  mov word ptr [bp - 0x5c], 0
+08042  jmp 0x808e
+08044  mov ax, word ptr [bp - 0x5c]
+08047  mov dx, 0xa
+0804A  imul dx
+0804C  mov dx, word ptr [bp - 0x56]
+0804F  add dx, ax
+08051  mov word ptr [bp - 0x68], dx
+08054  mov word ptr [bp - 0x63], 0
+08059  push word ptr [bp - 0x68]
+0805C  lea ax, [bp - 0x66]
+0805F  push ax
+08060  lcall 0x36f0, 0x71  ; -> 36F71
+08065  add sp, 4
+08068  push word ptr [bp - 0x66]
+0806B  mov al, byte ptr [bp - 0x64]
+0806E  push ax
+0806F  lea ax, [bp - 0x66]
+08072  push ax
+08073  lea ax, [bp - 0x48]
+08076  push ax
+08077  lcall 0x36f0, 0x30c  ; -> 3720C
+0807C  add sp, 8
+0807F  lea ax, [bp - 0x66]
+08082  push ax
+08083  lcall 0x36f0, 0x3d4  ; -> 372D4
+08088  add sp, 2
+0808B  inc word ptr [bp - 0x5c]
+0808E  mov al, byte ptr [bp - 0x59]
+08091  mov ah, 0
+08093  cmp ax, word ptr [bp - 0x5c]
+08096  jg 0x8044
+08098  mov dword ptr [bp - 0x6a], 0
+080A0  mov byte ptr [bp - 0x66], 2
+080A4  mov byte ptr [bp - 0x65], 0
+080A8  mov dword ptr [bp - 0x64], 0
+080B0  push 2
+080B2  lea ax, [bp - 0x6a]
+080B5  push ax
+080B6  push di
+080B7  push cs
+080B8  call 0x7519
+080BB  add sp, 6
+080BE  mov word ptr [bp - 0x6d], 0
+080C3  lea ax, [bp - 0x6a]
+080C6  push ax
+080C7  lea ax, [bp - 0x70]
+080CA  push ax
+080CB  lcall 0x36f0, 0x71  ; -> 36F71
+080D0  add sp, 4
+080D3  push word ptr [bp - 0x70]
+080D6  mov al, byte ptr [bp - 0x6e]
+080D9  push ax
+080DA  lea ax, [bp - 0x70]
+080DD  push ax
+080DE  lea ax, [bp - 0x48]
+080E1  push ax
+080E2  lcall 0x36f0, 0x30c  ; -> 3720C
+080E7  add sp, 8
+080EA  lea ax, [bp - 0x70]
+080ED  push ax
+080EE  lcall 0x36f0, 0x3d4  ; -> 372D4
+080F3  add sp, 2
+080F6  cmp byte ptr [bp - 0x65], 0
+080FA  je 0x811a
+080FC  cmp dword ptr [bp - 0x6a], 0
+08101  je 0x811a
+08103  push 0
+08105  mov al, byte ptr [bp - 0x66]
+08108  push ax
+08109  lea ax, [bp - 0x6a]
+0810C  push ax
+0810D  push 0x6a62
+08110  lcall 0x34ca, 0x17d  ; -> 34E1D
+08115  add sp, 8
+08118  jmp 0x811a
+0811A  mov dword ptr [bp - 0x6a], 0
+08122  mov byte ptr [bp - 0x65], 0
+08126  mov dword ptr [bp - 0x64], 0
+0812E  mov byte ptr [bp - 0x5d], 1
+08132  push 0x4b36
+08135  push 0x25
+08138  push 1
+0813A  push 0xa
+0813C  push 0xa
+0813E  lea ax, [bp - 0x3ac]
+08142  push ax
+08143  lcall 0, 0x1706  ; -> 01706
+08148  add sp, 0xc
+0814B  mov word ptr [bp - 0x60], 0
+08150  jmp 0x8293
+08153  inc word ptr [di + 4]
+08156  mov word ptr [bp - 0x3bc], 0x1914
+0815C  mov byte ptr [bp - 0x3ba], 1
+08161  mov word ptr [bp - 0x3bc], 0x18e0
+08167  push di
+08168  lea ax, [bp - 0x3bc]
+0816C  push ax
+0816D  lcall 0xc8c, 0x1c1  ; -> 0CA81
+08172  add sp, 4
+08175  lea ax, [bp - 0x3b9]
+08179  mov word ptr [bp - 0x62], ax
+0817C  push word ptr [bp - 0x62]
+0817F  lcall 0, 0x2f09  ; -> 02F09
+08184  add sp, 2
+08187  mov dx, word ptr [bp - 0x62]
+0818A  add dx, ax
+0818C  mov bx, dx
+0818E  mov al, byte ptr [bx - 1]
+08191  mov byte ptr [bp - 0x63], al
+08194  inc word ptr [bp - 0x60]
+08197  push 3
+08199  mov ax, word ptr [bp - 0x60]
+0819C  mov dx, 0xa
+0819F  imul dx
+081A1  lea dx, [bp - 0x3ac]
+081A5  add ax, dx
+081A7  push ax
+081A8  push word ptr [bp - 0x62]
+081AB  push di
+081AC  push cs
+081AD  call 0x74fb
+081B0  add sp, 8
+081B3  mov al, byte ptr [bp - 0x63]
+081B6  push ax
+081B7  push word ptr [bp - 0x3ae]
+081BB  push word ptr [bp - 0x3b0]
+081BF  mov ax, word ptr [bp - 0x60]
+081C2  mov dx, 0xa
+081C5  imul dx
+081C7  lea dx, [bp - 0x3ac]
+081CB  add ax, dx
+081CD  push ax
+081CE  push 0
+081D0  lcall 0x108a, 0x181b  ; -> 120BB
+081D5  add sp, 0xa
+081D8  mov word ptr [bp - 0x66], ax
+081DB  push word ptr [bp - 0x66]
+081DE  lea ax, [bp - 0x31a]
+081E2  push ax
+081E3  lcall 0x35ef, 0x1c8  ; -> 360B8
+081E8  add sp, 4
+081EB  cmp byte ptr [bp - 0x5d], 0
+081EF  jne 0x81f4
+081F1  jmp 0x8293
+081F4  mov dword ptr [bp - 0x70], 0
+081FC  mov byte ptr [bp - 0x6c], 2
+08200  mov byte ptr [bp - 0x6b], 0
+08204  mov dword ptr [bp - 0x6a], 0
+0820C  push 2
+0820E  lea ax, [bp - 0x70]
+08211  push ax
+08212  push word ptr [bp - 0x62]
+08215  push 4
+08217  push di
+08218  push cs
+08219  call 0x7276
+0821C  add sp, 0xa
+0821F  mov word ptr [bp - 0x73], 0
+08224  lea ax, [bp - 0x70]
+08227  push ax
+08228  lea ax, [bp - 0x76]
+0822B  push ax
+0822C  lcall 0x36f0, 0x71  ; -> 36F71
+08231  add sp, 4
+08234  push word ptr [bp - 0x76]
+08237  mov al, byte ptr [bp - 0x74]
+0823A  push ax
+0823B  lea ax, [bp - 0x76]
+0823E  push ax
+0823F  lea ax, [bp - 0x48]
+08242  push ax
+08243  lcall 0x36f0, 0x30c  ; -> 3720C
+08248  add sp, 8
+0824B  mov byte ptr [bp - 0x5d], 0
+0824F  lea ax, [bp - 0x76]
+08252  push ax
+08253  lcall 0x36f0, 0x3d4  ; -> 372D4
+08258  add sp, 2
+0825B  cmp byte ptr [bp - 0x6b], 0
+0825F  je 0x827f
+08261  cmp dword ptr [bp - 0x70], 0
+08266  je 0x827f
+08268  push 0
+0826A  mov al, byte ptr [bp - 0x6c]
+0826D  push ax
+0826E  lea ax, [bp - 0x70]
+08271  push ax
+08272  push 0x6a62
+08275  lcall 0x34ca, 0x17d  ; -> 34E1D
+0827A  add sp, 8
+0827D  jmp 0x827f
+0827F  mov dword ptr [bp - 0x70], 0
+08287  mov byte ptr [bp - 0x6b], 0
+0828B  mov dword ptr [bp - 0x6a], 0
+08293  les bx, ptr [di + 4]
+08296  cmp byte ptr es:[bx], 1
+0829A  jne 0x829f
+0829C  jmp 0x8153
+0829F  mov ax, word ptr [di]
+082A1  add ax, word ptr [di + 8]
+082A4  cmp ax, word ptr [di + 4]
+082A7  ja 0x82ae
+082A9  mov ax, 1
+082AC  jmp 0x82b0
+082AE  xor ax, ax
+082B0  or al, al
+082B2  jne 0x82bd
+082B4  les bx, ptr [di + 4]
+082B7  cmp byte ptr es:[bx], 2
+082BB  je 0x8334
+082BD  push 0
+082BF  push word ptr [0x4668]
+082C3  lcall 0x37cb, 0x2e5  ; -> 37F95
+082C8  add sp, 4
+082CB  push 0
+082CD  push word ptr [bp - 0x48]
+082D0  mov al, byte ptr [bp - 0x46]
+082D3  push ax
+082D4  lea ax, [bp - 0x48]
+082D7  push ax
+082D8  lcall 0x36f0, 0x16d  ; -> 3706D
+082DD  add sp, 8
+082E0  lea ax, [bp - 0x31a]
+082E4  push ax
+082E5  lcall 0x35ef, 0x3ca  ; -> 362BA
+082EA  add sp, 2
+082ED  xor eax, eax
+082F0  mov dword ptr [bp - 0x64], eax
+082F4  mov dword ptr [bp - 0x68], eax
+082F8  lcall 0x143f, 8  ; -> 143F8
+082FD  mov word ptr [bp - 0x6a], 0
+08302  jmp 0x832e
+08304  lcall 0x143f, 0x4c7  ; -> 148B7
+08309  or al, al
+0830B  je 0x830f
+0830D  jmp 0x8334
+0830F  mov dword ptr [bp - 0x64], 0xa
+08317  mov eax, dword ptr [0x510f]
+0831B  mov dword ptr [bp - 0x68], eax
+0831F  lea ax, [bp - 0x68]
+08322  push ax
+08323  lcall 0x4706, 0x21d  ; -> 4727D
+08328  add sp, 2
+0832B  inc word ptr [bp - 0x6a]
+0832E  cmp word ptr [bp - 0x6a], 7
+08332  jl 0x8304
+08334  jmp 0x86e5
+08337  mov word ptr [bp - 0x3c2], 0x1914
+0833D  mov byte ptr [bp - 0x3c0], 2
+08342  mov word ptr [bp - 0x3c2], 0x18d8
+08348  mov word ptr [bp - 0x3b1], 0
+0834E  mov word ptr [bp - 0x3af], 0
+08354  inc word ptr [di + 4]
+08357  push di
+08358  lea ax, [bp - 0x3c2]
+0835C  push ax
+0835D  lcall 0xc8c, 0x24b  ; -> 0CB0B
+08362  add sp, 4
+08365  push 3
+08367  mov ax, word ptr [bp - 0x60]
+0836A  mov dx, 0xa
+0836D  imul dx
+0836F  lea dx, [bp - 0x3ac]
+08373  add ax, dx
+08375  push ax
+08376  lea ax, [bp - 0x3bf]
+0837A  push ax
+0837B  push di
+0837C  push cs
+0837D  call 0x74fb
+08380  add sp, 8
+08383  push word ptr [bp - 0x3b4]
+08387  push word ptr [bp - 0x3b6]
+0838B  mov ax, word ptr [bp - 0x60]
+0838E  mov dx, 0xa
+08391  imul dx
+08393  lea dx, [bp - 0x3ac]
+08397  add ax, dx
+08399  push ax
+0839A  push 0
+0839C  lcall 0x108a, 0xe7c  ; -> 1171C
+083A1  add sp, 8
+083A4  mov si, ax
+083A6  push si
+083A7  lea ax, [bp - 0x31a]
+083AB  push ax
+083AC  lcall 0x35ef, 0x1c8  ; -> 360B8
+083B1  add sp, 4
+083B4  cmp byte ptr [bp - 0x5d], 0
+083B8  jne 0x83bd
+083BA  jmp 0x8457
+083BD  mov dword ptr [bp - 0x6a], 0
+083C5  mov byte ptr [bp - 0x66], 2
+083C9  mov byte ptr [bp - 0x65], 0
+083CD  mov dword ptr [bp - 0x64], 0
+083D5  push 2
+083D7  lea ax, [bp - 0x6a]
+083DA  push ax
+083DB  push di
+083DC  push cs
+083DD  call 0x7519
+083E0  add sp, 6
+083E3  mov word ptr [bp - 0x6d], 0
+083E8  lea ax, [bp - 0x6a]
+083EB  push ax
+083EC  lea ax, [bp - 0x70]
+083EF  push ax
+083F0  lcall 0x36f0, 0x71  ; -> 36F71
+083F5  add sp, 4
+083F8  push word ptr [bp - 0x70]
+083FB  mov al, byte ptr [bp - 0x6e]
+083FE  push ax
+083FF  lea ax, [bp - 0x70]
+08402  push ax
+08403  lea ax, [bp - 0x48]
+08406  push ax
+08407  lcall 0x36f0, 0x30c  ; -> 3720C
+0840C  add sp, 8
+0840F  mov byte ptr [bp - 0x5d], 0
+08413  lea ax, [bp - 0x70]
+08416  push ax
+08417  lcall 0x36f0, 0x3d4  ; -> 372D4
+0841C  add sp, 2
+0841F  cmp byte ptr [bp - 0x65], 0
+08423  je 0x8443
+08425  cmp dword ptr [bp - 0x6a], 0
+0842A  je 0x8443
+0842C  push 0
+0842E  mov al, byte ptr [bp - 0x66]
+08431  push ax
+08432  lea ax, [bp - 0x6a]
+08435  push ax
+08436  push 0x6a62
+08439  lcall 0x34ca, 0x17d  ; -> 34E1D
+0843E  add sp, 8
+08441  jmp 0x8443
+08443  mov dword ptr [bp - 0x6a], 0
+0844B  mov byte ptr [bp - 0x65], 0
+0844F  mov dword ptr [bp - 0x64], 0
+08457  lea ax, [bp - 0xc]
+0845A  push ax
+0845B  push word ptr [bp - 0x52]
+0845E  lcall 0, 0x2e40  ; -> 02E40
+08463  add sp, 4
+08466  or ax, ax
+08468  je 0x849c
+0846A  push 0
+0846C  push word ptr [0x4668]
+08470  lcall 0x37cb, 0x2e5  ; -> 37F95
+08475  add sp, 4
+08478  push 0
+0847A  push word ptr [bp - 0x48]
+0847D  mov al, byte ptr [bp - 0x46]
+08480  push ax
+08481  lea ax, [bp - 0x48]
+08484  push ax
+08485  lcall 0x36f0, 0x16d  ; -> 3706D
+0848A  add sp, 8
+0848D  push word ptr [bp - 0x52]
+08490  lea ax, [bp - 0xc]
+08493  push ax
+08494  lcall 0, 0x2e6f  ; -> 02E6F
+08499  add sp, 4
+0849C  mov word ptr [bp - 0x2fd], 0
+084A2  lea ax, [bp - 0x31a]
+084A6  push ax
+084A7  lcall 0x35ef, 0x3ca  ; -> 362BA
+084AC  add sp, 2
+084AF  cmp byte ptr [bp - 0x3c], 1
+084B3  jne 0x8500
+084B5  mov byte ptr [bp - 0x3c], 0
+084B9  xor eax, eax
+084BC  mov dword ptr [bp - 0x64], eax
+084C0  mov dword ptr [bp - 0x68], eax
+084C4  lcall 0x143f, 8  ; -> 143F8
+084C9  mov word ptr [bp - 0x6a], 0
+084CE  jmp 0x84fa
+084D0  lcall 0x143f, 0x4c7  ; -> 148B7
+084D5  or al, al
+084D7  je 0x84db
+084D9  jmp 0x8500
+084DB  mov dword ptr [bp - 0x64], 0xa
+084E3  mov eax, dword ptr [0x510f]
+084E7  mov dword ptr [bp - 0x68], eax
+084EB  lea ax, [bp - 0x68]
+084EE  push ax
+084EF  lcall 0x4706, 0x21d  ; -> 4727D
+084F4  add sp, 2
+084F7  inc word ptr [bp - 0x6a]
+084FA  cmp word ptr [bp - 0x6a], 7
+084FE  jl 0x84d0
+08500  push word ptr [bp - 0x3b1]
+08504  lcall 0, 0x2f09  ; -> 02F09
+08509  add sp, 2
+0850C  or ax, ax
+0850E  ja 0x8513
+08510  jmp 0x85b5
+08513  cmp word ptr [0x4031], 0
+08518  jne 0x851d
+0851A  jmp 0x85b5
+0851D  cmp byte ptr [bp - 0x28], 0
+08521  jne 0x8526
+08523  jmp 0x85b5
+08526  push ds
+08527  push 0x1780  ; ".voc"
+0852A  push ds
+0852B  push word ptr [bp - 0x3b1]
+0852F  push ds
+08530  push 0x177d  ; "f:"
+08533  lea ax, [bp - 0x158]
+08537  push ax
+08538  lcall 0x13d4, 0xbc  ; -> 13DFC
+0853D  add sp, 0xe
+08540  lea ax, [bp - 0x158]
+08544  push ax
+08545  lea ax, [bp - 0x260]
+08549  push ax
+0854A  lcall 0x4fc, 0x374  ; -> 05334
+0854F  add sp, 4
+08552  or al, al
+08554  je 0x8568
+08556  push 0xa
+08558  lea ax, [bp - 0x1b8]
+0855C  push ax
+0855D  push si
+0855E  lcall 0x108a, 0x994  ; -> 11234
+08563  add sp, 6
+08566  jmp 0x8587
+08568  lea ax, [bp - 0x158]
+0856C  push ax
+0856D  push si
+0856E  lcall 0x108a, 0x963  ; -> 11203
+08573  add sp, 4
+08576  push 0xa
+08578  mov ax, si
+0857A  add ax, 0x40
+0857D  push ax
+0857E  push si
+0857F  lcall 0x108a, 0x994  ; -> 11234
+08584  add sp, 6
+08587  push 1
+08589  lea ax, [bp - 0x158]
+0858D  push ax
+0858E  lea ax, [bp - 0x260]
+08592  push ax
+08593  lcall 0x4fc, 0xdf  ; -> 0509F
+08598  add sp, 6
+0859B  push si
+0859C  lcall 0x108a, 0x90c  ; -> 111AC
+085A1  add sp, 2
+085A4  push 2
+085A6  lea ax, [bp - 0x260]
+085AA  push ax
+085AB  lcall 0x4fc, 0x1e8  ; -> 051A8
+085B0  add sp, 4
+085B3  jmp 0x85c2
+085B5  push word ptr [bp - 0x3af]
+085B9  push si
+085BA  lcall 0x108a, 0x8b9  ; -> 11159
+085BF  add sp, 4
+085C2  jmp 0x85f5
+085C4  lcall 0x143f, 0x4c7  ; -> 148B7
+085C9  or al, al
+085CB  je 0x85e8
+085CD  inc byte ptr [bp - 0x29]
+085D0  cmp word ptr [si + 0x32], 0
+085D4  je 0x85e6
+085D6  mov bx, word ptr [si + 0x32]
+085D9  push word ptr [bx + 4]
+085DC  lcall 0x31dc, 0xc13  ; -> 329D3
+085E1  add sp, 2
+085E4  jmp 0x85e6
+085E6  jmp 0x8602
+085E8  lea ax, [bp - 0x31a]
+085EC  push ax
+085ED  lcall 0x35ef, 0x3ca  ; -> 362BA
+085F2  add sp, 2
+085F5  push si
+085F6  lcall 0x108a, 0x90c  ; -> 111AC
+085FB  add sp, 2
+085FE  or al, al
+08600  jne 0x85c4
+08602  lcall 0x4fc, 0x36a  ; -> 0532A
+08607  push si
+08608  mov bx, word ptr [si]
+0860A  lcall [bx + 0x1c]
+0860D  add sp, 2
+08610  push word ptr [bp - 0x3b1]
+08614  lcall 0, 0x2f09  ; -> 02F09
+08619  add sp, 2
+0861C  or ax, ax
+0861E  je 0x8633
+08620  cmp word ptr [0x4031], 0
+08625  je 0x8633
+08627  mov al, byte ptr [bp - 0x28]
+0862A  mov ah, 0
+0862C  or ax, ax
+0862E  je 0x8633
+08630  jmp 0x86c7
+08633  push 0
+08635  lea ax, [bp - 0x33c]
+08639  push ax
+0863A  lcall 0x4942, 0x17d  ; -> 4959D
+0863F  add sp, 4
+08642  mov al, byte ptr [bp - 0x3b2]
+08646  mov byte ptr [bp - 0x61], al
+08649  lea ax, [bp - 0x61]
+0864C  push ax
+0864D  mov ax, di
+0864F  add ax, 0x2c
+08652  push ax
+08653  mov bx, word ptr [di + 0x2c]
+08656  lcall [bx + 0x10]
+08659  add sp, 4
+0865C  push word ptr [bp - 0x3af]
+08660  lea ax, [bp - 0x33c]
+08664  push ax
+08665  push di
+08666  push cs
+08667  call 0x6fa5
+0866A  add sp, 6
+0866D  push word ptr [bp - 0x3af]
+08671  lcall 0, 0x2f09  ; -> 02F09
+08676  add sp, 2
+08679  or ax, ax
+0867B  jne 0x8682
+0867D  mov ax, 8
+08680  jmp 0x8685
+08682  mov ax, 0x32
+08685  mov word ptr [bp - 2], ax
+08688  mov al, byte ptr [bp - 0x29]
+0868B  mov ah, 0
+0868D  or ax, ax
+0868F  jne 0x86c7
+08691  mov word ptr [bp - 0x2fd], 0
+08697  jmp 0x86b1
+08699  lcall 0x143f, 0x4c7  ; -> 148B7
+0869E  or al, al
+086A0  je 0x86a4
+086A2  jmp 0x86c7
+086A4  lea ax, [bp - 0x31a]
+086A8  push ax
+086A9  lcall 0x35ef, 0x3ca  ; -> 362BA
+086AE  add sp, 2
+086B1  mov ax, word ptr [bp - 0x2fd]
+086B5  cmp ax, word ptr [bp - 2]
+086B8  jb 0x86bf
+086BA  mov ax, 1
+086BD  jmp 0x86c1
+086BF  xor ax, ax
+086C1  mov ah, 0
+086C3  or ax, ax
+086C5  je 0x8699
+086C7  mov word ptr [bp - 0x3c2], 0x18d8
+086CD  push word ptr [bp - 0x3b1]
+086D1  lcall 0x3539, 0x240  ; -> 355D0
+086D6  add sp, 2
+086D9  push word ptr [bp - 0x3af]
+086DD  lcall 0x3539, 0x240  ; -> 355D0
+086E2  add sp, 2
+086E5  mov ax, word ptr [di]
+086E7  add ax, word ptr [di + 8]
+086EA  cmp ax, word ptr [di + 4]
+086ED  ja 0x86f4
+086EF  mov ax, 1
+086F2  jmp 0x86f6
+086F4  xor ax, ax
+086F6  mov ah, 0
+086F8  or ax, ax
+086FA  jne 0x8708
+086FC  les bx, ptr [di + 4]
+086FF  cmp byte ptr es:[bx], 2
+08703  jne 0x8708
+08705  jmp 0x8337
+08708  cmp byte ptr [bp - 0x3c], 1
+0870C  jne 0x8755
+0870E  xor eax, eax
+08711  mov dword ptr [bp - 0x64], eax
+08715  mov dword ptr [bp - 0x68], eax
+08719  lcall 0x143f, 8  ; -> 143F8
+0871E  mov word ptr [bp - 0x6a], 0
+08723  jmp 0x874f
+08725  lcall 0x143f, 0x4c7  ; -> 148B7
+0872A  or al, al
+0872C  je 0x8730
+0872E  jmp 0x8755
+08730  mov dword ptr [bp - 0x64], 0xa
+08738  mov eax, dword ptr [0x510f]
+0873C  mov dword ptr [bp - 0x68], eax
+08740  lea ax, [bp - 0x68]
+08743  push ax
+08744  lcall 0x4706, 0x21d  ; -> 4727D
+08749  add sp, 2
+0874C  inc word ptr [bp - 0x6a]
+0874F  cmp word ptr [bp - 0x6a], 7
+08753  jl 0x8725
+08755  push 0x4b36
+08758  push 0x20
+0875B  push 0x19
+0875D  push 0
+0875F  push 0xa
+08761  push word ptr [bp - 0x54]
+08764  lcall 0, 0x1282  ; -> 01282
+08769  add sp, 0xc
+0876C  push 0x4b36
+0876F  push 0x20
+08772  push 0x19
+08774  push 0
+08776  push 0xa
+08778  push word ptr [bp - 0x56]
+0877B  lcall 0, 0x1282  ; -> 01282
+08780  add sp, 0xc
+08783  push word ptr [bp - 0x58]
+08786  lcall 0, 0x39c  ; -> 0039C
+0878B  add sp, 2
+0878E  push 0x4b36
+08791  push 0x20
+08794  push 1
+08796  push 0xa
+08798  push 0xa
+0879A  lea ax, [bp - 0x3ac]
+0879E  push ax
+0879F  lcall 0, 0x1282  ; -> 01282
+087A4  add sp, 0xc
+087A7  lea ax, [bp - 0x33a]
+087AB  push ax
+087AC  lcall 0x37cb, 0x25f  ; -> 37F0F
+087B1  add sp, 2
+087B4  push 2
+087B6  lea ax, [bp - 0x31a]
+087BA  push ax
+087BB  lcall 0x35ef, 0x340  ; -> 36230
+087C0  add sp, 4
+087C3  lea ax, [bp - 0x48]
+087C6  push ax
+087C7  lcall 0x36f0, 0x3d4  ; -> 372D4
+087CC  add sp, 2
+087CF  lea ax, [bp - 0x40]
+087D2  push ax
+087D3  lcall 0x36e8, 0x29  ; -> 36EA9
+087D8  add sp, 2
+087DB  jmp 0xa3be

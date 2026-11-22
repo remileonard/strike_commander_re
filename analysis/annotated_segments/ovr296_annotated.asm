@@ -102,10 +102,24 @@ TerrainTile_ReleaseSimple_9A925	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 413 lignes, NON DÉTAILLÉE — combine IndexedRecordReader_AdvanceIndex_65E2C (seg196),
-; CRT_Msg_Sprintf1, allocation et copie de chaîne.
+; far, 413 lignes, LUE 2026-10-15. CHARGEMENT DES OBJETS POSES D'UNE CELLULE DE TERRAIN (arg_4
+; = numero de cellule ; enregistrements du PAK d'objets du theatre).
+; IndexedRecordReader_AdvanceIndex_65E2C(lecteur, cellule) ; entree vide -> aucun objet. Sinon
+; : nom de secteur sprintf(1A8Eh, cellule) ; uint16 nombre -> +4 ; table de pointeurs +0x0A (2
+; octets par objet) ; masque m = dword_6EB2A[cellule]. Pour chaque objet k : enregistrement de
+; 70 octets (ReadTyped 46h) ; si le bit k de m est pose, instancie le 2e nom (octet +13 de
+; l'enregistrement), sinon le 1er (+0) : ObjectPrototype_FindOrLoadAndInstantiate_38B70
+; (directement, PAS par AIAircraft_SpawnAndConditionalLoadProfile_53363 : ni PROF ni ordres de
+; mission). Position +0x12 = les 3 dd +22 (c0, c1, c2 dans l'ordre du fichier) ; orientation
+; (vtable+0x3C) ligne 0 = dd +34..+42, ligne 1 (+0x0C) = dd +46..+54, ligne 2 (+0x18) = dd
+; +58..+66 (Utility_Helper_55E65). Objet ajoute a la liste du secteur (+6) ; pointeur range
+; dans la table (+0x0A)[k] ; la liste du secteur est ajoutee aux objets du monde 59C3h
+; (Container_Append) : les objets poses sont mis a jour par la boucle du monde comme les
+; autres (une SWPN posee execute SwpnInstance_Update_43491). Effet de bord observe en tete :
+; int 15h (AX=1209h, BX=5650h) puis byte_6E33B = 1 (mov cl,1 / mov byte_6E33B, cl) ; role non
+; etabli. Ex-'TerrainCell_LoadPlacedObjects_9A95A'.
 ; ==============================================================================================
-TerrainSector_LoadIndexedRecord_9A95A	proc far		; CODE XREF: VROOMM_StubThunk_6BE75J
+TerrainCell_LoadPlacedObjects_9A95A	proc far		; CODE XREF: VROOMM_StubThunk_6BE75J
 
 var_76		= dword	ptr -76h
 var_72		= dword	ptr -72h
@@ -182,10 +196,10 @@ loc_9A99D:
 		jmp	short loc_9A9B2
 ; ���������������������������������������������������������������������������
 
-loc_9A9AE:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A+4Cj
+loc_9A9AE:				; CODE XREF: TerrainCell_LoadPlacedObjects_9A95A+4Cj
 		mov	eax, [di+71h]
 
-loc_9A9B2:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A+52j
+loc_9A9B2:				; CODE XREF: TerrainCell_LoadPlacedObjects_9A95A+52j
 		cmp	eax, 0
 		jg	short loc_9A9BB
 
@@ -193,7 +207,7 @@ loc_9A9B8:
 		jmp	loc_9AC01
 ; ���������������������������������������������������������������������������
 
-loc_9A9BB:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A+5Cj
+loc_9A9BB:				; CODE XREF: TerrainCell_LoadPlacedObjects_9A95A+5Cj
 		push	[bp+arg_4]
 		push	1A8Eh
 
@@ -235,10 +249,10 @@ loc_9A9E3:
 		jmp	short loc_9AA10
 ; ���������������������������������������������������������������������������
 
-loc_9AA0D:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A:loc_9A9DAj
+loc_9AA0D:				; CODE XREF: TerrainCell_LoadPlacedObjects_9A95A:loc_9A9DAj
 		mov	ax, [bp+var_C]
 
-loc_9AA10:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A+B1j
+loc_9AA10:				; CODE XREF: TerrainCell_LoadPlacedObjects_9A95A+B1j
 		mov	[si+6],	ax
 		push	di
 		call	StreamReader_GetPosition_64075
@@ -301,7 +315,7 @@ loc_9AA64:
 		jmp	loc_9ABD9
 ; ���������������������������������������������������������������������������
 
-loc_9AA7E:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A+287j
+loc_9AA7E:				; CODE XREF: TerrainCell_LoadPlacedObjects_9A95A+287j
 		push	large 0FFFFFFFFh
 
 loc_9AA81:
@@ -339,7 +353,7 @@ loc_9AAB0:
 		jmp	short loc_9AACC
 ; ���������������������������������������������������������������������������
 
-loc_9AAB5:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A:loc_9AA9Aj
+loc_9AAB5:				; CODE XREF: TerrainCell_LoadPlacedObjects_9A95A:loc_9AA9Aj
 		push	1
 
 loc_9AAB7:
@@ -352,7 +366,7 @@ loc_9AAB7:
 		add	sp, 0Ah
 		mov	[bp+var_E], ax
 
-loc_9AACC:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A+159j
+loc_9AACC:				; CODE XREF: TerrainCell_LoadPlacedObjects_9A95A+159j
 		cmp	[bp+var_E], 0
 		jnz	short loc_9AAD5
 
@@ -360,7 +374,7 @@ loc_9AAD2:
 		jmp	loc_9ABBF
 ; ���������������������������������������������������������������������������
 
-loc_9AAD5:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A+176j
+loc_9AAD5:				; CODE XREF: TerrainCell_LoadPlacedObjects_9A95A+176j
 		sub	sp, 4
 
 loc_9AAD8:
@@ -475,7 +489,7 @@ loc_9ABB0:
 		call	List_AppendTail_22C23
 		add	sp, 4
 
-loc_9ABBF:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A:loc_9AAD2j
+loc_9ABBF:				; CODE XREF: TerrainCell_LoadPlacedObjects_9A95A:loc_9AAD2j
 		mov	bx, [bp+var_1C]
 		mov	ax, [bp+var_E]
 		mov	[bx], ax
@@ -489,14 +503,14 @@ loc_9ABCE:
 loc_9ABD5:
 		add	[bp+var_1C], 2
 
-loc_9ABD9:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A+121j
+loc_9ABD9:				; CODE XREF: TerrainCell_LoadPlacedObjects_9A95A+121j
 		mov	ax, [si+4]
 		cmp	ax, [bp+var_1E]
 		jle	short loc_9ABE4
 		jmp	loc_9AA7E
 ; ���������������������������������������������������������������������������
 
-loc_9ABE4:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A+285j
+loc_9ABE4:				; CODE XREF: TerrainCell_LoadPlacedObjects_9A95A+285j
 		push	large [bp+var_12]
 		push	di
 		call	StreamReader_SeekVariant_63DF6
@@ -508,15 +522,15 @@ loc_9ABE4:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A+285j
 		jmp	short loc_9AC0B
 ; ���������������������������������������������������������������������������
 
-loc_9AC01:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A:loc_9A9B8j
+loc_9AC01:				; CODE XREF: TerrainCell_LoadPlacedObjects_9A95A:loc_9A9B8j
 		mov	word ptr [si+4], 0
 		mov	word ptr [si+6], 0
 
-loc_9AC0B:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A+2A5j
+loc_9AC0B:				; CODE XREF: TerrainCell_LoadPlacedObjects_9A95A+2A5j
 		pop	di
 		pop	si
 		leave
 		retf
-TerrainSector_LoadIndexedRecord_9A95A	endp
+TerrainCell_LoadPlacedObjects_9A95A	endp
 
 ovr296		ends

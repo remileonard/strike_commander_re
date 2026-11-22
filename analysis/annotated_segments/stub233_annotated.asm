@@ -32,7 +32,7 @@ VROOMM_StubThunk_6AC80	endp
 ; d'overlay actuellement charge en memoire. fileoff=6890h, codesize=0A56h, nentries=3.
 ; ==============================================================================================
 VROOMM_StubThunk_6AC85	proc far
-		jmp	UIScript_ParseAndEvaluate_7A054
+		jmp	Autopilot_JumpSequence_7A054
 VROOMM_StubThunk_6AC85	endp
 
 

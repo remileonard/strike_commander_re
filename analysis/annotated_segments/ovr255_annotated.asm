@@ -983,7 +983,7 @@ loc_8B78E:				; CODE XREF: MissionRecord_LoadFieldGroupMix_8B5A7+1BFj
 		les	bx, [bp+var_3A]
 		mov	word ptr es:[bx+2Ah], 0
 		push	large [bp+var_36]
-		call	Struct_GetElementCountMinusOne_625CC
+		call	Shape_GetImageCount_625CC
 		mov	[bp+var_40], ax
 		mov	si, 1
 		jmp	short loc_8B7C1
@@ -1178,8 +1178,8 @@ loc_8B932:
 		call	Memory_TypedAllocDispatchB_5C832
 		add	sp, 0Ah
 ; ���������������������������������������������������������������������������
-word_8B984	dw 5689h		; DATA XREF: VROOMM_AllocateAndRelocate_6855F+1Dr
-word_8B986	dw 89E0h		; DATA XREF: VROOMM_AllocateAndRelocate_6855F+21r
+word_8B984	dw 5689h		; DATA XREF: VROOMM_ScanMemoryArena_6855F+1Dr
+word_8B986	dw 89E0h		; DATA XREF: VROOMM_ScanMemoryArena_6855F+21r
 aFFg		db 'F�f�~�',0
 ; ���������������������������������������������������������������������������
 		jnz	short loc_8B994

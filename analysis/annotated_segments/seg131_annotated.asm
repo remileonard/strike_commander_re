@@ -302,8 +302,8 @@ Memory_TypedFree_5C7B6	endp
 ; far, combine Memory_ValidateAllocatorIndex_5C9A6 et dispatch vtable [bx+0Ch]. Référencée par
 ; sub_96917.
 ; ==============================================================================================
-Memory_TypedAllocDispatch_5C7F0	proc far		; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+281P
-					; AircraftComponent_ConstructAndCalibrate_96917+383P ...
+Memory_TypedAllocDispatch_5C7F0	proc far		; CODE XREF: PolyAppearance_CreateInstance_96917+281P
+					; PolyAppearance_CreateInstance_96917+383P ...
 
 arg_0		= word ptr  6
 arg_2		= dword	ptr  8

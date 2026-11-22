@@ -940,7 +940,7 @@ loc_80144:
 		push	ax
 
 loc_801B4:
-		call	Struct_GetElementCountMinusOne_625CC
+		call	Shape_GetImageCount_625CC
 		les	bx, [bp+arg_0]
 
 loc_801BC:

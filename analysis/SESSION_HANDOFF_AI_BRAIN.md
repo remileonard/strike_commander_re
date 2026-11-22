@@ -2,6 +2,11 @@
 
 Document écrit avant compactage pour reprendre sans perdre le fil. À lire avec `CLAUDE.md` (règles de travail avec Rémi), `analysis/AI_TICK_CALL_GRAPH.md` (le détail de l'assembleur lu) et `analysis/AI_IMPLEMENTATION_GUIDE.md` (§2.10 et §3.5).
 
+> **Mise à jour 2026-09-25.** Cette fiche décrit l'état du 2026-09-20. Depuis : attaque au sol,
+> pilote automatique physique, commandes de roulis/tangage, signature du chercheur, leurres et vol
+> des missiles ont été lus. La liste des corrections à apporter au portage est dans
+> `IMPL_SCAIBRAIN_CORRECTIONS.md` (à lire en premier pour reprendre le chantier IA).
+
 ## 1. But et règles de travail
 
 - **But** : rendre le port libRealSpace fidèle à `STRIKE.EXE` sur l'IA. Le nouveau code suit l'assembleur ; l'ancien (`destroyTarget` et autres) est de la colle, décommissionnée progressivement.
@@ -59,15 +64,17 @@ Lu dans l'assembleur (détail dans `AI_TICK_CALL_GRAPH.md`, « Le tir de missile
 **Réponses obtenues de Rémi (2026-09-20) :**
 - `WDAT` en RAW (canon, 3 missiles air-air, SA-2, SA-6, AGM-65D, GBU-15, MK-20, MK-82, LAU-3) : tableau complet dans `AI_TICK_CALL_GRAPH.md`, section « Les deux octets de classe du chunk `WDAT` ». Noms du parseur : `weapon_category` (`+0x4D`, famille d'arme) et `target_domain` (`+0x4E`, 1 = missile guidé anti-avion, 2 = autre ; nom inféré). Le test de `scoreMissile` est `target_domain == 1`. L'ancien code (`SCMissionActors.cpp`, `switch` sur `weapon_category`) est à revoir par Rémi avec ces valeurs.
 - Chunk `SIGN` en RAW : F-16DES = 10, 150, 20 ; MIG21 = 10, 125, 20. Chargement, copie et lecteurs : `AI_TICK_CALL_GRAPH.md`, section « Le chunk `SIGN` ». 1er octet (`instance+0x28`, méthode `+0x7C`) = aspec 1, seuil > 210 ; 3e octet (`instance+0x29`, `Debris_GetStateFlag`) = aspec 2 ; 2e octet (modèle `+0x13`, `Debris_GetSubpartAttrib`) = aspec 3 (seuil >= 245) et aspec 4.
-- **Constat gênant** : le 1er octet vaut 10 sur les deux avions, donc l'AIM-9J (aspec 1, seuil 210) ne pourrait jamais verrouiller tel quel. Question ouverte : quelque chose écrit-il `instance+0x28` / `+0x29` après `Debris_BodyAttachToSubpart` (post-combustion, leurres) ? À chercher dans `annotated_segments` avant de coder. Aucun nom définitif pour les 3 octets : champ `radar_sign[3]` indexé par l'aspec qui le consomme.
+- ~~**Constat gênant**~~ **Résolu le 2026-09-24** (`AI_TICK_CALL_GRAPH.md`, « Qui écrit les octets de signature ») : personne ne réécrit `instance+0x28/+0x29`. (1) Pour un avion, l'octet des aspecs 1 et 2 est **calculé** par `Aircraft_ComputeSeekerSignature_3E2F1` : `10 + vitesse/602 × (100 de dos, 50 sinon) + (100 de dos, 50 sinon) si cran de gaz > 5` (post-combustion, preuve par `PhysicsTicks`). (2) Le seuil 210/245 de `Targeting_SelectAndPrioritize` **n'est pas un seuil de verrouillage** : il décide si un **autre candidat** du cône (surtout un leurre `DECY`, dont la signature S0 × temps restant / durée s'éteint) vole la piste, avec 3 chances sur 10. L'AIM-9J exige en plus l'aspect arrière. **Correction** : la table des aspecs était décalée (aspec 2 = signature ≥ 245 tous secteurs, aspec 3 = fenêtre du réticule, aspec 4 = S1 ≥ 245).
 - Non lus : `Targeting_FilterByWeaponType` (cône et portée du chercheur), `Targeting_ReticleWindowTest`, `Proximity_TestOriented`.
 - Rémi veut que les valeurs de contrôle (aspec de chaque missile) soient affichées dans le débug, pas demandées.
 
+**Vol du missile décodé (2026-09-24)** : `AI_TICK_CALL_GRAPH.md`, « Le vol du missile guidé ». Le chercheur est réévalué en vol, et la loi de guidage `MissileBody_SteerToTarget_42738` (ex-`Sound3D_ComputeSecondChannel`) fait une poursuite avec anticipation plafonnée à 1, en « bank-to-turn » : roulis immédiat, cabrage borné par le 1er dword du chunk dynamique `MISS`. La propulsion dure jusqu'à la vitesse maximale, et sans cible le missile tombe en balistique.
+
 ## 6. Reste à faire (ordre suggéré)
 
-1. Missile : chercher les écrivains de `instance+0x28`/`+0x29`, faire exposer `radar_sign[3]` par le parseur `SIGN`, puis coder le verrouillage fidèle sur `weapon_aspec` (voir §5).
+1. Missile : écrivains de `instance+0x28`/`+0x29` **trouvés** (aucun, voir §5). Reste : faire exposer `radar_sign[3]` par le parseur `SIGN`, coder `Aircraft_ComputeSeekerSignature` (cran de gaz > 5 = post-combustion) et le modèle de chercheur fidèle (garde ou vol de piste, aspect arrière de l'AIM-9J), puis les leurres `DECY` (chunk `DATA` = durée de vie ; valeurs `SIGN`/`DATA` des fichiers à relever).
 2. Esquive verticale : lire le seuil `dword_7203D` (calculé par `AIEntity_MasterTick_5ACC`) et `AI_EvalTargetAttribute` ; message radio de plainte de tir ami (`Radio_PlayMessage` `0x0E`).
-3. Attaque au sol : nœud permanent `+0xD9` (appliqué par `Goal_ExecuteAction` pour une cible de mission `+0x11 == 2`, et par le gestionnaire de tir si `arg_4` non nul), non lu.
+3. Attaque au sol : **lue intégralement le 2026-09-24/25** (`NOTE_ATTAQUE_SOL.md`, `AI_TICK_CALL_GRAPH.md` « L'attaque au sol »). `updateGroundAttack` existe dans le portage ; corrections à faire : `IMPL_SCAIBRAIN_CORRECTIONS.md` §1 (condition inversée) et §2 (pilote automatique physique des phases 2 et 3, qui dépend de `IMPL_SCJETPPLANE_CORRECTIONS.md` §1).
 4. `SCAIBrain::executeObjective()` (répartiteur d'après `Goal_ExecuteAction` : « détruire la cible » → gestionnaire de tir pour l'air, nœud sol pour le sol ; « défendre » → navigation puis gestionnaire puis errance) ; retrait progressif de l'ancien `destroyTarget` par responsabilité, après validation.
 5. Tournoi `MVRS` (sélecteur 4 = `AI_BehaviorStateMachine_WeightedOptionSelector_9D05`) : conditions d'entrée lues (cible aérienne, `+0x27F ≤ 1`, objet en cours nul, bruit ±1, plancher −1000) ; instincts à porter un par un.
 6. Retirer les `printf` de debug et l'`aim_trim` (ancien chemin) quand tout est validé ; calibrer la tolérance de tir avec des impacts réels.
@@ -78,5 +85,5 @@ Lu dans l'assembleur (détail dans `AI_TICK_CALL_GRAPH.md`, « Le tir de missile
 - Catégories d'objet (`vtable+8`, fixées par le chunk IFF présent) : 6 `JETP` avion, 8 `MISS` missile, 0x13 `SWPN` défenses fixes ; `objet+0x11 == 2` est `target_type` (cible sol).
 - Noms corrigés dans `known_functions.json` : `AI_SelectWeaponMask_9665` (ex-`AI_Cluster_9665`), `AI_ComputeFireSolutionQuality_91DF`, `AI_Sensor_WeaponVelocityCache` (vitesse de **mon arme**, pas de la cible), `AI_MissileEvasionReaction_9A77`, `WeaponStation_TestTargetLock`, `Weapon_LoadWDATChunk_A0700`, `WeaponId_ToTypeMask_9DE60`, `SwpnModel_LoadDataChunk_A0A00`, `Goal_WanderRandom` (lue : point à 30 000 unités dans une direction aléatoire), etc.
 - `Goal_ExecuteAction` est le répartiteur objectif → comportement ; l'ordre « détruire la cible » n'agit sur l'air que par un bonus de score.
-- Les IA de l'original ne tiennent aucune altitude : elles commandent le manche à partir d'écarts d'angle avec une zone morte (`AI_TurnToHeadingCmd`, `AI_PitchRollController_Heading`). Le seuil « 20° » de `AI_CombatDecision_Major` n'a pas été porté (sens incertain).
+- Les IA de l'original ne tiennent aucune altitude : elles commandent le manche à partir d'écarts d'angle avec une zone morte (`AI_RollToAngleCmd_8104`, `AI_RollController_7E56`). **Corrigé 2026-09-24** : ces fonctions commandent le **roulis** (et `AI_PitchToAngleCmd_7E18` / `AI_PitchController_7B20` le tangage), pas le cap : voir `AI_TICK_CALL_GRAPH.md`, « L'attaque au sol ». Le seuil « 20° » de `AI_CombatDecision_Major` n'a pas été porté (sens incertain).
 - `vz` est la vitesse par tick, avec 50 ticks par seconde (`vz = -6` ≈ 300 unités par seconde) ; les MiG plafonnent vers 300–500 unités par seconde.

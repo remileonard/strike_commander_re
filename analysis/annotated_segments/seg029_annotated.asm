@@ -460,8 +460,8 @@ Lexer_Rewind	endp
 ; suivi lui-même d'un token 0xA2 : prédicat de lookahead du parseur (reconnaissance de motif
 ; de token).
 ; ==============================================================================================
-Parser_LookaheadPattern	proc far		; CODE XREF: Weapon_HUDBox_UpdateAndRender_5923A+96P
-					; UIScript_ParseAndEvaluate_7A054+EBP
+Parser_LookaheadPattern	proc far		; CODE XREF: Music_SelectTuneCandidate_5923A+96P
+					; Autopilot_JumpSequence_7A054+EBP
 
 arg_0		= word ptr  6
 
@@ -519,7 +519,7 @@ Parser_LookaheadPattern	endp
 ; parseur).
 ; ==============================================================================================
 Parser_ConsumeRemaining	proc far		; CODE XREF: Compiler_EmitByTokenType+1C6p
-					; UIScript_ParseAndEvaluate_7A054+740P
+					; Autopilot_JumpSequence_7A054+740P
 
 arg_0		= word ptr  6
 
@@ -642,7 +642,7 @@ loc_1CC65:				; CODE XREF: Compiler_EmitByTokenType+3Cj
 		push	ss
 		lea	ax, [bp+var_1A]
 		push	ax
-		call	Player_ResolveAttachPointN_5305A
+		call	Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		push	large [bp+var_4]
 		push	ss
@@ -825,7 +825,7 @@ off_1CDC0	dw offset loc_1CC40	; DATA XREF: Compiler_EmitByTokenType+3Cr
 ; noms (sub_52DDB, word_706A0+0x34) et retourne un champ associé (+0x52) : résolution de
 ; symbole nommé (table de symboles) du parseur script IA.
 ; ==============================================================================================
-Lexer_ResolveSymbol	proc far		; CODE XREF: Radio_SelectContextMessage+16DP
+Lexer_ResolveSymbol	proc far		; CODE XREF: AI_ComputeMorale_CD4A+16DP
 
 var_6		= dword	ptr -6
 var_2		= word ptr -2
@@ -935,7 +935,7 @@ loc_1CE64:				; CODE XREF: Lexer_ResolveConstantAlt+41j
 		push	ss
 		lea	ax, [bp+var_10]
 		push	ax
-		call	GeomNode_SumOffsetsUpChain_50EEB
+		call	AreaRelPos_ToWorld_50EEB
 		add	sp, 8
 		mov	eax, [bp+var_10]
 		mov	[di], eax
@@ -964,7 +964,7 @@ Lexer_ResolveConstantAlt	endp
 ; correspondant à arg_2 : recherche de doublon/valeur existante dans une liste de symboles
 ; (détection de redéfinition).
 ; ==============================================================================================
-Parser_FindDuplicateSymbol	proc far		; CODE XREF: Render_DrawComplexShape_7EDCA+68DP
+Parser_FindDuplicateSymbol	proc far		; CODE XREF: NavMap_DrawMissionObjects_7EDCA+68DP
 
 var_4		= word ptr -4
 var_1		= byte ptr -1

@@ -1,0 +1,845 @@
+#!/usr/bin/env python3
+"""Vue 3D d'un terrain DATA\\<théâtre>.PAK avec Pygame + PyOpenGL.
+
+Rendu comme le jeu (Render_TerrainPipelineMain → Render_MeshPrimitive_21085, voir DATA_MODEL.md §6.8) :
+couleurs de PALETTE.IFF ; couleur de base du triangle = celle du sommet le plus haut (comparaison
+non signée) ; teinte du sommet = première + (éclairage × n + 128) ÷ 256 ; teinte interpolée sur
+le triangle. Pas de tramage : la teinte est rendue en continu, en mélangeant les deux couleurs de
+palette voisines (le jeu, limité à 256 couleurs, tramait en damier). Pistes (.TRI) : octet « couleur »
+pris comme index de palette, face unie. Textures du sol non dessinées. La diagonale qui coupe
+chaque carré n'est pas établie : touche G pour changer.
+
+Jupes (touche J) : au-delà des bords, le terrain continue comme dans le jeu
+(Terrain_BuildVertexWindow_3266E) : l'indice de cellule est borné à [0, 17], la position dans la
+cellule continue, donc la cellule du bord se répète toutes les 20 km (celle du coin dans les deux
+directions). --skirt N règle la largeur en cellules (0 = pas de jupe).
+Bruit des jupes (touche N, --skirt-noise A) : essai esthétique, PAS un comportement du jeu.
+L'octet d'éclairage du sommet copié reçoit A × bruit(position monde) avant le calcul de teinte
+(la teinte reste dans la gamme de sa couleur de base) ; bruit lisse à 2 octaves de périodes
+7,3 km et 31 km (sans rapport avec les 20 km d'une cellule) ; amplitude nulle au bord de la carte,
+pleine à 1,5 cellule. --skirt-patches : en plus, sur les jupes, la couleur de base d'un triangle
+passe de forêt (4) à neige (6) ou l'inverse là où un second bruit (période 23 km) dépasse un seuil
+(touche P). --skirt-smooth R : lissage moyen des jupes (touche M) : chaque sommet hors carte prend
+la moyenne de l'éclairage (et la couleur majoritaire) d'un carré de (2r + 1)² sommets autour de lui,
+r passant de 0 au bord à R sommets à 1,5 cellule ; --skirt-smooth-height lisse aussi l'altitude.
+--skirt-smooth-rgb (touche C) : le lissage porte sur la couleur RVB affichée (palette) au lieu de
+l'éclairage et de la couleur majoritaire : le blanc et le vert se mélangent. Le bruit et les plaques
+ne s'appliquent pas dans ce mode.
+--skirt-noise-rgb A (touche B) : bruit sur la couleur RVB des jupes qui reste dans les teintes de la
+carte : chaque couleur de base présente autour du sommet glisse le long de SA gamme de la palette
+(éclairage + A × bruit), puis les couleurs sont mélangées selon leur part. A ≈ 40 à 80.
+--skirt-ramp C : largeur de la transition carte → jupe (lissage et bruits), en cellules, courbe en S.
+
+Dépendances : pip install pygame "PyOpenGL>=3.1.9" (pas besoin de numpy)
+
+Usage : python3 tools/terrain_3d.py data/ALASKA.PAK [--palette data/PALETTE.IFF]
+
+Commandes :
+  souris (bouton gauche enfoncé) : regarder      molette : vitesse
+  Z/W ou ↑ : avancer   S ou ↓ : reculer   Q/A ou ← , D ou → : de côté
+  Espace : monter      Maj : descendre
+  1, 2, 3… : aller à la piste n     O : objet suivant     Origine (Home) : vue d'ensemble
+  F : ombrage plat / dégradé   G : diagonale « \\ » / « / »   J : jupes   N : bruit   P : plaques   M : lissage   C : lissage RVB   B : bruit RVB
+  F12 : capture d'écran (PNG)      Échap : quitter
+"""
+
+import argparse
+import array
+import math
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from terrain_map import assemble, read_elevations  # noqa: E402
+from terrain_viewer import read_objects, read_palette, read_runways  # noqa: E402
+from tri_map import read_pak  # noqa: E402
+
+import pygame  # noqa: E402
+from OpenGL import GL  # noqa: E402
+
+CELL_SIZE = 20000
+
+VS = """#version 120
+attribute vec3 aPos;
+attribute float aShade;
+uniform mat4 uMVP;
+varying float vShade;
+void main() {
+    vShade = aShade;
+    gl_Position = uMVP * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+}
+"""
+
+FS = """#version 120
+varying float vShade;
+uniform sampler2D uPal;
+uniform float uSmooth;
+vec4 pal(float idx) {
+    return texture2D(uPal, vec2((clamp(idx, 0.0, 255.0) + 0.5) / 256.0, 0.5));
+}
+void main() {
+    float base = floor(vShade + 0.5 * (1.0 - uSmooth));   // face unie : arrondi au plus proche
+    float t = (vShade - base) * uSmooth;
+    gl_FragColor = mix(pal(base), pal(base + 1.0), t);
+}
+"""
+
+VS_RGB = """#version 120
+attribute vec3 aPos;
+attribute vec3 aCol;
+uniform mat4 uMVP;
+varying vec3 vCol;
+void main() {
+    vCol = aCol;
+    gl_Position = uMVP * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+}
+"""
+
+FS_RGB = """#version 120
+varying vec3 vCol;
+void main() {
+    gl_FragColor = vec4(vCol, 1.0);
+}
+"""
+
+
+# --- données ---------------------------------------------------------------------------------
+
+class Terrain:
+    def __init__(self, pak_path, palette_path):
+        data = open(pak_path, "rb").read()
+        top = read_pak(data)
+        cells = read_elevations(data, top, 1)
+        self.grid = int(math.isqrt(len(cells)))
+        n = cells[0][0]
+        self.cn = n                     # sommets par cellule
+        self.n = self.grid * n
+        self.spacing = CELL_SIZE / n
+        self.half = self.grid * CELL_SIZE / 2
+        height, light = assemble(cells, self.grid)
+        colour = [[0] * self.n for _ in range(self.n)]
+        for c, (_, verts) in enumerate(cells):
+            row, col = divmod(c, self.grid)
+            for k, v in enumerate(verts):
+                i, j = divmod(k, n)
+                colour[row * n + i][col * n + j] = v[2]
+        self.h = [v for row in height for v in row]
+        self.light = [v for row in light for v in row]
+        self.colour = [v for row in colour for v in row]
+        self.runways = read_runways(data, top, 4)
+        self.objects = read_objects(data, top, 5)
+        self.palette, self.rang = read_palette(palette_path)
+        self.name = os.path.basename(pak_path)
+
+    # Repère GL : x = X du fichier, y = altitude Y, z = −Z du fichier.
+    def gl_x(self, j):
+        return -self.half + j * self.spacing
+
+    def gl_z(self, i):
+        return -(self.half - i * self.spacing)
+
+    def src(self, g):
+        """Indice de sommet global (ligne ou colonne, peut sortir de la carte) → sommet lu,
+        comme Terrain_BuildVertexWindow_3266E : cellule bornée à [0, grille − 1], position dans la
+        cellule = g mod n (le // et le % de Python arrondissent vers le bas, comme le jeu)."""
+        c = min(max(g // self.cn, 0), self.grid - 1)
+        return c * self.cn + g % self.cn
+
+    def key(self, i, j):
+        return self.src(i) * self.n + self.src(j)
+
+    def ground(self, x, z):
+        fj = (x + self.half) / self.spacing
+        fi = (z + self.half) / self.spacing
+        j = int(math.floor(fj))
+        i = int(math.floor(fi))
+        u = fj - j
+        v = fi - i
+        h = self.h
+        top = h[self.key(i, j)] * (1 - u) + h[self.key(i, j + 1)] * u
+        bottom = h[self.key(i + 1, j)] * (1 - u) + h[self.key(i + 1, j + 1)] * u
+        return top * (1 - v) + bottom * v
+
+    ramp_cells = 3.0                    # largeur de la transition carte → jupe, en cellules
+
+    def ramp(self, out):
+        """0 au bord de la carte, 1 à ramp_cells cellules, courbe en S (smoothstep)."""
+        x = min(1.0, out / (self.ramp_cells * self.cn))
+        return x * x * (3 - 2 * x)
+
+    @staticmethod
+    def hash01(i, j):
+        """Valeur pseudo-aléatoire déterministe dans [−1, 1] pour un nœud entier (i, j)."""
+        h = (i * 374761393 + j * 668265263) & 0xFFFFFFFF
+        h = ((h ^ (h >> 13)) * 1274126177) & 0xFFFFFFFF
+        h ^= h >> 16
+        return (h & 0xFFFF) / 32767.5 - 1.0
+
+    def value_noise(self, x, z, period):
+        """Bruit de valeur lisse (interpolation smoothstep entre nœuds espacés de « period »)."""
+        fx = x / period
+        fz = z / period
+        i0 = math.floor(fx)
+        j0 = math.floor(fz)
+        u = fx - i0
+        v = fz - j0
+        u = u * u * (3 - 2 * u)
+        v = v * v * (3 - 2 * v)
+        a = self.hash01(i0, j0)
+        b = self.hash01(i0 + 1, j0)
+        c = self.hash01(i0, j0 + 1)
+        d = self.hash01(i0 + 1, j0 + 1)
+        return (a * (1 - u) + b * u) * (1 - v) + (c * (1 - u) + d * u) * v
+
+    def skirt_noise(self, i, j, amplitude):
+        """Décalage de l'octet d'éclairage du sommet affiché (i, j) ; nul dans la carte."""
+        n = self.n
+        out = max(0, -i, i - (n - 1), -j, j - (n - 1))
+        if out == 0 or amplitude == 0:
+            return 0
+        ramp = self.ramp(out)
+        x = j * self.spacing
+        z = i * self.spacing
+        noise = 0.65 * self.value_noise(x, z, 7300.0) + 0.35 * self.value_noise(x + 5000.0, z - 9000.0, 31000.0)
+        return amplitude * ramp * noise
+
+    def patch_swap(self, i, j):
+        """Vrai si la couleur de base du triangle (i, j) doit être échangée (jupes seulement)."""
+        n = self.n
+        out = max(0, -i, i - (n - 1), -j, j - (n - 1))
+        if out < self.cn // 2:
+            return False
+        return self.value_noise(j * self.spacing - 3000.0, i * self.spacing + 11000.0, 23000.0) > 0.25
+
+    def smoothed_skirt(self, skirt, radius, with_height, rgb=False):
+        """Valeurs lissées (éclairage, couleur majoritaire, altitude) de la grille étendue.
+        Moyenne en boîte de rayon r(i, j) = round(radius × rampe), rampe = 0 au bord de la carte,
+        1 à 1,5 cellule ; calculée par tables de sommes cumulées sur les valeurs répétées du jeu."""
+        n = self.n
+        lo = -skirt * self.cn - radius
+        m = n + 2 * (skirt * self.cn + radius)
+        idx = [[self.key(lo + a, lo + b) for b in range(m)] for a in range(m)]
+
+        def sat(values):
+            s = [[0.0] * (m + 1) for _ in range(m + 1)]
+            for a in range(m):
+                row = 0.0
+                ra = idx[a]
+                for b in range(m):
+                    row += values[ra[b]]
+                    s[a + 1][b + 1] = s[a][b + 1] + row
+            return s
+
+        rgb_src = None
+        if rgb:
+            pal = self.palette
+            rgb_src = ([], [], [])
+            for k in range(len(self.light)):
+                c = self.colour[k]
+                first, shades, _ = self.rang[c] if c < len(self.rang) else self.rang[0]
+                tone = min(255, first + ((self.light[k] * shades + 128) >> 8))
+                for q in range(3):
+                    rgb_src[q].append(pal[3 * tone + q] / 255.0)
+        s_rgb = [sat(ch) for ch in rgb_src] if rgb else None
+        s_light = sat(self.light)
+        s_h = sat(self.h) if with_height else None
+        s_col = [sat([1.0 if c == k else 0.0 for c in self.colour]) for k in range(len(self.rang))]
+        present = sorted(set(self.colour))
+        s_lc = {k: sat([lv if c == k else 0.0 for lv, c in zip(self.light, self.colour)]) for k in present} if rgb else {}
+
+        def box(s, a, b, r):
+            a0 = a - r
+            b0 = b - r
+            a1 = a + r + 1
+            b1 = b + r + 1
+            return s[a1][b1] - s[a0][b1] - s[a1][b0] + s[a0][b0]
+
+        out = {}
+        for i in range(lo + radius, lo + m - radius):
+            for j in range(lo + radius, lo + m - radius):
+                d = max(0, -i, i - (n - 1), -j, j - (n - 1))
+                if d == 0:
+                    continue
+                r = int(round(radius * self.ramp(d)))
+                if r == 0:
+                    continue
+                a = i - lo
+                b = j - lo
+                area = (2 * r + 1) ** 2
+                lv = box(s_light, a, b, r) / area
+                cv = max(range(len(s_col)), key=lambda k: box(s_col[k], a, b, r))
+                hv = box(s_h, a, b, r) / area if with_height else None
+                col = tuple(box(s, a, b, r) / area for s in s_rgb) if rgb else None
+                comp = None
+                if rgb:
+                    comp = []
+                    for k in present:
+                        cnt = box(s_col[k], a, b, r)
+                        if cnt > 0:
+                            comp.append((k, cnt / area, box(s_lc[k], a, b, r) / cnt))
+                out[(i, j)] = (lv, cv, hv, col, comp)
+        return out
+
+    def pal_rgb(self, c, lv):
+        """Couleur RVB (0..1) de la teinte de la couleur de base c pour l'éclairage lv (0..255)."""
+        first, shades, _ = self.rang[c] if c < len(self.rang) else self.rang[0]
+        lv = max(0, min(255, int(round(lv))))
+        tone = min(255, first + ((lv * shades + 128) >> 8))
+        return tuple(self.palette[3 * tone + q] / 255.0 for q in range(3))
+
+    def light_shift(self, i, j, amplitude):
+        """Décalage d'éclairage (unités de l'octet) du sommet affiché (i, j) : nul dans la carte."""
+        n = self.n
+        out = max(0, -i, i - (n - 1), -j, j - (n - 1))
+        if out == 0 or amplitude == 0:
+            return 0.0
+        x = j * self.spacing
+        z = i * self.spacing
+        lum = 0.65 * self.value_noise(x, z, 7300.0) + 0.35 * self.value_noise(x + 5000.0, z - 9000.0, 31000.0)
+        return amplitude * self.ramp(out) * lum
+
+    def terrain_mesh_rgb(self, slash, flat, skirt, smooth, noise_rgb=0.0):
+        """Jupe en couleurs RVB : sommet lissé → sa couleur RVB moyenne ; sommet non lissé (au bord)
+        → couleur du jeu (couleur de base du sommet le plus haut, teinte du sommet)."""
+        n = self.n
+        h = self.h
+        light = self.light
+        colour = self.colour
+        rang = self.rang
+        pal = self.palette
+        pos = array.array("f")
+        col = array.array("f")
+
+        def tri(p0, p1, p2):
+            ks = [self.key(*q) for q in (p0, p1, p2)]
+            ss = [smooth.get(q) for q in (p0, p1, p2)]
+            hs = [h[k] if (s is None or s[2] is None) else s[2] for k, s in zip(ks, ss)]
+            kb = 0
+            for q in (1, 2):
+                if (int(hs[q]) & 0xFFFF) >= (int(hs[kb]) & 0xFFFF):
+                    kb = q
+            base = colour[ks[kb]]
+            first, shades, _ = rang[base] if base < len(rang) else rang[0]
+            cols = []
+            for p, k, s in zip((p0, p1, p2), ks, ss):
+                shift = self.light_shift(p[0], p[1], noise_rgb) if noise_rgb else 0.0
+                if s is not None and s[4]:
+                    # mélange des couleurs de la carte présentes autour, chacune glissée le long de sa gamme
+                    acc = [0.0, 0.0, 0.0]
+                    for c, frac, lv in s[4]:
+                        rgbc = self.pal_rgb(c, lv + shift)
+                        for q in range(3):
+                            acc[q] += frac * rgbc[q]
+                    cols.append(tuple(acc))
+                else:
+                    cols.append(self.pal_rgb(base, light[k] + shift))
+            if flat:
+                m = tuple(sum(c[q] for c in cols) / 3 for q in range(3))
+                cols = [m, m, m]
+            for (i, j), hv, c in zip((p0, p1, p2), hs, cols):
+                pos.extend((self.gl_x(j), hv, self.gl_z(i)))
+                col.extend(c)
+
+        lo = -skirt * self.cn
+        hi = n - 1 + skirt * self.cn
+        for i in range(lo, hi):
+            for j in range(lo, hi):
+                if 0 <= i < n - 1 and 0 <= j < n - 1:
+                    continue
+                a = (i, j)
+                b = (i, j + 1)
+                c = (i + 1, j)
+                d = (i + 1, j + 1)
+                if not slash:
+                    tri(a, b, d)
+                    tri(a, d, c)
+                else:
+                    tri(a, b, c)
+                    tri(d, c, b)
+        return pos, col
+
+    def terrain_mesh(self, slash, flat, skirt=0, noise=0.0, patches=False, smooth=None):
+        """2 triangles par carré, sommets non partagés : la couleur de base est propre au triangle.
+        flat : mode « face unie » du jeu (byte_6EB21 ≠ 1 dans Render_TerrainPipelineMain) — les
+        3 sommets reçoivent la moyenne de leurs 3 teintes (somme ÷ 3, partie entière).
+        skirt = 0 : la carte seule ; skirt > 0 : seulement les carrés hors de la carte, sur
+        skirt cellules de large tout autour."""
+        n = self.n
+        h = self.h
+        light = self.light
+        colour = self.colour
+        rang = self.rang
+        pos = array.array("f")
+        shade = array.array("f")
+
+        smooth = smooth or {}
+
+        def val(p):
+            k = self.key(*p)
+            s = smooth.get(p)
+            if s is None:
+                return h[k], light[k], colour[k]
+            return (h[k] if s[2] is None else s[2]), s[0], s[1]
+
+        def tri(p0, p1, p2):
+            v0 = val(p0)
+            v1 = val(p1)
+            v2 = val(p2)
+            vb = v0
+            if (int(v1[0]) & 0xFFFF) >= (int(vb[0]) & 0xFFFF):
+                vb = v1
+            if (int(v2[0]) & 0xFFFF) >= (int(vb[0]) & 0xFFFF):
+                vb = v2
+            base = vb[2]
+            if patches and base in (4, 6) and self.patch_swap(p0[0], p0[1]):
+                base = 10 - base
+            first, shades, _ = rang[base] if base < len(rang) else rang[0]
+            lights = [int(round(v[1])) for v in (v0, v1, v2)]
+            if noise:
+                lights = [max(0, min(255, int(round(lv + self.skirt_noise(p[0], p[1], noise)))))
+                          for lv, p in zip(lights, (p0, p1, p2))]
+            tones = [first + ((lv * shades + 128) >> 8) for lv in lights]
+            if flat:
+                tones = [sum(tones) // 3] * 3
+            for (i, j), v, tone in zip((p0, p1, p2), (v0, v1, v2), tones):
+                pos.extend((self.gl_x(j), v[0], self.gl_z(i)))
+                shade.append(tone)
+
+        lo = -skirt * self.cn
+        hi = n - 1 + skirt * self.cn
+        for i in range(lo, hi):
+            for j in range(lo, hi):
+                inside = 0 <= i < n - 1 and 0 <= j < n - 1
+                if inside == (skirt > 0):
+                    continue
+                a = (i, j)
+                b = (i, j + 1)
+                c = (i + 1, j)
+                d = (i + 1, j + 1)
+                if not slash:
+                    tri(a, b, d)
+                    tri(a, d, c)
+                else:
+                    tri(a, b, c)
+                    tri(d, c, b)
+        return pos, shade
+
+    def runway_mesh(self):
+        pos = array.array("f")
+        shade = array.array("f")
+        for r in self.runways:
+            for a, b, c, col in r["t"]:
+                for k in (a, b, c):
+                    x, z = r["v"][k]
+                    pos.extend((x, r["y"], -z))
+                    shade.append(min(col, 255))
+        return pos, shade
+
+    def marker_mesh(self):
+        pos = array.array("f")
+        shade = array.array("f")
+        for o in self.objects:
+            pos.extend((o["x"], o["y"], -o["z"], o["x"], o["y"] + 60, -o["z"]))
+            shade.extend((55, 55))
+        return pos, shade
+
+
+# --- OpenGL ----------------------------------------------------------------------------------
+
+def compile_program(vs=VS, fs=FS, attr="aShade"):
+    def shader(kind, src):
+        s = GL.glCreateShader(kind)
+        GL.glShaderSource(s, src)
+        GL.glCompileShader(s)
+        if not GL.glGetShaderiv(s, GL.GL_COMPILE_STATUS):
+            raise RuntimeError(GL.glGetShaderInfoLog(s).decode())
+        return s
+
+    prog = GL.glCreateProgram()
+    GL.glAttachShader(prog, shader(GL.GL_VERTEX_SHADER, vs))
+    GL.glAttachShader(prog, shader(GL.GL_FRAGMENT_SHADER, fs))
+    GL.glBindAttribLocation(prog, 0, "aPos")
+    GL.glBindAttribLocation(prog, 1, attr)
+    GL.glLinkProgram(prog)
+    if not GL.glGetProgramiv(prog, GL.GL_LINK_STATUS):
+        raise RuntimeError(GL.glGetProgramInfoLog(prog).decode())
+    return prog
+
+
+class Mesh:
+    def __init__(self, pos, shade, size=1):
+        self.size = size
+        self.vbo_pos = GL.glGenBuffers(1)
+        self.vbo_shade = GL.glGenBuffers(1)
+        self.upload(pos, shade)
+
+    def upload(self, pos, shade):
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vbo_pos)
+        GL.glBufferData(GL.GL_ARRAY_BUFFER, len(pos) * 4, pos.tobytes(), GL.GL_STATIC_DRAW)
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vbo_shade)
+        GL.glBufferData(GL.GL_ARRAY_BUFFER, len(shade) * 4, shade.tobytes(), GL.GL_STATIC_DRAW)
+        self.count = len(shade) // self.size
+
+    def draw(self, mode):
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vbo_pos)
+        GL.glEnableVertexAttribArray(0)
+        GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, 0, None)
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vbo_shade)
+        GL.glEnableVertexAttribArray(1)
+        GL.glVertexAttribPointer(1, self.size, GL.GL_FLOAT, GL.GL_FALSE, 0, None)
+        GL.glDrawArrays(mode, 0, self.count)
+
+
+def palette_texture(pal):
+    tex = GL.glGenTextures(1)
+    GL.glBindTexture(GL.GL_TEXTURE_2D, tex)
+    rgba = bytearray()
+    for k in range(256):
+        rgba += bytes((pal[3 * k], pal[3 * k + 1], pal[3 * k + 2], 255))
+    GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, 256, 1, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, bytes(rgba))
+    for p in (GL.GL_TEXTURE_MIN_FILTER, GL.GL_TEXTURE_MAG_FILTER):
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, p, GL.GL_NEAREST)
+    for p in (GL.GL_TEXTURE_WRAP_S, GL.GL_TEXTURE_WRAP_T):
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, p, GL.GL_CLAMP_TO_EDGE)
+    return tex
+
+
+# --- matrices (colonnes d'abord, comme OpenGL) ------------------------------------------------
+
+def perspective(fovy, aspect, near, far):
+    t = 1 / math.tan(fovy / 2)
+    return [t / aspect, 0, 0, 0,
+            0, t, 0, 0,
+            0, 0, (far + near) / (near - far), -1,
+            0, 0, 2 * far * near / (near - far), 0]
+
+
+def look(eye, fwd):
+    f = normalize(fwd)
+    s = normalize(cross(f, (0, 1, 0)))
+    u = cross(s, f)
+    return [s[0], u[0], -f[0], 0,
+            s[1], u[1], -f[1], 0,
+            s[2], u[2], -f[2], 0,
+            -dot(s, eye), -dot(u, eye), dot(f, eye), 1]
+
+
+def multiply(a, b):
+    out = [0.0] * 16
+    for c in range(4):
+        for r in range(4):
+            out[c * 4 + r] = sum(a[k * 4 + r] * b[c * 4 + k] for k in range(4))
+    return out
+
+
+def cross(a, b):
+    return (a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
+
+
+def dot(a, b):
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+
+
+def normalize(a):
+    length = math.sqrt(dot(a, a)) or 1.0
+    return (a[0] / length, a[1] / length, a[2] / length)
+
+
+# --- caméra ----------------------------------------------------------------------------------
+
+class Camera:
+    def __init__(self):
+        self.x = -139500.0
+        self.y = 900.0
+        self.z = 58600.0
+        self.yaw = math.pi / 2          # 0 = vers +Z du fichier, π/2 = vers +X
+        self.pitch = -0.12
+        self.speed = 300.0
+
+    def forward(self):
+        cp = math.cos(self.pitch)
+        return (cp * math.sin(self.yaw), math.sin(self.pitch), -cp * math.cos(self.yaw))
+
+    def go_to(self, x, y, z, dist):
+        self.x = x - dist
+        self.z = z
+        self.y = y + dist * 0.4
+        self.yaw = math.pi / 2
+        self.pitch = -0.38
+        self.speed = max(100.0, dist / 4)
+
+
+# --- programme -------------------------------------------------------------------------------
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("pak")
+    ap.add_argument("--palette", default=None, help="PALETTE.IFF (défaut : à côté du .PAK)")
+    ap.add_argument("--size", default="1280x800", help="taille de la fenêtre")
+    ap.add_argument("--screenshot", default=None, help="rend une image dans ce PNG puis quitte")
+    ap.add_argument("--flat", action="store_true", help="démarre en ombrage plat")
+    ap.add_argument("--view", default=None,
+                    help="caméra de départ : X,Y,Z,cap,assiette (m, m, m, degrés, degrés ; Z du fichier)")
+    ap.add_argument("--skirt", type=int, default=4,
+                    help="largeur des jupes en cellules de 20 km (0 = aucune ; défaut 4)")
+    ap.add_argument("--skirt-patches", action="store_true",
+                    help="essai esthétique : échange forêt/neige par plaques sur les jupes")
+    ap.add_argument("--skirt-smooth", type=int, default=0,
+                    help="essai esthétique : rayon max (sommets) du lissage moyen des jupes (défaut 0)")
+    ap.add_argument("--skirt-smooth-height", action="store_true", help="le lissage porte aussi sur l'altitude")
+    ap.add_argument("--skirt-smooth-rgb", action="store_true",
+                    help="le lissage porte sur la couleur RVB affichée (touche C)")
+    ap.add_argument("--skirt-noise-rgb", type=float, default=0.0,
+                    help="essai esthétique : bruit RVB des jupes le long des gammes de la palette, "
+                         "amplitude en unités d'éclairage (touche B ; ≈ 40 à 80)")
+    ap.add_argument("--skirt-ramp", type=float, default=3.0,
+                    help="largeur de la transition carte → jupe, en cellules (défaut 3)")
+    ap.add_argument("--skirt-noise", type=float, default=0.0,
+                    help="amplitude du bruit d'éclairage des jupes (essai esthétique ; 40 ≈ ±4 teintes ; défaut 0)")
+    args = ap.parse_args()
+
+    palette_path = args.palette or os.path.join(os.path.dirname(args.pak), "PALETTE.IFF")
+    print("lecture du terrain…")
+    world = Terrain(args.pak, palette_path)
+    width, height = (int(v) for v in args.size.split("x"))
+
+    pygame.init()
+    pygame.display.set_mode((width, height), pygame.OPENGL | pygame.DOUBLEBUF | pygame.RESIZABLE)
+    pygame.display.set_caption(f"{world.name} — 3D")
+    font = pygame.font.SysFont("monospace", 14)
+
+    prog = compile_program()
+    GL.glUseProgram(prog)
+    u_mvp = GL.glGetUniformLocation(prog, "uMVP")
+    u_smooth = GL.glGetUniformLocation(prog, "uSmooth")
+    GL.glUniform1i(GL.glGetUniformLocation(prog, "uPal"), 0)
+    tex = palette_texture(world.palette)
+
+    slash = False
+    print("construction du maillage…")
+    flat = args.flat
+    terrain = Mesh(*world.terrain_mesh(slash, flat))
+    noise_amp = args.skirt_noise if args.skirt_noise > 0 else 40.0
+    noise = args.skirt_noise
+    patches = args.skirt_patches
+    smooth_radius = args.skirt_smooth if args.skirt_smooth > 0 else 8
+    smoothing = args.skirt_smooth > 0
+    smooth_cache = {}
+
+    rgb_mode = args.skirt_smooth_rgb
+    noise_rgb_amp = args.skirt_noise_rgb if args.skirt_noise_rgb > 0 else 60.0
+    world.ramp_cells = args.skirt_ramp
+    noise_rgb = args.skirt_noise_rgb
+
+    def use_rgb():
+        return bool(skirt) and ((rgb_mode and smoothing) or noise_rgb > 0)
+
+    def smooth_now(rgb=False):
+        if not smoothing or args.skirt <= 0:
+            return None
+        if (smooth_radius, rgb) not in smooth_cache:
+            print("lissage des jupes…")
+            smooth_cache[(smooth_radius, rgb)] = world.smoothed_skirt(args.skirt, smooth_radius,
+                                                                      args.skirt_smooth_height, rgb)
+        return smooth_cache[(smooth_radius, rgb)]
+
+    def skirt_rgb_mesh():
+        smooth = smooth_now(True) if rgb_mode else None
+        return world.terrain_mesh_rgb(slash, flat, args.skirt, smooth or {}, noise_rgb)
+
+    skirt = Mesh(*world.terrain_mesh(slash, flat, args.skirt, noise, patches, smooth_now())) if args.skirt > 0 else None
+    prog_rgb = compile_program(VS_RGB, FS_RGB, "aCol")
+    u_mvp_rgb = GL.glGetUniformLocation(prog_rgb, "uMVP")
+    skirt_rgb = Mesh(*skirt_rgb_mesh(), size=3) if use_rgb() else None
+    show_skirt = skirt is not None
+    runways = Mesh(*world.runway_mesh())
+    markers = Mesh(*world.marker_mesh())
+
+    def refresh_rgb(mesh):
+        if not use_rgb():
+            return mesh
+        if mesh is None:
+            return Mesh(*skirt_rgb_mesh(), size=3)
+        mesh.upload(*skirt_rgb_mesh())
+        return mesh
+
+    cam = Camera()
+    if args.view:
+        vx, vy, vz, vcap, vpitch = (float(v) for v in args.view.split(","))
+        cam.x, cam.y, cam.z = vx, vy, -vz
+        cam.yaw, cam.pitch = math.radians(vcap), math.radians(vpitch)
+        cam.speed = max(300.0, vy / 4)
+    obj_index = -1
+    dragging = False
+    clock = pygame.time.Clock()
+    running = True
+    frames = 0
+
+    def runway_centre(r):
+        xs = [v[0] for v in r["v"]]
+        zs = [v[1] for v in r["v"]]
+        return (min(xs) + max(xs)) / 2, r["y"], -(min(zs) + max(zs)) / 2
+
+    while running:
+        dt = min(0.1, clock.tick(60) / 1000)
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                running = False
+            elif e.type == pygame.VIDEORESIZE:
+                width, height = e.w, e.h
+            elif e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
+                dragging = True
+            elif e.type == pygame.MOUSEBUTTONUP and e.button == 1:
+                dragging = False
+            elif e.type == pygame.MOUSEMOTION and dragging:
+                cam.yaw += e.rel[0] * 0.004
+                cam.pitch = max(-1.55, min(1.55, cam.pitch - e.rel[1] * 0.004))
+            elif e.type == pygame.MOUSEWHEEL:
+                cam.speed = max(20.0, min(20000.0, cam.speed * math.exp(e.y * 0.2)))
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_ESCAPE:
+                    running = False
+                elif e.key == pygame.K_g:
+                    slash = not slash
+                    terrain.upload(*world.terrain_mesh(slash, flat))
+                    if skirt:
+                        skirt.upload(*world.terrain_mesh(slash, flat, args.skirt, noise, patches, smooth_now()))
+                    skirt_rgb = refresh_rgb(skirt_rgb)
+                elif e.key == pygame.K_f:
+                    flat = not flat
+                    terrain.upload(*world.terrain_mesh(slash, flat))
+                    if skirt:
+                        skirt.upload(*world.terrain_mesh(slash, flat, args.skirt, noise, patches, smooth_now()))
+                    skirt_rgb = refresh_rgb(skirt_rgb)
+                elif e.key == pygame.K_j and skirt:
+                    show_skirt = not show_skirt
+                elif e.key == pygame.K_b and skirt:
+                    noise_rgb = 0.0 if noise_rgb else noise_rgb_amp
+                    skirt_rgb = refresh_rgb(skirt_rgb)
+                elif e.key == pygame.K_c and skirt:
+                    rgb_mode = not rgb_mode
+                    skirt_rgb = refresh_rgb(skirt_rgb)
+                elif e.key == pygame.K_m and skirt:
+                    smoothing = not smoothing
+                    skirt.upload(*world.terrain_mesh(slash, flat, args.skirt, noise, patches, smooth_now()))
+                    skirt_rgb = refresh_rgb(skirt_rgb)
+                elif e.key == pygame.K_p and skirt:
+                    patches = not patches
+                    skirt.upload(*world.terrain_mesh(slash, flat, args.skirt, noise, patches, smooth_now()))
+                    skirt_rgb = refresh_rgb(skirt_rgb)
+                elif e.key == pygame.K_n and skirt:
+                    noise = 0.0 if noise else noise_amp
+                    skirt.upload(*world.terrain_mesh(slash, flat, args.skirt, noise, patches, smooth_now()))
+                    skirt_rgb = refresh_rgb(skirt_rgb)
+                elif e.key == pygame.K_HOME:
+                    cam.x, cam.y, cam.z = 0.0, 120000.0, 260000.0
+                    cam.yaw, cam.pitch, cam.speed = 0.0, -0.6, 5000.0
+                elif e.key == pygame.K_o and world.objects:
+                    obj_index = (obj_index + 1) % len(world.objects)
+                    o = world.objects[obj_index]
+                    cam.go_to(o["x"], o["y"], -o["z"], 400)
+                elif pygame.K_1 <= e.key <= pygame.K_9:
+                    k = e.key - pygame.K_1
+                    if k < len(world.runways):
+                        x, y, z = runway_centre(world.runways[k])
+                        cam.go_to(x, y, z, 3000)
+                elif e.key == pygame.K_F12:
+                    save_png(width, height, "terrain_3d.png")
+
+        keys = pygame.key.get_pressed()
+        f = cam.forward()
+        side = normalize(cross(f, (0, 1, 0)))
+        step = cam.speed * dt
+
+        def move(v, k):
+            cam.x += v[0] * k
+            cam.y += v[1] * k
+            cam.z += v[2] * k
+
+        if keys[pygame.K_w] or keys[pygame.K_z] or keys[pygame.K_UP]:
+            move(f, step)
+        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
+            move(f, -step)
+        if keys[pygame.K_a] or keys[pygame.K_q] or keys[pygame.K_LEFT]:
+            move(side, -step)
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+            move(side, step)
+        if keys[pygame.K_SPACE]:
+            cam.y += step
+        if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
+            cam.y -= step
+        ground = world.ground(cam.x, cam.z)
+        cam.y = max(cam.y, ground + 5)
+
+        GL.glViewport(0, 0, width, height)
+        GL.glClearColor(0.55, 0.66, 0.78, 1)
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+        GL.glEnable(GL.GL_DEPTH_TEST)
+        GL.glUseProgram(prog)
+        near = max(2.0, (cam.y - ground) * 0.05)
+        mvp = multiply(perspective(math.radians(60), width / max(1, height), near, 600000.0),
+                       look((cam.x, cam.y, cam.z), f))
+        GL.glUniformMatrix4fv(u_mvp, 1, GL.GL_FALSE, mvp)
+        GL.glActiveTexture(GL.GL_TEXTURE0)
+        GL.glBindTexture(GL.GL_TEXTURE_2D, tex)
+        GL.glUniform1f(u_smooth, 0.0 if flat else 1.0)
+        terrain.draw(GL.GL_TRIANGLES)
+        if show_skirt and use_rgb() and skirt_rgb:
+            GL.glUseProgram(prog_rgb)
+            GL.glUniformMatrix4fv(u_mvp_rgb, 1, GL.GL_FALSE, mvp)
+            skirt_rgb.draw(GL.GL_TRIANGLES)
+            GL.glUseProgram(prog)
+        elif show_skirt:
+            skirt.draw(GL.GL_TRIANGLES)
+        GL.glUniform1f(u_smooth, 0.0)
+        GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
+        GL.glPolygonOffset(-2, -8)
+        runways.draw(GL.GL_TRIANGLES)
+        GL.glDisable(GL.GL_POLYGON_OFFSET_FILL)
+        markers.draw(GL.GL_LINES)
+
+        cap = math.degrees(cam.yaw) % 360
+        lines = [f"X {cam.x:.0f} m   Z {-cam.z:.0f} m",
+                 f"altitude Y {cam.y:.0f} m   sol {ground:.0f} m",
+                 f"cap {cap:.0f}°   vitesse {cam.speed:.0f} m/s",
+                 f"ombrage {'plat' if flat else 'dégradé'}   diagonale {'/' if slash else chr(92)}   "
+                 f"jupes {f'{args.skirt} cellules' if show_skirt else 'non'}"
+                 f"{f'   bruit {noise:g}' if show_skirt and noise else ''}"
+                 f"{'   plaques' if show_skirt and patches else ''}"
+                 f"{f'   lissage {smooth_radius}' if show_skirt and smoothing else ''}"
+                 f"{' RVB' if show_skirt and smoothing and rgb_mode else ''}"
+                 f"{f'   bruit RVB {noise_rgb:g}' if show_skirt and noise_rgb else ''}"]
+        if obj_index >= 0:
+            lines.append(f"objet : {world.objects[obj_index]['name']}")
+        draw_hud(font, lines, height)
+        pygame.display.flip()
+
+        frames += 1
+        if args.screenshot and frames == 3:
+            save_png(width, height, args.screenshot)
+            running = False
+    pygame.quit()
+
+
+def draw_hud(font, lines, height):
+    GL.glUseProgram(0)
+    GL.glDisable(GL.GL_DEPTH_TEST)
+    y = height - 8
+    for text in lines:
+        surf = font.render(text, True, (240, 245, 240), (0, 0, 0))
+        data = pygame.image.tostring(surf, "RGBA", True)
+        y -= surf.get_height()
+        GL.glWindowPos2d(8, y)
+        GL.glDrawPixels(surf.get_width(), surf.get_height(), GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, data)
+
+
+def save_png(width, height, path):
+    GL.glReadBuffer(GL.GL_BACK)
+    data = GL.glReadPixels(0, 0, width, height, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
+    surf = pygame.image.fromstring(bytes(data), (width, height), "RGB", True)
+    pygame.image.save(surf, path)
+    print(f"capture : {path}")
+
+
+if __name__ == "__main__":
+    main()

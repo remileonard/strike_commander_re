@@ -73,7 +73,7 @@ loc_A0C20:
 		push	si
 		nop
 		push	cs
-		call	near ptr PlayerComponent_LoadFieldGroupD_A0C36
+		call	near ptr DynSurf_LoadSURFChunk_A0C36
 		add	sp, 4
 		pop	di
 
@@ -91,9 +91,24 @@ PlayerComponent_SubHelperAA_A0C03	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ResourceRecord_SeekAndRead_64743 et ReadFieldGroupC_64A7E (×2, seg193).
+; far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldGroupD'. LECTEUR DU CHUNK 'SURF' : 2 int32
+; → +0x21, +0x25 du modèle. Le clonage vers l'instance
+; (PlayerComponentVariantP_ConstructAndInit_A0D23 → PlayerComponent_SubHelperY_A0BE0 +
+; PlayerComponent_Helper_A4ABC) remet +0x21 à 0 et ne recopie que masse et vitesse ; les ticks
+; SURF (loc_4536C, loc_45376) ne font rien. Rôle des deux valeurs et comportement de l'objet
+; SURF non établis (sous-système non étudié). | RECHERCHE DE CONSOMMATEUR 2026-10-15 : vtable
+; du corps SURF (seg339 0x6EE66) : +0 construction
+; (PlayerComponentVariantQ_ConstructAndInit_A0CA2 : +0x21 = 0), +4
+; (PlayerComponent_SubHelperZ_A0CE2 -> PlayerComponent_SubHelperY_A0BE0 : +2 = proprietaire,
+; +0x21 = 0), +8 clonage vers l'instance (PlayerComponentVariantP_ConstructAndInit_A0D23 :
+; SubHelperY puis PlayerComponent_Helper_A4ABC = copie de +4 et +8/+0x0C/+0x10 seulement),
+; +0x3C / +0x40 SurfBody_TickNoOp_4536C / loc_45376 (ne lisent rien) ; les autres slots sont
+; ceux de la DYNM de base. L'instance n'a donc jamais +0x25 recopie et a +0x21 = 0. Aucune
+; lecture de +0x21/+0x25 trouvee non plus apres un chargement du pointeur de dynamique d'un
+; modele (+0x35/+0x36) dans les segments annotes. Consommateur non trouve (ce qui ne prouve
+; pas son absence).
 ; ==============================================================================================
-PlayerComponent_LoadFieldGroupD_A0C36	proc far		; CODE XREF: VROOMM_StubThunk_6C62AJ PlayerComponent_SubHelperAA_A0C03+29p
+DynSurf_LoadSURFChunk_A0C36	proc far		; CODE XREF: VROOMM_StubThunk_6C62AJ PlayerComponent_SubHelperAA_A0C03+29p
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -134,12 +149,12 @@ loc_A0C57:
 		pop	cx
 		mov	[si+25h], eax
 
-loc_A0C74:				; CODE XREF: PlayerComponent_LoadFieldGroupD_A0C36+1Ej
+loc_A0C74:				; CODE XREF: DynSurf_LoadSURFChunk_A0C36+1Ej
 		pop	di
 		pop	si
 		pop	bp
 		retf
-PlayerComponent_LoadFieldGroupD_A0C36	endp
+DynSurf_LoadSURFChunk_A0C36	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

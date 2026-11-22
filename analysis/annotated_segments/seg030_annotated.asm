@@ -107,7 +107,7 @@ loc_1CFA7:				; DATA XREF: seg339:0E0Eo
 		mov	[bp-2],	ax
 		mov	bx, [bp-2]
 		push	large dword ptr	[bx]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 
 loc_1CFCF:
 		add	sp, 8
@@ -345,7 +345,7 @@ loc_1D156:				; CODE XREF: seg030:0241j
 		push	ax
 		lea	ax, [bp-0F6h]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	eax, [bp-0BAh]
 
@@ -376,7 +376,7 @@ loc_1D1E1:
 		push	ax
 		lea	ax, [bp-0DEh]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		push	large dword ptr	[bp-0D6h]
 		push	large dword ptr	[bp-0DAh]
@@ -555,7 +555,7 @@ loc_1D3DF:
 		push	ss
 		lea	ax, [bp-86h]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	ax, [bp-85h]
 		mov	[di+35h], ax
@@ -601,7 +601,7 @@ loc_1D422:				; CODE XREF: seg030:050Bj
 		push	ss
 		lea	ax, [bp-90h]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	ax, [bp-8Fh]
 		mov	[bp-8Ch], ax
@@ -610,7 +610,7 @@ loc_1D422:				; CODE XREF: seg030:050Bj
 		push	ss
 		lea	ax, [bp-96h]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	ax, [bp-95h]
 		mov	[bp-92h], ax
@@ -867,7 +867,7 @@ loc_1D6FC:
 		push	ss
 		lea	ax, [bp-34h]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	ax, [bp-33h]
 		mov	[di+35h], ax
@@ -1094,7 +1094,7 @@ loc_1D929:				; DATA XREF: seg339:0E12o
 		mov	[bp-2],	ax
 		mov	bx, [bp-2]
 		push	large dword ptr	[bx]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jnz	short loc_1D95B
@@ -1285,7 +1285,7 @@ loc_1DAF1:
 		push	ax
 		push	large dword ptr	[bp-16h]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		mov	ax, [bp-12h]
 		sub	[bp-0Ah], ax
@@ -1601,7 +1601,7 @@ loc_1DF2B:				; CODE XREF: seg030:0B87j
 		push	ax
 		push	large dword ptr	[bp-0Ah]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 
 loc_1DF61:				; CODE XREF: seg030:1019j
 		add	sp, 0Ch
@@ -1710,7 +1710,7 @@ loc_1E014:				; CODE XREF: seg030:112Fj seg030:1139j ...
 		push	word ptr [di+2]
 		push	word ptr [di]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		jmp	short loc_1E05D
 ; ���������������������������������������������������������������������������
@@ -1763,7 +1763,7 @@ loc_1E065:				; CODE XREF: seg030:10E7j
 		push	word ptr [di+2]
 		push	word ptr [di]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		cmp	byte ptr [di+4], 0
 		jz	short loc_1E0BE
@@ -1781,7 +1781,7 @@ loc_1E093:				; CODE XREF: seg030:1153j
 		push	word ptr [di+2]
 		push	word ptr [di]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_1E0BE:				; CODE XREF: seg030:1151j seg030:1181j
@@ -1914,7 +1914,7 @@ loc_1E1CF:
 		push	word ptr [si+3Dh]
 		push	word ptr [si+3Bh]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		jmp	short loc_1E1F3
 ; ���������������������������������������������������������������������������
@@ -1961,7 +1961,7 @@ loc_1E207:				; DATA XREF: seg339:0DFAo
 		mov	[bp-2],	ax
 		mov	bx, [bp-2]
 		push	large dword ptr	[bx]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jz	short loc_1E238
@@ -2093,7 +2093,7 @@ loc_1E304:
 		mov	[bp-2],	ax
 		mov	bx, [bp-2]
 		push	large dword ptr	[bx]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jnz	short loc_1E32D
@@ -2256,7 +2256,7 @@ loc_1E494:				; CODE XREF: seg030:1581j
 		push	large dword ptr	[bp-0Ch]
 		push	large dword ptr	[bp-8]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_1E4A8:
@@ -2380,7 +2380,7 @@ loc_1E5B1:
 loc_1E5B6:
 		lea	ax, [bp-2Eh]
 		push	ax
-		call	Math_ArcSin_5493E
+		call	Math_AcosDeg_5493E
 		add	sp, 6
 		mov	eax, [bp-2Eh]
 		mov	[bp-2Ah], eax
@@ -2569,7 +2569,7 @@ loc_1E7B7:				; CODE XREF: seg030:189Cj
 		push	ss
 		lea	ax, [bp-0CCh]
 		push	ax
-		call	Math_ArcSinOfRatio_54A0E
+		call	Math_AcosOfRatio_54A0E
 		add	sp, 8
 		mov	eax, [bp-0CCh]
 
@@ -2600,7 +2600,7 @@ loc_1E804:
 		push	ss
 		lea	ax, [bp-8Ch]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp-52h]
 		mov	edx, [bp-8Ch]
@@ -2616,7 +2616,7 @@ loc_1E804:
 		push	ss
 		lea	ax, [bp-98h]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp-52h]
 		mov	edx, [bp-98h]
@@ -2820,7 +2820,7 @@ loc_1E9FC:				; CODE XREF: seg030:1AD6j seg030:1ADBj ...
 		push	word ptr [bp-6Eh]
 		push	word ptr [bp-5Eh]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 
 loc_1EA0F:				; CODE XREF: seg030:1A9Fj
 		add	sp, 0Ch

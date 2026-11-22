@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terrain 3D __TITLE__</title>
+<style>
+:root {
+  --bg: #eef2f1; --panel: #ffffff; --fg: #18211f; --muted: #56645f; --rule: #cfd8d5;
+  --accent: #0a6b70; --accent-soft: #d6ecec;
+  --font: "Segoe UI", Helvetica, Arial, sans-serif; --mono: ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1413; --panel: #151d1c; --fg: #e2eae8; --muted: #93a39f; --rule: #2b3836;
+    --accent: #52c4c9; --accent-soft: #173638;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1413; --panel: #151d1c; --fg: #e2eae8; --muted: #93a39f; --rule: #2b3836;
+  --accent: #52c4c9; --accent-soft: #173638;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 14px;
+  display: grid; grid-template-columns: minmax(0, 1fr) 300px; height: 100vh; overflow: hidden; }
+#view { position: relative; min-width: 0; background: #000; }
+canvas { display: block; width: 100%; height: 100%; cursor: crosshair; touch-action: none; outline: none; }
+#hud { position: absolute; left: 10px; top: 10px; background: rgba(0,0,0,.6); color: #e8f0ee; border-radius: 6px;
+  padding: 6px 10px; font-family: var(--mono); font-size: 12px; white-space: pre; pointer-events: none; }
+#labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+#labels span { position: absolute; transform: translate(6px, -50%); font-size: 12px; color: #fff;
+  text-shadow: 0 0 3px #000, 0 0 3px #000; white-space: nowrap; }
+#help { position: absolute; left: 10px; bottom: 10px; right: 10px; background: rgba(0,0,0,.6); color: #e8f0ee; border-radius: 6px;
+  padding: 6px 10px; font-size: 12px; pointer-events: none; width: fit-content; max-width: calc(100% - 20px); }
+aside { background: var(--panel); border-left: 1px solid var(--rule); overflow-y: auto; padding: 14px; min-width: 0; }
+h1 { font-size: 18px; margin: 0 0 4px; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 16px 0 6px; }
+.opts label { display: flex; gap: 6px; align-items: center; margin: 4px 0; }
+.opts input[type=range] { flex: 1; min-width: 0; }
+ul.list { list-style: none; margin: 0; padding: 0; }
+ul.list li button { all: unset; display: block; width: 100%; box-sizing: border-box; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+ul.list li button:hover, ul.list li button:focus-visible { background: var(--accent-soft); }
+.nm { font-weight: 600; font-family: var(--mono); }
+.meta { color: var(--muted); font-size: 12px; font-family: var(--mono); }
+.note { color: var(--muted); font-size: 12px; margin-top: 14px; }
+#err { color: #c0392b; margin: 0; }
+@media (max-width: 720px) {
+  body { grid-template-columns: minmax(0, 1fr); grid-template-rows: 60vh minmax(0, 1fr); }
+  aside { border-left: 0; border-top: 1px solid var(--rule); }
+}
+</style>
+</head>
+<body>
+<div id="view">
+  <canvas id="gl" tabindex="0" aria-label="Vue 3D du terrain"></canvas>
+  <div id="labels"></div>
+  <div id="hud"></div>
+  <div id="help">Glisser : regarder · Z/W ou ↑ : avancer · S ou ↓ : reculer · Q/A, D ou ← → : de côté · Espace : monter · Maj : descendre · Molette : vitesse</div>
+</div>
+<aside>
+  <h1 id="title"></h1>
+  <p id="err"></p>
+  <h2>Rendu</h2>
+  <div class="opts">
+    <label><input type="checkbox" id="flat"> ombrage plat (mode « face unie » du jeu)</label>
+    <label><input type="checkbox" id="diag"> diagonale « / » au lieu de « \ »</label>
+    <label><input type="checkbox" id="labelsOn" checked> noms des objets</label>
+    <label><input type="checkbox" id="skirtOn" checked> jupes : 4 cellules hors carte, cellule du bord répétée (comme le jeu)</label>
+  </div>
+  <h2>Brouillard</h2>
+  <div class="opts">
+    <label><input type="checkbox" id="fogOn"> brouillard (Palette_ShadeIndexWithFog_2F24E)</label>
+    <label><input type="checkbox" id="fogSteps" checked> 32 paliers (comme le jeu)</label>
+    <label><input type="checkbox" id="fogSky" checked> fond = couleur du brouillard</label>
+    <label>début (m) <input type="number" id="fogStart" value="6000" min="0" max="200000" step="500"></label>
+    <label>fin (m) <input type="number" id="fogEnd" value="40000" min="500" max="400000" step="1000"></label>
+  </div>
+  <h2>Jupes : essais esthétiques (pas le jeu)</h2>
+  <div class="opts">
+    <label><input type="checkbox" id="smoothOn" checked> lissage RVB</label>
+    <label><input type="checkbox" id="smoothH"> lisser aussi l'altitude</label>
+    <label><input type="checkbox" id="noiseOn" checked> bruit dans les teintes de la carte</label>
+    <label>rayon du lissage (sommets) <input type="number" id="smoothR" value="8" min="1" max="20" step="1"></label>
+    <label>amplitude du bruit (éclairage) <input type="number" id="noiseA" value="60" min="0" max="160" step="10"></label>
+    <label>transition (cellules) <input type="number" id="rampC" value="3" min="0.5" max="4" step="0.5"></label>
+  </div>
+  <h2>Aller à</h2>
+  <ul class="list" id="goto"></ul>
+  <p class="note">Couleurs de PALETTE.IFF. Couleur de base du triangle = celle du sommet le plus haut (comparaison non signée) ; teinte du sommet = première + (éclairage × n + 128) ÷ 256 ; teinte interpolée sur le triangle et rendue en continu (mélange des deux couleurs de palette voisines) ; en ombrage plat, comme le mode « face unie » du jeu, le triangle prend la moyenne des 3 teintes (partie entière). Pistes : octet « couleur » comme index de palette, face unie. Textures du sol non dessinées. Diagonale des carrés non établie (réglable). Objets posés : simples repères. Brouillard : la teinte de chaque sommet glisse vers la teinte de brouillard de sa gamme (première + 3e champ de RANG, gris 192) selon sa profondeur, en 32 paliers ; les distances des paliers viennent du fichier « palfade » (absent du dépôt), une ligne de seuils par tranche de 512 m de hauteur de la caméra au-dessus du sol : ici début et fin réglables, paliers régulièrement espacés. Jupes : au-delà des bords, l'indice de cellule est borné à [0, 17] et la position dans la cellule continue (Terrain_BuildVertexWindow_3266E) : la cellule du bord se répète toutes les 20 km. Essais esthétiques (absents du jeu) : lissage moyen RVB des jupes (rayon croissant avec la distance au bord, courbe en S sur « transition » cellules) et bruit qui fait glisser chaque couleur de base le long de sa gamme de palette, puis mélange les couleurs présentes autour (teintes de la carte uniquement) ; voir analysis/IMPL_TERRAIN_SKIRTS.md §5 à 5ter.</p>
+</aside>
+<script>
+const D = /*__DATA__*/null;
+(function () {
+  "use strict";
+  const N = D.side, SP = D.spacing, HALF = D.grid * D.cellSize / 2;
+  const dec = (b64) => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+  const hb = dec(D.height);
+  const H = new Int16Array(hb.buffer, hb.byteOffset, N * N);
+  const L = dec(D.light), C = dec(D.colour);
+  const PAL = D.palette, RANG = D.rang;
+  document.getElementById("title").textContent = D.name + " — 3D";
+  const err = (m) => { document.getElementById("err").textContent = m; };
+  if (!PAL) { err("Pas de palette : relance terrain_viewer.py avec PALETTE.IFF."); return; }
+
+  // Repère GL : x = X du fichier, y = altitude Y, z = −Z du fichier.
+  const CN = N / D.grid;           // sommets par cellule
+  const SK = 4;                     // largeur des jupes, en cellules
+  // Comme Terrain_BuildVertexWindow_3266E : cellule bornée à [0, grille − 1], position dans la cellule = g mod n.
+  const src = (g) => Math.min(Math.max(Math.floor(g / CN), 0), D.grid - 1) * CN + (((g % CN) + CN) % CN);
+  const key = (i, j) => src(i) * N + src(j);
+  const posX = (j) => -HALF + j * SP;
+  const posZ = (i) => -(HALF - i * SP);
+
+  const cv = document.getElementById("gl");
+  const gl = cv.getContext("webgl", { antialias: true });
+  if (!gl) { err("WebGL indisponible dans ce navigateur."); return; }
+  // Brouillard (Palette_ShadeIndexWithFog_2F24E) : teinte = teinte éclairée + arrondi((teinte de brouillard
+  // − teinte éclairée) × f), f = (rang du seuil franchi + 1) / 32, 0 avant le 1er seuil, 1 après le dernier.
+  const FOG = `uniform vec3 uEye; uniform vec3 uFwd; uniform vec3 uFog; uniform float uFogSteps;
+    float fogF(vec3 p) {
+      if (uFog.x < 0.5) return 0.0;
+      float x = (dot(p - uEye, uFwd) - uFog.y) / max(1.0, uFog.z - uFog.y);
+      if (x <= 0.0) return 0.0;
+      if (x >= 1.0) return 1.0;
+      return uFogSteps > 0.5 ? (floor(x * 32.0) + 1.0) / 32.0 : x;
+    }`;
+  const vs = `attribute vec3 aPos; attribute float aShade; attribute float aFogTo; uniform mat4 uMVP;
+    varying float vShade;
+    ` + FOG + `
+    void main() {
+      vShade = aShade;
+      if (aFogTo >= 0.0) {
+        float d = (aFogTo - aShade) * fogF(aPos);
+        vShade = aShade + (uFogSteps > 0.5 ? floor(d + 0.5) : d);
+      }
+      gl_Position = uMVP * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    }`;
+  const fs = `precision highp float; varying float vShade; uniform sampler2D uPal; uniform float uSmooth;
+    vec4 pal(float idx) { return texture2D(uPal, vec2((clamp(idx, 0.0, 255.0) + 0.5) / 256.0, 0.5)); }
+    void main() {
+      float base = floor(vShade + 0.5 * (1.0 - uSmooth));
+      gl_FragColor = mix(pal(base), pal(base + 1.0), (vShade - base) * uSmooth);
+    }`;
+  function shader(type, src) {
+    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, shader(gl.VERTEX_SHADER, vs)); gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog); gl.useProgram(prog);
+  const aPos = gl.getAttribLocation(prog, "aPos"), aShade = gl.getAttribLocation(prog, "aShade");
+  const aFogTo = gl.getAttribLocation(prog, "aFogTo");
+  const fogLoc = (pr) => ({ eye: gl.getUniformLocation(pr, "uEye"), fwd: gl.getUniformLocation(pr, "uFwd"),
+    fog: gl.getUniformLocation(pr, "uFog"), steps: gl.getUniformLocation(pr, "uFogSteps"), col: gl.getUniformLocation(pr, "uFogColor") });
+  const fogU = fogLoc(prog);
+  const uMVP = gl.getUniformLocation(prog, "uMVP");
+  const uSmooth = gl.getUniformLocation(prog, "uSmooth");
+
+  const palTex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, palTex);
+  const palData = new Uint8Array(256 * 4);
+  for (let k = 0; k < 256; k++) { palData[4 * k] = PAL[3 * k]; palData[4 * k + 1] = PAL[3 * k + 1]; palData[4 * k + 2] = PAL[3 * k + 2]; palData[4 * k + 3] = 255; }
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 256, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, palData);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+  function upload(pos, sh, old, fogTo) {
+    const b = old || { p: gl.createBuffer(), s: gl.createBuffer(), f: gl.createBuffer() };
+    gl.bindBuffer(gl.ARRAY_BUFFER, b.p); gl.bufferData(gl.ARRAY_BUFFER, pos, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, b.s); gl.bufferData(gl.ARRAY_BUFFER, sh, gl.STATIC_DRAW);
+    b.hasFog = !!fogTo;
+    if (fogTo) { gl.bindBuffer(gl.ARRAY_BUFFER, b.f); gl.bufferData(gl.ARRAY_BUFFER, fogTo, gl.STATIC_DRAW); }
+    b.n = sh.length; return b;
+  }
+  // Gamme d'un index de palette (Table_LookupByRange_2E975) : index de sa teinte de brouillard, ou -1.
+  const fogToOf = (c) => { for (const r of RANG) { if (r[0] <= c && c <= r[0] + r[2]) return r[0] + r[2]; } return -1; };
+  // terrain : 2 triangles par carré, sommets non partagés (couleur de base propre au triangle)
+  let terrain = null, skirt = null;
+  // skirt = 0 : la carte seule ; skirt > 0 : seulement les carrés hors de la carte, sur skirt cellules
+  function buildMesh(slash, flat, sk, old) {
+    const M = N - 1 + 2 * sk * CN;
+    const ntri = (sk ? M * M - (N - 1) * (N - 1) : (N - 1) * (N - 1)) * 2;
+    const pos = new Float32Array(ntri * 9), sh = new Float32Array(ntri * 3), fz = new Float32Array(ntri * 3);
+    let t = 0;
+    const hu = (k) => H[k] & 0xFFFF;
+    function tri(p0, p1, p2) {
+      const k0 = key(p0[0], p0[1]), k1 = key(p1[0], p1[1]), k2 = key(p2[0], p2[1]);
+      let kb = k0;
+      if (hu(k1) >= hu(kb)) kb = k1;
+      if (hu(k2) >= hu(kb)) kb = k2;
+      const r = RANG[C[kb]] || RANG[0];
+      let tones = [k0, k1, k2].map((k) => r[0] + ((L[k] * r[1] + 128) >> 8));
+      if (flat) { const m = Math.floor((tones[0] + tones[1] + tones[2]) / 3); tones = [m, m, m]; }
+      [p0, p1, p2].forEach((p, q) => {
+        const k = [k0, k1, k2][q], o = 3 * t;
+        pos[o] = posX(p[1]); pos[o + 1] = H[k]; pos[o + 2] = posZ(p[0]);
+        sh[t] = tones[q];
+        fz[t] = r[0] + r[2];
+        t++;
+      });
+    }
+    const lo = -sk * CN, hi = N - 1 + sk * CN;
+    for (let i = lo; i < hi; i++) for (let j = lo; j < hi; j++) {
+      const inside = i >= 0 && i < N - 1 && j >= 0 && j < N - 1;
+      if (inside === (sk > 0)) continue;
+      const A = [i, j], B = [i, j + 1], Cc = [i + 1, j], Dd = [i + 1, j + 1];
+      if (!slash) { tri(A, B, Dd); tri(A, Dd, Cc); }
+      else { tri(A, B, Cc); tri(Dd, Cc, B); }
+    }
+    return upload(pos, sh, old, fz);
+  }
+  function buildTerrain(slash, flat) {
+    terrain = buildMesh(slash, flat, 0, terrain);
+    skirt = buildMesh(slash, flat, SK, skirt);
+    buildSkirtRGB(slash, flat);
+  }
+
+  // --- essais esthétiques des jupes (pas le jeu) : lissage RVB et bruit dans les teintes de la carte ---
+  const progRGB = gl.createProgram();
+  gl.attachShader(progRGB, shader(gl.VERTEX_SHADER, `attribute vec3 aPos; attribute vec3 aCol; uniform mat4 uMVP;
+    uniform vec3 uFogColor;
+    ` + FOG + `
+    varying vec3 vCol; void main() { vCol = mix(aCol, uFogColor, fogF(aPos)); gl_Position = uMVP * vec4(aPos, 1.0); }`));
+  gl.attachShader(progRGB, shader(gl.FRAGMENT_SHADER, `precision highp float; varying vec3 vCol;
+    void main() { gl_FragColor = vec4(vCol, 1.0); }`));
+  gl.linkProgram(progRGB);
+  const aPosR = gl.getAttribLocation(progRGB, "aPos"), aColR = gl.getAttribLocation(progRGB, "aCol");
+  const uMVPR = gl.getUniformLocation(progRGB, "uMVP");
+  const fogR = fogLoc(progRGB);
+  const FOGRGB = (() => { const k = RANG[1] ? RANG[1][0] + RANG[1][2] : 63; return [PAL[3 * k] / 255, PAL[3 * k + 1] / 255, PAL[3 * k + 2] / 255]; })();
+  let fogState = null;
+  function setFog(u) {
+    const s = fogState;
+    gl.uniform3f(u.eye, s.eye[0], s.eye[1], s.eye[2]);
+    gl.uniform3f(u.fwd, s.fwd[0], s.fwd[1], s.fwd[2]);
+    gl.uniform3f(u.fog, s.on ? 1 : 0, s.start, s.end);
+    gl.uniform1f(u.steps, s.steps ? 1 : 0);
+    if (u.col) { gl.uniform3f(u.col, FOGRGB[0], FOGRGB[1], FOGRGB[2]); }
+  }
+  const num = (id) => parseFloat(document.getElementById(id).value) || 0;
+  const chk = (id) => document.getElementById(id).checked;
+  const outOf = (i, j) => Math.max(0, -i, i - (N - 1), -j, j - (N - 1));
+  function ramp(out) { const x = Math.min(1, out / (Math.max(0.5, num("rampC")) * CN)); return x * x * (3 - 2 * x); }
+  function hash01(i, j) {
+    let h = (Math.imul(i, 374761393) + Math.imul(j, 668265263)) >>> 0;
+    h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0;
+    h = (h ^ (h >>> 16)) >>> 0;
+    return (h & 0xFFFF) / 32767.5 - 1;
+  }
+  function valueNoise(x, z, period) {
+    const fx = x / period, fz = z / period, i0 = Math.floor(fx), j0 = Math.floor(fz);
+    let u = fx - i0, v = fz - j0; u = u * u * (3 - 2 * u); v = v * v * (3 - 2 * v);
+    const a = hash01(i0, j0), b = hash01(i0 + 1, j0), c = hash01(i0, j0 + 1), d = hash01(i0 + 1, j0 + 1);
+    return (a * (1 - u) + b * u) * (1 - v) + (c * (1 - u) + d * u) * v;
+  }
+  function lightShift(i, j, amp) {
+    const out = outOf(i, j); if (!out || !amp) return 0;
+    const x = j * SP, z = i * SP;
+    return amp * ramp(out) * (0.65 * valueNoise(x, z, 7300) + 0.35 * valueNoise(x + 5000, z - 9000, 31000));
+  }
+  function palRGB(c, lv, o) {
+    const r = RANG[c] || RANG[0];
+    const l = Math.max(0, Math.min(255, Math.round(lv)));
+    const tone = Math.min(255, r[0] + ((l * r[1] + 128) >> 8));
+    o[0] = PAL[3 * tone] / 255; o[1] = PAL[3 * tone + 1] / 255; o[2] = PAL[3 * tone + 2] / 255;
+  }
+  const COLS = []; for (let k = 0; k < N * N; k++) if (!COLS.includes(C[k])) COLS.push(C[k]);
+  // composition lissée de chaque sommet de la jupe : part et éclairage moyen par couleur, altitude moyenne
+  const GW = N + 2 * SK * CN, G0 = -SK * CN;           // grille affichée de la jupe
+  let smooth = null;                                    // { r: rayon, part: [Float32Array], lit: [...], h, on }
+  function buildSmooth() {
+    const R = Math.max(1, Math.round(num("smoothR")));
+    if (smooth && smooth.R === R) return;
+    const lo = G0 - R, m = GW + 2 * R, w = m + 1;
+    const idx = new Int32Array(m * m);
+    for (let a = 0; a < m; a++) for (let b = 0; b < m; b++) idx[a * m + b] = key(lo + a, lo + b);
+    function sat(f) {
+      const s = new Float64Array(w * w);
+      for (let a = 0; a < m; a++) { let row = 0; for (let b = 0; b < m; b++) { row += f(idx[a * m + b]); s[(a + 1) * w + b + 1] = s[a * w + b + 1] + row; } }
+      return s;
+    }
+    const box = (s, a, b, r) => s[(a + r + 1) * w + b + r + 1] - s[(a - r) * w + b + r + 1] - s[(a + r + 1) * w + b - r] + s[(a - r) * w + b - r];
+    const sc = COLS.map((c) => sat((k) => (C[k] === c ? 1 : 0)));
+    const sl = COLS.map((c) => sat((k) => (C[k] === c ? L[k] : 0)));
+    const sh = sat((k) => H[k]);
+    const part = COLS.map(() => new Float32Array(GW * GW)), lit = COLS.map(() => new Float32Array(GW * GW));
+    const hs = new Float32Array(GW * GW), on = new Uint8Array(GW * GW);
+    for (let i = G0; i < G0 + GW; i++) for (let j = G0; j < G0 + GW; j++) {
+      const out = outOf(i, j); if (!out) continue;
+      const r = Math.round(R * ramp(out)); if (!r) continue;
+      const a = i - lo, b = j - lo, area = (2 * r + 1) * (2 * r + 1), g = (i - G0) * GW + (j - G0);
+      on[g] = 1; hs[g] = box(sh, a, b, r) / area;
+      COLS.forEach((c, q) => { const n = box(sc[q], a, b, r); part[q][g] = n / area; lit[q][g] = n > 0 ? box(sl[q], a, b, r) / n : 0; });
+    }
+    smooth = { R, ramp: num("rampC"), part, lit, hs, on };
+  }
+  let skirtRGB = null;
+  function buildSkirtRGB(slash, flat) {
+    const useS = chk("smoothOn"), useN = chk("noiseOn");
+    if (!useS && !useN) return;
+    if (useS) { if (smooth && smooth.ramp !== num("rampC")) smooth = null; buildSmooth(); }
+    const amp = useN ? num("noiseA") : 0, useH = useS && chk("smoothH");
+    const M = N - 1 + 2 * SK * CN, ntri = (M * M - (N - 1) * (N - 1)) * 2;
+    const pos = new Float32Array(ntri * 9), col = new Float32Array(ntri * 9);
+    let t = 0;
+    const tmp = [0, 0, 0], acc = [0, 0, 0];
+    function vert(p, base, o) {
+      const k = key(p[0], p[1]), g = (p[0] - G0) * GW + (p[1] - G0), sm = useS && smooth.on[g];
+      const shift = amp ? lightShift(p[0], p[1], amp) : 0;
+      if (sm) {
+        acc[0] = acc[1] = acc[2] = 0;
+        COLS.forEach((c, q) => { const f = smooth.part[q][g]; if (f > 0) { palRGB(c, smooth.lit[q][g] + shift, tmp); acc[0] += f * tmp[0]; acc[1] += f * tmp[1]; acc[2] += f * tmp[2]; } });
+        o[0] = acc[0]; o[1] = acc[1]; o[2] = acc[2];
+      } else palRGB(base, L[k] + shift, o);
+      return useH && sm ? smooth.hs[g] : H[k];
+    }
+    const hOf = (p) => { const g = (p[0] - G0) * GW + (p[1] - G0); return useH && useS && smooth.on[g] ? smooth.hs[g] : H[key(p[0], p[1])]; };
+    const c3 = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+    function tri(p0, p1, p2) {
+      const ps = [p0, p1, p2];
+      let kb = 0;
+      for (const q of [1, 2]) if ((hOf(ps[q]) & 0xFFFF) >= (hOf(ps[kb]) & 0xFFFF)) kb = q;
+      const base = C[key(ps[kb][0], ps[kb][1])];
+      const hv = ps.map((p, q) => vert(p, base, c3[q]));
+      if (flat) for (let q = 0; q < 3; q++) { const m = (c3[0][q] + c3[1][q] + c3[2][q]) / 3; c3[0][q] = c3[1][q] = c3[2][q] = m; }
+      for (let q = 0; q < 3; q++) {
+        const o = 3 * t; pos[o] = posX(ps[q][1]); pos[o + 1] = hv[q]; pos[o + 2] = posZ(ps[q][0]);
+        col[o] = c3[q][0]; col[o + 1] = c3[q][1]; col[o + 2] = c3[q][2]; t++;
+      }
+    }
+    const lo = -SK * CN, hi = N - 1 + SK * CN;
+    for (let i = lo; i < hi; i++) for (let j = lo; j < hi; j++) {
+      if (i >= 0 && i < N - 1 && j >= 0 && j < N - 1) continue;
+      const A = [i, j], B = [i, j + 1], Cc = [i + 1, j], Dd = [i + 1, j + 1];
+      if (!slash) { tri(A, B, Dd); tri(A, Dd, Cc); } else { tri(A, B, Cc); tri(Dd, Cc, B); }
+    }
+    skirtRGB = upload(pos, col, skirtRGB);
+  }
+  function drawRGB(b, MVP) {
+    gl.useProgram(progRGB);
+    gl.uniformMatrix4fv(uMVPR, false, new Float32Array(MVP));
+    setFog(fogR);
+    gl.bindBuffer(gl.ARRAY_BUFFER, b.p); gl.enableVertexAttribArray(aPosR); gl.vertexAttribPointer(aPosR, 3, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, b.s); gl.enableVertexAttribArray(aColR); gl.vertexAttribPointer(aColR, 3, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.TRIANGLES, 0, b.n / 3);
+    gl.useProgram(prog);
+  }
+  const runways = (function () {
+    const pos = [], sh = [], fz = [];
+    for (const r of D.runways) for (const [a, b, c, col] of r.t) for (const k of [a, b, c]) {
+      pos.push(r.v[k][0], r.y, -r.v[k][1]); sh.push(Math.min(col, 255)); fz.push(fogToOf(Math.min(col, 255)));
+    }
+    return upload(new Float32Array(pos), new Float32Array(sh), null, new Float32Array(fz));
+  })();
+  const markers = (function () {
+    const pos = [], sh = [];
+    for (const o of D.objects) { pos.push(o.x, o.y, -o.z, o.x, o.y + 60, -o.z); sh.push(55, 55); }
+    return upload(new Float32Array(pos), new Float32Array(sh));
+  })();
+  buildTerrain(false, false);
+
+  // matrices (colonnes d'abord)
+  function persp(fovy, asp, n, f) {
+    const t = 1 / Math.tan(fovy / 2);
+    return [t / asp, 0, 0, 0, 0, t, 0, 0, 0, 0, (f + n) / (n - f), -1, 0, 0, 2 * f * n / (n - f), 0];
+  }
+  function mul(a, b) {
+    const o = new Array(16).fill(0);
+    for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) o[c * 4 + r] += a[k * 4 + r] * b[c * 4 + k];
+    return o;
+  }
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const norm = (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+  function look(eye, fwd) {
+    const f = norm(fwd), s = norm(cross(f, [0, 1, 0])), u = cross(s, f);
+    return [s[0], u[0], -f[0], 0, s[1], u[1], -f[1], 0, s[2], u[2], -f[2], 0, -dot(s, eye), -dot(u, eye), dot(f, eye), 1];
+  }
+
+  // caméra (yaw 0 = vers +Z du fichier, π/2 = vers +X)
+  const cam = { x: -139500, y: 900, z: 58600, yaw: Math.PI / 2, pitch: -0.12, speed: 300 };
+  const fwdOf = () => [Math.cos(cam.pitch) * Math.sin(cam.yaw), Math.sin(cam.pitch), -Math.cos(cam.pitch) * Math.cos(cam.yaw)];
+  function groundAt(x, z) {
+    const fj = (x + HALF) / SP, fi = (z + HALF) / SP;
+    const j = Math.floor(fj), i = Math.floor(fi);
+    const u = fj - j, v = fi - i;
+    const h = (a, b) => H[key(a, b)];
+    return ((h(i, j) * (1 - u) + h(i, j + 1) * u) * (1 - v) + (h(i + 1, j) * (1 - u) + h(i + 1, j + 1) * u) * v);
+  }
+
+  let W = 0, Hh = 0;
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const r = cv.getBoundingClientRect(); W = r.width; Hh = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(Hh * dpr);
+  }
+  window.addEventListener("resize", resize); resize();
+
+  const keys = new Set();
+  window.addEventListener("keydown", (e) => {
+    if (e.target.tagName === "INPUT") return;
+    keys.add(e.code);
+    if (e.code.startsWith("Arrow") || e.code === "Space") e.preventDefault();
+  });
+  window.addEventListener("keyup", (e) => keys.delete(e.code));
+  window.addEventListener("blur", () => keys.clear());
+  let drag = null;
+  cv.addEventListener("pointerdown", (e) => { drag = { x: e.clientX, y: e.clientY }; cv.setPointerCapture(e.pointerId); cv.focus(); });
+  cv.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    cam.yaw += (e.clientX - drag.x) * 0.004;
+    cam.pitch = Math.max(-1.55, Math.min(1.55, cam.pitch - (e.clientY - drag.y) * 0.004));
+    drag = { x: e.clientX, y: e.clientY };
+  });
+  cv.addEventListener("pointerup", () => { drag = null; });
+  cv.addEventListener("wheel", (e) => { e.preventDefault(); cam.speed = Math.max(20, Math.min(20000, cam.speed * Math.exp(-e.deltaY * 0.0015))); }, { passive: false });
+
+  function draw(b, mode) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, b.p); gl.enableVertexAttribArray(aPos); gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, b.s); gl.enableVertexAttribArray(aShade); gl.vertexAttribPointer(aShade, 1, gl.FLOAT, false, 0, 0);
+    if (b.hasFog) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, b.f); gl.enableVertexAttribArray(aFogTo); gl.vertexAttribPointer(aFogTo, 1, gl.FLOAT, false, 0, 0);
+    } else {
+      gl.disableVertexAttribArray(aFogTo); gl.vertexAttrib1f(aFogTo, -1);
+    }
+    gl.drawArrays(mode, 0, b.n);
+  }
+
+  const labelBox = document.getElementById("labels");
+  const mkLabel = (text) => { const s = document.createElement("span"); s.textContent = text; labelBox.appendChild(s); return s; };
+  const objLabels = D.objects.map((o) => mkLabel(o.name));
+  const runCentres = D.runways.map((r) => {
+    const xs = r.v.map((v) => v[0]), zs = r.v.map((v) => v[1]);
+    return [(Math.min(...xs) + Math.max(...xs)) / 2, r.y, (Math.min(...zs) + Math.max(...zs)) / 2];
+  });
+  const runLabels = D.runways.map((r, k) => mkLabel("piste " + (k + 1)));
+
+  let last = performance.now();
+  function frame(t) {
+    const dt = Math.min(0.1, (t - last) / 1000); last = t;
+    const f = fwdOf(), side = norm(cross(f, [0, 1, 0])), mv = cam.speed * dt;
+    const go = (v, k) => { cam.x += v[0] * k; cam.y += v[1] * k; cam.z += v[2] * k; };
+    if (keys.has("KeyW") || keys.has("KeyZ") || keys.has("ArrowUp")) go(f, mv);
+    if (keys.has("KeyS") || keys.has("ArrowDown")) go(f, -mv);
+    if (keys.has("KeyA") || keys.has("KeyQ") || keys.has("ArrowLeft")) go(side, -mv);
+    if (keys.has("KeyD") || keys.has("ArrowRight")) go(side, mv);
+    if (keys.has("Space")) cam.y += mv;
+    if (keys.has("ShiftLeft") || keys.has("ShiftRight")) cam.y -= mv;
+    const g = groundAt(cam.x, cam.z);
+    if (cam.y < g + 5) cam.y = g + 5;
+
+    gl.viewport(0, 0, cv.width, cv.height);
+    fogState = { eye: [cam.x, cam.y, cam.z], fwd: f, on: chk("fogOn"), steps: chk("fogSteps"),
+      start: num("fogStart"), end: Math.max(num("fogStart") + 1, num("fogEnd")) };
+    if (fogState.on && chk("fogSky")) { gl.clearColor(FOGRGB[0], FOGRGB[1], FOGRGB[2], 1); } else { gl.clearColor(0.55, 0.66, 0.78, 1); }
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    setFog(fogU);
+    gl.enable(gl.DEPTH_TEST);
+    const near = Math.max(2, (cam.y - g) * 0.05);
+    const MVP = mul(persp(60 * Math.PI / 180, cv.width / cv.height, near, 600000), look([cam.x, cam.y, cam.z], f));
+    gl.uniformMatrix4fv(uMVP, false, new Float32Array(MVP));
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, palTex);
+    gl.uniform1f(uSmooth, document.getElementById("flat").checked ? 0 : 1);
+    draw(terrain, gl.TRIANGLES);
+    if (chk("skirtOn")) {
+      if ((chk("smoothOn") || chk("noiseOn")) && skirtRGB) drawRGB(skirtRGB, MVP);
+      else draw(skirt, gl.TRIANGLES);
+      gl.uniform1f(uSmooth, chk("flat") ? 0 : 1);
+    }
+    gl.uniform1f(uSmooth, 0);
+    gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(-2, -8);
+    draw(runways, gl.TRIANGLES);
+    gl.disable(gl.POLYGON_OFFSET_FILL);
+    draw(markers, gl.LINES);
+
+    const show = document.getElementById("labelsOn").checked;
+    const place = (el, x, y, z) => {
+      const px = MVP[0] * x + MVP[4] * y + MVP[8] * z + MVP[12];
+      const py = MVP[1] * x + MVP[5] * y + MVP[9] * z + MVP[13];
+      const pw = MVP[3] * x + MVP[7] * y + MVP[11] * z + MVP[15];
+      if (!show || pw <= 0 || Math.hypot(x - cam.x, y - cam.y, z - cam.z) > 15000) { el.style.display = "none"; return; }
+      el.style.display = ""; el.style.left = ((px / pw) * 0.5 + 0.5) * W + "px"; el.style.top = (0.5 - (py / pw) * 0.5) * Hh + "px";
+    };
+    D.objects.forEach((o, k) => place(objLabels[k], o.x, o.y + 60, -o.z));
+    runCentres.forEach((c, k) => place(runLabels[k], c[0], c[1], -c[2]));
+
+    const cap = ((cam.yaw * 180 / Math.PI) % 360 + 360) % 360;
+    document.getElementById("hud").textContent =
+      `X ${cam.x.toFixed(0)} m   Z ${(-cam.z).toFixed(0)} m\naltitude Y ${cam.y.toFixed(0)} m   sol ${g.toFixed(0)} m\ncap ${cap.toFixed(0)}°   vitesse ${cam.speed.toFixed(0)} m/s`;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  const rebuild = () => buildTerrain(document.getElementById("diag").checked, document.getElementById("flat").checked);
+  document.getElementById("diag").onchange = rebuild;
+  document.getElementById("flat").onchange = rebuild;
+  const rebuildSkirt = () => buildSkirtRGB(chk("diag"), chk("flat"));
+  for (const id of ["smoothOn", "smoothH", "noiseOn", "smoothR", "noiseA", "rampC"]) document.getElementById(id).onchange = rebuildSkirt;
+
+  function goTo(x, y, z, dist) {
+    cam.x = x - dist; cam.z = z; cam.y = y + dist * 0.4; cam.yaw = Math.PI / 2; cam.pitch = -0.38; cam.speed = Math.max(100, dist / 4);
+  }
+  function item(name, meta, fn) {
+    const li = document.createElement("li"), b = document.createElement("button");
+    b.innerHTML = `<div class="nm"></div><div class="meta"></div>`;
+    b.querySelector(".nm").textContent = name; b.querySelector(".meta").textContent = meta;
+    b.onclick = () => { fn(); cv.focus(); }; li.appendChild(b); document.getElementById("goto").appendChild(li);
+  }
+  item("vue d'ensemble", "au-dessus de la carte", () => { cam.x = 0; cam.z = 260000; cam.y = 120000; cam.yaw = 0; cam.pitch = -0.6; cam.speed = 5000; });
+  item("coin nord-ouest", "hors carte, pour voir les jupes", () => { cam.x = -330000; cam.z = -330000; cam.y = 150000; cam.yaw = 135 * Math.PI / 180; cam.pitch = -35 * Math.PI / 180; cam.speed = 5000; });
+  D.runways.forEach((r, k) => item(`piste ${k + 1} · case ${r.cell}`, `Y ${r.y} m`, () => goTo(runCentres[k][0], r.y, -runCentres[k][2], 3000)));
+  D.objects.forEach((o) => item(o.name, `case ${o.cell} · Y ${o.y.toFixed(0)} m`, () => goTo(o.x, o.y, -o.z, 400)));
+})();
+</script>
+</body>
+</html>

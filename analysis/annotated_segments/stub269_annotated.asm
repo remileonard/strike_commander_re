@@ -18,8 +18,8 @@ stru_6B850	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0926o
 ; far, thunk fixe VROOMM (jmp sub_93295) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=20AE0h, codesize=18ADh, nentries=4.
 ; ==============================================================================================
-VROOMM_StubThunk_6B870	proc far		; CODE XREF: Cockpit_LoadAndInitFull_90D20+C22P
-		jmp	ResourceFile_LoadTypeE_93295
+VROOMM_StubThunk_6B870	proc far		; CODE XREF: Options_ConfigurationScreen_90D20+C22P
+		jmp	Options_CockpitScreen_93295
 VROOMM_StubThunk_6B870	endp
 
 
@@ -31,8 +31,8 @@ VROOMM_StubThunk_6B870	endp
 ; far, thunk fixe VROOMM (jmp sub_93BA5) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=20AE0h, codesize=18ADh, nentries=4.
 ; ==============================================================================================
-VROOMM_StubThunk_6B875	proc far		; CODE XREF: Cockpit_LoadAndInitFull_90D20+C34P
-		jmp	ResourceFile_LoadTypeF_93BA5
+VROOMM_StubThunk_6B875	proc far		; CODE XREF: Options_ConfigurationScreen_90D20+C34P
+		jmp	Options_CamerasScreen_93BA5
 VROOMM_StubThunk_6B875	endp
 
 
@@ -44,8 +44,8 @@ VROOMM_StubThunk_6B875	endp
 ; far, thunk fixe VROOMM (jmp sub_9416A) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=20AE0h, codesize=18ADh, nentries=4.
 ; ==============================================================================================
-VROOMM_StubThunk_6B87A	proc far		; CODE XREF: Cockpit_LoadAndInitFull_90D20+BDAP
-		jmp	ResourceFile_LoadTypeG_9416A
+VROOMM_StubThunk_6B87A	proc far		; CODE XREF: Options_ConfigurationScreen_90D20+BDAP
+		jmp	Options_AudioScreen_9416A
 VROOMM_StubThunk_6B87A	endp
 
 
@@ -57,8 +57,8 @@ VROOMM_StubThunk_6B87A	endp
 ; far, thunk fixe VROOMM (jmp sub_92E60) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=20AE0h, codesize=18ADh, nentries=4.
 ; ==============================================================================================
-VROOMM_StubThunk_6B87F	proc far		; CODE XREF: Cockpit_LoadAndInitFull_90D20+C10P
-		jmp	ResourceFile_LoadTypeD_92E60
+VROOMM_StubThunk_6B87F	proc far		; CODE XREF: Options_ConfigurationScreen_90D20+C10P
+		jmp	Options_GameplayScreen_92E60
 VROOMM_StubThunk_6B87F	endp
 
 stub269		ends

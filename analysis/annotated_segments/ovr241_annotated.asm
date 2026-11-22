@@ -175,7 +175,7 @@ GlyphObject_MeasureAndAllocate_7DF7F	endp
 ; ==============================================================================================
 ; far, appelle GlyphObject_MeasureChar_6064A (seg162).
 ; ==============================================================================================
-GlyphObject_MeasureWrapper_7DFCA	proc far		; CODE XREF: VROOMM_StubThunk_6AE93J GlyphObject_Helper8_7EC45+26p
+GlyphObject_MeasureWrapper_7DFCA	proc far		; CODE XREF: VROOMM_StubThunk_6AE93J NavMap_PlaceLabel_7EC45+26p
 
 var_6		= word ptr -6
 var_4		= word ptr -4
@@ -344,8 +344,19 @@ GlyphObject_ResolveAndMeasure_7E00D	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 143 lignes, NON DÉTAILLÉE — combine Render_DrawScaledSprite_621A2 (seg175) et
-; GlyphObject_MeasureChar_6064A.
+; far, 143L, LUE 2026-10-31. Écrit une chaîne avec une police (arguments : police, surface, x,
+; y, texte far, couleur) ; rend le x qui suit le dernier caractère. Couleur : table de 256
+; octets tous égaux à la couleur demandée (boucle mov [bx], al jusqu'à cmp dx, 100h), passée à
+; Render_DrawScaledSprite_621A2 avec A = octet 25 de la police (mov al, [si+19h]) et B = 1
+; (push 1) : seuls les pixels de la lettre dont la couleur vaut l'octet 25 de la police
+; prennent la couleur demandée, les autres pixels gardent leur propre couleur. Lettres : si
+; l'octet 26 de la police n'est pas nul, une lettre de « a » à « z » ou de « A » à « Z »
+; devient octet 26 + rang de la lettre (sauf si l'octet 26 vaut déjà « a » ou « A », selon la
+; casse). Caractère 10 : retour au x de départ et y + (octet 23 de la police) + 1. Autre
+; caractère : image n° caractère de la forme obtenue par Memory_TypedAllocDispatchB_5C832
+; (police +2, +6), dessinée en (x, y + mot 14 de la police) à l'échelle 1 (push large
+; 1000100h), puis x + avance du caractère (GlyphObject_MeasureChar_6064A). Fin au caractère 0.
+; Appelée par GlyphObject_Helper_7E6E1 (police de la carte de navigation, [carte+52], y + 1).
 ; ==============================================================================================
 GlyphObject_DrawScaled_7E0BD	proc far		; CODE XREF: VROOMM_StubThunk_6AEA2J GlyphObject_Helper_7E6E1+1Ep
 
@@ -501,6 +512,11 @@ GlyphObject_DrawScaled_7E0BD	endp
 ; IFF, lit de nombreux champs — référencée directement par
 ; ResourceRecord_ReadDwordField_64AAE/64AFF (seg193) dans des sessions précédentes sans être
 ; documentée. Probable chargeur complet de définition de police. Candidat pour session dédiée.
+; COMPLÉMENT 2026-10-31 : chargeur de NAVMAP.IFF. Chunk INFO : 4 mots → [carte+0] gauche,
+; [carte+2] haut, [carte+4] largeur, [carte+6] hauteur de la fenêtre (25, 23, 212, 154 dans
+; les données), puis un int32 24.8 → [carte+20] demi-taille du monde (180 000 m) ; échelles
+; [carte+24] = demi-taille / (largeur / 2) et [carte+28] = demi-taille / (hauteur / 2) (sar
+; ax, 1 / idiv ebx). Puis FONT (police, [carte+52]) et TEXT.
 ; ==============================================================================================
 Font_LoadDefinitionFromIFF_7E1B4	proc far		; CODE XREF: VROOMM_StubThunk_6AE4DJ Lexer_LoadScriptFile_7F90F+84p
 
@@ -991,7 +1007,7 @@ Font_LoadDefinitionFromIFF_7E1B4	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle GeomNode_SumOffsetsUpChain_50EEB (seg114).
+; far, appelle AreaRelPos_ToWorld_50EEB (seg114).
 ; ==============================================================================================
 GlyphObject_ResolveHierarchyOffset_7E5F2	proc far		; CODE XREF: VROOMM_StubThunk_6AE39J GlyphObject_StoreComputedPosition_7E690+10p
 
@@ -1059,7 +1075,7 @@ loc_7E656:				; CODE XREF: GlyphObject_ResolveHierarchyOffset_7E5F2+5Ej
 		push	ss
 		lea	ax, [bp+var_12]
 		push	ax
-		call	GeomNode_SumOffsetsUpChain_50EEB
+		call	AreaRelPos_ToWorld_50EEB
 		add	sp, 8
 		mov	eax, [bp+var_12]
 		mov	[di], eax
@@ -1137,7 +1153,7 @@ GlyphObject_StoreComputedPosition_7E690	endp
 ; ==============================================================================================
 ; far, aucun appel externe visible (35 lignes).
 ; ==============================================================================================
-GlyphObject_Helper_7E6E1	proc far		; CODE XREF: VROOMM_StubThunk_6AE52J GlyphObject_Helper8_7EC45+16Ap
+GlyphObject_Helper_7E6E1	proc far		; CODE XREF: VROOMM_StubThunk_6AE52J NavMap_PlaceLabel_7EC45+16Ap
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1214,9 +1230,14 @@ GlyphObject_Helper2_7E708	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, aucun appel externe visible (70 lignes).
+; far, 70L, LUE 2026-10-31. Position monde → écran de la carte de navigation (arguments :
+; carte, vecteur position 3× i32 24.8, sorties x et y). x = [carte+0] + (c0 + [carte+20]) /
+; [carte+24] ; y = [carte+2] + [carte+6] − (c1 + [carte+20]) / [carte+28] (division 24.8 : sar
+; edx, 18h / shl eax, 8 / idiv ecx, puis partie entière). [carte+0], [carte+2], [carte+6] =
+; gauche, haut, hauteur de la fenêtre et [carte+20] = demi-taille du monde, lus dans le chunk
+; INFO de NAVMAP.IFF ; [carte+24] et [carte+28] = échelles (Font_LoadDefinitionFromIFF_7E1B4).
 ; ==============================================================================================
-GlyphObject_Helper3_7E72B	proc far		; CODE XREF: VROOMM_StubThunk_6AE5CJ Render_DrawComplexShape_7EDCA+B8p	...
+NavMap_WorldToScreen_7E72B	proc far		; CODE XREF: VROOMM_StubThunk_6AE5CJ NavMap_DrawMissionObjects_7EDCA+B8p	...
 
 var_E		= dword	ptr -0Eh
 var_A		= word ptr -0Ah
@@ -1285,7 +1306,7 @@ arg_6		= word ptr  0Ch
 		pop	si
 		leave
 		retf
-GlyphObject_Helper3_7E72B	endp
+NavMap_WorldToScreen_7E72B	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1293,7 +1314,7 @@ GlyphObject_Helper3_7E72B	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine allocateur typé, Render_MeasureOrDrawTextString_61F52 (seg174),
+; far, combine allocateur typé, Shape_DrawSpans_61F52 (seg174),
 ; TextFormat_ReleaseAttribute_5E5AC (seg143).
 ; ==============================================================================================
 GlyphObject_MeasureAndRelease_7E7CC	proc far		; CODE XREF: VROOMM_StubThunk_6AE61J GlyphObject_MeasureAndDraw_7F587+Ep
@@ -1325,7 +1346,7 @@ arg_2		= word ptr  8
 		push	ax
 		push	large 0
 		push	di
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		jmp	short loc_7E819
 ; ���������������������������������������������������������������������������
@@ -1349,7 +1370,7 @@ GlyphObject_MeasureAndRelease_7E7CC	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 205 lignes, NON DÉTAILLÉE — combine Expr_LookupBuiltinFuncDesc_52C5F (seg114, ×2) —
+; ⚠️ far, 205 lignes, NON DÉTAILLÉE — combine Mission_GetCastName_52C5F (seg114, ×2) —
 ; résolution de site d'appel de fonction native pour la VM d'expression.
 ; ==============================================================================================
 Expr_ResolveBuiltinCallSite_7E81D	proc far		; CODE XREF: VROOMM_StubThunk_6AE6BJ GlyphObject_MeasureAndDraw_7F587+44p
@@ -1438,7 +1459,7 @@ arg_2		= word ptr  8
 		jz	short loc_7E8DF
 		push	dx
 		push	word ptr [bp+var_12]
-		call	Expr_LookupBuiltinFuncDesc_52C5F
+		call	Mission_GetCastName_52C5F
 		add	sp, 4
 		mov	word ptr [bp+var_A+2], dx
 		mov	word ptr [bp+var_A], ax
@@ -1519,7 +1540,7 @@ loc_7E964:				; CODE XREF: Expr_ResolveBuiltinCallSite_7E81D+13Bj
 
 loc_7E978:				; CODE XREF: Expr_ResolveBuiltinCallSite_7E81D:loc_7E952j
 		push	large [bp+var_12]
-		call	Expr_LookupBuiltinFuncDesc_52C5F
+		call	Mission_GetCastName_52C5F
 		add	sp, 4
 		mov	word ptr [bp+var_E+2], dx
 		mov	word ptr [bp+var_E], ax
@@ -1760,9 +1781,10 @@ off_7EAF9	dw offset loc_7EA13	; DATA XREF: GlyphObject_ComputeClipRegion_7E9C9+4
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, aucun appel externe visible (13 lignes).
+; far, 13L, LUE 2026-10-31. Vide la table des rectangles occupés de la carte de navigation
+; ([carte+54] = 0) ; appelée au début de NavMap_DrawMissionObjects_7EDCA.
 ; ==============================================================================================
-GlyphObject_Helper4_7EB0D	proc far		; CODE XREF: VROOMM_StubThunk_6AE25J Render_DrawComplexShape_7EDCA+Dp
+GlyphObject_Helper4_7EB0D	proc far		; CODE XREF: VROOMM_StubThunk_6AE25J NavMap_DrawMissionObjects_7EDCA+Dp
 
 arg_0		= word ptr  6
 
@@ -1782,9 +1804,14 @@ GlyphObject_Helper4_7EB0D	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, aucun appel externe visible (64 lignes).
+; far, 64L, LUE 2026-10-31. Réserve un rectangle (gauche, haut, largeur, hauteur) dans la
+; table des rectangles occupés de la carte de navigation : nombre en [carte+54], gauches
+; [carte+56+2i], hauts [carte+120+2i], droites [carte+184+2i], bas [carte+248+2i] (droite =
+; gauche + largeur − 1, bas = haut + hauteur − 1) ; au plus 32 (cmp word ptr [si+36h], 20h).
+; Appelée pour le repère 3 × 3 de chaque objet et pour chaque texte placé
+; (NavMap_PlaceLabel_7EC45).
 ; ==============================================================================================
-GlyphObject_Helper5_7EB1C	proc far		; CODE XREF: VROOMM_StubThunk_6AE2AJ GlyphObject_Helper8_7EC45+135p ...
+NavMap_ReserveBox_7EB1C	proc far		; CODE XREF: VROOMM_StubThunk_6AE2AJ NavMap_PlaceLabel_7EC45+135p ...
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -1843,11 +1870,11 @@ loc_7EB4C:
 		mov	[bx+si+0F8h], ax
 		inc	word ptr [si+36h]
 
-loc_7EB6F:				; CODE XREF: GlyphObject_Helper5_7EB1C:loc_7EB42j
+loc_7EB6F:				; CODE XREF: NavMap_ReserveBox_7EB1C:loc_7EB42j
 		pop	si
 		leave
 		retf
-GlyphObject_Helper5_7EB1C	endp
+NavMap_ReserveBox_7EB1C	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1855,10 +1882,13 @@ GlyphObject_Helper5_7EB1C	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, aucun appel externe visible (58 lignes).
+; far, 58L, LUE 2026-10-31. Ramène le rectangle d'un texte de la carte de navigation dans la
+; fenêtre des textes : si droite > 241 (cmp …, 0F1h), gauche = 241 − largeur + 1 ; si bas >
+; 177 (0B1h), haut = 177 − hauteur + 1 ; puis gauche au moins 25 (19h) et haut au moins 23
+; (17h).
 ; ==============================================================================================
-GlyphObject_Helper6_7EB72	proc far		; CODE XREF: VROOMM_StubThunk_6AEA7J
-					; GlyphObject_Helper8_7EC45:loc_7ED52p
+NavMap_ClampBox_7EB72	proc far		; CODE XREF: VROOMM_StubThunk_6AEA7J
+					; NavMap_PlaceLabel_7EC45:loc_7ED52p
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -1891,7 +1921,7 @@ arg_6		= word ptr  0Ch
 		inc	ax
 		mov	[si], ax
 
-loc_7EBA5:				; CODE XREF: GlyphObject_Helper6_7EB72+29j
+loc_7EBA5:				; CODE XREF: NavMap_ClampBox_7EB72+29j
 		cmp	[bp+var_4], 0B1h ; '�'
 		jle	short loc_7EBB4
 		mov	ax, 0B1h ; '�'
@@ -1899,22 +1929,22 @@ loc_7EBA5:				; CODE XREF: GlyphObject_Helper6_7EB72+29j
 		inc	ax
 		mov	[di], ax
 
-loc_7EBB4:				; CODE XREF: GlyphObject_Helper6_7EB72+38j
+loc_7EBB4:				; CODE XREF: NavMap_ClampBox_7EB72+38j
 		cmp	word ptr [si], 19h
 		jge	short loc_7EBBD
 		mov	word ptr [si], 19h
 
-loc_7EBBD:				; CODE XREF: GlyphObject_Helper6_7EB72+45j
+loc_7EBBD:				; CODE XREF: NavMap_ClampBox_7EB72+45j
 		cmp	word ptr [di], 17h
 		jge	short loc_7EBC6
 		mov	word ptr [di], 17h
 
-loc_7EBC6:				; CODE XREF: GlyphObject_Helper6_7EB72+4Ej
+loc_7EBC6:				; CODE XREF: NavMap_ClampBox_7EB72+4Ej
 		pop	di
 		pop	si
 		leave
 		retf
-GlyphObject_Helper6_7EB72	endp
+NavMap_ClampBox_7EB72	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1922,9 +1952,12 @@ GlyphObject_Helper6_7EB72	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, aucun appel externe visible (103 lignes).
+; far, 103L, LUE 2026-10-31. Vrai si le rectangle (gauche, haut, largeur, hauteur) est dans la
+; fenêtre des textes (x de 25 à 241, y de 23 à 177) et ne recouvre aucun rectangle réservé
+; (NavMap_ReserveBox_7EB1C) ; recouvrement, bornes incluses : droite réservée ≥ gauche, gauche
+; réservée ≤ droite, bas réservé ≥ haut et haut réservé ≤ bas.
 ; ==============================================================================================
-GlyphObject_Helper7_7EBCA	proc far		; CODE XREF: VROOMM_StubThunk_6AE2FJ GlyphObject_Helper8_7EC45+11Fp
+NavMap_IsBoxFree_7EBCA	proc far		; CODE XREF: VROOMM_StubThunk_6AE2FJ NavMap_PlaceLabel_7EC45+11Fp
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -1965,18 +1998,18 @@ loc_7EBF2:
 		cmp	[bp+var_4], 0B1h ; '�'
 		jle	short loc_7EC09
 
-loc_7EC05:				; CODE XREF: GlyphObject_Helper7_7EBCA+26j
-					; GlyphObject_Helper7_7EBCA+2Dj ...
+loc_7EC05:				; CODE XREF: NavMap_IsBoxFree_7EBCA+26j
+					; NavMap_IsBoxFree_7EBCA+2Dj ...
 		mov	al, 0
 		jmp	short loc_7EC41
 ; ���������������������������������������������������������������������������
 
-loc_7EC09:				; CODE XREF: GlyphObject_Helper7_7EBCA+39j
+loc_7EC09:				; CODE XREF: NavMap_IsBoxFree_7EBCA+39j
 		xor	dx, dx
 		jmp	short loc_7EC3A
 ; ���������������������������������������������������������������������������
 
-loc_7EC0D:				; CODE XREF: GlyphObject_Helper7_7EBCA:loc_7EC3Dj
+loc_7EC0D:				; CODE XREF: NavMap_IsBoxFree_7EBCA:loc_7EC3Dj
 		mov	bx, dx
 		shl	bx, 1
 		cmp	[bx+si+0B8h], cx
@@ -2004,11 +2037,11 @@ loc_7EC34:
 		cmp	ax, [bp+var_4]
 		jle	short loc_7EC05
 
-loc_7EC39:				; CODE XREF: GlyphObject_Helper7_7EBCA+4Bj
-					; GlyphObject_Helper7_7EBCA+57j ...
+loc_7EC39:				; CODE XREF: NavMap_IsBoxFree_7EBCA+4Bj
+					; NavMap_IsBoxFree_7EBCA+57j ...
 		inc	dx
 
-loc_7EC3A:				; CODE XREF: GlyphObject_Helper7_7EBCA+41j
+loc_7EC3A:				; CODE XREF: NavMap_IsBoxFree_7EBCA+41j
 		cmp	[si+36h], dx
 
 loc_7EC3D:
@@ -2017,7 +2050,7 @@ loc_7EC3D:
 loc_7EC3F:
 		mov	al, 1
 
-loc_7EC41:				; CODE XREF: GlyphObject_Helper7_7EBCA+3Dj
+loc_7EC41:				; CODE XREF: NavMap_IsBoxFree_7EBCA+3Dj
 		pop	di
 
 loc_7EC42:
@@ -2026,7 +2059,7 @@ loc_7EC42:
 
 locret_7EC44:
 		retf
-GlyphObject_Helper7_7EBCA	endp
+NavMap_IsBoxFree_7EBCA	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2034,9 +2067,18 @@ GlyphObject_Helper7_7EBCA	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 256 lignes, NON DÉTAILLÉE — aucun appel externe visible (calcul entièrement inline).
+; far, 256L, LUE 2026-10-31. Écrit un texte près d'un point de la carte de navigation
+; (arguments : carte, surface, x, y, texte, couleur), en majuscules (lettre de base « A » de
+; la police, [police+26]). L = largeur du texte (GlyphObject_MeasureWrapper_7DFCA), H =
+; [police+23] + 1. Essais dans l'ordre, coin haut-gauche : 0 (x − L/2, y + H/4) ; 1 (x − L/2,
+; y − H − H/4) ; 2 (x + 3, y − H/2) ; 3 (x − L − 3, y − H/2) ; 4 (x − L/2, y + H) ; 5 (x −
+; L/2, y − 2H) ; ensuite (x + 3, y − H/2) sans contrôle. Chaque essai est ramené dans la
+; fenêtre (NavMap_ClampBox_7EB72) et gardé s'il est libre (NavMap_IsBoxFree_7EBCA), puis
+; réservé (NavMap_ReserveBox_7EB1C). Si byte_6D5DE n'est pas nul et que l'essai 0 est pris,
+; rien n'est écrit (le drapeau reste posé) ; sinon le texte est écrit par
+; GlyphObject_Helper_7E6E1 en (gauche, haut + 1) et byte_6D5DE est remis à 0.
 ; ==============================================================================================
-GlyphObject_Helper8_7EC45	proc far		; CODE XREF: VROOMM_StubThunk_6AE34J Render_DrawComplexShape_7EDCA+61Bp ...
+NavMap_PlaceLabel_7EC45	proc far		; CODE XREF: VROOMM_StubThunk_6AE34J NavMap_DrawMissionObjects_7EDCA+61Bp ...
 
 var_C		= word ptr -0Ch
 var_A		= word ptr -0Ah
@@ -2090,14 +2132,14 @@ loc_7EC48:
 		jmp	loc_7ED90
 ; ���������������������������������������������������������������������������
 
-loc_7EC98:				; CODE XREF: GlyphObject_Helper8_7EC45+154j
+loc_7EC98:				; CODE XREF: NavMap_PlaceLabel_7EC45+154j
 		mov	bx, [bp+var_8]
 		cmp	bx, 5		; switch 6 cases
 		jbe	short loc_7ECA3
 		jmp	loc_7ED23	; default
 ; ���������������������������������������������������������������������������
 
-loc_7ECA3:				; CODE XREF: GlyphObject_Helper8_7EC45+59j
+loc_7ECA3:				; CODE XREF: NavMap_PlaceLabel_7EC45+59j
 		shl	bx, 1
 		jmp	cs:off_7EDBE[bx] ; switch jump
 
@@ -2113,12 +2155,12 @@ loc_7ECAA:				; DATA XREF: ovr241:off_7EDBEo
 		mov	dx, [bp+arg_6]
 		add	dx, ax
 
-loc_7ECC1:				; CODE XREF: GlyphObject_Helper8_7EC45+B7j
+loc_7ECC1:				; CODE XREF: NavMap_PlaceLabel_7EC45+B7j
 		mov	[bp+var_C], dx
 		jmp	short loc_7ED3C
 ; ���������������������������������������������������������������������������
 
-loc_7ECC6:				; CODE XREF: GlyphObject_Helper8_7EC45+60j
+loc_7ECC6:				; CODE XREF: NavMap_PlaceLabel_7EC45+60j
 					; DATA XREF: ovr241:off_7EDBEo
 		mov	ax, [bp+arg_4]	; case 0x1
 		sub	ax, [bp+var_4]
@@ -2133,7 +2175,7 @@ loc_7ECC6:				; CODE XREF: GlyphObject_Helper8_7EC45+60j
 		jmp	short loc_7ECFA
 ; ���������������������������������������������������������������������������
 
-loc_7ECDF:				; CODE XREF: GlyphObject_Helper8_7EC45+60j
+loc_7ECDF:				; CODE XREF: NavMap_PlaceLabel_7EC45+60j
 					; DATA XREF: ovr241:off_7EDBEo
 		mov	ax, [bp+arg_4]	; case 0x2
 
@@ -2142,7 +2184,7 @@ loc_7ECE2:
 		jmp	short loc_7ECF0
 ; ���������������������������������������������������������������������������
 
-loc_7ECE7:				; CODE XREF: GlyphObject_Helper8_7EC45+60j
+loc_7ECE7:				; CODE XREF: NavMap_PlaceLabel_7EC45+60j
 					; DATA XREF: ovr241:off_7EDBEo
 		mov	ax, [bp+arg_4]	; case 0x3
 		sub	ax, [bp+var_2]
@@ -2150,7 +2192,7 @@ loc_7ECE7:				; CODE XREF: GlyphObject_Helper8_7EC45+60j
 loc_7ECED:
 		add	ax, 0FFFDh
 
-loc_7ECF0:				; CODE XREF: GlyphObject_Helper8_7EC45+A0j
+loc_7ECF0:				; CODE XREF: NavMap_PlaceLabel_7EC45+A0j
 		mov	[bp+var_A], ax
 
 loc_7ECF3:
@@ -2158,12 +2200,12 @@ loc_7ECF3:
 		sar	ax, 1
 		mov	dx, [bp+arg_6]
 
-loc_7ECFA:				; CODE XREF: GlyphObject_Helper8_7EC45+98j
+loc_7ECFA:				; CODE XREF: NavMap_PlaceLabel_7EC45+98j
 		sub	dx, ax
 		jmp	short loc_7ECC1
 ; ���������������������������������������������������������������������������
 
-loc_7ECFE:				; CODE XREF: GlyphObject_Helper8_7EC45+60j
+loc_7ECFE:				; CODE XREF: NavMap_PlaceLabel_7EC45+60j
 					; DATA XREF: ovr241:off_7EDBEo
 		mov	ax, [bp+arg_4]	; case 0x4
 		sub	ax, [bp+var_4]
@@ -2173,7 +2215,7 @@ loc_7ECFE:				; CODE XREF: GlyphObject_Helper8_7EC45+60j
 		jmp	short loc_7ED1E
 ; ���������������������������������������������������������������������������
 
-loc_7ED0E:				; CODE XREF: GlyphObject_Helper8_7EC45+60j
+loc_7ED0E:				; CODE XREF: NavMap_PlaceLabel_7EC45+60j
 					; DATA XREF: ovr241:off_7EDBEo
 		mov	ax, [bp+arg_4]	; case 0x5
 		sub	ax, [bp+var_4]
@@ -2182,12 +2224,12 @@ loc_7ED0E:				; CODE XREF: GlyphObject_Helper8_7EC45+60j
 		sub	ax, di
 		sub	ax, di
 
-loc_7ED1E:				; CODE XREF: GlyphObject_Helper8_7EC45+C7j
+loc_7ED1E:				; CODE XREF: NavMap_PlaceLabel_7EC45+C7j
 		mov	[bp+var_C], ax
 		jmp	short loc_7ED3C
 ; ���������������������������������������������������������������������������
 
-loc_7ED23:				; CODE XREF: GlyphObject_Helper8_7EC45+5Bj
+loc_7ED23:				; CODE XREF: NavMap_PlaceLabel_7EC45+5Bj
 		mov	ax, [bp+arg_4]	; default
 		add	ax, 3
 		mov	[bp+var_A], ax
@@ -2202,8 +2244,8 @@ loc_7ED35:
 		mov	[bp+var_C], dx
 		mov	[bp+var_5], 1
 
-loc_7ED3C:				; CODE XREF: GlyphObject_Helper8_7EC45+7Fj
-					; GlyphObject_Helper8_7EC45+DCj
+loc_7ED3C:				; CODE XREF: NavMap_PlaceLabel_7EC45+7Fj
+					; NavMap_PlaceLabel_7EC45+DCj
 		mov	al, [bp+var_5]
 
 loc_7ED3F:
@@ -2225,7 +2267,7 @@ loc_7ED49:
 		push	cs
 
 loc_7ED52:
-		call	near ptr GlyphObject_Helper6_7EB72
+		call	near ptr NavMap_ClampBox_7EB72
 
 loc_7ED55:
 		add	sp, 8
@@ -2235,7 +2277,7 @@ loc_7ED55:
 		push	[bp+var_A]
 		push	si
 		push	cs
-		call	near ptr GlyphObject_Helper7_7EBCA
+		call	near ptr NavMap_IsBoxFree_7EBCA
 		add	sp, 0Ah
 		or	al, al
 		jz	short loc_7ED86
@@ -2245,19 +2287,19 @@ loc_7ED55:
 		push	[bp+var_A]
 		push	si
 		push	cs
-		call	near ptr GlyphObject_Helper5_7EB1C
+		call	near ptr NavMap_ReserveBox_7EB1C
 		add	sp, 0Ah
 		mov	[bp+var_5], 1
 		jmp	short loc_7ED90
 ; ���������������������������������������������������������������������������
 
-loc_7ED86:				; CODE XREF: GlyphObject_Helper8_7EC45+127j
+loc_7ED86:				; CODE XREF: NavMap_PlaceLabel_7EC45+127j
 		cmp	byte_6D5DE, 0
 		jnz	short loc_7EDBA
 		inc	[bp+var_8]
 
-loc_7ED90:				; CODE XREF: GlyphObject_Helper8_7EC45+50j
-					; GlyphObject_Helper8_7EC45:loc_7ED43j	...
+loc_7ED90:				; CODE XREF: NavMap_PlaceLabel_7EC45+50j
+					; NavMap_PlaceLabel_7EC45:loc_7ED43j	...
 		mov	al, [bp+var_5]
 		mov	ah, 0
 		or	ax, ax
@@ -2265,7 +2307,7 @@ loc_7ED90:				; CODE XREF: GlyphObject_Helper8_7EC45+50j
 		jmp	loc_7EC98
 ; ���������������������������������������������������������������������������
 
-loc_7ED9C:				; CODE XREF: GlyphObject_Helper8_7EC45+152j
+loc_7ED9C:				; CODE XREF: NavMap_PlaceLabel_7EC45+152j
 		mov	al, [bp+arg_C]
 		push	ax
 		push	large [bp+arg_8]
@@ -2282,7 +2324,7 @@ loc_7EDB2:
 loc_7EDB5:
 		mov	byte_6D5DE, 0
 
-loc_7EDBA:				; CODE XREF: GlyphObject_Helper8_7EC45+146j
+loc_7EDBA:				; CODE XREF: NavMap_PlaceLabel_7EC45+146j
 		pop	di
 		pop	si
 
@@ -2291,10 +2333,10 @@ locret_7EDBC:
 
 locret_7EDBD:
 		retf
-GlyphObject_Helper8_7EC45	endp
+NavMap_PlaceLabel_7EC45	endp
 
 ; ���������������������������������������������������������������������������
-off_7EDBE	dw offset loc_7ECAA	; DATA XREF: GlyphObject_Helper8_7EC45+60r
+off_7EDBE	dw offset loc_7ECAA	; DATA XREF: NavMap_PlaceLabel_7EC45+60r
 		dw offset loc_7ECC6	; jump table for switch	statement
 		dw offset loc_7ECDF
 		dw offset loc_7ECE7
@@ -2306,12 +2348,29 @@ off_7EDBE	dw offset loc_7ECAA	; DATA XREF: GlyphObject_Helper8_7EC45+60r
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 1080 lignes, NON DÉTAILLÉE — combine Render_SetPixelClipped_61B58 (seg171),
-; Render_DrawEllipseOutline_61612 (seg169), Render_FillClippedRect_61960 (seg170, répété) —
-; grosse fonction de dessin combinant plusieurs primitives 2D. Candidat prioritaire pour
-; session dédiée.
+; far, 1080L, LUE 2026-10-31 en entier (ex-'Render_DrawComplexShape'). CARTE DE NAVIGATION :
+; ce qui est dessiné sur la carte, en trois passes, après NavMap_ResetBoxes
+; (GlyphObject_Helper4_7EB0D). (1) Contours des zones : pour chaque scène (scénario+58 nombre,
+; +60 tableau, 39 octets) active, avec une zone dont le nom ne commence pas par « . » (cmp
+; byte ptr es:[bx+2], 2Eh) : couleur 215 (0D7h), 238 (0EEh) si c'est la zone de l'objectif
+; ([carte+314], NavMap_SetObjective_7F5D5) ; pixel au point de référence (zone+34,
+; NavMap_WorldToScreen_7E72B) ; sphère : ellipse de demi-axes rayon (zone+46) / échelle X et /
+; échelle Y (Render_DrawEllipseOutline_61612) ; cylindre : même ellipse avec le rayon zone+50
+; ; boîte : 4 traits (Render_FillClippedRect_61960) de x − ouest (zone+50) à x + est (zone+46)
+; et de y − nord (zone+54) à y + sud (zone+58). (2) Objets : chaque objet de la table de
+; mission (Expr_LookupTableEntry85B_52D45) créé (+0x52) et marqué (bit 4 de +0x39) : point de
+; couleur 230 (0E6h) si camp +0x31 = 255, 199 (0C7h) pour le joueur (word_722E6), 31 sinon ;
+; repère 3 × 3 réservé (NavMap_ReserveBox_7EB1C) ; second point en (x + 1, y) de la même
+; couleur, ou pour un avion (bit 2 de +4) point de couleur 0 à l'opposé de la vitesse (seuil
+; 0x40 en 24.8 sur c0 et c1) ; nom en couleur 31 (NavMap_PlaceLabel_7EC45) : chaîne ds:1449h
+; pour le joueur, indicatif du pilote ([+0x55]+140) pour un autre avion, [objet+6] sinon. (3)
+; Noms des zones, mêmes scènes qu'en (1) : couleur 223 (0DFh), 237 (0EDh) si la zone est dans
+; la liste à scénario+104 (Parser_FindDuplicateSymbol ; rôle de la liste non établi), 199
+; (0C7h) si c'est la zone de l'objectif ; byte_6D5DE = 1, NavMap_PlaceLabel_7EC45 au point de
+; référence, puis à y + 10, puis à y − 10 tant que rien n'est écrit, enfin byte_6D5DE = 0 et
+; dernier appel au point de référence.
 ; ==============================================================================================
-Render_DrawComplexShape_7EDCA	proc far		; CODE XREF: VROOMM_StubThunk_6AE66J GlyphObject_MeasureAndDraw_7F587+17p
+NavMap_DrawMissionObjects_7EDCA	proc far		; CODE XREF: VROOMM_StubThunk_6AE66J GlyphObject_MeasureAndDraw_7F587+17p
 
 var_6E		= dword	ptr -6Eh
 var_6A		= dword	ptr -6Ah
@@ -2367,11 +2426,11 @@ arg_2		= word ptr  8
 		jmp	loc_7F214
 ; ���������������������������������������������������������������������������
 
-loc_7EDEF:				; CODE XREF: Render_DrawComplexShape_7EDCA+20j
+loc_7EDEF:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+20j
 		jmp	loc_7F1EF
 ; ���������������������������������������������������������������������������
 
-loc_7EDF2:				; CODE XREF: Render_DrawComplexShape_7EDCA+447j
+loc_7EDF2:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+447j
 		mov	eax, [di+4]
 		mov	[bp+var_A+2], eax
 		cmp	[bp+var_A+2], 0
@@ -2379,7 +2438,7 @@ loc_7EDF2:				; CODE XREF: Render_DrawComplexShape_7EDCA+447j
 		jmp	loc_7F1EC
 ; ���������������������������������������������������������������������������
 
-loc_7EE04:				; CODE XREF: Render_DrawComplexShape_7EDCA+35j
+loc_7EE04:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+35j
 		cmp	byte ptr [di], 0
 		jz	short loc_7EE2A
 		cmp	dword ptr [di+4], 0
@@ -2397,10 +2456,10 @@ loc_7EE1D:
 		jmp	short loc_7EE21
 ; ���������������������������������������������������������������������������
 
-loc_7EE1F:				; CODE XREF: Render_DrawComplexShape_7EDCA+4Ej
+loc_7EE1F:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+4Ej
 		xor	ax, ax
 
-loc_7EE21:				; CODE XREF: Render_DrawComplexShape_7EDCA:loc_7EE1Dj
+loc_7EE21:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA:loc_7EE1Dj
 		or	al, al
 
 loc_7EE23:
@@ -2411,17 +2470,17 @@ loc_7EE25:
 		jmp	short loc_7EE2C
 ; ���������������������������������������������������������������������������
 
-loc_7EE2A:				; CODE XREF: Render_DrawComplexShape_7EDCA+3Dj
-					; Render_DrawComplexShape_7EDCA+44j ...
+loc_7EE2A:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+3Dj
+					; NavMap_DrawMissionObjects_7EDCA+44j ...
 		xor	ax, ax
 
-loc_7EE2C:				; CODE XREF: Render_DrawComplexShape_7EDCA+5Ej
+loc_7EE2C:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+5Ej
 		or	al, al
 		jnz	short loc_7EE33
 		jmp	loc_7F1EC
 ; ���������������������������������������������������������������������������
 
-loc_7EE33:				; CODE XREF: Render_DrawComplexShape_7EDCA+64j
+loc_7EE33:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+64j
 		mov	word ptr [bp+var_A], 0D7h ; '�'
 
 loc_7EE38:
@@ -2434,7 +2493,7 @@ loc_7EE41:
 loc_7EE43:
 		mov	word ptr [bp+var_A], 0EEh ; '�'
 
-loc_7EE48:				; CODE XREF: Render_DrawComplexShape_7EDCA:loc_7EE41j
+loc_7EE48:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA:loc_7EE41j
 		lea	ax, [bp+var_E]
 		push	ax
 		lea	ax, [bp+var_C]
@@ -2455,7 +2514,7 @@ loc_7EE48:				; CODE XREF: Render_DrawComplexShape_7EDCA:loc_7EE41j
 		push	ax
 		push	si
 		push	cs
-		call	near ptr GlyphObject_Helper3_7E72B
+		call	near ptr NavMap_WorldToScreen_7E72B
 		add	sp, 8
 		mov	al, byte ptr [bp+var_A]
 		push	ax
@@ -2475,19 +2534,19 @@ loc_7EE48:				; CODE XREF: Render_DrawComplexShape_7EDCA:loc_7EE41j
 		jmp	loc_7F015
 ; ���������������������������������������������������������������������������
 
-loc_7EEB5:				; CODE XREF: Render_DrawComplexShape_7EDCA+E6j
+loc_7EEB5:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+E6j
 		cmp	ax, 43h	; 'C'
 		jnz	short loc_7EEBD
 		jmp	loc_7EF74
 ; ���������������������������������������������������������������������������
 
-loc_7EEBD:				; CODE XREF: Render_DrawComplexShape_7EDCA+EEj
+loc_7EEBD:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+EEj
 		cmp	ax, 53h	; 'S'
 		jz	short loc_7EEC5
 		jmp	loc_7F1EC
 ; ���������������������������������������������������������������������������
 
-loc_7EEC5:				; CODE XREF: Render_DrawComplexShape_7EDCA+F6j
+loc_7EEC5:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+F6j
 		mov	eax, [bp+var_A+2]
 		mov	[bp+var_18+2], eax
 		mov	ax, word ptr [bp+var_14]
@@ -2555,7 +2614,7 @@ loc_7EF40:
 		push	[bp+var_2A]
 		push	word ptr [bp+var_18]
 
-loc_7EF63:				; CODE XREF: Render_DrawComplexShape_7EDCA:loc_7F012j
+loc_7EF63:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA:loc_7F012j
 		push	[bp+var_E]
 		push	[bp+var_C]
 		push	[bp+arg_2]
@@ -2563,7 +2622,7 @@ loc_7EF63:				; CODE XREF: Render_DrawComplexShape_7EDCA:loc_7F012j
 		jmp	loc_7F1E9
 ; ���������������������������������������������������������������������������
 
-loc_7EF74:				; CODE XREF: Render_DrawComplexShape_7EDCA+F0j
+loc_7EF74:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+F0j
 		mov	eax, [bp+var_A+2]
 		mov	[bp+var_18+2], eax
 		mov	ax, word ptr [bp+var_14]
@@ -2631,7 +2690,7 @@ loc_7F012:
 		jmp	loc_7EF63
 ; ���������������������������������������������������������������������������
 
-loc_7F015:				; CODE XREF: Render_DrawComplexShape_7EDCA+E8j
+loc_7F015:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+E8j
 		mov	eax, [bp+var_A+2]
 
 loc_7F019:
@@ -2849,14 +2908,14 @@ loc_7F1E1:
 		push	[bp+arg_2]
 		call	Render_FillClippedRect_61960
 
-loc_7F1E9:				; CODE XREF: Render_DrawComplexShape_7EDCA+1A7j
+loc_7F1E9:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+1A7j
 		add	sp, 0Ch
 
-loc_7F1EC:				; CODE XREF: Render_DrawComplexShape_7EDCA+37j
-					; Render_DrawComplexShape_7EDCA+66j ...
+loc_7F1EC:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+37j
+					; NavMap_DrawMissionObjects_7EDCA+66j ...
 		inc	[bp+var_4]
 
-loc_7F1EF:				; CODE XREF: Render_DrawComplexShape_7EDCA:loc_7EDEFj
+loc_7F1EF:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA:loc_7EDEFj
 		mov	bx, [bp+var_2]
 
 loc_7F1F2:
@@ -2872,21 +2931,21 @@ loc_7F1F2:
 		jmp	short loc_7F20B
 ; ���������������������������������������������������������������������������
 
-loc_7F209:				; CODE XREF: Render_DrawComplexShape_7EDCA+42Ej
+loc_7F209:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+42Ej
 		xor	ax, ax
 
-loc_7F20B:				; CODE XREF: Render_DrawComplexShape_7EDCA+43Dj
+loc_7F20B:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+43Dj
 		mov	di, ax
 		or	ax, ax
 		jz	short loc_7F214
 		jmp	loc_7EDF2
 ; ���������������������������������������������������������������������������
 
-loc_7F214:				; CODE XREF: Render_DrawComplexShape_7EDCA+22j
-					; Render_DrawComplexShape_7EDCA+445j
+loc_7F214:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+22j
+					; NavMap_DrawMissionObjects_7EDCA+445j
 		mov	[bp+var_6], 0
 
-loc_7F219:				; CODE XREF: Render_DrawComplexShape_7EDCA+628j
+loc_7F219:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+628j
 		mov	ax, [bp+var_6]
 		inc	[bp+var_6]
 		push	ax
@@ -2916,7 +2975,7 @@ loc_7F232:
 		jmp	loc_7F3EB
 ; ���������������������������������������������������������������������������
 
-loc_7F23F:				; CODE XREF: Render_DrawComplexShape_7EDCA+470j
+loc_7F23F:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+470j
 		les	bx, [bp+var_A]
 		cmp	word ptr es:[bx+52h], 0
 		jz	short loc_7F24E
@@ -2924,16 +2983,16 @@ loc_7F23F:				; CODE XREF: Render_DrawComplexShape_7EDCA+470j
 		jmp	short loc_7F250
 ; ���������������������������������������������������������������������������
 
-loc_7F24E:				; CODE XREF: Render_DrawComplexShape_7EDCA+47Dj
+loc_7F24E:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+47Dj
 		xor	ax, ax
 
-loc_7F250:				; CODE XREF: Render_DrawComplexShape_7EDCA+482j
+loc_7F250:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+482j
 		or	ax, ax
 		jnz	short loc_7F257
 		jmp	loc_7F3EB
 ; ���������������������������������������������������������������������������
 
-loc_7F257:				; CODE XREF: Render_DrawComplexShape_7EDCA+488j
+loc_7F257:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+488j
 		les	bx, [bp+var_A]
 		mov	al, es:[bx+39h]
 		shl	ax, 0Bh
@@ -2943,7 +3002,7 @@ loc_7F257:				; CODE XREF: Render_DrawComplexShape_7EDCA+488j
 		jmp	loc_7F3EB
 ; ���������������������������������������������������������������������������
 
-loc_7F26B:				; CODE XREF: Render_DrawComplexShape_7EDCA+49Cj
+loc_7F26B:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+49Cj
 		mov	di, es:[bx+52h]
 		mov	[bp+var_C], 0
 		push	di
@@ -2959,15 +3018,15 @@ loc_7F26B:				; CODE XREF: Render_DrawComplexShape_7EDCA+49Cj
 		jmp	short loc_7F289
 ; ���������������������������������������������������������������������������
 
-loc_7F287:				; CODE XREF: Render_DrawComplexShape_7EDCA+4B2j
+loc_7F287:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+4B2j
 		mov	al, 17h
 
-loc_7F289:				; CODE XREF: Render_DrawComplexShape_7EDCA+4BBj
+loc_7F289:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+4BBj
 		cmp	al, 6
 		jnz	short loc_7F290
 		mov	[bp+var_C], di
 
-loc_7F290:				; CODE XREF: Render_DrawComplexShape_7EDCA+4C1j
+loc_7F290:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+4C1j
 		lea	ax, [bp+var_12+2]
 		push	ax
 		lea	ax, [bp+var_E]
@@ -2977,7 +3036,7 @@ loc_7F290:				; CODE XREF: Render_DrawComplexShape_7EDCA+4C1j
 		push	ax
 		push	si
 		push	cs
-		call	near ptr GlyphObject_Helper3_7E72B
+		call	near ptr NavMap_WorldToScreen_7E72B
 		add	sp, 8
 		les	bx, [bp+var_A]
 		cmp	byte ptr es:[bx+31h], 0FFh
@@ -2988,24 +3047,24 @@ loc_7F2B0:
 		jmp	short loc_7F2C9
 ; ���������������������������������������������������������������������������
 
-loc_7F2B7:				; CODE XREF: Render_DrawComplexShape_7EDCA+4E4j
+loc_7F2B7:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+4E4j
 		cmp	di, word_722E6
 		jnz	short loc_7F2C4
 		mov	word ptr [bp+var_12], 0C7h ; '�'
 		jmp	short loc_7F2C9
 ; ���������������������������������������������������������������������������
 
-loc_7F2C4:				; CODE XREF: Render_DrawComplexShape_7EDCA+4F1j
+loc_7F2C4:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+4F1j
 		mov	word ptr [bp+var_12], 1Fh
 
-loc_7F2C9:				; CODE XREF: Render_DrawComplexShape_7EDCA+4EBj
-					; Render_DrawComplexShape_7EDCA+4F8j
+loc_7F2C9:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+4EBj
+					; NavMap_DrawMissionObjects_7EDCA+4F8j
 		cmp	word ptr [bp+var_12], 0FFFFh
 		jnz	short loc_7F2D2
 		jmp	loc_7F39A
 ; ���������������������������������������������������������������������������
 
-loc_7F2D2:				; CODE XREF: Render_DrawComplexShape_7EDCA+503j
+loc_7F2D2:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+503j
 		mov	al, byte ptr [bp+var_12]
 		push	ax
 		push	word ptr [bp+var_12+2]
@@ -3030,7 +3089,7 @@ loc_7F2F2:
 		push	ax
 		push	si
 		push	cs
-		call	near ptr GlyphObject_Helper5_7EB1C
+		call	near ptr NavMap_ReserveBox_7EB1C
 		add	sp, 0Ah
 		mov	word ptr [bp+var_1C+2],	1
 		mov	word ptr [bp+var_1C], 0
@@ -3067,39 +3126,39 @@ loc_7F332:
 		jmp	short loc_7F357
 ; ���������������������������������������������������������������������������
 
-loc_7F344:				; CODE XREF: Render_DrawComplexShape_7EDCA+571j
+loc_7F344:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+571j
 		cmp	[bp+var_6E], 0FFFFFFC0h
 		jge	short loc_7F352
 		mov	word ptr [bp+var_1C+2],	1
 		jmp	short loc_7F357
 ; ���������������������������������������������������������������������������
 
-loc_7F352:				; CODE XREF: Render_DrawComplexShape_7EDCA+57Fj
+loc_7F352:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+57Fj
 		mov	word ptr [bp+var_1C+2],	0
 
-loc_7F357:				; CODE XREF: Render_DrawComplexShape_7EDCA+578j
-					; Render_DrawComplexShape_7EDCA+586j
+loc_7F357:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+578j
+					; NavMap_DrawMissionObjects_7EDCA+586j
 		cmp	[bp+var_6A], 40h ; '@'
 		jle	short loc_7F365
 		mov	word ptr [bp+var_1C], 1
 		jmp	short loc_7F378
 ; ���������������������������������������������������������������������������
 
-loc_7F365:				; CODE XREF: Render_DrawComplexShape_7EDCA+592j
+loc_7F365:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+592j
 		cmp	[bp+var_6A], 0FFFFFFC0h
 		jge	short loc_7F373
 		mov	word ptr [bp+var_1C], 0FFFFh
 		jmp	short loc_7F378
 ; ���������������������������������������������������������������������������
 
-loc_7F373:				; CODE XREF: Render_DrawComplexShape_7EDCA+5A0j
+loc_7F373:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+5A0j
 		mov	word ptr [bp+var_1C], 0
 
-loc_7F378:				; CODE XREF: Render_DrawComplexShape_7EDCA+599j
-					; Render_DrawComplexShape_7EDCA+5A7j
+loc_7F378:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+599j
+					; NavMap_DrawMissionObjects_7EDCA+5A7j
 		mov	word ptr [bp+var_12], 0
 
-loc_7F37D:				; CODE XREF: Render_DrawComplexShape_7EDCA+543j
+loc_7F37D:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+543j
 		mov	al, byte ptr [bp+var_12]
 		push	ax
 		mov	ax, word ptr [bp+var_12+2]
@@ -3112,7 +3171,7 @@ loc_7F37D:				; CODE XREF: Render_DrawComplexShape_7EDCA+543j
 		call	Render_SetPixelClipped_61B58
 		add	sp, 8
 
-loc_7F39A:				; CODE XREF: Render_DrawComplexShape_7EDCA+505j
+loc_7F39A:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+505j
 		mov	word ptr [bp+var_14], 1Fh
 		cmp	[bp+var_C], 0
 		jz	short loc_7F3CA
@@ -3125,7 +3184,7 @@ loc_7F3AE:
 		jmp	short loc_7F3D2
 ; ���������������������������������������������������������������������������
 
-loc_7F3B5:				; CODE XREF: Render_DrawComplexShape_7EDCA+5DFj
+loc_7F3B5:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+5DFj
 		mov	bx, [bp+var_C]
 		mov	ax, [bx+57h]
 		mov	dx, [bx+55h]
@@ -3135,12 +3194,12 @@ loc_7F3B5:				; CODE XREF: Render_DrawComplexShape_7EDCA+5DFj
 		jmp	short loc_7F3D2
 ; ���������������������������������������������������������������������������
 
-loc_7F3CA:				; CODE XREF: Render_DrawComplexShape_7EDCA+5D9j
+loc_7F3CA:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+5D9j
 		mov	eax, [di+6]
 		mov	[bp+var_18], eax
 
-loc_7F3D2:				; CODE XREF: Render_DrawComplexShape_7EDCA+5E9j
-					; Render_DrawComplexShape_7EDCA+5FEj
+loc_7F3D2:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+5E9j
+					; NavMap_DrawMissionObjects_7EDCA+5FEj
 		mov	al, [bp+var_14]
 		push	ax
 		push	large [bp+var_18]
@@ -3149,28 +3208,28 @@ loc_7F3D2:				; CODE XREF: Render_DrawComplexShape_7EDCA+5E9j
 		push	[bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr GlyphObject_Helper8_7EC45
+		call	near ptr NavMap_PlaceLabel_7EC45
 		add	sp, 0Eh
 
-loc_7F3EB:				; CODE XREF: Render_DrawComplexShape_7EDCA+472j
-					; Render_DrawComplexShape_7EDCA+48Aj ...
+loc_7F3EB:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+472j
+					; NavMap_DrawMissionObjects_7EDCA+48Aj ...
 		cmp	[bp+var_A], 0
 		jz	short loc_7F3F5
 		jmp	loc_7F219
 ; ���������������������������������������������������������������������������
 
-loc_7F3F5:				; CODE XREF: Render_DrawComplexShape_7EDCA+626j
+loc_7F3F5:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+626j
 		mov	[bp+var_4], 0
 		cmp	[bp+var_2], 0
 		jnz	short loc_7F403
 		jmp	loc_7F583
 ; ���������������������������������������������������������������������������
 
-loc_7F403:				; CODE XREF: Render_DrawComplexShape_7EDCA+634j
+loc_7F403:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+634j
 		jmp	loc_7F55E
 ; ���������������������������������������������������������������������������
 
-loc_7F406:				; CODE XREF: Render_DrawComplexShape_7EDCA+7B6j
+loc_7F406:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+7B6j
 		mov	eax, [di+4]
 		mov	[bp+var_A+2], eax
 
@@ -3180,7 +3239,7 @@ loc_7F40E:
 		jmp	loc_7F55B
 ; ���������������������������������������������������������������������������
 
-loc_7F418:				; CODE XREF: Render_DrawComplexShape_7EDCA+649j
+loc_7F418:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+649j
 		cmp	byte ptr [di], 0
 		jz	short loc_7F43E
 		cmp	dword ptr [di+4], 0
@@ -3198,10 +3257,10 @@ loc_7F431:
 		jmp	short loc_7F435
 ; ���������������������������������������������������������������������������
 
-loc_7F433:				; CODE XREF: Render_DrawComplexShape_7EDCA+662j
+loc_7F433:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+662j
 		xor	ax, ax
 
-loc_7F435:				; CODE XREF: Render_DrawComplexShape_7EDCA:loc_7F431j
+loc_7F435:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA:loc_7F431j
 		or	al, al
 
 loc_7F437:
@@ -3212,11 +3271,11 @@ loc_7F43C:
 		jmp	short loc_7F440
 ; ���������������������������������������������������������������������������
 
-loc_7F43E:				; CODE XREF: Render_DrawComplexShape_7EDCA+651j
-					; Render_DrawComplexShape_7EDCA+658j ...
+loc_7F43E:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+651j
+					; NavMap_DrawMissionObjects_7EDCA+658j ...
 		xor	ax, ax
 
-loc_7F440:				; CODE XREF: Render_DrawComplexShape_7EDCA:loc_7F43Cj
+loc_7F440:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA:loc_7F43Cj
 		or	al, al
 
 loc_7F442:
@@ -3226,7 +3285,7 @@ loc_7F444:
 		jmp	loc_7F55B
 ; ���������������������������������������������������������������������������
 
-loc_7F447:				; CODE XREF: Render_DrawComplexShape_7EDCA:loc_7F442j
+loc_7F447:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA:loc_7F442j
 		mov	word ptr [bp+var_A], 0DFh ; '�'
 		push	large [bp+var_A+2]
 		mov	ax, [bp+var_2]
@@ -3238,13 +3297,13 @@ loc_7F447:				; CODE XREF: Render_DrawComplexShape_7EDCA:loc_7F442j
 		jz	short loc_7F468
 		mov	word ptr [bp+var_A], 0EDh ; '�'
 
-loc_7F468:				; CODE XREF: Render_DrawComplexShape_7EDCA+697j
+loc_7F468:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+697j
 		mov	eax, [si+13Ah]
 		cmp	eax, [bp+var_A+2]
 		jnz	short loc_7F478
 		mov	word ptr [bp+var_A], 0C7h ; '�'
 
-loc_7F478:				; CODE XREF: Render_DrawComplexShape_7EDCA+6A7j
+loc_7F478:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+6A7j
 		lea	ax, [bp+var_E]
 		push	ax
 		lea	ax, [bp+var_C]
@@ -3267,7 +3326,7 @@ loc_7F478:				; CODE XREF: Render_DrawComplexShape_7EDCA+6A7j
 		push	cs
 
 loc_7F4B2:
-		call	near ptr GlyphObject_Helper3_7E72B
+		call	near ptr NavMap_WorldToScreen_7E72B
 		add	sp, 8
 		mov	byte_6D5DE, 1
 		mov	al, byte ptr [bp+var_A]
@@ -3283,7 +3342,7 @@ loc_7F4C4:
 		push	[bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr GlyphObject_Helper8_7EC45
+		call	near ptr NavMap_PlaceLabel_7EC45
 		add	sp, 0Eh
 		cmp	byte_6D5DE, 0
 		jz	short loc_7F506
@@ -3302,10 +3361,10 @@ loc_7F4F1:
 		push	[bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr GlyphObject_Helper8_7EC45
+		call	near ptr NavMap_PlaceLabel_7EC45
 		add	sp, 0Eh
 
-loc_7F506:				; CODE XREF: Render_DrawComplexShape_7EDCA+717j
+loc_7F506:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+717j
 		cmp	byte_6D5DE, 0
 		jz	short loc_7F530
 		mov	al, byte ptr [bp+var_A]
@@ -3329,10 +3388,10 @@ loc_7F525:
 		push	[bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr GlyphObject_Helper8_7EC45
+		call	near ptr NavMap_PlaceLabel_7EC45
 		add	sp, 0Eh
 
-loc_7F530:				; CODE XREF: Render_DrawComplexShape_7EDCA+741j
+loc_7F530:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+741j
 		cmp	byte_6D5DE, 0
 		jz	short loc_7F55B
 		mov	byte_6D5DE, 0
@@ -3351,16 +3410,16 @@ loc_7F54D:
 loc_7F553:
 		push	si
 		push	cs
-		call	near ptr GlyphObject_Helper8_7EC45
+		call	near ptr NavMap_PlaceLabel_7EC45
 
 loc_7F558:
 		add	sp, 0Eh
 
-loc_7F55B:				; CODE XREF: Render_DrawComplexShape_7EDCA+64Bj
-					; Render_DrawComplexShape_7EDCA:loc_7F444j	...
+loc_7F55B:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+64Bj
+					; NavMap_DrawMissionObjects_7EDCA:loc_7F444j	...
 		inc	[bp+var_4]
 
-loc_7F55E:				; CODE XREF: Render_DrawComplexShape_7EDCA:loc_7F403j
+loc_7F55E:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA:loc_7F403j
 		mov	bx, [bp+var_2]
 		mov	ax, [bx+3Ah]
 		cmp	ax, [bp+var_4]
@@ -3374,23 +3433,23 @@ loc_7F55E:				; CODE XREF: Render_DrawComplexShape_7EDCA:loc_7F403j
 		jmp	short loc_7F57A
 ; ���������������������������������������������������������������������������
 
-loc_7F578:				; CODE XREF: Render_DrawComplexShape_7EDCA+79Dj
+loc_7F578:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+79Dj
 		xor	ax, ax
 
-loc_7F57A:				; CODE XREF: Render_DrawComplexShape_7EDCA+7ACj
+loc_7F57A:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+7ACj
 		mov	di, ax
 		or	ax, ax
 		jz	short loc_7F583
 		jmp	loc_7F406
 ; ���������������������������������������������������������������������������
 
-loc_7F583:				; CODE XREF: Render_DrawComplexShape_7EDCA+636j
-					; Render_DrawComplexShape_7EDCA+7B4j
+loc_7F583:				; CODE XREF: NavMap_DrawMissionObjects_7EDCA+636j
+					; NavMap_DrawMissionObjects_7EDCA+7B4j
 		pop	di
 		pop	si
 		leave
 		retf
-Render_DrawComplexShape_7EDCA	endp
+NavMap_DrawMissionObjects_7EDCA	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -3398,7 +3457,7 @@ Render_DrawComplexShape_7EDCA	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine allocateur typé et Render_MeasureOrDrawTextString_61F52.
+; far, combine allocateur typé et Shape_DrawSpans_61F52.
 ; ==============================================================================================
 GlyphObject_MeasureAndDraw_7F587	proc far		; CODE XREF: VROOMM_StubThunk_6AE75J Cockpit_ProcessInputFrame_7F6EE+38p	...
 
@@ -3419,7 +3478,7 @@ arg_2		= word ptr  8
 		push	di
 		push	si
 		push	cs
-		call	near ptr Render_DrawComplexShape_7EDCA
+		call	near ptr NavMap_DrawMissionObjects_7EDCA
 		add	sp, 4
 		push	large 0
 		mov	al, [si+24h]
@@ -3438,7 +3497,7 @@ loc_7F5B7:
 loc_7F5BC:
 		push	large 0
 		push	di
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	di
 		push	si
@@ -3457,9 +3516,17 @@ GlyphObject_MeasureAndDraw_7F587	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine Str_GetNthEntry_50EC8 (seg114) et Expr_LookupNamedValue_52DDB (seg114).
+; far, 106L, LUE 2026-10-31 (ex-NavMap_SetObjective_7F5D5). Prépare l'objectif affiché sur la
+; carte de navigation à partir de l'ordre de navigation courant (enregistrement bx : +6 ordre,
+; +7 argument, +8 numéro de message). [carte+314], [carte+318] et [carte+322] remis à 0 ;
+; message ≠ −1 : [carte+322] = texte du message (Str_GetNthEntry_50EC8, liste MSGS) ; ordres
+; 164, 165 (OP_SET_OBJ_FLY_TO_WP) et 166 (OP_SET_OBJ_FLY_TO_AREA) : [carte+314] = zone du SPOT
+; de l'argument (premier champ de l'enregistrement de 16 octets, liste à scénario+30) ; ordres
+; 167 à 170 : [carte+318] = objet visé (Expr_LookupNamedValue_52DDB). Appelée par
+; Lexer_AdvanceWrapper_7F69C et les autres déplacements dans la liste des ordres de
+; navigation.
 ; ==============================================================================================
-Expr_ResolveStringEntry_7F5D5	proc far		; CODE XREF: VROOMM_StubThunk_6AE84J Lexer_AdvanceWrapper_7F69C+1Fp	...
+NavMap_SetObjective_7F5D5	proc far		; CODE XREF: VROOMM_StubThunk_6AE84J Lexer_AdvanceWrapper_7F69C+1Fp	...
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -3506,7 +3573,7 @@ loc_7F626:
 		mov	[si+144h], dx
 		mov	[si+142h], ax
 
-loc_7F62E:				; CODE XREF: Expr_ResolveStringEntry_7F5D5+3Fj
+loc_7F62E:				; CODE XREF: NavMap_SetObjective_7F5D5+3Fj
 		mov	bx, [bp+var_2]
 		sub	bx, 0A4h	; switch 7 cases
 		cmp	bx, 6
@@ -3532,11 +3599,11 @@ loc_7F652:
 		jmp	short loc_7F65D
 ; ���������������������������������������������������������������������������
 
-loc_7F659:				; CODE XREF: Expr_ResolveStringEntry_7F5D5:loc_7F648j
+loc_7F659:				; CODE XREF: NavMap_SetObjective_7F5D5:loc_7F648j
 		xor	dx, dx
 		xor	ax, ax
 
-loc_7F65D:				; CODE XREF: Expr_ResolveStringEntry_7F5D5+82j
+loc_7F65D:				; CODE XREF: NavMap_SetObjective_7F5D5+82j
 		mov	bx, ax
 		mov	es, dx
 		assume es:seg000
@@ -3547,7 +3614,7 @@ loc_7F65D:				; CODE XREF: Expr_ResolveStringEntry_7F5D5+82j
 		jmp	short loc_7F68A	; default
 ; ���������������������������������������������������������������������������
 
-loc_7F672:				; CODE XREF: Expr_ResolveStringEntry_7F5D5+67j
+loc_7F672:				; CODE XREF: NavMap_SetObjective_7F5D5+67j
 					; DATA XREF: ovr241:off_7F68Eo
 		push	di		; case 0xA7
 		mov	ax, word_706A0
@@ -3558,16 +3625,16 @@ loc_7F672:				; CODE XREF: Expr_ResolveStringEntry_7F5D5+67j
 		mov	[si+140h], dx
 		mov	[si+13Eh], ax
 
-loc_7F68A:				; CODE XREF: Expr_ResolveStringEntry_7F5D5+63j
-					; Expr_ResolveStringEntry_7F5D5+9Bj
+loc_7F68A:				; CODE XREF: NavMap_SetObjective_7F5D5+63j
+					; NavMap_SetObjective_7F5D5+9Bj
 		pop	di		; default
 		pop	si
 		leave
 		retf
-Expr_ResolveStringEntry_7F5D5	endp
+NavMap_SetObjective_7F5D5	endp
 
 ; ���������������������������������������������������������������������������
-off_7F68E	dw offset loc_7F641	; DATA XREF: Expr_ResolveStringEntry_7F5D5+67r
+off_7F68E	dw offset loc_7F641	; DATA XREF: NavMap_SetObjective_7F5D5+67r
 		dw offset loc_7F641	; jump table for switch	statement
 		dw offset loc_7F641
 		dw offset loc_7F672
@@ -3600,7 +3667,7 @@ arg_0		= word ptr  6
 		jz	short loc_7F6BF
 		push	si
 		push	cs
-		call	near ptr Expr_ResolveStringEntry_7F5D5
+		call	near ptr NavMap_SetObjective_7F5D5
 		pop	cx
 
 loc_7F6BF:				; CODE XREF: Lexer_AdvanceWrapper_7F69C+1Bj
@@ -3638,7 +3705,7 @@ arg_0		= word ptr  6
 		push	cs
 
 loc_7F6E4:
-		call	near ptr Expr_ResolveStringEntry_7F5D5
+		call	near ptr NavMap_SetObjective_7F5D5
 		pop	cx
 
 loc_7F6E8:				; CODE XREF: Lexer_RewindWrapper_7F6C5+1Bj
@@ -3751,7 +3818,7 @@ loc_7F77B:				; CODE XREF: Cockpit_ProcessInputFrame_7F6EE+88j
 		mov	eax, dword_711CD
 		mov	[bp+var_E], eax
 		push	51E2h
-		call	Config_ReadCalibration
+		call	Input_AltKeyCommands_26F7E
 		pop	cx
 		mov	[bp+var_F], al
 		cmp	word_72350, 4
@@ -3764,7 +3831,7 @@ loc_7F77B:				; CODE XREF: Cockpit_ProcessInputFrame_7F6EE+88j
 		jz	short loc_7F7B8
 		push	si
 		push	cs
-		call	near ptr Expr_ResolveStringEntry_7F5D5
+		call	near ptr NavMap_SetObjective_7F5D5
 		pop	cx
 		mov	[bp+var_5], 1
 
@@ -3803,7 +3870,7 @@ loc_7F7B8:				; CODE XREF: Cockpit_ProcessInputFrame_7F6EE+AEj
 		jnz	short loc_7F818
 		push	si
 		push	cs
-		call	near ptr Expr_ResolveStringEntry_7F5D5
+		call	near ptr NavMap_SetObjective_7F5D5
 		pop	cx
 		mov	[bp+var_5], 1
 
@@ -3842,7 +3909,7 @@ loc_7F83F:				; DATA XREF: ovr241:1A6Do
 		push	cs
 
 loc_7F841:
-		call	near ptr Expr_ResolveStringEntry_7F5D5
+		call	near ptr NavMap_SetObjective_7F5D5
 		pop	cx
 
 loc_7F845:
@@ -4063,7 +4130,7 @@ loc_7F93E:
 		pop	cx
 		push	si
 		push	cs
-		call	near ptr Expr_ResolveStringEntry_7F5D5
+		call	near ptr NavMap_SetObjective_7F5D5
 		pop	cx
 		push	si
 		push	cs

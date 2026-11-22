@@ -353,7 +353,7 @@ arg_4		= word ptr  0Ah
 		mov	byte_6E33B, cl
 		push	[bp+arg_4]
 		push	large [bp+arg_0]
-		call	IFF_LoadAngleParam
+		call	Object_LoadCommonAndAllegiance_3C942
 		add	sp, 6
 		pop	bp
 		retf

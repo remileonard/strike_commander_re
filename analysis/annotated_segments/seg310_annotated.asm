@@ -19,7 +19,7 @@ stru_6C450	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0ABEo
 ; d'overlay actuellement charge en memoire. fileoff=2DFF0h, codesize=864h, nentries=29.
 ; ==============================================================================================
 VROOMM_StubThunk_6C470	proc far		; CODE XREF: IFF_LoadModelMain+995P
-		jmp	PlayerComponent_LoadFieldsWithRetry_9FAD0
+		jmp	BombModel_LoadDATAChunk_9FAD0
 VROOMM_StubThunk_6C470	endp
 
 
@@ -45,7 +45,7 @@ VROOMM_StubThunk_6C475	endp
 ; d'overlay actuellement charge en memoire. fileoff=2DFF0h, codesize=864h, nentries=29.
 ; ==============================================================================================
 VROOMM_StubThunk_6C47A	proc far
-		jmp	PlayerComponent_InitTimerField_9FD1C
+		jmp	Bomb_InitArmingDelay_9FD1C
 VROOMM_StubThunk_6C47A	endp
 
 
@@ -175,7 +175,7 @@ VROOMM_StubThunk_6C4A7	endp
 ; d'overlay actuellement charge en memoire. fileoff=2DFF0h, codesize=864h, nentries=29.
 ; ==============================================================================================
 VROOMM_StubThunk_6C4AC	proc far
-		jmp	PlayerComponent_LoadFieldGroup_9FDDE
+		jmp	DynGuidedBomb_LoadGBMBChunk_9FDDE
 VROOMM_StubThunk_6C4AC	endp
 
 
@@ -321,7 +321,7 @@ VROOMM_StubThunk_6C4DE	endp
 ; d'overlay actuellement charge en memoire. fileoff=2DFF0h, codesize=864h, nentries=29.
 ; ==============================================================================================
 VROOMM_StubThunk_6C4E3	proc far
-		jmp	PlayerComponent_LoadFieldGroupB_A014E
+		jmp	DynDurd_LoadDURDChunk_A014E
 VROOMM_StubThunk_6C4E3	endp
 
 

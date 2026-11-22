@@ -3,7 +3,13 @@ seg084		segment	byte public 'CODE' use16
 		;org 0Bh
 		assume es:nothing, ss:nothing, ds:seg339, fs:nothing, gs:nothing
 
-loc_3C93B:				; DATA XREF: seg339:off_6F630o
+; ==============================================================================================
+; far, LUE 2026-10-06. 'mov al, 1 / retf' : categorie 1, slot +8 de la vtable 0x6F628 (tag
+; 2578h) que IFF_LoadModelMain pose sur les objets ORNT (decor oriente : immeubles...) juste
+; apres la base 1B6Fh, avant IFF_LoadAngleParam. 2578h sert aussi de tag intermediaire aux
+; classes derivees (TRCR, AFTB, MOBL...).
+; ==============================================================================================
+OrntModel_GetCategory_3C93B:				; DATA XREF: seg339:off_6F630o
 		push	bp
 		mov	bp, sp
 		mov	al, 1
@@ -15,12 +21,15 @@ loc_3C93B:				; DATA XREF: seg339:off_6F630o
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,46L — vérifie le support VESA (INT15h), copie un tag (sub_6BFFF), recherche le chunk
-; 'NGLA' via sub_64743, résout une valeur associée (sub_64B51) stockée à +0x35 : chargement
-; d'un paramètre angulaire depuis un chunk IFF (probable angle d'attache/orientation d'un
-; sous-composant).
+; far, LUE 2026-10-12. Ex-'IFF_LoadAngleParam' (FAUX : pas un angle). Lecteur de base des
+; classes ORNT et dérivées : Object_LoadCommonChunks_9BA85 puis chunk ALGN facultatif : uint8
+; (int8) → modèle +0x35 = CAMP de l'objet (ALLÉGEANCE) ; absent → 0. Recopié dans l'instance
+; +0x50 (WorldObject_BaseConstructAttached, Camera_InitAttachedWithTarget_3DC3D…) : 1 = camp
+; du joueur, 0xFF (−1) = adverse, 0 = neutre. Le champ « camp » de PART l'écrase
+; (PartEntry_ResolveSpawnPositionAndActivate_51EDC). Lu par Targeting_AcquireBestThreat,
+; World_OnObjectDestroyed_53A94, Goal_MoraleReaction_878F, Music_ScanNearbyEnemies_590E0…
 ; ==============================================================================================
-IFF_LoadAngleParam	proc far		; CODE XREF: IFF_LoadModelMain:loc_3BA6EP
+Object_LoadCommonAndAllegiance_3C942	proc far		; CODE XREF: IFF_LoadModelMain:loc_3BA6EP
 					; IFF_LoadAngleParam_Wrapper+AP	...
 
 arg_0		= dword	ptr  6
@@ -55,17 +64,17 @@ arg_4		= word ptr  0Ah
 		jmp	short loc_3C993
 ; ���������������������������������������������������������������������������
 
-loc_3C98B:				; CODE XREF: IFF_LoadAngleParam+37j
+loc_3C98B:				; CODE XREF: Object_LoadCommonAndAllegiance_3C942+37j
 		les	bx, [bp+arg_0]
 
 loc_3C98E:
 		mov	byte ptr es:[bx+35h], 0
 
-loc_3C993:				; CODE XREF: IFF_LoadAngleParam+47j
+loc_3C993:				; CODE XREF: Object_LoadCommonAndAllegiance_3C942+47j
 		pop	si
 		pop	bp
 		retf
-IFF_LoadAngleParam	endp
+Object_LoadCommonAndAllegiance_3C942	endp
 
 ; ���������������������������������������������������������������������������
 
@@ -367,7 +376,11 @@ WorldObject_ComposeOrientationAngleArray_3CB0B:				; DATA XREF: seg339:off_6F66C
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_3CB2D:				; DATA XREF: seg339:off_6F678o
+; ==============================================================================================
+; far, LUE (2026-09-24). Methode virtuelle +0x3C (notamment classe missile, vtable seg339
+; 0x6FAC4) : renvoie l'adresse objet+0x2C = matrice d'orientation 3x3 24.8 (36 octets).
+; ==============================================================================================
+WorldObject_GetOrientationMatrix_3CB2D:				; DATA XREF: seg339:off_6F678o
 					; seg339:off_6F704o ...
 		push	bp
 		mov	bp, sp
@@ -416,7 +429,7 @@ loc_3CB5B:				; DATA XREF: seg339:25F8o
 		pop	cx
 		push	ax
 		push	word ptr [bp+8]
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		pop	si
 		pop	bp
@@ -439,7 +452,7 @@ loc_3CB82:
 		push	word ptr [bp+8]
 
 loc_3CB8A:
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 
 loc_3CB8F:
 		add	sp, 4
@@ -450,7 +463,12 @@ locret_3CB94:
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_3CB95:				; DATA XREF: seg339:25CCo
+; ==============================================================================================
+; far, LUE (2026-09-24). Methode virtuelle +0x40 (notamment classe missile, vtable seg339
+; 0x6FAC4) : recopie 36 octets (AI_ComputeGeometryHelper_56E29) de la matrice passee en
+; argument dans objet+0x2C (orientation), puis appelle Debris_BodyDetach(objet).
+; ==============================================================================================
+WorldObject_SetOrientationMatrix_3CB95:				; DATA XREF: seg339:25CCo
 					; seg339:off_6F708o ...
 		push	bp
 		mov	bp, sp
@@ -479,7 +497,7 @@ loc_3CBB3:
 ; far, enrobage de WorldObject_TestAliveAndUpdateChildren_3800A : renvoie non nul si l'objet
 ; est vivant (le nom d'origine, IsDestroyed, était inversé).
 ; ==============================================================================================
-WorldObject_IsAlive_3CBB7	proc far		; CODE XREF: Camera_ExternalUpdate_3D9B4+8P WorldObject_UpdateWithAIEntity_3D9FB+BP ...
+WorldObject_IsAlive_3CBB7	proc far		; CODE XREF: WorldObject_TickBodyAndSmoke_3D9B4+8P WorldObject_UpdateWithAIEntity_3D9FB+BP ...
 
 arg_0		= word ptr  6
 

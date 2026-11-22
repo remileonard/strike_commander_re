@@ -1218,8 +1218,8 @@ EntityTracker_ClearAll	endp
 ; a jour +0x12/+0xF si c'etait la selection/tete courante. Appelee depuis
 ; MissionRecord_LoadEntityDatabase_7B035 ET MissionRecord_LoadAndBuildWidgetTree_7D31A.
 ; ==============================================================================================
-EntityTracker_RemoveByTarget	proc far		; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+2189P
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+A42P
+EntityTracker_RemoveByTarget	proc far		; CODE XREF: Player_ShotDownSequence_7B035+2189P
+					; Player_EjectSequence_7D31A+A42P
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -1662,7 +1662,7 @@ EntityTracker_ApplySelection	endp
 ; (vtable[0x14]==4), déclenche sub_6BC03 sur un champ (+0x60) sinon : traitement de l'entrée
 ; sélectionnée du journal (probable action 'centrer la carte sur cet objectif').
 ; ==============================================================================================
-Kneeboard_ProcessSelected	proc far		; CODE XREF: Cockpit_LoadAndInitFull_90D20+D7CP
+Kneeboard_ProcessSelected	proc far		; CODE XREF: Options_ConfigurationScreen_90D20+D7CP
 
 var_8		= dword	ptr -8
 arg_0		= word ptr  6
@@ -1866,18 +1866,19 @@ EntityTracker_Destruct	endp
 ; MAURITAN.IFF) : +0x00 char[8] nom interne, +0x08 u16 flags (CHASECAM: 14o), +0x0A char[8]
 ; sujet 'PLAYER', (CKPT: +0x12 char[8] art 'F16-CKPT'), puis u32 farClip=50000, u16 fov=40,
 ; nearClip~10, u32 0, u16,u16 viewport 319,199 ; VICT/WEAP ajoutent une table d'offsets i32
-; FIXED-POINT 24.8 (val/256 = pieds, relatifs au sujet). COMP : en-tête + u8 compte + char[8]
+; FIXED-POINT 24.8 (val/256 = mètres, relatifs au sujet). COMP : en-tête + u8 compte + char[8]
 ; sujet + SCRIPT keyframes variable (opcodes 1o, petits int signés, offsets i32/256), terminé
 ; par octet 0xFE + char[8] vue de reprise ('COCKPIT'). Objet caméra runtime word_72A8F :
 ; +0x14/+0x18/+0x1C i32 X/Z/Y monde 24.8 (preuve : HUD_RenderSymbologyMain/Alt seg088,
-; Debris_SpawnOrchestrator seg079 : delta entité[+0x12/+0x16/+0x1A] - cam[+0x14/..] ->
-; Math_VectorLength3D_5828E -> sar eax,8) ; +0x50 far vtable ([0]=tick keyframe, [4]=stop
-; préc, [0x10]=start/parse script, [0x14]=get state, 4=mode spécial) ; +0x5C sous-objet ;
-; +0x60 dword. Activation : Kneeboard_SelectByID(0x59CD,nom) depuis seg009 (état vol,
-; 'TAKEOFF'), ovr233 UIScript_ParseAndEvaluate_7A054 ('AUTOPILT' + Camera_DetachParent),
-; Player_MainUpdate (Kneeboard_SelectByStateCode(0x59CD,4)), Expr_VM_OpcodeHelperA_53504
-; (opcode +0xA38). OUVERT : interpréteur COMP dans vtable [cam+0x50] slots [0x10]/[0x00],
-; overlay-swappés, non ouverts. Détail complet : DATA_MODEL.md §6.6b b-bis.
+; Object_SpawnDestructionEffects_3863A seg079 : delta entité[+0x12/+0x16/+0x1A] -
+; cam[+0x14/..] -> Math_VectorLength3D_5828E -> sar eax,8) ; +0x50 far vtable ([0]=tick
+; keyframe, [4]=stop préc, [0x10]=start/parse script, [0x14]=get state, 4=mode spécial) ;
+; +0x5C sous-objet ; +0x60 dword. Activation : Kneeboard_SelectByID(0x59CD,nom) depuis seg009
+; (état vol, 'TAKEOFF'), ovr233 UIScript_ParseAndEvaluate_7A054 ('AUTOPILT' +
+; Camera_DetachParent), Player_MainUpdate (Kneeboard_SelectByStateCode(0x59CD,4)),
+; Expr_VM_OpcodeHelperA_53504 (opcode +0xA38). OUVERT : interpréteur COMP dans vtable
+; [cam+0x50] slots [0x10]/[0x00], overlay-swappés, non ouverts. Détail complet : DATA_MODEL.md
+; §6.6b b-bis.
 ; ==============================================================================================
 Cinematic_LoadCameraDef	proc far		; CODE XREF: MissionLoader_LoadChunkA_A7C8E+9P
 

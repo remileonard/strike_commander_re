@@ -75,7 +75,7 @@ Timer_SetRelativeFrames_4F9BB	endp
 ; ==============================================================================================
 ; far, décrémente le minuteur selon son mode (dword_70458 = temps global si mode0, 0x100 = 1
 ; frame fixe si mode1, sinon force à 0), retourne si le minuteur est encore actif (valeur>0).
-; Utilisé par Trigger_TimedRangedSpawnOnce_4F351 (même sémantique de champ +0x55).
+; Utilisé par EjectSeat_TickReleaseObject_4F351 (même sémantique de champ +0x55).
 ; ==============================================================================================
 Timer_Tick_4F9E6	proc far		; CODE XREF: seg087:02A0P seg089:0762P ...
 
@@ -138,7 +138,7 @@ Timer_Tick_4F9E6	endp
 ; far, variante de Timer_SetAbsolute écrivant via un pointeur far (es:bx) au lieu de si
 ; direct.
 ; ==============================================================================================
-Timer_SetAbsoluteFarPtr_4FA31	proc far		; CODE XREF: AI_WeaponEngagementCycle_776FB+2D6P
+Timer_SetAbsoluteFarPtr_4FA31	proc far		; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+2D6P
 
 var_4		= dword	ptr -4
 arg_0		= dword	ptr  6
@@ -195,7 +195,7 @@ Timer_SetAbsoluteFarPtr_4FA31	endp
 ; ==============================================================================================
 ; far, variante far-pointeur (es:bx) de Timer_Tick.
 ; ==============================================================================================
-Timer_TickFarPtr_4FA80	proc far		; CODE XREF: AI_WeaponEngagementCycle_776FB+3BAP
+Timer_TickFarPtr_4FA80	proc far		; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+3BAP
 
 var_14		= dword	ptr -14h
 var_10		= dword	ptr -10h
@@ -270,7 +270,7 @@ Timer_TickFarPtr_4FA80	endp
 ; far, appelle Timer_SetAbsolute puis remet à zéro 4 octets de compteurs/flags de pulsation
 ; (+5..+8) de l'objet.
 ; ==============================================================================================
-Timer_SetAbsoluteAndResetPulses_4FAFC	proc far		; CODE XREF: PlayerComponent_InitPulseTimer_A0455+29P
+Timer_SetAbsoluteAndResetPulses_4FAFC	proc far		; CODE XREF: Missile_InitFlightTimer_A0455+29P
 					; PlayerComponent_RegisterAndInitPulses_A0B40+3CP
 
 arg_0		= word ptr  6

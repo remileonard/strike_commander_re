@@ -63,10 +63,10 @@ Stopwatch_Construct_675EF	endp
 
 ; ==============================================================================================
 ; ⭐ far, enregistre un module de comptage de tics (loc_676E7) dans le registre de modules à
-; créneaux temporisés (ModuleRegistry_RegisterModule_5FF08, seg161) avec une cadence de 60
-; tics (ModuleRegistry_ConfigureAndActivate_600DB), avec avertissement d'échec
-; (Runtime_FatalErrorHandler, tag 4121h). Référencée par sub_8F47A — confirme que le registre
-; de modules du seg161 est utilisé au-delà du seul séquenceur de contre-mesures.
+; créneaux temporisés (AIL_register_timer_5FF08, seg161) avec une cadence de 60 tics
+; (AIL_set_timer_frequency_600DB), avec avertissement d'échec (Runtime_FatalErrorHandler, tag
+; 4121h). Référencée par sub_8F47A — confirme que le registre de modules du seg161 est utilisé
+; au-delà du seul séquenceur de contre-mesures.
 ; ==============================================================================================
 Stopwatch_RegisterTickModule_67611	proc far		; CODE XREF: InputSystem_InitAll_8F47A+1AP
 
@@ -86,14 +86,14 @@ loc_67614:
 		jnz	short loc_6765F
 
 loc_67621:
-		call	ModuleRegistry_Helper_5FE61
+		call	AIL_startup_5FE61
 
 loc_67626:
 		push	seg seg207
 
 loc_67629:
 		push	offset Stopwatch_TickCallback_676E7
-		call	ModuleRegistry_RegisterModule_5FF08
+		call	AIL_register_timer_5FF08
 
 loc_67631:
 		add	sp, 4
@@ -104,14 +104,14 @@ loc_67636:
 		jz	short loc_67651
 		push	large 3Ch ; '<'
 		push	word ptr [si]
-		call	ModuleRegistry_ConfigureAndActivate_600DB
+		call	AIL_set_timer_frequency_600DB
 		add	sp, 6
 
 loc_67648:
 		push	word ptr [si]
 
 loc_6764A:
-		call	ModuleRegistry_Helper_60018
+		call	AIL_start_timer_60018
 		jmp	short loc_67659
 ; ���������������������������������������������������������������������������
 
@@ -139,8 +139,8 @@ Stopwatch_RegisterTickModule_67611	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, variante de Stopwatch_RegisterTickModule_67611 (ModuleRegistry_RegisterModule_5FF08,
-; ConfigureAndActivate_600DB, ModuleRegistry_Helper_60018).
+; far, variante de Stopwatch_RegisterTickModule_67611 (AIL_register_timer_5FF08,
+; ConfigureAndActivate_600DB, AIL_start_timer_60018).
 ; ==============================================================================================
 Stopwatch_RegisterTickModuleVariant_67662	proc far		; CODE XREF: TextRenderer_Main+97CP
 					; ConfigOption_ConstructFull_66762+38P ...
@@ -163,7 +163,7 @@ loc_67673:
 		push	large [bp+arg_2]
 
 loc_67677:
-		call	ModuleRegistry_RegisterModule_5FF08
+		call	AIL_register_timer_5FF08
 
 loc_6767C:
 		add	sp, 4
@@ -174,10 +174,10 @@ loc_6767F:
 		jz	short loc_6769A
 		push	large [bp+arg_6]
 		push	ax
-		call	ModuleRegistry_ConfigureAndActivate_600DB
+		call	AIL_set_timer_frequency_600DB
 		add	sp, 6
 		push	si
-		call	ModuleRegistry_Helper_60018
+		call	AIL_start_timer_60018
 		pop	cx
 
 loc_6769A:				; CODE XREF: Stopwatch_RegisterTickModuleVariant_67662+Fj
@@ -194,8 +194,8 @@ Stopwatch_RegisterTickModuleVariant_67662	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, désenregistre le module de tic (ModuleRegistry_UnregisterModule_5FFBD, seg161) si
-; actif. Référencée par sub_27F0E et le destructeur ConfigOption (seg201).
+; far, désenregistre le module de tic (AIL_release_timer_handle_5FFBD, seg161) si actif.
+; Référencée par sub_27F0E et le destructeur ConfigOption (seg201).
 ; ==============================================================================================
 Stopwatch_UnregisterTickModule_6769F	proc far		; CODE XREF: Dialog_Close+61P
 					; seg201:loc_667E0P ...
@@ -211,7 +211,7 @@ loc_676A2:
 		cmp	byte_711CC, 0
 		jz	short loc_676B5
 		push	[bp+arg_2]
-		call	ModuleRegistry_UnregisterModule_5FFBD
+		call	AIL_release_timer_handle_5FFBD
 		pop	cx
 
 loc_676B5:				; CODE XREF: Stopwatch_UnregisterTickModule_6769F+Bj
@@ -228,7 +228,7 @@ Stopwatch_UnregisterTickModule_6769F	endp
 		push	word ptr [bp+8]
 
 loc_676C7:
-		call	ModuleRegistry_Helper3_60052
+		call	AIL_stop_timer_60052
 		pop	cx
 
 loc_676CD:				; CODE XREF: seg207:00E2j
@@ -245,7 +245,7 @@ loc_676CF:
 		push	word ptr [bp+8]
 
 loc_676DF:
-		call	ModuleRegistry_Helper_60018
+		call	AIL_start_timer_60018
 
 loc_676E4:
 		pop	cx
@@ -279,8 +279,8 @@ locret_676F0:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 138 lignes, NON DÉTAILLÉE — combine ModuleRegistry_CleanupModuleSlot_5FE9F et
-; sub_338 — démarre ou arrête le chronomètre (enregistrement/désenregistrement complet).
+; ⚠️ far, 138 lignes, NON DÉTAILLÉE — combine AIL_shutdown_5FE9F et sub_338 — démarre ou
+; arrête le chronomètre (enregistrement/désenregistrement complet).
 ; ==============================================================================================
 Stopwatch_StartOrStop_676F1	proc far		; CODE XREF: seg207:loc_6782Dp
 
@@ -317,7 +317,7 @@ loc_6770D:				; CODE XREF: Stopwatch_StartOrStop_676F1+17j
 		push	offset aBye	; "bye!"
 
 loc_67711:
-		call	ModuleRegistry_CleanupModuleSlot_5FE9F
+		call	AIL_shutdown_5FE9F
 		add	sp, 4
 		mov	ah, 2
 		int	1Ah		; CLOCK	- READ REAL TIME CLOCK (AT,XT286,CONV,PS)

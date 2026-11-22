@@ -230,7 +230,7 @@ loc_37705:				; CODE XREF: Terrain_UpdateLODPerFrame+190j
 loc_3770A:				; CODE XREF: Terrain_UpdateLODPerFrame+195j
 		push	eax
 		push	541Ah
-		call	Texture_SelectMipLevel
+		call	Palette_SelectFogRow_2EA80
 		add	sp, 6
 		mov	word ptr [si+127h], 0
 		mov	word ptr [si+11Bh], 0
@@ -483,9 +483,13 @@ loc_378B1:				; CODE XREF: seg077:02F7j seg077:0326j
 ; far,162L — interpole la hauteur du terrain à une position donnée (sub_32901) après
 ; vérification du frustum (sub_32F55) : requête d'altitude du terrain à une position 3D —
 ; utilisée à la fois par le rendu et par l'IA de vol (seg003) pour le suivi de
-; terrain/évitement.
+; terrain/évitement. | LUE 2026-10-12 : h = Terrain_HeightSample (valeur .OBJ de la cellule,
+; plafond) ; pour chaque patch voisin (liste +0xB5, nombre +0xB3) visible, si h × 256 >
+; altitude de la position ([di+8]) ou si arg_A force : altitude précise sur le maillage
+; (Camera_TransformIfVisible). Sinon renvoie h × 256 : au-dessus du plafond .OBJ d'une
+; cellule, le jeu ne calcule pas le relief exact.
 ; ==============================================================================================
-Terrain_QueryAltitudeAt	proc far		; CODE XREF: AI_Sensor_InterceptFeasibleCached+93P seg003:0C6DP ...
+Terrain_QueryAltitudeAt	proc far		; CODE XREF: AI_Sensor_TooLow_56E5+93P seg003:0C6DP ...
 
 var_2A		= dword	ptr -2Ah
 var_26		= dword	ptr -26h
@@ -791,7 +795,7 @@ Terrain_TestAdjacentVisibility	endp
 ; far,13L — wrapper vers sub_3317E (vidage de liste, table 0x5510) : vidage de la liste
 ; d'objets sélectionnables (picking).
 ; ==============================================================================================
-Picking_ClearSelectableList	proc far		; CODE XREF: UIScript_ParseAndEvaluate_7A054+6BCP
+Picking_ClearSelectableList	proc far		; CODE XREF: Autopilot_JumpSequence_7A054+6BCP
 
 arg_0		= word ptr  6
 
@@ -996,7 +1000,7 @@ loc_37BC6:				; CODE XREF: seg077:0653j
 ; far,60L — parcourt les patches adjacents, appelle sub_32FBC (test de distance limite) pour
 ; chacun : vérification de la limite de distance sur les patches voisins de terrain.
 ; ==============================================================================================
-Terrain_CheckAdjacentDistance	proc far		; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+2A8P
+Terrain_CheckAdjacentDistance	proc far		; CODE XREF: Aircraft_OnCollision_9D910+2A8P
 					; PlayerComponent_ComputeImpactResponse_A089D+84P
 
 var_E		= dword	ptr -0Eh
@@ -1063,10 +1067,13 @@ Terrain_CheckAdjacentDistance	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,22L — wrapper vers sub_36AA4 (recherche d'objet sélectionnable) avec offset fixe
-; (+0x171) : wrapper de recherche de sélection pour un type d'objet spécifique.
+; far, 22L, LUE 2026-10-15. TerrainCells_MarkPlacedObjectGone_36AA4(terrain arg_0 + 0x171,
+; objet). Appelee par Collision_MainLoop pour chacun des deux objets d'une paire en collision
+; qui est retire de la liste du monde (WorldObjects_RemoveAndDelete_223C5 sur 59C3h) : un
+; objet pose du terrain detruit par collision est remplace, au rechargement de sa cellule, par
+; son 2e nom. Ex-'Terrain_MarkPlacedObjectGone_37C33'.
 ; ==============================================================================================
-Picking_FindSelectableTyped	proc far		; CODE XREF: Collision_MainLoop+243P
+Terrain_MarkPlacedObjectGone_37C33	proc far		; CODE XREF: Collision_MainLoop+243P
 					; Collision_MainLoop+266P
 
 arg_0		= word ptr  6
@@ -1083,10 +1090,10 @@ loc_37C3E:
 
 loc_37C41:
 		push	ax
-		call	Picking_FindSelectableObject
+		call	TerrainCells_MarkPlacedObjectGone_36AA4
 		add	sp, 4
 		pop	bp
 		retf
-Picking_FindSelectableTyped	endp
+Terrain_MarkPlacedObjectGone_37C33	endp
 
 seg077		ends

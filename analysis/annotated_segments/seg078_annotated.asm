@@ -43,7 +43,9 @@ Debris_BodyReset	endp
 ; ==============================================================================================
 ; far,52L — appelle sub_37C4C (reset), enregistre une référence de sous-composant (+0xE),
 ; copie sa position d'origine (+0x20) : initialisation d'un corps physique de débris attaché à
-; un sous-composant de modèle (probable pièce détachée après dommage).
+; un sous-composant de modèle (probable pièce détachée après dommage). | PRÉCISÉ 2026-10-12 :
+; instance +0x20 = rayon de l'objet (EXTE, modèle (+8)+0x10) ; +4 bit 1 = EXTE octet (+0x16) ≠
+; 0 (collisions actives) ; +0x28 = SIGN octet 1 ; +0x29 = SIGN octet 3.
 ; ==============================================================================================
 Debris_BodyAttachToSubpart	proc far		; CODE XREF: seg079:004DP
 					; WorldObject_BaseConstructAttached+5DP ...
@@ -174,12 +176,12 @@ locret_37D53:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,44L — accumule 3 vecteurs de force (+0x12/0x16/0x1A), applique un couple additionnel si
-; sous-composant présent (sub_37E4A), notifie l'objet (vtable[8]) : intégration des forces
-; appliquées sur un débris (physique de corps rigide détaché).
+; far, 44L, LUE (2026-09-25). Ex-'Debris_BodyIntegrateForces' (FAUX : pas des forces). (objet,
+; &dx, &dy, &dz) : position objet+0x12/+0x16/+0x1A += (dx, dy, dz) ; puis Debris_ComputeTorque
+; si +0x24 et notification (vtable+8).
 ; ==============================================================================================
-Debris_BodyIntegrateForces	proc far		; CODE XREF: seg085:02D2P
-					; Camera_ComputeMountedPosition_3D31D+B6P ...
+WorldObject_TranslateBy_37D54	proc far		; CODE XREF: seg085:02D2P
+					; WorldObject_IntegrateBodyMotion_3D31D+B6P ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -212,7 +214,7 @@ loc_37D73:
 		call	near ptr Debris_ComputeTorque
 		pop	cx
 
-loc_37D89:				; CODE XREF: Debris_BodyIntegrateForces+2Aj
+loc_37D89:				; CODE XREF: WorldObject_TranslateBy_37D54+2Aj
 		push	si
 		mov	bx, [si]
 		call	dword ptr [bx+8]
@@ -221,7 +223,7 @@ loc_37D89:				; CODE XREF: Debris_BodyIntegrateForces+2Aj
 		pop	si
 		pop	bp
 		retf
-Debris_BodyIntegrateForces	endp
+WorldObject_TranslateBy_37D54	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -363,7 +365,7 @@ loc_37E48:
 ; (sub_22CC6, produit vectoriel position×force) : calcul de couple (moment de force) pour la
 ; rotation d'un débris.
 ; ==============================================================================================
-Debris_ComputeTorque	proc far		; CODE XREF: Debris_BodyIntegrateForces+31p
+Debris_ComputeTorque	proc far		; CODE XREF: WorldObject_TranslateBy_37D54+31p
 					; Debris_ComputeTorque+55p ...
 
 var_C		= dword	ptr -0Ch
@@ -481,7 +483,7 @@ Debris_ComputeNetForce	endp
 ; buffer de couple ; sinon retourne le buffer de force local : résolution du buffer de
 ; force/couple actif d'un débris (avec ou sans parent).
 ; ==============================================================================================
-Debris_ResolveForceBuffer	proc far		; CODE XREF: Damage_SimulationTick+A3P
+Debris_ResolveForceBuffer	proc far		; CODE XREF: PolyInstance_Render_2BF6C+A3P
 					; Debris_TransferForceToParent+59p ...
 
 arg_0		= word ptr  6
@@ -564,7 +566,7 @@ loc_37F61:
 
 loc_37F64:
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		push	word ptr [si+24h]
 		push	cs
@@ -1098,11 +1100,12 @@ Debris_GetStateFlag	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,148L — compare deux objets par vtable[0], combine leurs positions transformées
-; (vtable[0x4C]) : fusion/combinaison de deux corps physiques (probable calcul de collision
-; entre débris).
+; far, LUE 2026-10-12. Ex-'Debris_CombinePhysicsBodies' (FAUX). Méthode +0x84 générique des
+; objets du monde : POINTS DE DÉGÂTS INFLIGÉS PAR CHOC à un autre objet. v = |vitesse(this) +
+; vitesse(autre)| (méthodes +0x4C) ; k = min(v² / 200, 10) ; renvoie k × DAMG du modèle
+; (modèle +6, chunk DAMG). Voir DamageSys_ApplyHit_9C9A0.
 ; ==============================================================================================
-Debris_CombinePhysicsBodies	proc far		; CODE XREF: seg090:013BP
+WorldObject_CollisionDamage_38210	proc far		; CODE XREF: seg090:013BP
 					; DATA XREF: seg339:1B60o ...
 
 var_4C		= dword	ptr -4Ch
@@ -1151,7 +1154,7 @@ arg_2		= word ptr  8
 		mov	ax, es:[bx+6]
 		mov	[bp+var_2], ax
 
-loc_3823E:				; CODE XREF: Debris_CombinePhysicsBodies+16j
+loc_3823E:				; CODE XREF: WorldObject_CollisionDamage_38210+16j
 		push	si
 		push	ss
 		lea	ax, [bp+var_40]
@@ -1216,20 +1219,20 @@ loc_38257:
 		jmp	short loc_382FB
 ; ���������������������������������������������������������������������������
 
-loc_382F9:				; CODE XREF: Debris_CombinePhysicsBodies+E2j
+loc_382F9:				; CODE XREF: WorldObject_CollisionDamage_38210+E2j
 		xor	ax, ax
 
-loc_382FB:				; CODE XREF: Debris_CombinePhysicsBodies+E7j
+loc_382FB:				; CODE XREF: WorldObject_CollisionDamage_38210+E7j
 		or	al, al
 		jz	short loc_38304
 		lea	ax, [bp+var_16]
 		jmp	short loc_38307
 ; ���������������������������������������������������������������������������
 
-loc_38304:				; CODE XREF: Debris_CombinePhysicsBodies+EDj
+loc_38304:				; CODE XREF: WorldObject_CollisionDamage_38210+EDj
 		lea	ax, [bp+var_1E]
 
-loc_38307:				; CODE XREF: Debris_CombinePhysicsBodies+F2j
+loc_38307:				; CODE XREF: WorldObject_CollisionDamage_38210+F2j
 		mov	si, ax
 		mov	eax, [si]
 		mov	[bp+var_22], eax
@@ -1249,7 +1252,7 @@ loc_38307:				; CODE XREF: Debris_CombinePhysicsBodies+F2j
 		pop	si
 		leave
 		retf
-Debris_CombinePhysicsBodies	endp
+WorldObject_CollisionDamage_38210	endp
 
 ; ���������������������������������������������������������������������������
 

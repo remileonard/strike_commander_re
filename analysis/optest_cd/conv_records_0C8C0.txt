@@ -1,0 +1,341 @@
+0C8C0  inc di
+0C8C1  add al, 0xf6
+0C8C3  ljmp 0x35ef:0x846
+0C8C8  push bp
+0C8C9  mov bp, sp
+0C8CB  push si
+0C8CC  push di
+0C8CD  mov dx, word ptr [bp + 6]
+0C8D0  mov di, word ptr [bp + 8]
+0C8D3  xor cx, cx
+0C8D5  jmp 0xc8e8
+0C8D7  les bx, ptr [di + 4]
+0C8DA  inc word ptr [di + 4]
+0C8DD  mov al, byte ptr es:[bx]
+0C8E0  mov bx, dx
+0C8E2  add bx, cx
+0C8E4  mov byte ptr [bx + 3], al
+0C8E7  inc cx
+0C8E8  cmp cx, 9
+0C8EB  jl 0xc8d7
+0C8ED  pop di
+0C8EE  pop si
+0C8EF  pop bp
+0C8F0  retf 
+0C8F1  push bp
+0C8F2  mov bp, sp
+0C8F4  sub sp, 8
+0C8F7  push si
+0C8F8  push di
+0C8F9  mov di, word ptr [bp + 6]
+0C8FC  mov al, byte ptr [di + 0x1f]
+0C8FF  mov ah, 0
+0C901  or ax, ax
+0C903  je 0xc908
+0C905  jmp 0xc9ad
+0C908  xor cx, cx
+0C90A  jmp 0xc91e
+0C90C  mov bx, word ptr [bp + 8]
+0C90F  les si, ptr [bx + 4]
+0C912  inc word ptr [bx + 4]
+0C915  mov al, byte ptr es:[si]
+0C918  mov bx, cx
+0C91A  mov byte ptr [bx + di + 3], al
+0C91D  inc cx
+0C91E  cmp cx, 9
+0C921  jl 0xc90c
+0C923  mov bx, word ptr [bp + 8]
+0C926  les si, ptr [bx + 4]
+0C929  inc word ptr [bx + 4]
+0C92C  mov al, byte ptr es:[si]
+0C92F  mov byte ptr [di + 0xc], al
+0C932  xor cx, cx
+0C934  jmp 0xc948
+0C936  mov bx, word ptr [bp + 8]
+0C939  les si, ptr [bx + 4]
+0C93C  inc word ptr [bx + 4]
+0C93F  mov al, byte ptr es:[si]
+0C942  mov bx, cx
+0C944  mov byte ptr [bx + di + 0xd], al
+0C947  inc cx
+0C948  cmp cx, 9
+0C94B  jl 0xc936
+0C94D  mov bx, word ptr [bp + 8]
+0C950  les si, ptr [bx + 4]
+0C953  inc word ptr [bx + 4]
+0C956  mov al, byte ptr es:[si]
+0C959  mov byte ptr [bp - 7], al
+0C95C  mov bx, word ptr [bp + 8]
+0C95F  les si, ptr [bx + 4]
+0C962  inc word ptr [bx + 4]
+0C965  mov al, byte ptr es:[si]
+0C968  mov byte ptr [bp - 8], al
+0C96B  mov al, byte ptr [bp - 7]
+0C96E  mov ah, 0
+0C970  mov dl, byte ptr [bp - 8]
+0C973  mov dh, 0
+0C975  shl dx, 8
+0C978  add ax, dx
+0C97A  mov word ptr [di + 0x16], ax
+0C97D  mov bx, word ptr [bp + 8]
+0C980  les si, ptr [bx + 4]
+0C983  inc word ptr [bx + 4]
+0C986  mov al, byte ptr es:[si]
+0C989  mov byte ptr [bp - 7], al
+0C98C  mov bx, word ptr [bp + 8]
+0C98F  les si, ptr [bx + 4]
+0C992  inc word ptr [bx + 4]
+0C995  mov al, byte ptr es:[si]
+0C998  mov byte ptr [bp - 8], al
+0C99B  mov al, byte ptr [bp - 7]
+0C99E  mov ah, 0
+0C9A0  mov dl, byte ptr [bp - 8]
+0C9A3  mov dh, 0
+0C9A5  shl dx, 8
+0C9A8  add ax, dx
+0C9AA  mov word ptr [di + 0x18], ax
+0C9AD  mov bx, word ptr [bp + 8]
+0C9B0  push word ptr [bx + 6]
+0C9B3  push word ptr [bx + 4]
+0C9B6  lcall 0, 0x3912  ; -> 03912
+0C9BB  add sp, 4
+0C9BE  inc ax
+0C9BF  mov word ptr [bp - 2], ax
+0C9C2  push word ptr [di + 0x1c]
+0C9C5  lcall 0x3539, 0x240  ; -> 355D0
+0C9CA  add sp, 2
+0C9CD  push word ptr [bp - 2]
+0C9D0  lcall 0x3539, 0x127  ; -> 354B7
+0C9D5  add sp, 2
+0C9D8  mov word ptr [di + 0x1c], ax
+0C9DB  mov ax, word ptr [di + 0x1c]
+0C9DE  mov word ptr [bp - 6], ax
+0C9E1  mov word ptr [bp - 4], 0
+0C9E6  jmp 0xc9ff
+0C9E8  mov bx, word ptr [bp + 8]
+0C9EB  les si, ptr [bx + 4]
+0C9EE  inc word ptr [bx + 4]
+0C9F1  mov al, byte ptr es:[si]
+0C9F4  mov bx, word ptr [bp - 6]
+0C9F7  mov byte ptr [bx], al
+0C9F9  inc word ptr [bp - 6]
+0C9FC  inc word ptr [bp - 4]
+0C9FF  mov ax, word ptr [bp - 4]
+0CA02  cmp ax, word ptr [bp - 2]
+0CA05  jl 0xc9e8
+0CA07  mov bx, word ptr [bp + 8]
+0CA0A  push word ptr [bx + 6]
+0CA0D  push word ptr [bx + 4]
+0CA10  lcall 0, 0x3912  ; -> 03912
+0CA15  add sp, 4
+0CA18  inc ax
+0CA19  mov word ptr [bp - 2], ax
+0CA1C  push word ptr [di + 0x1a]
+0CA1F  lcall 0x3539, 0x240  ; -> 355D0
+0CA24  add sp, 2
+0CA27  push word ptr [bp - 2]
+0CA2A  lcall 0x3539, 0x127  ; -> 354B7
+0CA2F  add sp, 2
+0CA32  mov word ptr [di + 0x1a], ax
+0CA35  mov ax, word ptr [di + 0x1a]
+0CA38  mov word ptr [bp - 6], ax
+0CA3B  mov word ptr [bp - 4], 0
+0CA40  jmp 0xca59
+0CA42  mov bx, word ptr [bp + 8]
+0CA45  les si, ptr [bx + 4]
+0CA48  inc word ptr [bx + 4]
+0CA4B  mov al, byte ptr es:[si]
+0CA4E  mov bx, word ptr [bp - 6]
+0CA51  mov byte ptr [bx], al
+0CA53  inc word ptr [bp - 6]
+0CA56  inc word ptr [bp - 4]
+0CA59  mov ax, word ptr [bp - 4]
+0CA5C  cmp ax, word ptr [bp - 2]
+0CA5F  jl 0xca42
+0CA61  mov al, byte ptr [di + 0x1f]
+0CA64  mov ah, 0
+0CA66  or ax, ax
+0CA68  jne 0xca79
+0CA6A  mov bx, word ptr [bp + 8]
+0CA6D  les si, ptr [bx + 4]
+0CA70  inc word ptr [bx + 4]
+0CA73  mov al, byte ptr es:[si]
+0CA76  mov byte ptr [di + 0x1e], al
+0CA79  mov byte ptr [di + 0x1f], 1
+0CA7D  pop di
+0CA7E  pop si
+0CA7F  leave 
+0CA80  retf 
+0CA81  push bp
+0CA82  mov bp, sp
+0CA84  sub sp, 2
+0CA87  push si
+0CA88  push di
+0CA89  mov di, word ptr [bp + 6]
+0CA8C  xor cx, cx
+0CA8E  jmp 0xcaa2
+0CA90  mov bx, word ptr [bp + 8]
+0CA93  les si, ptr [bx + 4]
+0CA96  inc word ptr [bx + 4]
+0CA99  mov al, byte ptr es:[si]
+0CA9C  mov bx, cx
+0CA9E  mov byte ptr [bx + di + 3], al
+0CAA1  inc cx
+0CAA2  cmp cx, 9
+0CAA5  jl 0xca90
+0CAA7  mov bx, word ptr [bp + 8]
+0CAAA  les si, ptr [bx + 4]
+0CAAD  inc word ptr [bx + 4]
+0CAB0  mov al, byte ptr es:[si]
+0CAB3  mov byte ptr [bp - 1], al
+0CAB6  mov bx, word ptr [bp + 8]
+0CAB9  les si, ptr [bx + 4]
+0CABC  inc word ptr [bx + 4]
+0CABF  mov al, byte ptr es:[si]
+0CAC2  mov byte ptr [bp - 2], al
+0CAC5  mov al, byte ptr [bp - 1]
+0CAC8  mov ah, 0
+0CACA  mov dl, byte ptr [bp - 2]
+0CACD  mov dh, 0
+0CACF  shl dx, 8
+0CAD2  add ax, dx
+0CAD4  mov word ptr [di + 0xc], ax
+0CAD7  mov bx, word ptr [bp + 8]
+0CADA  les si, ptr [bx + 4]
+0CADD  inc word ptr [bx + 4]
+0CAE0  mov al, byte ptr es:[si]
+0CAE3  mov byte ptr [bp - 1], al
+0CAE6  mov bx, word ptr [bp + 8]
+0CAE9  les si, ptr [bx + 4]
+0CAEC  inc word ptr [bx + 4]
+0CAEF  mov al, byte ptr es:[si]
+0CAF2  mov byte ptr [bp - 2], al
+0CAF5  mov al, byte ptr [bp - 1]
+0CAF8  mov ah, 0
+0CAFA  mov dl, byte ptr [bp - 2]
+0CAFD  mov dh, 0
+0CAFF  shl dx, 8
+0CB02  add ax, dx
+0CB04  mov word ptr [di + 0xe], ax
+0CB07  pop di
+0CB08  pop si
+0CB09  leave 
+0CB0A  retf 
+0CB0B  push bp
+0CB0C  mov bp, sp
+0CB0E  sub sp, 8
+0CB11  push si
+0CB12  push di
+0CB13  mov di, word ptr [bp + 6]
+0CB16  mov word ptr [bp - 6], 0
+0CB1B  jmp 0xcb32
+0CB1D  mov bx, word ptr [bp + 8]
+0CB20  les si, ptr [bx + 4]
+0CB23  inc word ptr [bx + 4]
+0CB26  mov al, byte ptr es:[si]
+0CB29  mov bx, word ptr [bp - 6]
+0CB2C  mov byte ptr [bx + di + 3], al
+0CB2F  inc word ptr [bp - 6]
+0CB32  cmp word ptr [bp - 6], 9
+0CB36  jl 0xcb1d
+0CB38  mov bx, word ptr [bp + 8]
+0CB3B  les si, ptr [bx + 4]
+0CB3E  inc word ptr [bx + 4]
+0CB41  mov al, byte ptr es:[si]
+0CB44  mov byte ptr [bp - 7], al
+0CB47  mov bx, word ptr [bp + 8]
+0CB4A  les si, ptr [bx + 4]
+0CB4D  inc word ptr [bx + 4]
+0CB50  mov al, byte ptr es:[si]
+0CB53  mov byte ptr [bp - 8], al
+0CB56  mov al, byte ptr [bp - 7]
+0CB59  mov ah, 0
+0CB5B  mov dl, byte ptr [bp - 8]
+0CB5E  mov dh, 0
+0CB60  shl dx, 8
+0CB63  add ax, dx
+0CB65  mov word ptr [di + 0xc], ax
+0CB68  mov bx, word ptr [bp + 8]
+0CB6B  les si, ptr [bx + 4]
+0CB6E  inc word ptr [bx + 4]
+0CB71  mov al, byte ptr es:[si]
+0CB74  mov byte ptr [bp - 7], al
+0CB77  mov bx, word ptr [bp + 8]
+0CB7A  les si, ptr [bx + 4]
+0CB7D  inc word ptr [bx + 4]
+0CB80  mov al, byte ptr es:[si]
+0CB83  mov byte ptr [bp - 8], al
+0CB86  mov al, byte ptr [bp - 7]
+0CB89  mov ah, 0
+0CB8B  mov dl, byte ptr [bp - 8]
+0CB8E  mov dh, 0
+0CB90  shl dx, 8
+0CB93  add ax, dx
+0CB95  mov word ptr [di + 0xe], ax
+0CB98  mov bx, word ptr [bp + 8]
+0CB9B  les si, ptr [bx + 4]
+0CB9E  inc word ptr [bx + 4]
+0CBA1  mov al, byte ptr es:[si]
+0CBA4  mov byte ptr [di + 0x10], al
+0CBA7  mov bx, word ptr [bp + 8]
+0CBAA  push word ptr [bx + 6]
+0CBAD  push word ptr [bx + 4]
+0CBB0  lcall 0, 0x3912  ; -> 03912
+0CBB5  add sp, 4
+0CBB8  inc ax
+0CBB9  mov word ptr [bp - 2], ax
+0CBBC  push word ptr [di + 0x11]
+0CBBF  lcall 0x3539, 0x240  ; -> 355D0
+0CBC4  add sp, 2
+0CBC7  push word ptr [bp - 2]
+0CBCA  lcall 0x3539, 0x127  ; -> 354B7
+0CBCF  add sp, 2
+0CBD2  mov word ptr [di + 0x11], ax
+0CBD5  mov ax, word ptr [di + 0x11]
+0CBD8  mov word ptr [bp - 4], ax
+0CBDB  mov word ptr [bp - 6], 0
+0CBE0  jmp 0xcbf9
+0CBE2  mov bx, word ptr [bp + 8]
+0CBE5  les si, ptr [bx + 4]
+0CBE8  inc word ptr [bx + 4]
+0CBEB  mov al, byte ptr es:[si]
+0CBEE  mov bx, word ptr [bp - 4]
+0CBF1  mov byte ptr [bx], al
+0CBF3  inc word ptr [bp - 4]
+0CBF6  inc word ptr [bp - 6]
+0CBF9  mov ax, word ptr [bp - 6]
+0CBFC  cmp ax, word ptr [bp - 2]
+0CBFF  jl 0xcbe2
+0CC01  mov bx, word ptr [bp + 8]
+0CC04  push word ptr [bx + 6]
+0CC07  push word ptr [bx + 4]
+0CC0A  lcall 0, 0x3912  ; -> 03912
+0CC0F  add sp, 4
+0CC12  inc ax
+0CC13  mov word ptr [bp - 2], ax
+0CC16  push word ptr [di + 0x13]
+0CC19  lcall 0x3539, 0x240  ; -> 355D0
+0CC1E  add sp, 2
+0CC21  push word ptr [bp - 2]
+0CC24  lcall 0x3539, 0x127  ; -> 354B7
+0CC29  add sp, 2
+0CC2C  mov word ptr [di + 0x13], ax
+0CC2F  mov ax, word ptr [di + 0x13]
+0CC32  mov word ptr [bp - 4], ax
+0CC35  mov word ptr [bp - 6], 0
+0CC3A  jmp 0xcc53
+0CC3C  mov bx, word ptr [bp + 8]
+0CC3F  les si, ptr [bx + 4]
+0CC42  inc word ptr [bx + 4]
+0CC45  mov al, byte ptr es:[si]
+0CC48  mov bx, word ptr [bp - 4]
+0CC4B  mov byte ptr [bx], al
+0CC4D  inc word ptr [bp - 4]
+0CC50  inc word ptr [bp - 6]
+0CC53  mov ax, word ptr [bp - 6]
+0CC56  cmp ax, word ptr [bp - 2]
+0CC59  jl 0xcc3c
+0CC5B  pop di
+0CC5C  pop si
+0CC5D  leave 
+0CC5E  retf 

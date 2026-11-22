@@ -45,7 +45,7 @@ VROOMM_StubThunk_6CD35	endp
 ; far, thunk fixe VROOMM (jmp sub_A7060) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=35AA0h, codesize=565h, nentries=15.
 ; ==============================================================================================
-VROOMM_StubThunk_6CD3A	proc far		; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+E7P
+VROOMM_StubThunk_6CD3A	proc far		; CODE XREF: Poly_LoadTXMS_95E20+E7P
 		jmp	TextCycler_ReleaseEntry_A7060
 VROOMM_StubThunk_6CD3A	endp
 
@@ -111,7 +111,7 @@ VROOMM_StubThunk_6CD4E	endp
 ; far, thunk fixe VROOMM (jmp sub_A7245) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=35AA0h, codesize=565h, nentries=15.
 ; ==============================================================================================
-VROOMM_StubThunk_6CD53	proc far		; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+165P
+VROOMM_StubThunk_6CD53	proc far		; CODE XREF: Poly_LoadTXMS_95E20+165P
 		jmp	TextCycler_AdvanceRandomA_A7245
 VROOMM_StubThunk_6CD53	endp
 
@@ -150,8 +150,8 @@ VROOMM_StubThunk_6CD5D	endp
 ; far, thunk fixe VROOMM (jmp sub_A7408) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=35AA0h, codesize=565h, nentries=15.
 ; ==============================================================================================
-VROOMM_StubThunk_6CD62	proc far		; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+66P
-					; AircraftComponent_LoadSubrecord_95FD0:loc_960B9P	...
+VROOMM_StubThunk_6CD62	proc far		; CODE XREF: Poly_LoadTXMS_95E20+66P
+					; Poly_LoadTRIS_95FD0:loc_960B9P	...
 		jmp	TextCycler_Helper_A7408
 VROOMM_StubThunk_6CD62	endp
 

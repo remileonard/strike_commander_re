@@ -142,7 +142,7 @@ GaugeWidgetVariantD_ConstructAndInit_A4270	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 155 lignes, NON DÉTAILLÉE — combine le verrou d'ownership (seg442),
-; Memory_TypedAllocDispatchB_5C832, Render_MeasureOrDrawTextString_61F52 (seg174),
+; Memory_TypedAllocDispatchB_5C832, Shape_DrawSpans_61F52 (seg174),
 ; TextFormat_ApplyStyleAttribute_5E2D0 (×3), TextFormat_ReleaseStyleList_5E526 — dessin du
 ; widget avec étiquette de texte.
 ; ==============================================================================================
@@ -203,7 +203,7 @@ loc_A43C0:				; CODE XREF: GaugeWidget_DrawWithLabel_A4388+33j
 		add	ax, [di]
 		push	ax
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		cmp	word ptr [di+0Ch], 0
 		jnz	short loc_A43F9

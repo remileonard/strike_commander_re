@@ -19,7 +19,7 @@ stru_6CAE0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:off_6A916o
 ; d'overlay actuellement charge en memoire. fileoff=33380h, codesize=0B0Ch, nentries=28.
 ; ==============================================================================================
 VROOMM_StubThunk_6CB00	proc far		; CODE XREF: PlayerComponent_ConstructAndLoadMassive_A5EB4+28P
-					; TriggerObject_ConstructSubobjects_A700F+1DP
+					; DynPara_Construct_A700F+1DP
 		jmp	PlayerComponent_ResetFieldsB_A4B98
 VROOMM_StubThunk_6CB00	endp
 
@@ -141,7 +141,7 @@ VROOMM_StubThunk_6CB28	endp
 ; d'overlay actuellement charge en memoire. fileoff=33380h, codesize=0B0Ch, nentries=28.
 ; ==============================================================================================
 VROOMM_StubThunk_6CB2D	proc far		; CODE XREF: JDYN_LoadChunkAndConstruct_3A49C+3A4P
-		jmp	PlayerComponentVariantY_ConstructAndInit_A4F40
+		jmp	DynAgrv_Construct_A4F40
 VROOMM_StubThunk_6CB2D	endp
 
 
@@ -293,7 +293,7 @@ VROOMM_StubThunk_6CB5F	endp
 ; d'overlay actuellement charge en memoire. fileoff=33380h, codesize=0B0Ch, nentries=28.
 ; ==============================================================================================
 VROOMM_StubThunk_6CB64	proc far		; CODE XREF: PlayerComponent_ConstructAndLoadMassive_A5EB4:loc_A5EF2P
-					; TriggerObject_ConstructSubobjects_A700F+38P
+					; DynPara_Construct_A700F+38P
 		jmp	AircraftDynamics_ReadStblChunk_A52B8
 VROOMM_StubThunk_6CB64	endp
 

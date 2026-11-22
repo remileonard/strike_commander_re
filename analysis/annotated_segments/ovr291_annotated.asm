@@ -21,7 +21,7 @@ ovr291		segment	para public 'OVERLAY' use16
 ; 0x0E<=v<=0x11 -> double-face), 6 octets UV @+0xA (copies via sub_3FD cx=6). Record de sortie
 ; : stride 0x1E (30) octets. Cf. analysis/DATA_MODEL.md §6.8bis. NB : l'ancienne annotation
 ; 'IndexedRecordReader_ScanAndReadTyped' etait trompeuse. || Coords sommet = int32 FIXED-POINT
-; 24.8 (valeur/256 = pieds monde, meme systeme que SCNE/JDYN/HOME) ; poly+0x08 = 'color'. ||
+; 24.8 (valeur/256 = mètres monde, meme systeme que SCNE/JDYN/HOME) ; poly+0x08 = 'color'. ||
 ; TABLE param3 + GRILLE (queue, loc_99519..loc_9961A) : APRES les polygones viennent [param3 x
 ; u16] = table de listes, rangee telle quelle en [di+1Ch] et CONSERVEE ; puis [param2^2 x u16]
 ; = grille, lue dans un buffer TEMPORAIRE. Chaque case de la grille = index (en mots) dans la
@@ -38,7 +38,11 @@ ovr291		segment	para public 'OVERLAY' use16
 ; (StreamReader_SeekVariant) : chaque entree .TRI se parse independamment, ne pas lire ces 2
 ; tables ne decale rien. Format TRIANGLES SEUL cote Strike Commander (record poly fixe 16 o, 3
 ; indices, avance 0x10 sans condition) ; le mix triangle/quad existe dans Pacific Strike
-; (RealSpace modifie), pas ici.
+; (RealSpace modifie), pas ici. | PRÉCISÉ 2026-10-12 : octet +0xC du sommet (« pad ») → sommet
+; +0x1D = ÉCLAIRAGE du sommet (Render_ObjectPipelineMain : octet haut de l'intensité [di+0Ch])
+; ; octet +0 du triangle (« flag0 ») → triangle +0x1C = GROUPE DE DÉTAIL
+; (TriOverlay_RenderRegion_31BFF) ; triangle +0x1D = double face (couleur 14..17 ou matériau
+; absent).
 ; ==============================================================================================
 TRI_ParseOverlayGeometry_99120	proc far		; CODE XREF: VROOMM_StubThunk_6BD30J
 

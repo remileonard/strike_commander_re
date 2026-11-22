@@ -26,8 +26,8 @@ flowchart TD
     G -->|sélecteur 2| H[Goal_ExecuteAction]
     G -->|sélecteur 3| I[Goal_WanderRandom]
     G -->|sélecteur 4| J[AI_BehaviorStateMachine<br/>sélection pondérée MVRS]
-    G -->|sélecteur 5| K[Goal_ActiveWingmanEngagement<br/>escorte active du joueur]
-    H --> L[Commandes bas niveau<br/>AI_TurnToBearingCmd, etc.]
+    G -->|sélecteur 5| K[Goal_MoraleReaction_878F<br/>escorte active du joueur]
+    H --> L[Commandes bas niveau<br/>AI_PitchToAngleCmd_7E18, etc.]
     J --> L
     K --> L
     I --> L
@@ -106,6 +106,14 @@ sans exception**, à celles publiées dans le manuel du jeu pour
 cet ordre exact, sans réarrangement, ce qui correspond à la lecture
 directe confirmée dans `libRealSpace` (`ReadByte()` × 9, dans cet
 ordre précis).
+
+> ⚠️ **Corrigé le 2026-09-25 : ordre en mémoire ≠ ordre du fichier.** Le fichier est bien lu dans
+> cet ordre, mais `PilotProfile_LoadATRB_12E47` range les octets à profil `+0x97, +0x99, +0x98,
+> +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F`, et le profil vit à `entité+0x1A`. Sur l'entité :
+> `+0xB0` = **FL**, `+0xB1` = TH, `+0xB2` = VB, `+0xB3` = **CN**, `+0xB4` = **LY**, `+0xB5` = AG,
+> `+0xB6` = AA, `+0xB7` = SM, `+0xB8` = AR. Le tableau du §6ter (lecture séquentielle supposée) est
+> faux pour `+0xB0`, `+0xB1`, `+0xB3`, `+0xB4`. Détail et consommateurs :
+> `IMPL_SCAIBRAIN_CORRECTIONS.md` §0bis.
 
 **Le 10ᵉ octet** (valeur `1` chez Billy) **n'a pas de nom dans cet
 extrait du manuel** — soit une statistique non documentée dans la
@@ -239,6 +247,13 @@ l'un de ces 8 identifiants, sa valeur **ne crée pas** une nouvelle
 entrée de tournoi — elle est interceptée par une chaîne de cas
 spéciaux et stockée comme **biais de configuration** dans un champ
 dédié sur le nœud déjà construit :
+
+> **Précision 2026-09-25** : ce « champ de biais » est en réalité **l'octet de poids de l'entrée du
+> nœud dans la table du tournoi** (entrées 0 à 7, 5 octets à partir de `entité+0x202`). Les 8 nœuds
+> fixes concourent donc toujours au tournoi, avec un poids 0 si le fichier ne les cite pas, et les
+> fichiers d'exemple les citent bien (Billy/Stern/Hammer listent 1 à 13, dont 4 et 7). Voir
+> `AI_TICK_CALL_GRAPH.md`, « `GOAL` et tournoi `MVRS` ».
+
 
 | ID (déc) | Tag du nœud | Champ de biais (si présent dans le fichier) |
 |---|---|---|
@@ -446,7 +461,7 @@ int AI_BehaviorStateMachine(Entity* entity) {
 **CORRIGÉ (2026-09-19)** : ce pseudocode ne montre que la boucle de score.
 La fonction commence par des réactions prioritaires, exige une **cible**
 (`entité+0x287`) ou applique directement le nœud `entité+0xD9`, puis appelle
-`AI_BehaviorSelector_8D30` (tir et guidage vers la cible) avant de scorer. Le
+`AI_BehaviorSelector` (tir et guidage vers la cible) avant de scorer. Le
 score n'a lieu que si cette fonction renvoie 0 **et** que `entité+0x0D` est
 nul. Dans la boucle, le bruit est **±1** (`test ax, 1`, jamais 0), le plancher
 de départ est **−1000**, et le score renvoyé par `[vtable+4]` est un octet. Le
@@ -474,8 +489,8 @@ pendant le balayage de nouvelle cible :
 ```mermaid
 sequenceDiagram
     participant Tick as AI_TopLevelThink
-    participant Scan as AI_ScanForNewTarget
-    participant Vis as AI_VisibilityTest
+    participant Scan as AI_ScanCollisionThreats_DF99
+    participant Vis as AI_CollisionCourseTest_DD21
     participant Prox as Entity_ProximityTest_ThreatGate
     participant Node as Nœud MVRS ID=20
 
@@ -495,7 +510,7 @@ sequenceDiagram
     end
 ```
 
-Cette même infrastructure (`AI_VisibilityTest`) est également invoquée
+Cette même infrastructure (`AI_CollisionCourseTest_DD21`) est également invoquée
 depuis du code d'évaluation de menace dans `seg008`, suggérant qu'elle
 est **partagée** entre le balayage de cible de l'IA et la réaction aux
 menaces entrantes (missiles).
@@ -528,14 +543,14 @@ total** — confirmant qu'un overlay VROOMM correspond ici précisément à
 | Fonction | Rôle |
 |---|---|
 | `PilotProfile_NamedPropertyNode_Construct_755A0` | Constructeur (déjà documenté, §3.3) |
-| `NotifiableRef_AttachTarget_75612` | Copie des champs, appelle `[vtable+0x1C]` de la cible **si une condition est vraie** (argument `1`) |
+| `Behavior_PopFinished_75612` | Copie des champs, appelle `[vtable+0x1C]` de la cible **si une condition est vraie** (argument `1`) |
 | `NotifiableRef_DetachTarget_75661` | Variante inconditionnelle de la précédente (argument `0`), remet les champs à zéro |
-| `NotifiableRef_SwapTarget_756A4` | Opération d'échange (lit puis écrit un champ de la cible) |
+| `Behavior_PushRunning_756A4` | Opération d'échange (lit puis écrit un champ de la cible) |
 | `NotifiableRef_Destructor_756D5` | Vrai destructeur (convention Borland *ScalarDeletingDtor*) |
 
 **Le vrai destructeur révèle le cycle de vie complet** : pose
 `node[0]=0x2F8` (même tag temporaire que le constructeur), appelle
-`WeakRef_InvalidateFar_3A432` (le pendant « libérer » de `SetReference`,
+`WeakRef_InvalidateFar` (le pendant « libérer » de `SetReference`,
 déjà documenté dans le registre de références faibles, `seg081`) pour
 invalider la référence établie à la construction, puis — conditionnellement
 — appelle `Memory_TypedFree_5C7B6` (tag `0x5C44`) pour libérer réellement
@@ -544,7 +559,7 @@ la mémoire. Cycle de vie C++ classique et complet.
 **Connexion majeure, inattendue** : `NotifiableRef_DetachTarget_75661`
 est appelée via `VROOMM_StubThunk_6AB54` — **le même thunk** qu'on avait
 vu invoqué à plusieurs reprises dans `AIEntity_MasterTick_5ACC` et
-`Entity_ProximityTest_ThreatGate_315B` pour « notifier la cible »,
+`AI_ProximityGeometricWarning_315B` pour « notifier la cible »,
 **sans jamais avoir fait le lien avec la classe des nœuds `MVRS`**.
 Ceci révèle que cette classe n'est **pas réservée aux nœuds de
 propriété `MVRS`** — c'est une classe générique de **référence
@@ -587,14 +602,14 @@ base `WorldObjectA` (confirmé : premier appel à
   tout chargement `PROF`.
 - Position par défaut (`+0x111/+0x115/+0x119`) = **(0, 0, 0x3E800)** —
   le même décalage d'altitude (1000 en virgule fixe 24.8) que celui
-  trouvé dans `Goal_ActiveWingmanEngagement_878F` pour le
+  trouvé dans `Goal_MoraleReaction_878F` pour le
   positionnement de formation.
 - `+0x200` (compteur `MVRS`) = 0, `+0x202` (premier pointeur `MVRS`) =
   0 — confirme que la table `MVRS` démarre **strictement vide**, avant
   que `PilotProfile_LoadFromPROF_73B4F` ne la peuple.
 - Références faibles établies sur `+0x10F/+0x137/+0x145/+0x147` — les
   mêmes champs cible déjà rencontrés dans `Goal_IsComplete` et
-  `Goal_ActiveWingmanEngagement_878F`.
+  `Goal_MoraleReaction_878F`.
 - Trois nouvelles constantes non décodées : `+0x139=30000`,
   `+0x13D=512000`, `+0x141=64000`.
 - Efface le premier emplacement `GOAL` (`+0x1B0`, 8 octets), et
@@ -642,13 +657,13 @@ détail complet et le tableau des 8 types.
 ### 3.6quater Troisième consommateur confirmé : la succession de leader
 d'escadrille
 
-`Escort_LeaderSuccession_C17A` (découvert en relisant intégralement
+`Escort_LeaderSuccession` (découvert en relisant intégralement
 `seg006`) touche le nœud `MVRS` de deux façons distinctes dans son
 propre switch interne :
 
 - **Cas « leader mort/hors-jeu »** : calcule la distance à la cible
   d'escorte (via `[vtable+0x3C]` sur celle-ci, comme dans
-  `MissionInit_LoadEntitiesAndPlayIntroCamera_7B035`), compare contre
+  `Player_ShotDownSequence_7B035`, ex-`MissionRecord_LoadEntityDatabase_7B035`), compare contre
   un seuil, puis appelle **`[vtable+8]` directement sur le nœud
   `ID=20`** (`+0xC1`) — même idiome de finalisation que
   `Entity_ProximityTest_ThreatGate` et `AI_BehaviorStateMachine`, dans
@@ -699,58 +714,33 @@ dynamique, pas de construction à la volée pour cette partie — une
 vraie table statique de vtables miniatures, une par type, directement
 adressable une fois le tag connu.
 
-#### `ID=19` entièrement décodé — `MVRS_ID19_ScoreWeaponReadiness_77000` / `MVRS_ID19_ApplyWeaponTracking_7709A`
+#### `ID=19` entièrement décodé — le nœud d'attaque au sol (`GroundAttack_CanEngage_77000` / `GroundAttack_Start_7709A`) — réécrit 2026-09-25
 
-*(Tag `0x160`, distinct du nœud `ID=20`/tag `0x14C` discuté au §3.6 —
-les deux avaient été mélangés sous une même étiquette hexadécimale
-ambiguë dans une version antérieure de cette section, corrigé ici.)*
+*(Tag `0x160`, distinct du nœud `ID=20`/tag `0x14C` discuté au §3.6.)*
 
-```c
-// [vtable+4] — score
-int Score(Node* node) {
-    Entity* entity = node->back_ref;               // node+0x22
-    Target* target = entity->field_283 ?: entity->field_137;
-    Result* r = target ? target->vtable[0]() : NULL;
+> **Correction 2026-09-24/25.** La version précédente de cette section interprétait ce nœud comme
+> « préparer/sélectionner une arme » avec un « minuteur de verrouillage de 100 000 unités ». La
+> relecture complète montre que c'est le **nœud permanent d'attaque au sol** de l'entité
+> (`entité+0xD9`), et que `nœud+0x30 = 100000` est une **distance sentinelle** (le « raté »
+> initial), pas un minuteur. Description complète : `AI_TICK_CALL_GRAPH.md`, section
+> « L'attaque au sol », et `NOTE_ATTAQUE_SOL.md`.
 
-    if (entity->field_13 == 0 && r && r->field_11 == 2) {
-        if (WeaponStationCheck(entity->field_104, 0xFC))
-            return 5;
-    }
-    return 0;   // exclu du tournoi si 0
-}
-
-// [vtable+8] — application
-void Apply(Node* node, arg) {
-    if (node->field_C == 0) Score(node);            // réévalue si besoin
-    GenericHelper(node, arg);
-    node->field_26 = 0;
-    node->field_D = 0x200;                            // mode "arme sélectionnée"
-
-    Target* target = entity->field_283 ?: entity->field_137;
-    SetReference(&node->field_27, target);             // cache la cible sur le nœud
-
-    if (!target) {
-        NotifiableRef_AttachTarget(node, arg);          // motif générique (ovr229)
-    } else {
-        SetReference(&node->field_29, NULL);
-        node->field_34 = 0;
-        node->field_30 = 100000;                        // minuteur de verrouillage
-        node->vtable[0xC](arg);                          // démarre le suivi
-    }
-}
-```
-
-**Interprétation** : ce type de propriété représente « préparer/
-sélectionner une arme contre la cible courante ». Score binaire (`0`
-ou `5`) selon qu'un poste d'arme compatible est libre et qu'aucune
-autre tâche n'occupe l'entité. Quand sélectionné, il met en cache la
-cible sur le nœud et démarre un minuteur de verrouillage de 100 000
-unités.
-
-**Un cinquième slot de vtable confirmé** : `+0xC`, retrouvé
-indépendamment dans `Escort_LeaderSuccession_C17A` — méthode
-« démarrer le suivi/verrouillage », appelée uniquement quand une
-cible est effectivement acquise.
+- **Méthode `+4`, `GroundAttack_CanEngage_77000`** : cible = cible sol acquise (`+0x283`), sinon
+  cible de mission (`+0x137`). Renvoie **5** si `nœud+0x13 == 0` (sens non tracé), si la cible est
+  au sol (`target_type == 2`) et si une arme air-sol est chargée
+  (`WeaponStation_FindLoadedCompatible(chargement, 0xFC)` : identifiants 3 à 8, **pas le canon**) ;
+  sinon 0.
+- **Méthode `+8`, `GroundAttack_Start_7709A`** : le nœud devient le comportement en cours
+  (`Behavior_PushRunning_756A4`, `entité+0x0D`) ; phase `nœud+0x26 = 0`, minuteur d'approche
+  `nœud+0x0D = 2 s`, cible en cache `nœud+0x27`, arme larguée `nœud+0x29 = 0`, arme choisie
+  `nœud+0x34 = 0`, distance sentinelle `nœud+0x30 = 100000` ; sans cible :
+  `Behavior_PopFinished_75612`. Puis méthode `+0xC`.
+- **Méthode `+0xC`, `GroundAttack_PhaseDispatch_77215`** : machine à 5 phases (approche, retour,
+  passage au pilote automatique physique, largage, dégagement), appelée à chaque tick tant que le
+  nœud est le comportement en cours.
+- **Déclencheurs** : `Goal_ExecuteAction_A8AC` (ordre « détruire la cible » avec une cible de mission
+  au sol) et `AI_BehaviorStateMachine_WeightedOptionSelector_9D05` (cible sol acquise et
+  « nouvelle cible autorisée »).
 
 #### Récapitulatif complet et corrigé des 19 identifiants `MVRS` valides
 
@@ -767,27 +757,32 @@ chaque fonction de score **et** d'application a été lue intégralement.*
 | ID | Tag | Score — contenu réel | Application — contenu réel |
 |---|---|---|---|
 | 1 | `0x2B4` | Angulaire, base 5, gardes `byte_720C3`/`word_72093`, `sub_564A`/`sub_56E5` | Calcul géométrique complet (delta de position 3D via `[vtable+0x3C]`/`[vtable+0x4C]`, longueur via `sub_5828E`), pose `node+0x26=0/1`, **appelle directement l'application d'`ID=20`** (`entité+0x22→+0xC1→vtable+8`) (`loc_EEA0`) |
-| 2 | `0x28C` | **Toujours 10** (`sub_EC22`, sert aussi de synchronisation de contexte partagée par tous les scores) | Rupture gauche/droite, pile ou face si ambigu (`loc_F2C8`) |
+| 2 | `0x28C` | `MVRS_ID2_Score_3FCB` (corrigé 2026-10-11 : le « toujours 10 » de `sub_EC22` est le score de la classe de base, tag `0x2A0`) : base 5, **nul si l'entité est un avion** (`byte_720DF`), donc jamais choisi par un avion IA | Rupture gauche/droite, pile ou face si ambigu (`loc_F2C8`) |
 | 3 | `0x278` | Angulaire simple (pas de `sub_564A`/`sub_56E5`), ajustement `TH` `/4` | Minuteur générique `0x400` (`loc_F6C2`) |
 | 4 | `0x264` | Angulaire étendu, double seuil de menace (`dword_720CD` vs deux seuils) | **Solution d'interception complète** : `Angle_DeltaNormalized_A`, pose bit0/1 de `entité+0x32`, écrit position anticipée dans `node+0x26/2A/2E` (`loc_FCE1`) |
-| 5 | `0x250` | Sous-mode riche, fenêtre temporelle `dword_720D9`, lit `avion+0x8B` — **déclenche la séquence Immelmann/Split S à 8 phases** (`node+0x26=1` si `dword_72034` dépassé) | Minuteur `0x400`, amorce phase 1 (`loc_100B6`) |
+| 5 | `0x250` | Sous-mode riche, fenêtre temporelle `dword_720D9`, lit `avion+0x8B` — **déclenche la séquence Immelmann/Split S à 8 phases** (`node+0x26=1` si `dword_72034` dépassé) | Minuteur `0x500` (5 s), phase posée par le score (`loc_100B6`) |
 | 6 | `0x23C` | Garde de portée capteur (`dword_7203D+0xFA000`), sous-mode différent (`node+0x26=2`) | Minuteur `0x500` seul — les phases vivent dans le suivi `loc_10673` |
 | 7 | `0x228` | Base 1 (plancher), garde `flags_75` bit6/`TH`, pose bits `entité+0x32`, écrit position d'interception | Lit ces mêmes bits pour choisir le minuteur (`0x100`/`0x200`/`0x400` selon capteur) (`loc_10AF2`) |
-| 8 | `0x214` | Renvoie 0 dans le chemin de score lu — **investigation incomplète, voir note ci-dessous** | Délégation triviale, aucun minuteur (`loc_1115D`) |
-| 9 | `0x200` | Renvoie 0 dans le chemin de score lu — **investigation incomplète, voir note ci-dessous** | Délégation triviale pure (`loc_112F7`) |
-| 10 | `0x1EC` | Renvoie 0 dans le chemin de score lu — **investigation incomplète, voir note ci-dessous** | Délégation triviale pure (`loc_1131D`) |
-| 11 | `0x1D8` | Renvoie 0 dans le chemin de score lu — **investigation incomplète, voir note ci-dessous** | Délégation triviale pure (`loc_11343`) |
-| 12 | `0x1C4` | Renvoie 0 dans le chemin de score lu — **investigation incomplète, voir note ci-dessous** | Délégation triviale pure (`loc_11369`) |
-| 13 | `0x1B0` | Base 1, formule riche, utilise `dword_72039` ET `dword_7202C` — **déclenche la séquence Scissors/Rollaway à 5 phases** | Minuteur `0x400`, amorce phase 1 (`loc_1138F`) |
-| 14 | `0x19C` | **Interception** — calcul trigonométrique complet (angle/distance, `imul`/`shrd`), pas juste binaire dans le principe mais le résultat final reste `0` ou `10` | `loc_11763` |
-| 15 | `0x188` | **Détection de menace** — binaire, 0 ou 10 | — |
-| 16 | `0x174` | **CORRIGÉ, lu intégralement** : `var_4` est initialisé à `0` en dur, rendant la branche de plafonnement `0x900` inatteignable — le résultat final ne dépend que d'un seul test (`TH < 12`) et la valeur retournée est en réalité **`0` ou `1`** (lecture d'un octet décalé, `[bp-3]`, pas `[bp-4]`) — **pas l'échelle continue `0x100`-`0x900` documentée précédemment** | Retour à la base (`loc_118C3`) |
-| 19 | `0x160` | **Prêt à tirer** — lu intégralement : résout une cible via `entité+0x283` (référence prioritaire) sinon `entité+0x137` (cible de mission), vérifie son type (`==2`) via `[cible→vtable+0]`, **garde affinée : `node+0x13` doit être VIDE** (pas déjà de cible verrouillée sur ce nœud), puis contrôle le poste d'arme (`sub_40F92`, code `0xFC`) — retourne `0` ou `5` | Verrouillage/suivi de cible, minuteur ~390s (`sub_7709A`) |
+| 8 | `0x214` | **Toujours 0** (relu 2026-09-25 : score vide, jamais choisi) | Manœuvre complète « se caler derrière la cible, 100 dans son axe, à 900 » (`MVRS_ID8_TickShadowTarget_111AE`), inaccessible |
+| 9 | `0x200` | **Toujours 0** (relu 2026-09-25) | Vide : se termine aussitôt |
+| 10 | `0x1EC` | **Toujours 0** (relu 2026-09-25) | Vide : se termine aussitôt |
+| 11 | `0x1D8` | **Toujours 0** (relu 2026-09-25) | Vide : se termine aussitôt |
+| 12 | `0x1C4` | **Toujours 0** (relu 2026-09-25) | Vide : se termine aussitôt |
+| 13 | `0x1B0` | Base 1 : **prise d'altitude** (corrigé 2026-09-25, pas Scissors/Rollaway) — exige de ne pas être trop lent et d'être sous le plafond `JDYN+0x86` ; favorisé si plus rapide que la cible et loin (> 17 700 = `dword_7202C`) | Minuteur `0x400`, phase 1 ; tick `MVRS_ID13_TickZoomClimb_113FD` : cap sur la cible puis chandelle 30–60° |
+| 14 | `0x19C` | **Évitement du sol** (corrigé 2026-09-25) — `0` ou `10` : sans cible, pilote automatique coupé, trop près du sol | Nœud fixe `entité+0xC5`, lancé par le réflexe `AI_GroundAvoidReflex_E06C` (niveau 4) : assiette +30°, plein gaz |
+| 15 | `0x188` | **Récupération nez haut / décrochage** (corrigé 2026-09-25) — `0` ou `10` | Nœud fixe `entité+0xC9`, lancé par `AI_StallRecoveryReflex_E159` (niveau 5) : ralenti ou plein gaz, assiette −30° |
+| 16 | `0x174` | **CORRIGÉ, lu intégralement** : `var_4` est initialisé à `0` en dur, rendant la branche de plafonnement `0x900` inatteignable — le résultat final ne dépend que d'un seul test (`TH < 12`) et la valeur retournée est en réalité **`0` ou `1`** (lecture d'un octet décalé, `[bp-3]`, pas `[bp-4]`) — **pas l'échelle continue `0x100`-`0x900` documentée précédemment** | **Reprendre de la vitesse** (corrigé 2026-09-25, pas un retour à la base) : vitesse max, assiette +5° |
+| 19 | `0x160` | **Attaque au sol** (corrigé 2026-09-25) — `GroundAttack_CanEngage_77000` : cible `entité+0x283` sinon `+0x137`, `target_type == 2`, `nœud+0x13 == 0`, arme air-sol chargée (masque `0xFC`) → `5`, sinon `0` | `GroundAttack_Start_7709A` : empile le nœud comme comportement en cours et lance la machine à phases (`GroundAttack_PhaseDispatch_77215`) ; `nœud+0x30 = 100000` est une distance sentinelle, pas un minuteur |
 | 20 | `0x14C` | **Toujours 0** — mais utilisé comme **outil géométrique partagé hors tournoi**, référencé en dur via `entité+0xC1`, consommé par `AI_ProximityGeometricWarning_315B` pour une alerte de proximité/collision, **et directement par l'application d'`ID=1`** | `loc_1195A` |
-| 21 | `0x138` | Renvoie 0 dans le chemin de score lu (juste `sub_EC22` puis retour direct) — **investigation incomplète, voir note ci-dessous ; ce nœud a par ailleurs un rôle réel et confirmé hors tournoi, voir §4bis** | `loc_11AC4` (non détaillée cette session) |
+| 21 | `0x138` | **Toujours 0** (jamais dans le tournoi) | **Navigation au pilote automatique physique** (`MVRS_ID21_ApplyAutopilotNav_11AC4`), appelée directement via `entité+0xD1` (relu 2026-09-25) |
 
 `ID=17`/`18` : invalides, la table de saut du constructeur pointe les
 deux vers le cas par défaut (aucun nœud construit).
+
+> **Relu le 2026-09-25** : les identifiants 8 à 12 ont été retracés en entier (scores, applications,
+> ticks, tous les chemins d'accès). Résultat et table des méthodes vérifiée : `AI_TICK_CALL_GRAPH.md`,
+> « Les identifiants `MVRS` 8 à 12 ». En bref : scores toujours nuls (le tournoi les exclut),
+> ID 9 à 12 vides, ID 8 = manœuvre « se caler derrière la cible » complète mais inaccessible.
 
 **Sur les identifiants `8,9,10,11,12` (correction — voir note
 méthodologique ci-dessous)** : dans le seul chemin lu jusqu'ici, chacun
@@ -820,7 +815,7 @@ binaire). Le fichier de Billy utilise les identifiants `1` à `13` —
 voir la table complète et corrigée au §3.7bis pour le détail de
 chacun. Sur ces 13, **7 ont une vraie logique de score graduée**
 (`1,2,3,4,5,6,7`), `13` a une formule riche et distincte (déclencheur
-de la séquence Scissors/Rollaway), et les **5 suivants (`8` à `12`)
+de la prise d'altitude, relue 2026-09-25), et les **5 suivants (`8` à `12`)
 renvoient 0 dans le seul chemin de code lu jusqu'ici** — voir la note
 de correction ci-dessous, ce dernier point n'est pas une conclusion
 acquise.
@@ -901,7 +896,7 @@ flowchart LR
 distincts, créant une chaîne de dépendance :
 
 - `ID=4` (application, `loc_FCE1`) calcule un delta géométrique
-  (`Angle_DeltaNormalized_A_4F95`) et **pose le bit 0** si le résultat
+  (`Angle_DeltaNormalized_A`) et **pose le bit 0** si le résultat
   est positif, écrit aussi une position anticipée dans `node+0x26/2A/2E`.
 - `ID=7` (application, `loc_10AF2`) **lit ce même bit 0** pour choisir
   la durée de son propre minuteur (`0x100` si posé, `0x200` sinon), et
@@ -920,15 +915,19 @@ un minuteur `0x400` et la phase 1 ; le tick périodique
 (`loc_1011F`, lu intégralement) exécute les 8 phases — chaque phase
 (`node+0x26`, 1 à 8) commande une attitude précise (tangage,
 inclinaison, cap) via les mêmes contrôleurs bas niveau que la
-navigation normale (`AI_TurnToBearingCmd`, `AI_TurnToHeadingCmd`,
-`AI_PitchRollController_Heading`). Motifs reconnaissables : phases 0-2
+navigation normale (`AI_PitchToAngleCmd_7E18`, `AI_RollToAngleCmd_8104`,
+`AI_RollController_7E56`). Motifs reconnaissables : phases 0-2
 correspondent à un Immelmann (tirer à cabrer, ajuster l'inclinaison,
 rouler à plat puis ajuster le cap) ; phase 3 (inclinaison à 90°) est
 cohérente avec le début d'un Split S. La phase 5 écrit directement
 dans `entité+7+0x1F` — le même champ consommé aux côtés de l'entrée
 souris du joueur dans `Player_MainUpdate` (§4bis).
 
-**Séquence Scissors/Rollaway à 5 phases — appartient à `ID=13`** (et
+> **Corrigé le 2026-09-25** : le tick d'`ID=13` a été relu ; ce n'est pas un Scissors/Rollaway mais
+> une **prise d'altitude à longue distance** (cap sur la cible, chandelle 30–60° selon l'excès de
+> vitesse). Détail : `AI_TICK_CALL_GRAPH.md`, « Les actions confirmées des manœuvres `MVRS` ».
+
+**Séquence à 5 phases — appartient à `ID=13`** (et
 non `ID=0xE` comme documenté précédemment). Le score d'`ID=13`
 (`loc_4A99`) utilise à la fois `dword_72039` ET `dword_7202C` (les
 deux constantes `NUMS` déjà associées à cette séquence) ; son
@@ -967,7 +966,7 @@ flowchart LR
     B2 --> H2[Goal_ExecuteAction<br/>machine à états générique 0xA1-0xAC]
     B3 --> H3[Goal_WanderRandom<br/>patrouille/vagabondage]
     B4 --> H4[AI_BehaviorStateMachine<br/>sélection pondérée MVRS]
-    B5 --> H5["Goal_ActiveWingmanEngagement<br/>escorte/suivi du joueur<br/>(réservé coéquipiers actifs)"]
+    B5 --> H5["Goal_MoraleReaction_878F<br/>escorte/suivi du joueur<br/>(réservé coéquipiers actifs)"]
 ```
 
 ### 4.2 `AI_TopLevelThink` — réactions, objet en cours, puis objectifs
@@ -991,7 +990,7 @@ int AI_TopLevelThink(Entity* entity) {
     Radio_CombatChatterDispatch(entity);
 
     // 2. traitement des menaces, SAUTÉ si décollage/atterrissage (+0x11D = 0xA1/0xA2),
-    //    avion au sol, ou word_70466 <= 3  (partie non lue en détail)
+    //    avion au sol, ou word_70466 <= 3 (compteur de frames : 3 premières frames de la mission)
 
     // 3. réactions prioritaires, avant tout objectif
     int reacted = 0;
@@ -1002,7 +1001,7 @@ int AI_TopLevelThink(Entity* entity) {
             AI_QueryTargetField4B(entity);
     }
     if (!reacted && entity->f27F <= 1)
-        reacted = Formation_DamageReactionHandler(entity);
+        reacted = AI_EngageAttackerReaction_E246(entity);
     if (reacted) return;                      // "protect self" passe avant "obey order"
 
     // 4. objet en cours : passe avant GOAL et tournoi (nature de l'objet non établie)
@@ -1027,7 +1026,7 @@ int AI_TopLevelThink(Entity* entity) {
 Points établis :
 - **Les gestionnaires sont alternatifs**, choisis par l'octet du fichier
   (2 `Goal_ExecuteAction`, 3 `Goal_WanderRandom`, 4 tournoi, 5
-  `Goal_ActiveWingmanEngagement`) : ils ne s'enchaînent pas.
+  `Goal_MoraleReaction_878F`) : ils ne s'enchaînent pas.
 - **La valeur `1` du fichier n'occupe aucun emplacement** (abandonnée dans
   `PilotProfile_LoadFromPROF`) ; `GOAL=1` seul donne un tableau vide.
 - **Au sol, `Goal_ExecuteAction` tourne quel que soit le tableau `GOAL`**,
@@ -1069,79 +1068,92 @@ int Goal_ExecuteAction(Entity* entity, int slot) {
 }
 ```
 
-### 4.4 `Goal_ActiveWingmanEngagement` — le gestionnaire du sélecteur `5`
-(escorte active du joueur)
+### 4.4 `Goal_MoraleReaction_878F` — le gestionnaire du sélecteur `5` : réaction au moral (relu le 2026-09-25)
 
-Entièrement tracé (393 lignes). Confirme précisément l'hypothèse
-pressentie dès les premières corrélations empiriques sur les fichiers
-`PROF` (§8) : ce gestionnaire est spécifiquement le comportement
-« devenir/rester coéquipier actif du joueur ».
+> **Correction 2026-09-25.** Ce gestionnaire était décrit comme « escorte active du joueur ».
+> Relu ligne à ligne, c'est une **réaction au moral** : fuite, abandon, retournement contre le
+> joueur ou rattachement au joueur, selon le moral et la discipline du pilote. Il ne fait **pas**
+> le suivi de formation. Les deux fonctions qu'il appelle étaient aussi mal nommées :
+> `AI_ComputeMorale_CD4A` (ex-`Radio_SelectContextMessage`) et `AI_MoraleDisciplineCheck_CA93`
+> (ex-`Voice_ExpressionTimer`).
 
-```mermaid
-flowchart TD
-    Start([Appel du gestionnaire]) --> RateLimit{Délai suffisant<br/>écoulé ?}
-    RateLimit -->|non| Exit0([Sortie, non géré])
-    RateLimit -->|oui| Context[Radio_SelectContextMessage<br/>classifie le contexte radio]
-    Context --> IsEscortCtx{Contexte == 4 ou 5 ?}
+**Moral** (`AI_ComputeMorale_CD4A`, rangé dans `entité+0xF5`) : score de départ 100, puis
+- carburant : `+ 51 × restant / capacité − 50` ;
+- −100 si `DamageSys_SumDamage_43D0F` de l'avion est non nul (sens de l'attribut non établi) ;
+- −50 si l'ordre en cours ne peut pas être tenu (pas d'arme adaptée à la cible, pas de cible) ;
+- tant que des adversaires sont en vie : −8 par adversaire vivant, −32 par perte de son camp, et
+  plafond à 79 ;
+- −50 si une réaction est active (`+0x27F ≠ 0`) ;
+- confiance `CN` (`+0xB3` ; « loyauté `LY` » avant la correction du 2026-09-25) : +0, +15, +30, +50 ou +75
+  (paliers 3, 6, 12, 15) ; plancher 25 si `CN > 9` ; 0 si `CN ≤ 0`.
 
-    IsEscortCtx -->|oui| TargetPlayer{Cible/référence liée<br/>au joueur ?}
-    TargetPlayer -->|non, ni cible ni timer libre| FlyToWP[Branche B : FLY_TO_WP]
-    TargetPlayer -->|oui, timer vocal libre| Escort[Branche A : FOLLOW_ALLY]
+Résultat : **2** (≥ 80, bon), **3** (≥ 50), **4** (≥ 25, ébranlé), **5** (< 25, panique).
 
-    IsEscortCtx -->|non| TransferCheck{Cible déjà joueur,<br/>goal=FOLLOW_ALLY,<br/>verrou global actif ?}
-    TransferCheck -->|oui| Transfer[Branche C : transfert coéquipier]
-    TransferCheck -->|non| Exit0
+**Discipline** (`AI_MoraleDisciplineCheck_CA93`, toutes les 3 s) : `LY + (+7, +4, −3, −5 selon le
+moral 2 à 5) > 7` (`LY` = loyauté, `+0xB4` ; « `FL` » avant la correction du 2026-09-25). Un pilote discipliné tient son rôle.
 
-    Escort --> EscortPos[Position de formation relative<br/>au joueur + altitude fixe]
-    EscortPos --> EscortState[goal_state = 0xAA<br/>verrouille cible sur le joueur]
-    EscortState --> EscortRadio[Radio_PlayMessage]
-    EscortRadio --> Delegate[AI_BehaviorStateMachine<br/>sélection pondérée MVRS]
-    Delegate --> Handled1([Sortie, géré])
+**Le gestionnaire** (au plus toutes les 5 s ; renvoie 1 s'il a agi, sinon le gestionnaire `GOAL`
+suivant prend la main) :
 
-    FlyToWP --> WPPos[Position fusionnée<br/>de deux sources]
-    WPPos --> WPState[goal_state = 0xA5]
-    WPState --> WPRadio[Radio_PlayMessage]
-    WPRadio --> Handled2([Sortie, géré])
+| Moral | Cas | Action |
+|---|---|---|
+| 4 ou 5 | pilote hors du camp du joueur | **fuite** : radio 8, ordre « vol vers un point » (`0xA5`) verrouillé contre le script, comportement en cours abandonné, navigation (nœud ID 21) vers un point résolu depuis l'objet global `word_706A0`, 1000 m plus haut |
+| 4 ou 5 | ailier du joueur, indiscipliné, en suivi : **la menace qui le vise est le joueur** et aucun adversaire actif | **se retourne contre le joueur** : cible aérienne = le joueur, combat, radio `0x20` |
+| 4 ou 5 | ailier du joueur, indiscipliné, en suivi, autre cas (une seule fois, `+0x149 = 2`) | radio 8, ordre « suivre » le joueur verrouillé, navigation vers le même point relevé de 1000 m |
+| 4 ou 5 | ailier du joueur, sinon, en combat contre un attaquant ou sous missile (niveau 1 ou 2) | radio 6 au joueur, ne prend pas la main |
+| 2 ou 3 | ailier du joueur, indiscipliné, en suivi, adversaires actifs | radio `0x12`, `Goal_TransferToWingman` (cible de mission et navigation = le joueur, ordre verrouillé) |
 
-    Transfer --> TransferRadio[Radio_PlayMessage]
-    TransferRadio --> TransferCall[Goal_TransferToWingman]
-    TransferCall --> Handled3([Sortie, géré])
-```
+« Camp du joueur » = octet `+0x50` de l'objet monde à 1 (0xFF = camp adverse, 0 = neutre) : déduit
+des branches où le leader est le joueur. **Répliques** (chunk `MSGS` de `data/BILLY.IFF`, vocabulaire commun à tous les personnages) :
 
-**Trois branches de comportement** :
+| Index | Réplique de Billy | Branche |
+|---|---|---|
+| 6 | « This guy's good. Could someone give me a hand here? » | appel à l'aide (dégâts ou missile) |
+| 8 | « That's all for me. I'm outta here! » | **abandon du combat** : fuite d'un adversaire, départ d'un ailier |
+| `0x12` | « This one's all mine. » | prise d'initiative de l'ailier (`Goal_TransferToWingman`) |
+| `0x20` | « Do you feel lucky? Well? Do you punk? » | provocation : ailier retourné contre le joueur (aussi jouée au tir par `AI_BehaviorSelector`) |
 
-- **(A) Escorte/suivi du joueur** — si le contexte radio est `4`/`5`,
-  que la cible ou référence de l'entité pointe vers le joueur
-  (`word_722E6`), et que le timer d'expression vocale n'est pas occupé :
-  calcule une position de formation relative au joueur
-  (`AI_ResolveNodePosition_54274`, décalage d'altitude fixe et décalage
-  latéral), fixe `goal_state = 0xAA` (`OP_SET_OBJ_FOLLOW_ALLY`),
-  **verrouille la référence cible directement sur le joueur**,
-  déclenche un message radio, puis **délègue la décision finale à
-  `AI_BehaviorStateMachine`** — confirme que le mécanisme de sélection
-  pondérée `MVRS` (§3.5) intervient aussi dans le comportement
-  d'escorte active, pas uniquement via le sélecteur `GOAL` `4`
-  isolément.
-- **(B) Repli vers un point de navigation** — si le contexte `4`/`5` est
-  présent mais la condition de cible joueur n'est pas remplie : calcule
-  une position différente (fusion de deux sources — probable
-  interception/rendez-vous), fixe `goal_state = 0xA5`
-  (`OP_SET_OBJ_FLY_TO_WP`), message radio.
-- **(C) Transfert de coéquipier** — si le contexte radio n'est *pas*
-  `4`/`5`, mais que la cible est déjà le joueur, l'état est déjà
-  `FOLLOW_ALLY`, et qu'un verrou global (`byte_6E4CD`) est actif :
-  déclenche un message radio distinct puis appelle
-  **`Goal_TransferToWingman_C4FD`** (transmet l'état `GOAL`/cible/point
-  de navigation vers une autre entité — passation d'escorte, par
-  exemple si le coéquipier courant doit être remplacé).
+Le point résolu depuis `word_706A0` n'est pas tracé.
 
-**Ce que ça confirme architecturalement** : ce gestionnaire relie
-ensemble le système radio contextuel, le verrouillage de cible sur le
-joueur, la machine à états `GOAL`, et le mécanisme de sélection pondérée
-`MVRS` en aval — c'est le point de jonction entre « qui peut être
-coéquipier » (déterminé au chargement du fichier `PROF`, §8) et
-« comment ce coéquipier se comporte concrètement » (délégué à
-`AI_BehaviorStateMachine`).
+**Comment ces réactions s'expriment ensuite : l'état de l'ailier `entité+0x149`** (lu dans
+`Goal_SelectTransition`, relue le 2026-09-25). La réaction au moral et l'entrée en combat
+n'exécutent presque rien elles-mêmes : elles écrivent l'objectif (`+0x11D`), le verrouillent contre
+le script (bit 5 de `+0x28B`) et changent l'état `+0x149`. C'est ensuite **`GOAL` 2**
+(`Goal_ExecuteAction_A8AC` → `Goal_SelectTransition` pour l'ordre « suivre ») qui l'applique à
+chaque tick, après `Goal_FollowAllyExec` (le vol en formation) :
+
+| `+0x149` | Posé par | Ce que fait `Goal_SelectTransition` |
+|---|---|---|
+| 0 | défaut | en formation ; ordre déverrouillé. Si l'ailier est discipliné et qu'un ennemi est dans les six heures du joueur (`word_722EE`, déduction) : il l'engage (état 3) et annonce `0x10` « You've got one on your tail, Commander! » |
+| 1 | `Goal_TransferToWingman` (réplique `0x12`) | **combat libre autour du leader** : ordre `0xAC` le temps d'un appel à `Goal_ExecuteAction_A8AC` (combat, cible sol autorisée), puis retour à « suivre » |
+| 2 | `Goal_MoraleReaction_878F` (réplique 8) | **a quitté le combat** : navigation vers le point posé par la réaction au moral |
+| 3 | `AI_EngageAttackerReaction_E246` (réplique `0x12`), défense du joueur (`0x10`) | **engage une cible précise** `+0x285` : cible au sol → attaque au sol ; avion → `Escort_LeaderSuccession` (non relue) |
+
+La réplique `0x12` (« This one's all mine. ») annonce donc bien un passage en combat (état 1 ou
+3), ce que Rémi observe en jeu.
+
+**Usage des répliques observé en jeu (Rémi, 2026-09-25)** : `0x12` (« This one's all mine. »)
+arrive en début de combat, quand l'ailier sélectionne une cible, en alternance avec `0x0C`
+(« Here we go, folks. It's Primetime! ») ; `0x0D` (« Hasta la vista, baby. ») quand il a détruit un
+ennemi ; `0x0F` (« Radical shot! ») compliment quand le joueur abat un MiG au canon. Côté code,
+`0x12` est joué par ce gestionnaire (branche prise d'initiative) et surtout par
+`AI_EngageAttackerReaction_E246` (ex-`Formation_DamageReactionHandler`) : touché, ou un avion
+dans ses six heures (écart nez/cible > 150°, même sens à 30° près, distance < `dword_7201C`),
+l'ailier prend l'attaquant comme cible de mission, passe au niveau de réaction 1 et annonce
+`0x12`. Les appels qui jouent `0x0C`, `0x0D` et `0x0F` ne sont pas localisés (code du message
+probablement calculé, pas une constante).
+
+**`GOAL` de Billy** (fichier réel) : `5, 2, 1, 4, 3` → réaction au moral, puis ordre du script
+(dont le suivi `0xAA`), puis combat, puis errance ; le `1` est ignoré.
+
+**Ce que ça ne fait pas : le suivi de formation.** Celui-ci passe par `Goal_FollowAllyExec`,
+appelé soit par `AIEntity_MasterTick_5ACC` (bit 3 de `entité+0x28B`, posé et entretenu par
+`Goal_FollowAllyExec` lui-même, et bit 5 de `flags_75` de l'avion), soit par
+`Goal_ExecuteAction_A8AC` (ordre `0xAA`), soit par `Goal_SetObjective_A307`. **Vérifié en jeu (Rémi, 2026-09-25)** :
+avec `GOAL = 5, 1`, l'avion décolle puis ne fait plus rien (nez vers le ciel, plus de pilotage).
+C'est ce que prévoit le code : au sol, `AI_TopLevelThink` exécute l'ordre du script
+(`Goal_ExecuteAction_A8AC`) sans regarder le `GOAL` ; en vol, seul ce gestionnaire tourne, et il
+n'agit que sur le moral. **Le suivi d'un ordre « suivre » exige la valeur `2` dans le `GOAL`.**
 
 ---
 
@@ -1152,7 +1164,7 @@ Détail complet dans `AI_TICK_CALL_GRAPH.md` (section du même nom). Résumé :
 - **Catégories d'objet** : lues par `vtable+8` de la classe modèle, fixée par le chunk présent dans `OBJECTS\<nom>.IFF` (`IFF_LoadModelMain`). **6 = `JETP` (avion), 8 = `MISS` (missile), 0x13 = `SWPN` (défenses fixes : AA, batteries, SAM, navires ; fait vérifié côté données)**. L'ancien commentaire « 2 = aéronef, 6 = missile, 8 = contre-mesure » était faux.
 - **Candidats** : missile qui me vise (`nœud+0x55` = mon avion), avion hostile (camp `+0x50` de signe opposé), objet hostile à `+0x11 = 2` (si `arg_4` non nul et arme `0x83C` chargée).
 - **Score** : deux notes A et B pondérées par `(AR − TH) + 16` et `(TH − AR) + 16` (copie `ATRB`, `+0xB8` = `AR`, `+0xB0` = `TH`), bandes de distance (`NUMS`), angles d'aspect, persistance de la cible courante, porte de compétence `Pilot_SkillCheck_B0` (`tirage 1-16 ≤ TH + aptitude`).
-- **Résultat** : le gagnant est rangé dans `entité+0x287` (avion), `+0x283` (objet à `+0x11 = 2`) ou `+0x281` (missile). **Un missile gagnant vide `+0x287` et `+0x283` et pose `+0x27F = 2`** : plus de cible d'attaque, pas de tir (`AI_BehaviorSelector_8D30` exige `+0x27F` ≤ 1) et pas de tournoi pour ce tick. La réaction défensive n'est pas dans cette fonction.
+- **Résultat** : le gagnant est rangé dans `entité+0x287` (avion), `+0x283` (objet à `+0x11 = 2`) ou `+0x281` (missile). **Un missile gagnant vide `+0x287` et `+0x283` et pose `+0x27F = 2`** : plus de cible d'attaque, pas de tir (`AI_BehaviorSelector` exige `+0x27F` ≤ 1) et pas de tournoi pour ce tick. La réaction défensive n'est pas dans cette fonction.
 
 ## 4bis. Comment une décision se traduit en mouvement réel — chaîne
 complète vérifiée
@@ -1162,7 +1174,7 @@ complète vérifiée
 navigation »...), comment ça se traduit en déplacement effectif de
 l'avion ? Une première hypothèse (VM de script `COMP` partagée avec
 la caméra) a été vérifiée puis **écartée** — la balise `COMP` n'existe
-que dans le chargeur de caméra (`Cinematic_LoadCameraDef_23E7D`,
+que dans le chargeur de caméra (`Cinematic_LoadCameraDef`,
 `seg041`), aucune trace côté `PROF`/avion. La bonne piste s'est
 révélée être une **chaîne de guidage géométrique classique**,
 entièrement tracée et vérifiée fonction par fonction :
@@ -1175,24 +1187,25 @@ flowchart TD
     D -->|"tick périodique (vtable+0x10)"| E["décompte le minuteur<br/>AI_GuidanceCmd_FromOwnPos"]
     E --> F["AI_GuidanceSolution_Major (651L)<br/>géométrie de poursuite/anticipation"]
     F --> G["AI_CombatDecision_Major"]
-    G --> H["AI_TurnToHeadingCmd<br/>delta de cap → taux de virage"]
-    H --> I["AI_PitchRollController_Heading"]
+    G --> H["AI_RollToAngleCmd_8104<br/>écart de ROULIS (corrigé 2026-09-24)"]
+    H --> I["AI_RollController_7E56"]
     I -->|"écrit dans entité+7+0x23"| J(("MÊME champ que
 l'entrée souris
 du joueur !"))
-    I --> K["JDYN_HighLevelPhysicsCalc<br/>— LE MÊME calcul physique que le joueur"]
+    I --> K["JDYN_RollStickFromError_4B09D<br/>— écart de roulis → manche (IA)"]
 ```
 
-**Le point décisif** : `AI_PitchRollController_Heading` écrit son
+**Le point décisif** : `AI_RollController_7E56` écrit son
 résultat dans `entité+7+0x23` — **exactement le champ que
-`Player_MainUpdate_13100` lit aux côtés de la valeur dérivée de la
+`Player_MainUpdate` lit aux côtés de la valeur dérivée de la
 souris du joueur**, dans la même comparaison. Ce n'est pas une
 coïncidence d'offset : l'IA et le joueur alimentent le **même point
-d'entrée**, avec des valeurs interchangeables, avant que le résultat
-ne soit consommé par `JDYN_HighLevelPhysicsCalc` (`sub_4B09D`) — la
-fonction de calcul physique de haut niveau du modèle de vol `JDYN`,
-**partagée sans distinction entre avions pilotés par le joueur et par
-l'IA**.
+d'entrée**, avec des valeurs interchangeables. *(Corrigé le 2026-09-25 :
+`JDYN_RollStickFromError_4B09D` n'est **pas** en aval de ce champ ; c'est
+l'IA qui l'appelle **avant** d'écrire `+0x23`, pour convertir son écart de
+roulis en manche — seuls `AI_RollController_7E56` et `AI_BankErrorCmd_7F34`
+l'appellent. Ce qui est partagé avec le joueur, c'est le modèle de vol qui lit
+ensuite le manche.)*
 
 **Ce que ça confirme et infirme** :
 - **Infirme** : pas de VM de mouvement séparée façon caméra scriptée,
@@ -1247,7 +1260,7 @@ consigne (`target_climb`/`target_speed`) consommés par une physique
 simplifiée pour les appareils IA, le jeu original calcule un delta de
 cap via une vraie géométrie de guidage puis l'injecte dans le modèle
 de vol complet, au même titre qu'une entrée manette. Le bit `flags_75`
-bit 4 (`Aero_ComputeControlFlags75Bit5B`) reste un mécanisme réel mais
+bit 4 (`Aero_ComputeAoACommand_48862`) reste un mécanisme réel mais
 séparé — probablement un ajustement aérodynamique fin, pas le
 mécanisme de navigation lui-même.
 
@@ -1258,7 +1271,7 @@ mécanisme de navigation lui-même.
 
 ### 5.1 Vue d'ensemble de l'interpréteur
 
-`MissionScript_ExecutePROG_51106` dispatche sur **209 valeurs d'opcode**
+`Expr_VM_Interpreter_51106` dispatche sur **209 valeurs d'opcode**
 via une table de sauts indexée directement par la valeur brute de
 l'octet d'opcode (pas de décalage). **119 des 209 valeurs (57 %)**
 pointent vers le même gestionnaire par défaut (`loc_51C94` — avance à
@@ -1289,7 +1302,7 @@ est le **registre de travail (work register)**.
 |---|---|---|
 | `0` | `OP_NOOP` | Aucune exécution — confirmé (tombe dans le gestionnaire par défaut) |
 | `1` | `OP_EXIT_PROG` | Termine le script — *voir note ci-dessous : partage le même code que `0`* |
-| `2` | `OP_EXEC_SUB_PROG` | **Vrai mécanisme d'appel de sous-programme** : vérifie une profondeur de pile d'exécution (max 16 niveaux), résout un sous-programme nommé (`Expr_LookupNamedValue_51E4A`), empile le contexte courant puis saute au début du sous-programme (`MissionScript_ExecSubProgram_51033`) |
+| `2` | `OP_EXEC_SUB_PROG` | **Vrai mécanisme d'appel de sous-programme** : vérifie une profondeur de pile d'exécution (max 16 niveaux), résout un sous-programme nommé (`Expr_LookupNamedValue_51E4A`), empile le contexte courant puis saute au début du sous-programme (`Expr_VM_PushValue_51033`) |
 | *(3)* | *(variante d'adressage de `OP_EXEC_SUB_PROG`)* | Même chemin de code que `2`, mais lit `[di+0xC]` — absent de la table `libRealSpace`, probablement un mode d'adressage alternatif du même opcode conceptuel |
 | `8` | `OP_SET_LABEL` | Aucune exécution — confirmé (marqueur de saut, tombe dans le défaut) |
 | `9` | `OP_SPOT_DATA` | Aucune exécution — confirmé (déclaration de donnée inline, tombe dans le défaut) |
@@ -1317,9 +1330,9 @@ est le **registre de travail (work register)**.
 | `82`/`83` | `OP_SET_FLAG_TO_TRUE`/`_FALSE` | `drapeau[idx] = 1` / `= 0` — confirmé |
 | *(84)* | *(bascule de drapeau, `^= 1`)* | Pas d'entrée dédiée côté `libRealSpace` |
 | `85`/`86` | `OP_ADD_1_TO_FLAG`/`OP_REMOVE_1_TO_FLAG` | Incrémente/décrémente `drapeau[idx]` en place — confirmé |
-| **`128`/`129`** | **`OP_ACTIVATE_SCENE`/`OP_DEACTIVATE_SCENE`** | Résout un nœud nommé et pose/efface son drapeau — **corrige ma lecture générique** (« set/clear drapeau de nœud ») : c'est spécifiquement l'activation/désactivation d'une **scène** (chunk `SCNE`, cf. `DATA_MODEL.md`) |
-| *(130)* | *(test de scène active)* | Pas d'entrée dédiée côté `libRealSpace` |
-| **`144`** | **`OP_ACTIVATE_OBJ`** | Résout un nœud puis appelle `GeomNode_BuildOrRefreshCluster_51EDC` — **confirme et précise** la découverte du spawn de formation : c'est l'activation d'un objet/formation, pas un « spawn cluster » générique |
+| **`128`/`129`** | **`OP_ENABLE_SCENE`/`OP_DISABLE_SCENE`** | Résout un nœud nommé et pose/efface son drapeau — **corrige ma lecture générique** (« set/clear drapeau de nœud ») : c'est le drapeau `is_enabled` d'une **scène** (chunk `SCNE`, cf. `DATA_MODEL.md`) : la scène devient jouable ou non ; l'activation (entrée du joueur) n'est pas lancée par l'instruction |
+| *(130)* | *(`OP_IS_SCENE_ENABLED`, nom proposé : teste `is_enabled`)* | Pas d'entrée dédiée côté `libRealSpace` |
+| **`144`** | **`OP_ACTIVATE_OBJ`** | Résout un nœud puis appelle `PartEntry_ResolveSpawnPositionAndActivate_51EDC` — **confirme et précise** la découverte du spawn de formation : c'est l'activation d'un objet/formation, pas un « spawn cluster » générique |
 | *(145)* | *(`Expr_Node_ClearDirtyAndNotify`)* | Pas d'entrée dédiée côté `libRealSpace` |
 | **`146`** | **`OP_IF_TARGET_IN_AREA`** | Teste le bit 0 du champ `+0x39` d'un nœud résolu — **résout le sens exact** de ce bit de drapeau |
 | **`147`** | **`OP_IS_TARGET_ALIVE`** | Teste le bit 1 du même champ `+0x39` — **résout le sens exact** de ce second bit |
@@ -1402,7 +1415,7 @@ boucle principale de `AI_BehaviorStateMachine`) — aucun accumulateur
 de `dt`, aucun cooldown. Comme le tick est cadencé sur le framerate,
 **la fréquence de décision de l'IA (et donc le nombre de jets
 aléatoires par seconde réelle — bruit du tournoi via `CRT_Rand`, test
-de compétence « 3d6 » dans `AI_ManeuverSolution_Major_6977`) scale
+de compétence « 3d6 » dans `AI_GunSnapAim_6977`) scale
 directement avec le framerate**, contrairement à la physique qui est
 correctement synchronisée sur le temps réel. Un pilote de faible
 compétence sur une machine rapide obtiendrait statistiquement plus de
@@ -1415,7 +1428,7 @@ void AIEntity_MasterTick(Entity* entity) {
     unpack_status_flags(entity);  // +0x28C / +0x28D
 
     // seuils globaux de menace/proximite, partages avec d'autres
-    // fonctions de decision (ex. AI_EvadeOrPursueSelector)
+    // fonctions de decision (ex. AI_GroundAvoidPullUp_6616)
     dword_7203D = RangeTest(entity) + SecondaryAngleSensor(entity);
     dword_72039 = weighted_cosine(entity);
 
@@ -1474,13 +1487,16 @@ dans le binaire une autre valeur suivant cette échelle précise.
 Recherche exhaustive de cette famille de fonctions (même motif,
 offset variable) :
 
+> ⚠️ **Tableau faux pour `+0xB0/+0xB1/+0xB3/+0xB4`** (supposait l'ordre du fichier) : lire `+0xB0` = FL,
+> `+0xB1` = TH, `+0xB3` = CN, `+0xB4` = LY — voir §2.3 et `IMPL_SCAIBRAIN_CORRECTIONS.md` §0bis.
+
 | Offset | Trait `ATRB` (ordre du fichier) | Confirmé par |
 |---|---|---|
-| `entité+0xB0` | `TH` (Trigger Happy) | `sub_8C1E`, jet de compétence appelé par `MVRS_ID7` (modificateur `-7`) |
-| `entité+0xB1` | `CN` (Confidence) | `sub_8CA2`, jet de compétence, appelée depuis `sub_9027` |
-| `entité+0xB2` | `VB` (Verbosity) | **`Radio_CanPlayMessage_CC7A`** — lue intégralement plus tôt dans cette session, le lien avec `ATRB` était resté non démontré à l'époque ; confirmé maintenant |
-| `entité+0xB3` | `LY` (Loyalty) | `Radio_SelectContextMessage_CD4A` — compare `LY` à des paliers (`3`, `6`, `0xC`...) pour choisir un registre de message contextuel |
-| `entité+0xB4` | `FL` (Flying) | `AI_MessageDispatcher_C5CD` — compare `FL > 14` comme condition de branche |
+| `entité+0xB0` | ~~`TH`~~ **`FL` (Flying)** | `sub_8C1E`, jet de compétence appelé par `MVRS_ID7` (modificateur `-7`) |
+| `entité+0xB1` | ~~`CN`~~ **`TH` (Trigger Happy)** | `sub_8CA2`, jet de compétence, appelée depuis `sub_9027` |
+| `entité+0xB2` | `VB` (Verbosity) | **`Radio_CanPlayMessage`** — lue intégralement plus tôt dans cette session, le lien avec `ATRB` était resté non démontré à l'époque ; confirmé maintenant |
+| `entité+0xB3` | ~~`LY`~~ **`CN` (Confidence)** | `AI_ComputeMorale_CD4A` — bonus de moral par paliers de `CN` (`3`, `6`, `0xC`, `0xF`), plancher si `LY > 9`, moral nul si `LY ≤ 0` (§4.4) |
+| `entité+0xB4` | ~~`FL`~~ **`LY` (Loyalty)** | `AI_MessageDispatcher` — compare `LY > 14` comme condition de branche |
 | `entité+0xB5` | `AG` (Air-to-Ground) | jet de compétence (motif identique, `sub_776FB`, voisine de la zone `MVRS_ID19`) |
 | `entité+0xB6` | `AA` (Air-to-Air) | `sub_8CCE`, **appelée depuis `AI_BehaviorStateMachine_WeightedOptionSelector_9D05` elle-même** (le tournoi) — comparaison par division, pas un simple jet |
 | `entité+0xB7` | `SM` (Showmanship) | `sub_8C4A`, jet de compétence, appelée par `loc_3FCB` (la fonction jumelle hors-tournoi qui a lancé cette investigation) |
@@ -1560,11 +1576,11 @@ répond-elle à un message radio, se vante d'un exploit, avertit en cas
 de danger ? » Les deux fonctions suivantes ont été lues intégralement
 pour y répondre avec certitude plutôt que par extrapolation.*
 
-**`AI_MissileThreatTrigger_A` (`sub_50FF`, 169 lignes) — le vrai
+**`AI_EjectDecision_50FF` (`sub_50FF`, 169 lignes) — le vrai
 mécanisme d'alerte de danger, entièrement décodé :**
 
 - Calcule un **ratio de menace** via deux sommes sur une liste
-  d'enregistrements (`Roster_SumAttributeB × 100 / Roster_SumAttributeA`)
+  d'enregistrements (`DamageSys_SumDamage_43D0F × 100 / DamageSys_SumMaxPoints_43CDC`)
   — vraisemblablement un pourcentage de verrouillage/poursuite actif.
   Si > 80%, ou si la cible entre dans la portée du seuil capteur
   (`dword_7203D`), l'alerte se déclenche.
@@ -1600,7 +1616,7 @@ fréquence générique, confirmé et précisé :**
 
 **Ce que ça répond à la question d'origine :**
 1. *Avertir en cas de danger* — oui, un vrai mécanisme existe
-   (`AI_MissileThreatTrigger_A`), mais spécifiquement pour des
+   (`AI_EjectDecision_50FF`), mais spécifiquement pour des
    menaces missile/radar verrouillées sur le joueur, passant par
    `Radio_CanPlayMessage` comme limiteur de fréquence commun à tout
    le système radio.
@@ -1783,7 +1799,7 @@ rond aussi net exclut une position monde absolue (qui aurait des
 coordonnées réalistes, pas un chiffre rond simple) et confirme
 l'hypothèse d'un **décalage de formation** (300 unités sur le côté,
 même altitude) — cohérent avec tout ce qu'on avait déduit du code
-(`Player_ResolveAttachPointN_5305A`, calcul dynamique de position
+(`Mission_GetSpotWorldPosition_5305A`, calcul dynamique de position
 relative).
 
 Plusieurs autres valeurs rondes (-40, -800, 1800, 2000) suggèrent des
@@ -1822,18 +1838,19 @@ maintenant en place :
   `dword_72034` pour `ID=5`, `dword_72039`/`dword_7202C` pour `ID=13`).
 - **La séquence de manœuvre acrobatique** (§3.9) : les switch à
   phases de `MVRS_ID5` (8 phases) et `MVRS_ID13` (5 phases)
-  décodés intégralement (Immelmann/Split S pour l'un, probable
-  Scissors/Rollaway pour l'autre — confirmés au répertoire par le
-  manuel officiel) — chaque phase commande une attitude via les mêmes
+  décodés intégralement (montée verticale + retournement pour l'un,
+  prise d'altitude à longue distance pour l'autre — relu 2026-09-25,
+  l'hypothèse Scissors/Rollaway est abandonnée) — chaque phase commande une attitude via les mêmes
   contrôleurs bas niveau que la navigation, `ID=13` calculant même un
   délai de roulis basé sur la capacité propre de l'avion.
 - **La chaîne décision → mouvement réel** (§4bis) : `Goal_ExecuteAction`
   → `AI_NavSolutionToPoint` → nœud `MVRS_ID21` (réutilisé hors
   tournoi) → `AI_GuidanceSolution_Major` → **`AI_CombatDecision_Major`**
   (arbre à 4 branches selon la magnitude de l'angle, écrit la commande
-  finale) → `AI_TurnToHeadingCmd` → `AI_PitchRollController_Heading` →
-  `JDYN_HighLevelPhysicsCalc` — le même calcul physique que le joueur,
-  confirmé par un champ de commande partagé (`entité+7+0x23`/`+0x1F`).
+  finale) → `AI_RollToAngleCmd_8104` → `AI_RollController_7E56` →
+  `JDYN_RollStickFromError_4B09D` (écart → manche, propre à l'IA), puis le
+  même modèle de vol que le joueur via le champ de commande partagé
+  (`entité+7+0x23`/`+0x1F`).
 - **Les constantes `NUMS` non rondes** (`dword_72020/24/28/2C`) :
   identifiées comme des seuils de classification de distance en 4
   paliers, avec deux jeux de seuils distincts selon le type de cible
@@ -1847,13 +1864,13 @@ maintenant en place :
 - **`AI_ResolveNodePosition_54274` vs `CameraScript_ExecuteCOMP_781D0`**
   : confirmé comme DEUX mécanismes distincts, pas la même famille — le
   premier résout une position nommée (système d'expressions +
-  hiérarchie géométrique) et est bien utilisé par l'IA (`Goal_ActiveWingmanEngagement`).
+  hiérarchie géométrique) et est bien utilisé par l'IA (`Goal_MoraleReaction_878F`).
   Le second (renommé — l'hypothèse « partagé avec l'IA » d'une analyse
   externe non revérifiée s'est révélée fausse à la lecture directe :
   il opère sur des offsets et une globale d'abandon spécifiques au
   contexte caméra, aucun lien avec la structure d'entité IA) est très
   probablement **purement caméra**, sans usage IA confirmé.
-- **`Player_MainUpdate_13100`** examinée structurellement (liste
+- **`Player_MainUpdate`** examinée structurellement (liste
   complète des 38 appels) : confirmée entièrement spécifique au
   joueur (HUD, joystick, kneeboard) — aucune lecture complémentaire
   nécessaire, le seul point de contact IA est celui déjà documenté en
@@ -1861,20 +1878,16 @@ maintenant en place :
 - **La structure globale de l'entité** (§10, constructeur/destructeur)
   : `goal_state` sentinelle, tableau `GOAL`/`MVRS` initialisés à vide,
   toutes les références faibles du destructeur désormais expliquées —
-  `+0x281` (référence liée au système d'escorte, effacée en fin de
-  relation), **`+0x283` entièrement résolu, CORRIGÉ suite à la reprise
-  complète de la table `MVRS`** : pointe vers un nœud dédié permanent
-  (`entité+0xD9`, construit une fois par pilote au chargement,
-  `push 0x13` avant `sub_742FC` dans `PilotProfile_LoadFromPROF_73B4F`)
-  — le tag correspondant (`0x160`) est celui d'**`ID=19`, le type
-  « disponibilité d'arme »** (pas « urgence carburant » comme
-  documenté précédemment — cette erreur venait du décalage
-  systématique corrigé au §3.7bis). `[entité+0xD9→vtable+8]` est donc
-  `MVRS_ID19_ApplyWeaponTracking_7709A`, pas `ApplyReturnToBase`.
-  **Signification révisée** : `+0x283` signale un **engagement
-  d'arme confirmé** (verrouillage/prêt à tirer), pas une urgence
-  carburant — ce qui court-circuite le tournoi au profit d'un tir
-  immédiat plutôt que d'un retour à la base.
+  `+0x281` = **menace missile** (missile qui me vise, posé par
+  `Targeting_AcquireBestThreat`, traité par `AI_MissileEvasionReaction_9A77`) ;
+  `+0x283` = **cible sol acquise** (défense fixe `target_type == 2`) ;
+  `+0x287` = cible aérienne. *(Corrigé 2026-09-25 : les versions
+  précédentes voyaient dans `+0x281` une référence d'escorte et dans
+  `+0x283` un « engagement d'arme confirmé » — deux erreurs.)* Le nœud
+  dédié permanent `entité+0xD9` (construit au chargement,
+  `push 0x13` avant `sub_742FC` dans `PilotProfile_LoadFromPROF_73B4F`,
+  tag `0x160`, `ID=19`) est le **nœud d'attaque au sol**
+  (`GroundAttack_CanEngage_77000` / `GroundAttack_Start_7709A`, §3.7).
   `+0x285`/`+0x287` via `Goal_SelectTransition`, `+0x289` via
   `AI_ProximityRadioCalloutTrigger_A002`. Découverte notable au
   passage : ces trois références (`+0x281`/`+0x283`/`+0x287`) forment
@@ -1890,11 +1903,25 @@ maintenant en place :
 
 Par ordre de valeur probable :
 
-1. **Le rôle précis du bit `flags_75` bit 4** dans la chaîne de
-   guidage (§4bis) — **différé intentionnellement** : Rémi travaille
-   sur le moteur physique dans une session séparée dédiée à `JDYN`/
-   `flags_75` ; ce point sera traité conjointement plus tard, pas une
-   piste à explorer côté rétro-ingénierie de l'IA pour l'instant.
+*(Liste mise à jour le 2026-09-25.)*
+
+1. ~~`AI_GuidanceSolution_Major`, `AI_CombatDecision_Major`, `JDYN_RollStickFromError_4B09D`~~ —
+   **lues le 2026-09-25** : la loi de pilotage complète est dans `IMPL_SCAIBRAIN_CORRECTIONS.md` §7.
+2. Rôle des bits 7-8 de `flags_75` (état à 3 valeurs, taux de roulis × 0,6 à l'état 2) et nature de
+   `JDYN+0x59` (vitesse, pas altitude ? — `IMPL_SCAIBRAIN_CORRECTIONS.md` §7).
+3. **`Targeting_FilterByWeaponType`** — quel candidat le chercheur retient dans son cône
+   (cône et portée exacts du verrouillage).
+4. Test de verrouillage de l'AGM-65D (fonction pas encore nommée, `loc_42F71`, méthode `+0x14`
+   du modèle `MISS`) et champ `+0x13` du nœud d'attaque au sol.
+5. `BombModel_PredictImpact_41311` : la hauteur de chute passée par l'appelant (voir
+   `NOTE_ATTAQUE_SOL.md` §6).
+6. Rôle du seuil `dword_7203D` (calculé par `AIEntity_MasterTick_5ACC`, utilisé par l'esquive et
+   la poursuite).
+
+**Tranché depuis** : le bit 4 de `flags_75` n'appartient pas à la chaîne de guidage de l'IA ; c'est
+une condition de la loi de charge de la physique (`Aero_ComputeAoACommand_48862`, `PHYSICS.md`
+§5.7). Le mode pilote automatique physique utilisé par l'IA (`JDYN+0x68`,
+`Autopilot_FlyToPointKinematic_49C2E`) est décrit dans `PHYSICS.md` §9.
 
 **Ce qui n'est plus une priorité** (résolu ou recontextualisé
 au fil de cette session) : la localisation de la table de
@@ -1904,3 +1931,37 @@ constructeur » des nœuds `MVRS` (cadre obsolète depuis la découverte
 de la table statique), et le rôle des 3 constantes du constructeur
 d'entité (`+0x139`/`+0x13D`/`+0x141`, mécanisme compris via
 `Goal_SetObjective_A307`).
+
+## 12. Défenses fixes SWPN (catégorie 0x13) — lu 2026-10-15
+
+Chemin de création d'un objet de mission (PART), quelle que soit sa classe : `Expr_VM_Interpreter_51106` (opcode 0x90) ou `Scene_EnsureUnitsSpawned_530FF` → `PartEntry_ResolveSpawnPositionAndActivate_51EDC` → `AIAircraft_SpawnAndConditionalLoadProfile_53363` (seul appelant), qui instancie le modèle nommé par `ObjectPrototype_FindOrLoadAndInstantiate_38B70` sans tester sa classe : malgré son nom, elle crée aussi les SWPN placées comme PART. Les objets posés par le terrain (listes d'objets du PAK de théâtre) ne passent pas par ce chemin : `TerrainCell_LoadPlacedObjects_9A95A` les instancie directement par `ObjectPrototype_FindOrLoadAndInstantiate_38B70` (ni test de PROF, ni ordres de mission possibles), puis les ajoute aux objets du monde ; une SWPN posée par le terrain a donc la même mise à jour `SwpnInstance_Update_43491`.
+
+Une instance SWPN (vtable seg339 0x6FB50) n'a pas d'entité IA : sa mise à jour est
+`SwpnInstance_Update_43491` (slot +0x10), un automate fixe qui ne lit ni GOAL ni MVRS. Dans
+`AIAircraft_SpawnAndConditionalLoadProfile_53363`, le PROF n'est chargé que si
+`(instance+4 & 0x6F) == 0x4E` ; le constructeur SWPN lu (`PlayerComponent_SubHelperX_A0B8B` →
+`PlayerComponent_RegisterAndInitPulses_A0B40`) pose les bits 0x10 et 0x40, pas le bit 0x08 que pose
+le constructeur des avions IA (`Camera_Helper3_9D490`, nom faux).
+
+Opcodes de PROG transmis à l'instance : `MissionScript_CallNativeHandler_52513` passe le code d'opcode au
+slot +0x88 de l'instance, `SwpnInstance_OnOrder_43CBB` : opcode 0xBE (190) → munitions = 0 (la défense ne
+tire plus, reste ciblable et destructible), renvoie 1 ; tout autre opcode transmis est ignoré (renvoie 0).
+
+Tick (`SwpnInstance_Update_43491`), données = chunk DATA du modèle SWPN :
+1. Minuteur +0x5B (valeur 1 000 000 s posée à la construction, sert à ses impulsions).
+2. Délai entre tirs +0x57 > 0 : décompté de dt ; rien d'autre ce tick.
+3. Sinon, **une frame sur 10** (impulsion +0x63) : recherche de cible dans la portée de détection,
+   toutes directions : l'avion le plus proche (`World_FindNearestInCone_22A7D`, TRGT 1, catégorie 6),
+   puis les suivants (`World_SelectTargetInCone_22795`) jusqu'au premier d'un **autre camp** que
+   le mien et, pour un avion, dont le pilote n'est pas éjecté. Aucun → pas de cible. Le camp 0xFF
+   pose `byte_6E4C2` (rôle non établi).
+4. Avec cible : tir seulement si distance < portée de tir **et** si la cible n'est pas trop près de
+   l'horizon : avec u = direction unitaire, il faut ux² + uz² ≤ cos 15° (0,966), soit une
+   élévation d'au moins ~10,6°. Sinon la cible est abandonnée.
+5. Tir si munitions > 0 :
+   - lance-missiles : la cible doit être à plus de 305 m au-dessus du sol (`cmp …, 13100h`) ; plafond
+     de missiles du camp IA (`word_70479`, +1) ; missile créé à ma position, altitude + 2 × décalage
+     DATA, nez vers la cible, cible = la mienne, lanceur = moi, guidage actif ;
+   - canon : `Effect_SpawnPeriodicAtAttach` (non détaillé) ;
+   - missile : munitions −1, délai = cadence DATA.
+6. Mort → renvoie 0 (retirée) ; sinon l'altitude est recollée au terrain et renvoie 1.

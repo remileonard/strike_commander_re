@@ -7,9 +7,12 @@ ovr311		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, thunks voisins uniquement (40 lignes).
+; far, LECTEUR DE LA CLASSE ARMG (objet armé ; ex-Camera_Helper2) : Guided_LoadFromIFF_9D286
+; puis PlayerComponent_ReleaseAndLoad_9EBD7 (modèle +0x4A) = FORM WEAP (chunks INFO, HPTS
+; points d'emport, DCOY leurres, WPNS armes, qui chargent leurs OBJECTS\*.IFF par
+; IFF_LoadModelMain). Base de JETP.
 ; ==============================================================================================
-Camera_Helper2_9D380	proc far		; CODE XREF: VROOMM_StubThunk_6C200J
+Armed_LoadFromIFF_9D380	proc far		; CODE XREF: VROOMM_StubThunk_6C200J
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -48,7 +51,7 @@ loc_9D3AB:
 		pop	si
 		pop	bp
 		retf
-Camera_Helper2_9D380	endp
+Armed_LoadFromIFF_9D380	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

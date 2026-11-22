@@ -251,12 +251,12 @@ loc_A7778:				; CODE XREF: World_ParseWrldForm_A767F+F4j
 		push	si
 		nop
 		push	cs
-		call	near ptr MissionLoader_LoadPosition_A7A10
+		call	near ptr World_LoadLGHTChunk_A7A10
 		pop	cx
 		push	si
 		nop
 		push	cs
-		call	near ptr MissionLoader_LoadChunkB_A7CA1
+		call	near ptr World_LoadSmokeSet_A7CA1
 		pop	cx
 		push	ds
 		push	offset word_72A94
@@ -550,11 +550,15 @@ MissionLoader_LoadFormation_A78F5	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 145 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743,
-; ReadFieldGroupB_64A54, sub_2B24F, sub_2B228, ReadFieldGroupA_64A19, sub_2B2DB — chargement
-; de champs de position (coordonnées) d'une entité de mission.
+; far, LUE 2026-10-14. LECTEUR DU CHUNK 'LGHT' du FORM WRLD (appelé par
+; World_ParseWrldForm_A767F), objet jeu de lumières 5A9Ah. uint16 poids ambiant →
+; LightSet_SetAmbientWeight_2B24F (+7) ; uint16 pourcentage, borné à 100 puis × 255 ÷ 100 →
+; LightSet_SetIntensityPercent_2B228 (+9 ; ce dernier borne à son tour à 100 : ≥ 40 % donne
+; 1,0) ; puis jusqu'à la fin du chunk, enregistrements de 10 o : uint16 poids, 3 int16
+; direction (<< 8 ; ordre fichier X, Z, Y), uint8 normaliser, 1 octet non référencé ici →
+; LightSet_AddLight_2B2DB. Ex-'MissionLoader_LoadPosition_A7A10'.
 ; ==============================================================================================
-MissionLoader_LoadPosition_A7A10	proc far		; CODE XREF: VROOMM_StubThunk_6CDB4J World_ParseWrldForm_A767F+123p
+World_LoadLGHTChunk_A7A10	proc far		; CODE XREF: VROOMM_StubThunk_6CDB4J World_ParseWrldForm_A767F+123p
 
 var_24		= dword	ptr -24h
 var_20		= dword	ptr -20h
@@ -588,7 +592,7 @@ loc_A7A30:
 		jmp	loc_A7B1A
 ; ���������������������������������������������������������������������������
 
-loc_A7A33:				; CODE XREF: MissionLoader_LoadPosition_A7A10+1Ej
+loc_A7A33:				; CODE XREF: World_LoadLGHTChunk_A7A10+1Ej
 		push	di
 
 loc_A7A34:
@@ -597,7 +601,7 @@ loc_A7A34:
 		mov	[bp+var_C], ax
 		push	ax
 		push	5A9Ah
-		call	ProgressBar_UpdateValue
+		call	LightSet_SetAmbientWeight_2B24F
 		add	sp, 4
 		push	di
 		call	ResourceRecord_ReadFieldGroupB_64A54
@@ -608,10 +612,10 @@ loc_A7A34:
 		jmp	short loc_A7A5C
 ; ���������������������������������������������������������������������������
 
-loc_A7A59:				; CODE XREF: MissionLoader_LoadPosition_A7A10+45j
+loc_A7A59:				; CODE XREF: World_LoadLGHTChunk_A7A10+45j
 		mov	ax, 64h	; 'd'
 
-loc_A7A5C:				; CODE XREF: MissionLoader_LoadPosition_A7A10+47j
+loc_A7A5C:				; CODE XREF: World_LoadLGHTChunk_A7A10+47j
 		mov	dx, ax
 		movsx	eax, dx
 		imul	eax, 0FFh
@@ -622,12 +626,12 @@ loc_A7A5C:				; CODE XREF: MissionLoader_LoadPosition_A7A10+47j
 		push	5A9Ah
 
 loc_A7A78:
-		call	ProgressBar_PercentToFixed
+		call	LightSet_SetIntensityPercent_2B228
 		add	sp, 4
 		jmp	short loc_A7AE7
 ; ���������������������������������������������������������������������������
 
-loc_A7A82:				; CODE XREF: MissionLoader_LoadPosition_A7A10+107j
+loc_A7A82:				; CODE XREF: World_LoadLGHTChunk_A7A10+107j
 		push	large 0Ah
 		push	ss
 		lea	ax, [bp+var_A]
@@ -657,10 +661,10 @@ loc_A7A82:				; CODE XREF: MissionLoader_LoadPosition_A7A10+107j
 		mov	[bp+var_24], eax
 		push	[bp+var_A]
 		push	5A9Ah
-		call	ListItem_ConstructComplex
+		call	LightSet_AddLight_2B2DB
 		add	sp, 12h
 
-loc_A7AE7:				; CODE XREF: MissionLoader_LoadPosition_A7A10+70j
+loc_A7AE7:				; CODE XREF: World_LoadLGHTChunk_A7A10+70j
 		test	word ptr [di+72h], 1
 		jz	short loc_A7B02
 		mov	eax, [di+76h]
@@ -671,11 +675,11 @@ loc_A7AE7:				; CODE XREF: MissionLoader_LoadPosition_A7A10+70j
 		jmp	short loc_A7B02
 ; ���������������������������������������������������������������������������
 
-loc_A7B00:				; CODE XREF: MissionLoader_LoadPosition_A7A10+E8j
+loc_A7B00:				; CODE XREF: World_LoadLGHTChunk_A7A10+E8j
 		jmp	short $+2
 
-loc_A7B02:				; CODE XREF: MissionLoader_LoadPosition_A7A10+DCj
-					; MissionLoader_LoadPosition_A7A10+EEj
+loc_A7B02:				; CODE XREF: World_LoadLGHTChunk_A7A10+DCj
+					; World_LoadLGHTChunk_A7A10+EEj
 		mov	eax, [di+65h]
 		cmp	eax, [di+76h]
 		jl	short loc_A7B11
@@ -683,22 +687,22 @@ loc_A7B02:				; CODE XREF: MissionLoader_LoadPosition_A7A10+DCj
 		jmp	short loc_A7B13
 ; ���������������������������������������������������������������������������
 
-loc_A7B11:				; CODE XREF: MissionLoader_LoadPosition_A7A10+FAj
+loc_A7B11:				; CODE XREF: World_LoadLGHTChunk_A7A10+FAj
 		xor	ax, ax
 
-loc_A7B13:				; CODE XREF: MissionLoader_LoadPosition_A7A10+FFj
+loc_A7B13:				; CODE XREF: World_LoadLGHTChunk_A7A10+FFj
 		or	ax, ax
 		jnz	short loc_A7B1A
 		jmp	loc_A7A82
 ; ���������������������������������������������������������������������������
 
-loc_A7B1A:				; CODE XREF: MissionLoader_LoadPosition_A7A10:loc_A7A30j
-					; MissionLoader_LoadPosition_A7A10+105j
+loc_A7B1A:				; CODE XREF: World_LoadLGHTChunk_A7A10:loc_A7A30j
+					; World_LoadLGHTChunk_A7A10+105j
 		pop	di
 		pop	si
 		leave
 		retf
-MissionLoader_LoadPosition_A7A10	endp
+World_LoadLGHTChunk_A7A10	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -941,10 +945,12 @@ MissionLoader_LoadChunkA_A7C8E	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ResourceRecord_SeekAndRead_64743, sub_2AFE0, alloue (sub_658), sub_6CC3D,
-; enregistrement conteneur (sub_21F8D).
+; far, LECTEUR DU CHUNK SMOK D'UN MONDE (ex-MissionLoader_LoadChunkB) : nom du jeu de fumées
+; (ex. 'SMOKESET'), alloue l'objet jeu de fumées (0x33 o, vtable 30BAh) et le remplit par
+; SmokeSet_LoadFromIFF_A636C ; résultat dans word_70483 (utilisé par SmokeTrail_Tick_3D57E,
+; SmokeGen_Tick_4C057, Particle_SpawnWithColor).
 ; ==============================================================================================
-MissionLoader_LoadChunkB_A7CA1	proc far		; CODE XREF: VROOMM_StubThunk_6CDB9J World_ParseWrldForm_A767F+12Ap
+World_LoadSmokeSet_A7CA1	proc far		; CODE XREF: VROOMM_StubThunk_6CDB9J World_ParseWrldForm_A767F+12Ap
 
 var_C		= word ptr -0Ch
 var_A		= word ptr -0Ah
@@ -965,7 +971,7 @@ arg_0		= word ptr  6
 		jmp	loc_A7D43
 ; ���������������������������������������������������������������������������
 
-loc_A7CC3:				; CODE XREF: MissionLoader_LoadChunkB_A7CA1+1Dj
+loc_A7CC3:				; CODE XREF: World_LoadSmokeSet_A7CA1+1Dj
 		mov	[bp+var_C], si
 		push	[bp+var_C]
 		lea	ax, [bp+var_A]
@@ -998,10 +1004,10 @@ loc_A7CC3:				; CODE XREF: MissionLoader_LoadChunkB_A7CA1+1Dj
 		jmp	short loc_A7D2D
 ; ���������������������������������������������������������������������������
 
-loc_A7D2B:				; CODE XREF: MissionLoader_LoadChunkB_A7CA1+40j
+loc_A7D2B:				; CODE XREF: World_LoadSmokeSet_A7CA1+40j
 		mov	ax, si
 
-loc_A7D2D:				; CODE XREF: MissionLoader_LoadChunkB_A7CA1+88j
+loc_A7D2D:				; CODE XREF: World_LoadSmokeSet_A7CA1+88j
 		mov	word_70483, ax
 
 loc_A7D30:
@@ -1016,14 +1022,14 @@ loc_A7D3B:
 loc_A7D40:
 		add	sp, 4
 
-loc_A7D43:				; CODE XREF: MissionLoader_LoadChunkB_A7CA1+1Fj
-					; MissionLoader_LoadChunkB_A7CA1+94j
+loc_A7D43:				; CODE XREF: World_LoadSmokeSet_A7CA1+1Fj
+					; World_LoadSmokeSet_A7CA1+94j
 		pop	si
 
 locret_A7D44:
 		leave
 		retf
-MissionLoader_LoadChunkB_A7CA1	endp
+World_LoadSmokeSet_A7CA1	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

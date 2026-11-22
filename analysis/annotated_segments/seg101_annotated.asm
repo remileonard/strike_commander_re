@@ -131,7 +131,14 @@ loc_4629F:				; DATA XREF: seg339:1DDEo
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_462A7:				; DATA XREF: seg339:off_6EE92o
+; ==============================================================================================
+; far (label), LU 2026-10-15. Slot +0x2C de la vtable DYNM de base (seg339 0x6EE92 ; garde par
+; le corps MISS, vtable 0x6F016) : vitesse angulaire du corps = vecteur nul
+; (dword_707F8..70800 ; alloue 12 octets si le tampon est nul). Pour un missile, la rotation
+; de WorldObject_IntegrateBodyMotion_3D31D est donc nulle : son orientation ne change que par
+; MissileBody_SteerToTarget_42738 et l'alignement balistique.
+; ==============================================================================================
+DynBody_GetAngularVelocityZero_462A7:				; DATA XREF: seg339:off_6EE92o
 					; seg339:1E32o	...
 		push	bp
 		mov	bp, sp
@@ -434,12 +441,12 @@ Physics_ResolveWindVectorCached_4643B	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,117L — met à l'échelle un vecteur de force (+8/0xC/0x10) par un scalaire (arg_6),
-; l'ajoute à une position de référence (+0x2, +0x12) : application pondérée d'une force à un
-; point d'application (moment/couple).
+; far, LUE 2026-10-02. (sortie, corps, &echelle) : position monde de l'objet du corps (corps+2
+; -> +0x12) + vitesse du corps (+8/+0x0C/+0x10) x echelle. Position predite absolue (ex. a 4
+; s).
 ; ==============================================================================================
-Physics_ApplyForceAtPoint	proc far		; CODE XREF: AI_VisibilityTest+6EP
-					; Missile_PhysicsTick+182P ...
+Physics_ApplyForceAtPoint	proc far		; CODE XREF: AI_CollisionCourseTest_DD21+6EP
+					; MVRS_BuildCombatContext_E5A4+182P ...
 
 var_18		= dword	ptr -18h
 var_14		= dword	ptr -14h
@@ -757,7 +764,7 @@ loc_466F7:				; CODE XREF: Physics_AllocGroundConstraintVector+10j
 		push	ss
 		lea	ax, [bp+var_4]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	eax, [bp+var_4]
 		neg	eax
@@ -780,7 +787,7 @@ loc_4673C:				; CODE XREF: Physics_AllocGroundConstraintVector+73j
 		push	ss
 		lea	ax, [bp+var_10]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp+var_4]
 
@@ -824,7 +831,7 @@ loc_46793:				; CODE XREF: Physics_AllocGroundConstraintVector+CAj
 		push	ss
 		lea	ax, [bp+var_20]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	[bp+var_24], 9CCh
 		cmp	[bp+var_8], 100h
@@ -888,7 +895,7 @@ loc_4685C:
 loc_46861:
 		lea	ax, [bp+var_28]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_28]
 		add	[bp+var_C], eax
@@ -1015,7 +1022,14 @@ loc_4691A:				; DATA XREF: seg339:off_6EEAAo
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_46922:				; DATA XREF: seg339:off_6EE42o
+; ==============================================================================================
+; far (label), LUE 2026-10-12. Slot +0x48 de la vtable DYNM de base (seg339 tag 0x223A) : «
+; est-ce un JDYN ? » → renvoie 0 (xor ax,ax). Toutes les variantes
+; MISS/GBMB/DURD/AGRV/SURF/PARA gardent ce slot ; seule JDYN le remplace (thunk loc_3B63B →
+; JDYN_AsJDYN_4B093, renvoie l'objet JDYN). Appelé ~60 fois sur [instance+0x51] ou
+; [modèle+0x36] par l'IA, le HUD, la physique, les collisions.
+; ==============================================================================================
+DYNM_AsJDYN_Base_46922:				; DATA XREF: seg339:off_6EE42o
 					; seg339:off_6EEAEo ...
 		push	bp
 		mov	bp, sp

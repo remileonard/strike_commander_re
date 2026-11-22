@@ -8,11 +8,19 @@ seg067		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,233L — variante de résolution d'interpolation par table (recherche par intervalle avec
-; cache dword_6E9BA/BE/C2) précédée d'un test de borne (+0x58) : résolution d'interpolation
-; cachée avec garde de limite (utilisée par le setup de face du seg055).
+; far, 233 L, LUE 2026-10-14. INDEX DE PALETTE D'UN SOMMET OMBRÉ AVEC BROUILLARD (utilisée par
+; le rendu du terrain et le setup de face seg055). Args : (table, couleur, intensité 0..255,
+; profondeur 24.8, surcharge). couleur ≥ [table+58h] → 0. Profondeur ÷ 256 → facteur de
+; brouillard f : 0 sous [table+72h], max [table+6Ah] au-delà de [table+76h], sinon recherche
+; dichotomique dans la table de seuils dword [table+48h] (nombre [table+4Ch], cache
+; dword_6E9BA/BE/C2), f = (rang+1) << ([table+68h]−[table+4Eh]). Entrée e = [table+5Ah] +
+; couleur × 15. n = surcharge ou mot e+0Bh (nombre de teintes). v = (intensité × n + 0x80) >>
+; 8. Résultat = e+6 (première teinte) + v si f = 0 ; sinon e+6 + v + (((mot e+0Dh) − v) × f +
+; [[e]+6Eh]) >> [[e]+68h] : la teinte glisse vers la teinte de brouillard e+0Dh quand la
+; distance croît. Ancien résumé : 'résolution d'interpolation cachée avec garde de limite'.
+; Ex-'Interp_ResolveCachedGuarded'.
 ; ==============================================================================================
-Interp_ResolveCachedGuarded	proc far		; CODE XREF: seg055:0B18P seg055:0E87P ...
+Palette_ShadeIndexWithFog_2F24E	proc far		; CODE XREF: seg055:0B18P seg055:0E87P ...
 
 var_14		= byte ptr -14h
 var_12		= dword	ptr -12h
@@ -47,15 +55,15 @@ arg_A		= word ptr  10h
 		jmp	loc_2F397
 ; ���������������������������������������������������������������������������
 
-loc_2F28A:				; CODE XREF: Interp_ResolveCachedGuarded+37j
+loc_2F28A:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+37j
 		mov	eax, [bp+arg_6]
 		cmp	eax, dword_6E9BE
 		jge	short loc_2F298
 		jmp	loc_2F397
 ; ���������������������������������������������������������������������������
 
-loc_2F298:				; CODE XREF: Interp_ResolveCachedGuarded+25j
-					; Interp_ResolveCachedGuarded+2Cj ...
+loc_2F298:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+25j
+					; Palette_ShadeIndexWithFog_2F24E+2Cj ...
 		mov	eax, [si+72h]
 		cmp	eax, [bp+arg_6]
 		jle	short loc_2F2B9
@@ -65,15 +73,15 @@ loc_2F2A2:
 		mov	dword_6E9BE, eax
 		xor	eax, eax
 
-loc_2F2B2:				; CODE XREF: Interp_ResolveCachedGuarded+81j
-					; Interp_ResolveCachedGuarded+146j
+loc_2F2B2:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+81j
+					; Palette_ShadeIndexWithFog_2F24E+146j
 		mov	dword_6E9C2, eax
 
 loc_2F2B6:
 		jmp	loc_2F39B
 ; ���������������������������������������������������������������������������
 
-loc_2F2B9:				; CODE XREF: Interp_ResolveCachedGuarded+52j
+loc_2F2B9:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+52j
 		mov	eax, [si+76h]
 		cmp	eax, [bp+arg_6]
 		jg	short loc_2F2D1
@@ -87,7 +95,7 @@ loc_2F2CB:
 		jmp	short loc_2F2B2
 ; ���������������������������������������������������������������������������
 
-loc_2F2D1:				; CODE XREF: Interp_ResolveCachedGuarded+73j
+loc_2F2D1:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+73j
 		mov	dx, [si+4Ch]
 		sar	dx, 1
 		dec	dx
@@ -98,7 +106,7 @@ loc_2F2D1:				; CODE XREF: Interp_ResolveCachedGuarded+73j
 		jmp	loc_2F378
 ; ���������������������������������������������������������������������������
 
-loc_2F2E5:				; CODE XREF: Interp_ResolveCachedGuarded+133j
+loc_2F2E5:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+133j
 		dec	[bp+var_A]
 		les	bx, [si+48h]
 		mov	cx, bx
@@ -126,8 +134,8 @@ loc_2F326:
 		jmp	short loc_2F34E
 ; ���������������������������������������������������������������������������
 
-loc_2F32C:				; CODE XREF: Interp_ResolveCachedGuarded+C8j
-					; Interp_ResolveCachedGuarded+CEj
+loc_2F32C:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+C8j
+					; Palette_ShadeIndexWithFog_2F24E+CEj
 		mov	eax, [bp+arg_6]
 		cmp	eax, [bp+var_12]
 		jnz	short loc_2F358
@@ -140,13 +148,13 @@ loc_2F32C:				; CODE XREF: Interp_ResolveCachedGuarded+C8j
 		add	bx, ax
 		mov	eax, es:[bx+4]
 
-loc_2F34E:				; CODE XREF: Interp_ResolveCachedGuarded+DCj
+loc_2F34E:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+DCj
 		mov	dword_6E9BE, eax
 		mov	[bp+var_14], 1
 		jmp	short loc_2F378
 ; ���������������������������������������������������������������������������
 
-loc_2F358:				; CODE XREF: Interp_ResolveCachedGuarded+E6j
+loc_2F358:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+E6j
 		mov	eax, [bp+arg_6]
 		cmp	eax, [bp+var_E]
 		jge	short loc_2F36E
@@ -157,14 +165,14 @@ loc_2F358:				; CODE XREF: Interp_ResolveCachedGuarded+E6j
 		jmp	short loc_2F378
 ; ���������������������������������������������������������������������������
 
-loc_2F36E:				; CODE XREF: Interp_ResolveCachedGuarded+112j
+loc_2F36E:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+112j
 		mov	ax, 1
 		mov	cl, [bp+var_A]
 		shl	ax, cl
 		add	dx, ax
 
-loc_2F378:				; CODE XREF: Interp_ResolveCachedGuarded+94j
-					; Interp_ResolveCachedGuarded+108j ...
+loc_2F378:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+94j
+					; Palette_ShadeIndexWithFog_2F24E+108j ...
 		mov	al, [bp+var_14]
 		mov	ah, 0
 		or	ax, ax
@@ -172,7 +180,7 @@ loc_2F378:				; CODE XREF: Interp_ResolveCachedGuarded+94j
 		jmp	loc_2F2E5
 ; ���������������������������������������������������������������������������
 
-loc_2F384:				; CODE XREF: Interp_ResolveCachedGuarded+131j
+loc_2F384:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+131j
 		mov	ax, dx
 		inc	ax
 		movsx	eax, ax
@@ -182,11 +190,11 @@ loc_2F384:				; CODE XREF: Interp_ResolveCachedGuarded+131j
 		jmp	loc_2F2B2
 ; ���������������������������������������������������������������������������
 
-loc_2F397:				; CODE XREF: Interp_ResolveCachedGuarded+39j
-					; Interp_ResolveCachedGuarded+47j
+loc_2F397:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+39j
+					; Palette_ShadeIndexWithFog_2F24E+47j
 		mov	eax, dword_6E9C2
 
-loc_2F39B:				; CODE XREF: Interp_ResolveCachedGuarded:loc_2F2B6j
+loc_2F39B:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E:loc_2F2B6j
 		mov	[bp+var_4], eax
 
 loc_2F39F:
@@ -204,7 +212,7 @@ loc_2F3A5:
 		jnz	short loc_2F3BC
 		mov	ax, [di+0Bh]
 
-loc_2F3BC:				; CODE XREF: Interp_ResolveCachedGuarded+169j
+loc_2F3BC:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+169j
 		mov	[bp+var_8], ax
 		mov	ax, [bp+var_6]
 		imul	[bp+var_8]
@@ -220,7 +228,7 @@ loc_2F3C8:
 		jmp	short loc_2F3FC
 ; ���������������������������������������������������������������������������
 
-loc_2F3DD:				; CODE XREF: Interp_ResolveCachedGuarded+185j
+loc_2F3DD:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+185j
 		mov	ax, [di+0Dh]
 		sub	ax, [bp+var_6]
 		cwde
@@ -232,19 +240,19 @@ loc_2F3DD:				; CODE XREF: Interp_ResolveCachedGuarded+185j
 		add	ax, [di+6]
 		add	ax, [bp+var_6]
 
-loc_2F3FC:				; CODE XREF: Interp_ResolveCachedGuarded+18Dj
+loc_2F3FC:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+18Dj
 		jmp	short loc_2F400
 ; ���������������������������������������������������������������������������
 
-loc_2F3FE:				; CODE XREF: Interp_ResolveCachedGuarded+Fj
+loc_2F3FE:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E+Fj
 		xor	ax, ax
 
-loc_2F400:				; CODE XREF: Interp_ResolveCachedGuarded:loc_2F3FCj
+loc_2F400:				; CODE XREF: Palette_ShadeIndexWithFog_2F24E:loc_2F3FCj
 		pop	di
 		pop	si
 		leave
 		retf
-Interp_ResolveCachedGuarded	endp
+Palette_ShadeIndexWithFog_2F24E	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -252,11 +260,11 @@ Interp_ResolveCachedGuarded	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,185L — même algorithme de recherche par intervalle avec cache (utilisé par le système
-; d'easing des keyframes, sub_29194) : résolution générique d'interpolation par table triée
-; avec cache — moteur commun aux systèmes d'easing (keyframe) et de texture mapping (mipmap).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). N° de table de brouillard pour une
+; profondeur (ex-Interp_ResolveCached) : même recherche de seuils que
+; Palette_ShadeIndexWithFog_2F24E (cache dword_6E9BA/BE/C2).
 ; ==============================================================================================
-Interp_ResolveCached	proc far		; CODE XREF: Keyframe_ResolveEasingValue+17P
+Palette_FogTableIndex_2F404	proc far		; CODE XREF: Palette_FogRemapColour_29194+17P
 					; seg055:109EP	...
 
 var_C		= byte ptr -0Ch
@@ -287,15 +295,15 @@ loc_2F42C:
 		jmp	loc_2F543
 ; ���������������������������������������������������������������������������
 
-loc_2F436:				; CODE XREF: Interp_ResolveCached+2Dj
+loc_2F436:				; CODE XREF: Palette_FogTableIndex_2F404+2Dj
 		mov	eax, [bp+arg_2]
 		cmp	eax, dword_6E9BE
 		jge	short loc_2F444
 		jmp	loc_2F543
 ; ���������������������������������������������������������������������������
 
-loc_2F444:				; CODE XREF: Interp_ResolveCached+1Bj
-					; Interp_ResolveCached+22j ...
+loc_2F444:				; CODE XREF: Palette_FogTableIndex_2F404+1Bj
+					; Palette_FogTableIndex_2F404+22j ...
 		mov	eax, [si+72h]
 		cmp	eax, [bp+arg_2]
 		jle	short loc_2F465
@@ -303,13 +311,13 @@ loc_2F444:				; CODE XREF: Interp_ResolveCached+1Bj
 		mov	dword_6E9BE, eax
 		xor	eax, eax
 
-loc_2F45E:				; CODE XREF: Interp_ResolveCached+77j
-					; Interp_ResolveCached+13Cj
+loc_2F45E:				; CODE XREF: Palette_FogTableIndex_2F404+77j
+					; Palette_FogTableIndex_2F404+13Cj
 		mov	dword_6E9C2, eax
 		jmp	loc_2F547
 ; ���������������������������������������������������������������������������
 
-loc_2F465:				; CODE XREF: Interp_ResolveCached+48j
+loc_2F465:				; CODE XREF: Palette_FogTableIndex_2F404+48j
 		mov	eax, [si+76h]
 		cmp	eax, [bp+arg_2]
 		jg	short loc_2F47D
@@ -319,7 +327,7 @@ loc_2F465:				; CODE XREF: Interp_ResolveCached+48j
 		jmp	short loc_2F45E
 ; ���������������������������������������������������������������������������
 
-loc_2F47D:				; CODE XREF: Interp_ResolveCached+69j
+loc_2F47D:				; CODE XREF: Palette_FogTableIndex_2F404+69j
 		mov	dx, [si+4Ch]
 		sar	dx, 1
 		dec	dx
@@ -330,7 +338,7 @@ loc_2F47D:				; CODE XREF: Interp_ResolveCached+69j
 		jmp	loc_2F524
 ; ���������������������������������������������������������������������������
 
-loc_2F491:				; CODE XREF: Interp_ResolveCached+129j
+loc_2F491:				; CODE XREF: Palette_FogTableIndex_2F404+129j
 		dec	[bp+var_2]
 		les	bx, [si+48h]
 		mov	cx, bx
@@ -368,8 +376,8 @@ loc_2F4D6:
 		jmp	short loc_2F4FA
 ; ���������������������������������������������������������������������������
 
-loc_2F4D8:				; CODE XREF: Interp_ResolveCached+BEj
-					; Interp_ResolveCached:loc_2F4C8j
+loc_2F4D8:				; CODE XREF: Palette_FogTableIndex_2F404+BEj
+					; Palette_FogTableIndex_2F404:loc_2F4C8j
 		mov	eax, [bp+arg_2]
 		cmp	eax, [bp+var_A]
 		jnz	short loc_2F504
@@ -382,13 +390,13 @@ loc_2F4D8:				; CODE XREF: Interp_ResolveCached+BEj
 		add	bx, ax
 		mov	eax, es:[bx+4]
 
-loc_2F4FA:				; CODE XREF: Interp_ResolveCached:loc_2F4D6j
+loc_2F4FA:				; CODE XREF: Palette_FogTableIndex_2F404:loc_2F4D6j
 		mov	dword_6E9BE, eax
 		mov	[bp+var_C], 1
 		jmp	short loc_2F524
 ; ���������������������������������������������������������������������������
 
-loc_2F504:				; CODE XREF: Interp_ResolveCached+DCj
+loc_2F504:				; CODE XREF: Palette_FogTableIndex_2F404+DCj
 		mov	eax, [bp+arg_2]
 		cmp	eax, [bp+var_6]
 		jge	short loc_2F51A
@@ -399,14 +407,14 @@ loc_2F504:				; CODE XREF: Interp_ResolveCached+DCj
 		jmp	short loc_2F524
 ; ���������������������������������������������������������������������������
 
-loc_2F51A:				; CODE XREF: Interp_ResolveCached+108j
+loc_2F51A:				; CODE XREF: Palette_FogTableIndex_2F404+108j
 		mov	ax, 1
 		mov	cl, [bp+var_2]
 		shl	ax, cl
 		add	dx, ax
 
-loc_2F524:				; CODE XREF: Interp_ResolveCached+8Aj
-					; Interp_ResolveCached+FEj ...
+loc_2F524:				; CODE XREF: Palette_FogTableIndex_2F404+8Aj
+					; Palette_FogTableIndex_2F404+FEj ...
 		mov	al, [bp+var_C]
 		mov	ah, 0
 
@@ -416,7 +424,7 @@ loc_2F529:
 		jmp	loc_2F491
 ; ���������������������������������������������������������������������������
 
-loc_2F530:				; CODE XREF: Interp_ResolveCached+127j
+loc_2F530:				; CODE XREF: Palette_FogTableIndex_2F404+127j
 		mov	ax, dx
 		inc	ax
 		movsx	eax, ax
@@ -426,11 +434,11 @@ loc_2F530:				; CODE XREF: Interp_ResolveCached+127j
 		jmp	loc_2F45E
 ; ���������������������������������������������������������������������������
 
-loc_2F543:				; CODE XREF: Interp_ResolveCached+2Fj
-					; Interp_ResolveCached+3Dj
+loc_2F543:				; CODE XREF: Palette_FogTableIndex_2F404+2Fj
+					; Palette_FogTableIndex_2F404+3Dj
 		mov	eax, dword_6E9C2
 
-loc_2F547:				; CODE XREF: Interp_ResolveCached+5Ej
+loc_2F547:				; CODE XREF: Palette_FogTableIndex_2F404+5Ej
 		movsx	edx, word ptr [si+52h]
 		imul	eax, edx
 		add	eax, [si+6Eh]
@@ -440,7 +448,7 @@ loc_2F547:				; CODE XREF: Interp_ResolveCached+5Ej
 		pop	si
 		leave
 		retf
-Interp_ResolveCached	endp
+Palette_FogTableIndex_2F404	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -448,11 +456,13 @@ Interp_ResolveCached	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,216L — variante avec normalisation d'index (multiplication par le nombre d'entrées
-; +0x52, arrondi) avant la recherche par intervalle cachée : résolution d'interpolation avec
-; normalisation d'index (jauge/gradient proportionnel).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). N° de table (ex-
+; Interp_ResolveNormalizedIndex). niveau = ((intensité × (N + 1) + 80h) >> 8) − 1, N = [+52h]
+; (16 dans PALETTE.IFF), borné à ≥ 0. Facteur de brouillard f (mêmes seuils que
+; Palette_ShadeIndexWithFog_2F24E) ; f = 0 → n° = niveau − N (0 à pleine lumière, négatif =
+; plus sombre) ; branche avec brouillard (f ≠ 0) non détaillée.
 ; ==============================================================================================
-Interp_ResolveNormalizedIndex	proc far		; CODE XREF: Gauge_ResolveAndApplyLabel+FP
+Palette_ShadeTableIndex_2F55E	proc far		; CODE XREF: Palette_ShadeTableFor_2E8CD+FP
 
 var_C		= byte ptr -0Ch
 var_A		= dword	ptr -0Ah
@@ -489,15 +499,15 @@ loc_2F5A1:
 		jmp	loc_2F6B1
 ; ���������������������������������������������������������������������������
 
-loc_2F5A4:				; CODE XREF: Interp_ResolveNormalizedIndex+41j
+loc_2F5A4:				; CODE XREF: Palette_ShadeTableIndex_2F55E+41j
 		mov	eax, [bp+arg_4]
 		cmp	eax, dword_6E9BE
 		jge	short loc_2F5B2
 		jmp	loc_2F6B1
 ; ���������������������������������������������������������������������������
 
-loc_2F5B2:				; CODE XREF: Interp_ResolveNormalizedIndex+2Fj
-					; Interp_ResolveNormalizedIndex+36j ...
+loc_2F5B2:				; CODE XREF: Palette_ShadeTableIndex_2F55E+2Fj
+					; Palette_ShadeTableIndex_2F55E+36j ...
 		mov	eax, [si+72h]
 		cmp	eax, [bp+arg_4]
 		jle	short loc_2F5D3
@@ -509,13 +519,13 @@ loc_2F5C5:
 		mov	dword_6E9BE, eax
 		xor	eax, eax
 
-loc_2F5CC:				; CODE XREF: Interp_ResolveNormalizedIndex+8Bj
-					; Interp_ResolveNormalizedIndex+150j
+loc_2F5CC:				; CODE XREF: Palette_ShadeTableIndex_2F55E+8Bj
+					; Palette_ShadeTableIndex_2F55E+150j
 		mov	dword_6E9C2, eax
 		jmp	loc_2F6B5
 ; ���������������������������������������������������������������������������
 
-loc_2F5D3:				; CODE XREF: Interp_ResolveNormalizedIndex+5Cj
+loc_2F5D3:				; CODE XREF: Palette_ShadeTableIndex_2F55E+5Cj
 		mov	eax, [si+76h]
 		cmp	eax, [bp+arg_4]
 		jg	short loc_2F5EB
@@ -525,7 +535,7 @@ loc_2F5D3:				; CODE XREF: Interp_ResolveNormalizedIndex+5Cj
 		jmp	short loc_2F5CC
 ; ���������������������������������������������������������������������������
 
-loc_2F5EB:				; CODE XREF: Interp_ResolveNormalizedIndex+7Dj
+loc_2F5EB:				; CODE XREF: Palette_ShadeTableIndex_2F55E+7Dj
 		mov	dx, [si+4Ch]
 		sar	dx, 1
 		dec	dx
@@ -536,7 +546,7 @@ loc_2F5EB:				; CODE XREF: Interp_ResolveNormalizedIndex+7Dj
 		jmp	loc_2F692
 ; ���������������������������������������������������������������������������
 
-loc_2F5FF:				; CODE XREF: Interp_ResolveNormalizedIndex+13Dj
+loc_2F5FF:				; CODE XREF: Palette_ShadeTableIndex_2F55E+13Dj
 		dec	[bp+var_2]
 		les	bx, [si+48h]
 		mov	cx, bx
@@ -570,8 +580,8 @@ loc_2F636:
 		jmp	short loc_2F668
 ; ���������������������������������������������������������������������������
 
-loc_2F646:				; CODE XREF: Interp_ResolveNormalizedIndex+D2j
-					; Interp_ResolveNormalizedIndex:loc_2F636j
+loc_2F646:				; CODE XREF: Palette_ShadeTableIndex_2F55E+D2j
+					; Palette_ShadeTableIndex_2F55E:loc_2F636j
 		mov	eax, [bp+arg_4]
 		cmp	eax, [bp+var_A]
 		jnz	short loc_2F672
@@ -584,13 +594,13 @@ loc_2F646:				; CODE XREF: Interp_ResolveNormalizedIndex+D2j
 		add	bx, ax
 		mov	eax, es:[bx+4]
 
-loc_2F668:				; CODE XREF: Interp_ResolveNormalizedIndex+E6j
+loc_2F668:				; CODE XREF: Palette_ShadeTableIndex_2F55E+E6j
 		mov	dword_6E9BE, eax
 		mov	[bp+var_C], 1
 		jmp	short loc_2F692
 ; ���������������������������������������������������������������������������
 
-loc_2F672:				; CODE XREF: Interp_ResolveNormalizedIndex+F0j
+loc_2F672:				; CODE XREF: Palette_ShadeTableIndex_2F55E+F0j
 		mov	eax, [bp+arg_4]
 		cmp	eax, [bp+var_6]
 		jge	short loc_2F688
@@ -601,14 +611,14 @@ loc_2F672:				; CODE XREF: Interp_ResolveNormalizedIndex+F0j
 		jmp	short loc_2F692
 ; ���������������������������������������������������������������������������
 
-loc_2F688:				; CODE XREF: Interp_ResolveNormalizedIndex+11Cj
+loc_2F688:				; CODE XREF: Palette_ShadeTableIndex_2F55E+11Cj
 		mov	ax, 1
 		mov	cl, [bp+var_2]
 		shl	ax, cl
 		add	dx, ax
 
-loc_2F692:				; CODE XREF: Interp_ResolveNormalizedIndex+9Ej
-					; Interp_ResolveNormalizedIndex+112j ...
+loc_2F692:				; CODE XREF: Palette_ShadeTableIndex_2F55E+9Ej
+					; Palette_ShadeTableIndex_2F55E+112j ...
 		mov	al, [bp+var_C]
 		mov	ah, 0
 		or	ax, ax
@@ -616,7 +626,7 @@ loc_2F692:				; CODE XREF: Interp_ResolveNormalizedIndex+9Ej
 		jmp	loc_2F5FF
 ; ���������������������������������������������������������������������������
 
-loc_2F69E:				; CODE XREF: Interp_ResolveNormalizedIndex+13Bj
+loc_2F69E:				; CODE XREF: Palette_ShadeTableIndex_2F55E+13Bj
 		mov	ax, dx
 		inc	ax
 
@@ -632,17 +642,17 @@ loc_2F6AB:
 		jmp	loc_2F5CC
 ; ���������������������������������������������������������������������������
 
-loc_2F6B1:				; CODE XREF: Interp_ResolveNormalizedIndex:loc_2F5A1j
-					; Interp_ResolveNormalizedIndex+51j
+loc_2F6B1:				; CODE XREF: Palette_ShadeTableIndex_2F55E:loc_2F5A1j
+					; Palette_ShadeTableIndex_2F55E+51j
 		mov	eax, dword_6E9C2
 
-loc_2F6B5:				; CODE XREF: Interp_ResolveNormalizedIndex+72j
+loc_2F6B5:				; CODE XREF: Palette_ShadeTableIndex_2F55E+72j
 		mov	bx, [bp+arg_2]
 		cmp	bx, 0
 		jge	short loc_2F6C0
 		mov	bx, 0
 
-loc_2F6C0:				; CODE XREF: Interp_ResolveNormalizedIndex+15Dj
+loc_2F6C0:				; CODE XREF: Palette_ShadeTableIndex_2F55E+15Dj
 		cmp	eax, 0
 		jnz	short loc_2F6CF
 		movsx	eax, bx
@@ -650,7 +660,7 @@ loc_2F6C0:				; CODE XREF: Interp_ResolveNormalizedIndex+15Dj
 		jmp	short loc_2F6F1
 ; ���������������������������������������������������������������������������
 
-loc_2F6CF:				; CODE XREF: Interp_ResolveNormalizedIndex+166j
+loc_2F6CF:				; CODE XREF: Palette_ShadeTableIndex_2F55E+166j
 		movsx	edx, word ptr [si+52h]
 		shl	edx, 1
 		sub	edx, ebx
@@ -662,12 +672,12 @@ loc_2F6CF:				; CODE XREF: Interp_ResolveNormalizedIndex+166j
 		movsx	eax, bx
 		add	ax, cx
 
-loc_2F6F1:				; CODE XREF: Interp_ResolveNormalizedIndex+16Fj
+loc_2F6F1:				; CODE XREF: Palette_ShadeTableIndex_2F55E+16Fj
 		pop	di
 		pop	si
 		leave
 		retf
-Interp_ResolveNormalizedIndex	endp
+Palette_ShadeTableIndex_2F55E	endp
 
 ; ���������������������������������������������������������������������������
 		enter	0Ch, 0

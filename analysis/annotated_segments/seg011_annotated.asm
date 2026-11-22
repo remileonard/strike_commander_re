@@ -1045,7 +1045,7 @@ loc_136C0:				; CODE XREF: Player_MainUpdate+5BBj
 		push	ss
 		lea	ax, [bp+var_6C]
 		push	ax
-		call	Player_ResolveAttachPointN_5305A
+		call	Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		lea	ax, [bp+var_6C]
 		mov	[bp+var_2E], ax
@@ -1058,7 +1058,7 @@ loc_136C0:				; CODE XREF: Player_MainUpdate+5BBj
 		push	ss
 		lea	ax, [bp+var_78]
 		push	ax
-		call	Player_ResolveAttachPointN_5305A
+		call	Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		lea	ax, [bp+var_78]
 		mov	word ptr [bp+var_32+2],	ax

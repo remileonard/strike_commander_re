@@ -25,7 +25,9 @@
         "titleBar.activeBackground": "#a54372",
         "titleBar.activeForeground": "#e7e7e7",
         "titleBar.inactiveBackground": "#a5437299",
-        "titleBar.inactiveForeground": "#e7e7e799"
+        "titleBar.inactiveForeground": "#e7e7e799",
+        "statusBar.inactiveBackground": "#a54372"
     },
-    "peacock.color": "#a54372"
+    "peacock.color": "#a54372",
+    "cmake.sourceDirectory": "/Users/remi/source/strike_commander_re/tools/sc_player"
 }

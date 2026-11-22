@@ -19,7 +19,7 @@ stru_6ABB0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:07F6o
 ; d'overlay actuellement charge en memoire. fileoff=3A30h, codesize=0DC6h, nentries=7.
 ; ==============================================================================================
 VROOMM_StubThunk_6ABD0	proc far
-		jmp	AI_TransformTargetVector_775B1
+		jmp	GroundAttack_Phase2_EngageAutopilot_775B1
 VROOMM_StubThunk_6ABD0	endp
 
 
@@ -32,7 +32,7 @@ VROOMM_StubThunk_6ABD0	endp
 ; d'overlay actuellement charge en memoire. fileoff=3A30h, codesize=0DC6h, nentries=7.
 ; ==============================================================================================
 VROOMM_StubThunk_6ABD5	proc far
-		jmp	AI_WeaponEngagementCycle_776FB
+		jmp	GroundAttack_Phase3_WeaponRelease_776FB
 VROOMM_StubThunk_6ABD5	endp
 
 
@@ -45,7 +45,7 @@ VROOMM_StubThunk_6ABD5	endp
 ; d'overlay actuellement charge en memoire. fileoff=3A30h, codesize=0DC6h, nentries=7.
 ; ==============================================================================================
 VROOMM_StubThunk_6ABDA	proc far
-		jmp	AI_IssueTurnAndThrottle_77171
+		jmp	GroundAttack_Phase4_PullUp_77171
 VROOMM_StubThunk_6ABDA	endp
 
 
@@ -58,7 +58,7 @@ VROOMM_StubThunk_6ABDA	endp
 ; d'overlay actuellement charge en memoire. fileoff=3A30h, codesize=0DC6h, nentries=7.
 ; ==============================================================================================
 VROOMM_StubThunk_6ABDF	proc far
-		jmp	AI_ComputeGuidanceSolution_77282
+		jmp	GroundAttack_Phase01_Approach_77282
 VROOMM_StubThunk_6ABDF	endp
 
 
@@ -71,7 +71,7 @@ VROOMM_StubThunk_6ABDF	endp
 ; d'overlay actuellement charge en memoire. fileoff=3A30h, codesize=0DC6h, nentries=7.
 ; ==============================================================================================
 VROOMM_StubThunk_6ABE4	proc far		; DATA XREF: seg339:016Co
-		jmp	AI_TargetTrackHelper_77215
+		jmp	GroundAttack_PhaseDispatch_77215
 VROOMM_StubThunk_6ABE4	endp
 
 
@@ -84,7 +84,7 @@ VROOMM_StubThunk_6ABE4	endp
 ; d'overlay actuellement charge en memoire. fileoff=3A30h, codesize=0DC6h, nentries=7.
 ; ==============================================================================================
 VROOMM_StubThunk_6ABE9	proc far		; DATA XREF: seg339:0164o
-		jmp	MVRS_ID14_ScoreWeaponReadiness_77000
+		jmp	GroundAttack_CanEngage_77000
 VROOMM_StubThunk_6ABE9	endp
 
 
@@ -97,7 +97,7 @@ VROOMM_StubThunk_6ABE9	endp
 ; d'overlay actuellement charge en memoire. fileoff=3A30h, codesize=0DC6h, nentries=7.
 ; ==============================================================================================
 VROOMM_StubThunk_6ABEE	proc far		; DATA XREF: seg339:0168o
-		jmp	MVRS_ID14_ApplyWeaponTracking_7709A
+		jmp	GroundAttack_Start_7709A
 VROOMM_StubThunk_6ABEE	endp
 
 stub231		ends

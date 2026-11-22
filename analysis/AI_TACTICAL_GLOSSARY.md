@@ -37,7 +37,7 @@ flowchart TD
 
 | Intention | Description | Réf. technique |
 |---|---|---|
-| **Coéquipier** | Suit et protège le joueur activement — position de formation, réagit aux ordres radio du joueur (attaquer ma cible, rentrer à la base...). Réservé aux personnages « actifs » (Billy, Gwen, Stern). | `Goal_ActiveWingmanEngagement_878F`, sélecteur `5` |
+| **Coéquipier** | Suit et protège le joueur activement — position de formation, réagit aux ordres radio du joueur (attaquer ma cible, rentrer à la base...). Réservé aux personnages « actifs » (Billy, Gwen, Stern). | suivi : `Goal_FollowAllyExec` ; le sélecteur `5` (`Goal_MoraleReaction_878F`) est la **réaction au moral** de l'ailier (fuite, abandon, retournement contre le joueur), corrigé 2026-09-25 |
 | **En mission** | Exécute un ordre de mission précis assigné par le scénario ou la radio — décoller, atterrir, détruire une cible, défendre une zone. | `Goal_ExecuteAction`, `Goal_SetObjective_A307`, sélecteur `2` |
 | **Solo / en attente** | Aucun ordre précis en cours — patrouille ou vagabonde sans intention forte. Comportement de repli. | `Goal_WanderRandom`, sélecteur `3` |
 | **Instinct de combat** | La vraie prise de décision moment par moment une fois engagé — voir §3. | `AI_BehaviorStateMachine`, sélecteur `4` |
@@ -62,6 +62,14 @@ temps chez un vrai pilote, et que le plus pressant l'emportait.
 
 ### Les instincts identifiés
 
+> ⚠️ **Tableau périmé (identifiants décalés et rôles devinés).** Relu le 2026-09-25 : ce que fait
+> réellement chaque identifiant est dans `AI_TICK_CALL_GRAPH.md`, « Les actions confirmées des
+> manœuvres `MVRS` ». En bref : 1 virage de réacquisition, 2 dégagement, 3 manœuvre d'énergie,
+> 4 virage défensif sur alerte, 5 montée verticale + retournement, 6 Split-S, 7 poursuite,
+> 13 prise d'altitude à longue distance, 14 évitement du sol, 15 récupération nez haut /
+> décrochage, 16 reprendre de la vitesse, 19 attaque au sol. Aucun « carburant » ni « retour à la
+> base » dans les manœuvres.
+
 | Intention | Ce qui le déclenche | Ce qu'il fait s'il l'emporte | Réf. technique |
 |---|---|---|---|
 | **Manœuvre de poursuite** | Une cible est engagée ; l'urgence dépend de l'angle par rapport à elle (suis-je bien placé ?) et de la distance | Ajuste la position/l'orientation vers la cible ; peut choisir une **rupture défensive** (voir ci-dessous) si la position est ambiguë | `MVRS_ID3/4/5/6/7`, famille angulaire |
@@ -82,7 +90,7 @@ et s'il n'y a vraiment aucun indice géométrique pour trancher, **il
 tire à pile ou face**. C'est un choix défensif : casser la ligne de
 mire de l'adversaire plutôt que de rester prévisible.
 
-*Réf. technique : `MVRS_ID3_ApplyBreakDirection_F2C8`.*
+*Réf. technique : `MVRS_ID2_ApplyBreakDirection_F2C8`.*
 
 ### Les instincts se parlent entre eux
 

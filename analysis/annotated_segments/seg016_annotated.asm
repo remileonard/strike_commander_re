@@ -28,7 +28,7 @@ loc_1618B:				; DATA XREF: seg339:0894o
 		push	ds
 		push	offset aRadio	; "RADIO"
 		push	large dword ptr	[di+5Eh]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jz	short loc_161E6
@@ -612,7 +612,7 @@ loc_16626:				; DATA XREF: seg339:0898o
 		mov	[bp-2],	ax
 		mov	bx, [bp-2]
 		push	large dword ptr	[bx]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jnz	short loc_1665D

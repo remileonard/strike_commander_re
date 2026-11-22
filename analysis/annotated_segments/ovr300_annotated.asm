@@ -83,8 +83,8 @@ Debris_ConstructWithFormation_9B4A0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine Formation_ComputeGeometryHelper_56D43, Math_ApplyRotationHelperA_58768
-; (seg117), opération de conteneur.
+; far, combine Formation_ComputeGeometryHelper_56D43, Matrix_WorldToLocal_58768 (seg117),
+; opération de conteneur.
 ; ==============================================================================================
 Debris_ConstructWithRotation_9B4DE	proc far		; CODE XREF: VROOMM_StubThunk_6BF65J
 
@@ -171,7 +171,7 @@ loc_9B533:				; CODE XREF: Debris_ConstructWithRotation_9B4DE+30j
 		mov	ax, si
 		add	ax, 12h
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		cmp	word ptr [si+1Eh], 0
 		jz	short loc_9B57A
@@ -327,7 +327,7 @@ Debris_ConstructWithTorque_9B5BD	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle une opération de conteneur (Container_Op_22DE5).
+; far, appelle une opération de conteneur (Container_RemoveAndDeleteObject_22DE5).
 ; ==============================================================================================
 Debris_ContainerOpWrapper_9B62B	proc far		; CODE XREF: VROOMM_StubThunk_6BF74J
 
@@ -344,7 +344,7 @@ loc_9B632:
 		jz	short loc_9B646
 		push	[bp+arg_2]
 		push	word ptr [si+1Eh]
-		call	Container_Op_22DE5
+		call	Container_RemoveAndDeleteObject_22DE5
 		add	sp, 4
 
 loc_9B646:				; CODE XREF: Debris_ContainerOpWrapper_9B62B+Bj

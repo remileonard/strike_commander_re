@@ -68,11 +68,11 @@ loc_2F93A:
 		mov	[bp-4],	eax
 		push	eax
 		push	541Ah
-		call	Interp_ResolveCached
+		call	Palette_FogTableIndex_2F404
 		add	sp, 6
 		push	ax
 		push	541Ah
-		call	Text_ResolveTruncated
+		call	Palette_FadeTablePtr_2E8F1
 		add	sp, 4
 		push	dx
 		push	ax
@@ -116,7 +116,7 @@ locret_2F9A6:
 ; calcule un code de sortie combiné (AND des 4 bits par sommet, façon Cohen-Sutherland) : test
 ; de rejet rapide 'triangle entièrement hors de la zone visible' (bounding-box reject).
 ; ==============================================================================================
-Render_TriangleBBoxReject	proc far		; CODE XREF: Model_ResetTransformCache+10CP
+Render_TriangleBBoxReject	proc far		; CODE XREF: TriOverlay_RenderRegion_31BFF+10CP
 					; Model_RenderWithSubcomponents+13EP
 
 var_6		= dword	ptr -6
@@ -705,7 +705,7 @@ loc_2FDCB:
 		push	ax
 
 loc_2FDCF:
-		call	Math_ArcSinOfRatio_54A0E
+		call	Math_AcosOfRatio_54A0E
 
 loc_2FDD4:
 		add	sp, 8
@@ -735,7 +735,7 @@ loc_2FDED:				; CODE XREF: Render_PolygonProjectVertices:loc_2FDE4j
 		push	ss
 		lea	ax, [bp+var_2C]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_12]
 		mov	edx, [bp+var_2C]
@@ -757,7 +757,7 @@ loc_2FE32:
 loc_2FE37:
 		lea	ax, [bp+var_38]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 
 loc_2FE43:

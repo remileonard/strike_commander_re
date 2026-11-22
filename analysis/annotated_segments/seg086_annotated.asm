@@ -63,7 +63,7 @@ loc_3DDF6:				; CODE XREF: Camera_ResolvePositionVelocity_3DDC4+2Cj
 		push	dx
 		push	ax
 		push	large dword ptr	[si+5Ah]
-		call	HUD_RenderSymbologyAlt
+		call	WeaponSystem_FrameUpdate_3F8C0
 		add	sp, 8
 		jmp	short $+2
 

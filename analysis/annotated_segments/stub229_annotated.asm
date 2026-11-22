@@ -32,7 +32,7 @@ VROOMM_StubThunk_6AB40	endp
 ; d'overlay actuellement charge en memoire. fileoff=1F30h, codesize=184h, nentries=5.
 ; ==============================================================================================
 VROOMM_StubThunk_6AB45	proc far		; CODE XREF: seg008:0950P seg008:0C2FP ...
-		jmp	NotifiableRef_AttachTarget_75612
+		jmp	Behavior_PopFinished_75612
 VROOMM_StubThunk_6AB45	endp
 
 
@@ -59,7 +59,7 @@ VROOMM_StubThunk_6AB4A	endp
 ; d'overlay actuellement charge en memoire. fileoff=1F30h, codesize=184h, nentries=5.
 ; ==============================================================================================
 VROOMM_StubThunk_6AB4F	proc far		; CODE XREF: seg008:092BP seg008:0D52P ...
-		jmp	NotifiableRef_SwapTarget_756A4
+		jmp	Behavior_PushRunning_756A4
 VROOMM_StubThunk_6AB4F	endp
 
 

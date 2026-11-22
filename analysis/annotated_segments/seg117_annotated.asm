@@ -64,11 +64,12 @@ Math_FixedMulDiv_5804C	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, cosinus en virgule fixe (implémentation brute, sans normalisation d'angle — appelée par
-; Math_Cos_54876).
+; far, LUE (2026-09-24). Ex-'Math_Cos_Raw' : NOM INVERSE, c'est un SINUS. i = angle 24.8 >> 6
+; (+1440 si negatif) ; indexe la meme table cosinus seg213 a (90 deg - angle) avec signe :
+; sin(0) = table[360] = 0.
 ; ==============================================================================================
-Math_Cos_Raw_58063	proc far		; CODE XREF: seg020:0A10P
-					; Camera_ComputeMountedPosition_3D31D+192P ...
+Math_SinRaw_58063	proc far		; CODE XREF: seg020:0A10P
+					; WorldObject_IntegrateBodyMotion_3D31D+192P ...
 
 arg_0		= dword	ptr  6
 
@@ -79,7 +80,7 @@ arg_0		= dword	ptr  6
 		jns	short loc_58077
 		add	bx, 5A0h
 
-loc_58077:				; CODE XREF: Math_Cos_Raw_58063+Ej
+loc_58077:				; CODE XREF: Math_SinRaw_58063+Ej
 		mov	ax, 168h
 		sub	bx, ax
 		jl	short loc_5808B
@@ -89,16 +90,16 @@ loc_58077:				; CODE XREF: Math_Cos_Raw_58063+Ej
 		jmp	short loc_5808D
 ; ���������������������������������������������������������������������������
 
-loc_58086:				; CODE XREF: Math_Cos_Raw_58063+1Dj
+loc_58086:				; CODE XREF: Math_SinRaw_58063+1Dj
 		inc	cx
 		sub	bx, ax
 		jge	short loc_5808D
 
-loc_5808B:				; CODE XREF: Math_Cos_Raw_58063+19j
+loc_5808B:				; CODE XREF: Math_SinRaw_58063+19j
 		neg	bx
 
-loc_5808D:				; CODE XREF: Math_Cos_Raw_58063+21j
-					; Math_Cos_Raw_58063+26j
+loc_5808D:				; CODE XREF: Math_SinRaw_58063+21j
+					; Math_SinRaw_58063+26j
 		mov	ax, 100h
 		or	bx, bx
 		jz	short loc_5809E
@@ -108,16 +109,16 @@ loc_5808D:				; CODE XREF: Math_Cos_Raw_58063+21j
 		xor	ax, ax
 		mov	al, es:[bx]
 
-loc_5809E:				; CODE XREF: Math_Cos_Raw_58063+2Fj
+loc_5809E:				; CODE XREF: Math_SinRaw_58063+2Fj
 		or	cx, cx
 		jz	short loc_580A4
 		neg	ax
 
-loc_580A4:				; CODE XREF: Math_Cos_Raw_58063+3Dj
+loc_580A4:				; CODE XREF: Math_SinRaw_58063+3Dj
 		cwd
 		leave
 		retf
-Math_Cos_Raw_58063	endp
+Math_SinRaw_58063	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -125,10 +126,14 @@ Math_Cos_Raw_58063	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, sinus en virgule fixe (implémentation brute — appelée par Math_Sin_5483F).
+; far, LUE (2026-09-24). Ex-'Math_Sin_Raw' : NOM INVERSE, c'est un COSINUS. i = |angle 24.8|
+; >> 6 (quarts de degre) ; ramene dans [0, 90 deg] avec signe (cx) ; 1.0 (0x100) si i == 0,
+; sinon table d'octets seg213 (unk_68B90) : table[i] = cos(i/4 deg) en 24.8 (1.0 = 256)
+; (verifie : 221 a 30 deg, 181 a 45 deg, 127 a 60 deg, 0 a 90 deg). Fonction paire (utilise
+; |angle|) : cos(0) = 1, cos(180) = -1.
 ; ==============================================================================================
-Math_Sin_Raw_580A7	proc far		; CODE XREF: seg020:0A24P
-					; Camera_ComputeMountedPosition_3D31D+1A6P ...
+Math_CosRaw_580A7	proc far		; CODE XREF: seg020:0A24P
+					; WorldObject_IntegrateBodyMotion_3D31D+1A6P ...
 
 arg_0		= dword	ptr  6
 
@@ -139,7 +144,7 @@ arg_0		= dword	ptr  6
 		jns	short loc_580B9
 		neg	bx
 
-loc_580B9:				; CODE XREF: Math_Sin_Raw_580A7+Ej
+loc_580B9:				; CODE XREF: Math_CosRaw_580A7+Ej
 		cmp	bx, 168h
 		jb	short loc_580D3
 		inc	cx
@@ -150,11 +155,11 @@ loc_580B9:				; CODE XREF: Math_Sin_Raw_580A7+Ej
 		dec	cx
 		sub	bx, 2D0h
 
-loc_580D1:				; CODE XREF: Math_Sin_Raw_580A7+1Dj
+loc_580D1:				; CODE XREF: Math_CosRaw_580A7+1Dj
 		neg	bx
 
-loc_580D3:				; CODE XREF: Math_Sin_Raw_580A7+16j
-					; Math_Sin_Raw_580A7+23j
+loc_580D3:				; CODE XREF: Math_CosRaw_580A7+16j
+					; Math_CosRaw_580A7+23j
 		mov	ax, 100h
 		or	bx, bx
 		jz	short loc_580E4
@@ -163,16 +168,16 @@ loc_580D3:				; CODE XREF: Math_Sin_Raw_580A7+16j
 		xor	ax, ax
 		mov	al, es:[bx]
 
-loc_580E4:				; CODE XREF: Math_Sin_Raw_580A7+31j
+loc_580E4:				; CODE XREF: Math_CosRaw_580A7+31j
 		or	cx, cx
 		jz	short loc_580EA
 		neg	ax
 
-loc_580EA:				; CODE XREF: Math_Sin_Raw_580A7+3Fj
+loc_580EA:				; CODE XREF: Math_CosRaw_580A7+3Fj
 		cwd
 		leave
 		retf
-Math_Sin_Raw_580A7	endp
+Math_CosRaw_580A7	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -275,9 +280,10 @@ loc_58197:				; CODE XREF: seg117:0182j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, arc cosinus en virgule fixe (implémentation brute — appelée par Math_ArcCos_549A6).
+; far, LUE (2026-09-24). Ex-'Math_ArcCos_Raw_581A0' : NOM INVERSE, c'est un ARC SINUS. 90 deg
+; - table_acos(|x|), puis negation si x < 0 (asin(-x) = -asin(x)).
 ; ==============================================================================================
-Math_ArcCos_Raw_581A0	proc far		; CODE XREF: Math_ArcCos_549A6+44P
+Math_AsinRaw_581A0	proc far		; CODE XREF: Math_AsinDeg_549A6+44P
 
 arg_0		= dword	ptr  6
 
@@ -288,7 +294,7 @@ arg_0		= dword	ptr  6
 		jns	short loc_581B3
 		neg	ebx
 
-loc_581B3:				; CODE XREF: Math_ArcCos_Raw_581A0+Ej
+loc_581B3:				; CODE XREF: Math_AsinRaw_581A0+Ej
 		cmp	ebx, 100h
 		ja	short loc_581DC
 		shl	bx, 1
@@ -302,12 +308,12 @@ loc_581B3:				; CODE XREF: Math_ArcCos_Raw_581A0+Ej
 		jz	short loc_581DC
 		neg	eax
 
-loc_581DC:				; CODE XREF: Math_ArcCos_Raw_581A0+1Aj
-					; Math_ArcCos_Raw_581A0+37j
+loc_581DC:				; CODE XREF: Math_AsinRaw_581A0+1Aj
+					; Math_AsinRaw_581A0+37j
 		shld	edx, eax, 10h
 		leave
 		retf
-Math_ArcCos_Raw_581A0	endp
+Math_AsinRaw_581A0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -315,9 +321,13 @@ Math_ArcCos_Raw_581A0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, arc sinus en virgule fixe (implémentation brute — appelée par Math_ArcSin_5493E).
+; far, LUE (2026-09-24). Ex-'Math_ArcSin_Raw_581E3' : NOM INVERSE, c'est un ARC COSINUS. x
+; 24.8, |x| <= 1.0 : table de mots seg213+0x169 indexee par |x| (table[x] = acos(x/256) en
+; degres 24.8, verifie : 90 deg a 0, 60 deg a 0,5, 45 deg a 181/256, 0 deg a 1) ; x < 0 : 180
+; deg - table (symetrie acos(-x) = 180 - acos(x)). |x| > 1.0 : eax non defini (pas de
+; branche).
 ; ==============================================================================================
-Math_ArcSin_Raw_581E3	proc far		; CODE XREF: Math_ArcSin_5493E+44P
+Math_AcosRaw_581E3	proc far		; CODE XREF: Math_AcosDeg_5493E+44P
 
 arg_0		= dword	ptr  6
 
@@ -328,7 +338,7 @@ arg_0		= dword	ptr  6
 		jns	short loc_581F6
 		neg	ebx
 
-loc_581F6:				; CODE XREF: Math_ArcSin_Raw_581E3+Ej
+loc_581F6:				; CODE XREF: Math_AcosRaw_581E3+Ej
 		cmp	ebx, 100h
 		ja	short loc_5821C
 		shl	bx, 1
@@ -341,12 +351,12 @@ loc_581F6:				; CODE XREF: Math_ArcSin_Raw_581E3+Ej
 		neg	eax
 		add	eax, 0B400h
 
-loc_5821C:				; CODE XREF: Math_ArcSin_Raw_581E3+1Aj
-					; Math_ArcSin_Raw_581E3+2Ej
+loc_5821C:				; CODE XREF: Math_AcosRaw_581E3+1Aj
+					; Math_AcosRaw_581E3+2Ej
 		shld	edx, eax, 10h
 		leave
 		retf
-Math_ArcSin_Raw_581E3	endp
+Math_AcosRaw_581E3	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -550,8 +560,10 @@ Math_Sqrt_Raw_582EE	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, calcule simultanément sinus et cosinus d'un même angle (Math_Cos_Raw_58063 +
-; Math_Sin_Raw_580A7). Référencée par sub_1B23F.
+; far, calcule simultanément sinus et cosinus d'un même angle (Math_SinRaw_58063 +
+; Math_CosRaw_580A7). Référencée par sub_1B23F. ⚠️ (2026-09-24) Math_Sin_5483F /
+; Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute
+; mention de sinus/cosinus tiree de ces noms dans ce resume est a relire.
 ; ==============================================================================================
 Math_ComputeSinCosPair_58344	proc far		; CODE XREF: UI_ComputeScaledRect+65P
 					; UI_ComputeScaledRect+72P
@@ -573,10 +585,10 @@ arg_2		= word ptr  8
 		push	dx
 		push	ax
 		push	cs
-		call	near ptr Math_Cos_Raw_58063
+		call	near ptr Math_SinRaw_58063
 		mov	[bp+var_2], ax
 		push	cs
-		call	near ptr Math_Sin_Raw_580A7
+		call	near ptr Math_CosRaw_580A7
 		add	sp, 4
 		mov	[bp+var_4], ax
 		mov	ax, [si]
@@ -940,10 +952,12 @@ Math_VectorTransformByMatrix3x3_58476	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, référencée par sub_5ECE et seg014 (UI cockpit) — utilisée par
-; WorldObject_ApplyOrientationVariantA_5776A.
+; far, LUE (2026-09-24). Ex-'Math_ApplyRotationHelperA'. v = M . v : chaque sortie est le
+; produit scalaire de v avec une LIGNE de la matrice 3x3 24.8 (M+0, M+0x0C, M+0x18). Pour une
+; matrice d'orientation (lignes = axes de l'objet), passage du repere monde au repere de
+; l'objet. Inverse de Matrix_LocalToWorld_58828.
 ; ==============================================================================================
-Math_ApplyRotationHelperA_58768	proc far		; CODE XREF: AI_ComputeBearingToRef+39P seg014:0134P ...
+Matrix_WorldToLocal_58768	proc far		; CODE XREF: AI_ComputeBearingToRef+39P seg014:0134P ...
 
 var_C		= dword	ptr -0Ch
 var_8		= dword	ptr -8
@@ -1009,7 +1023,7 @@ arg_2		= word ptr  8
 		pop	si
 		leave
 		retf
-Math_ApplyRotationHelperA_58768	endp
+Matrix_WorldToLocal_58768	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1017,9 +1031,12 @@ Math_ApplyRotationHelperA_58768	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, référencée par sub_5392 — utilisée par WorldObject_ApplyOrientationVariantB_5779A.
+; far, LUE (2026-09-24). Ex-'Math_ApplyRotationHelperB'. v = transposee(M) . v : chaque sortie
+; combine une COLONNE de la matrice ([di],[di+0Ch],[di+18h] pour la 1re, etc.). Pour une
+; matrice orthonormee, inverse de Matrix_WorldToLocal_58768 : passage du repere de l'objet au
+; repere monde.
 ; ==============================================================================================
-Math_ApplyRotationHelperB_58828	proc far		; CODE XREF: AI_IncomingThreatWarning+187P
+Matrix_LocalToWorld_58828	proc far		; CODE XREF: AI_IncomingThreatWarning+187P
 					; AI_Sensor_WeaponVelocityCache+113P ...
 
 var_C		= dword	ptr -0Ch
@@ -1088,6 +1105,6 @@ loc_588DE:
 		pop	si
 		leave
 		retf
-Math_ApplyRotationHelperB_58828	endp
+Matrix_LocalToWorld_58828	endp
 
 seg117		ends

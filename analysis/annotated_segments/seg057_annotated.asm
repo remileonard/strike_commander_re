@@ -136,7 +136,7 @@ String_ConstructFromPtrLen	endp
 ; len).
 ; ==============================================================================================
 String_ConstructFromFarPtrLen	proc far		; CODE XREF: AITargeting_LoadFieldsFromIFFB_8EAE8+11BP
-					; Debris_LoadFieldMixC_9BFB0+5FP ...
+					; Exte_LoadVolume_9BFB0+5FP ...
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah

@@ -1,0 +1,402 @@
+04FC4  push bp
+04FC5  mov bp, sp
+04FC7  sub sp, 2
+04FCA  push si
+04FCB  mov si, word ptr [bp + 6]
+04FCE  mov byte ptr [bp - 1], 0
+04FD2  cmp byte ptr [si + 0xb2], 0
+04FD7  je 0x4fe4
+04FD9  push 0x1600  ; "Tex"
+04FDC  lcall 0x4d8, 0x1a5  ; -> 04F25
+04FE1  add sp, 2
+04FE4  push 1
+04FE6  push word ptr [bp + 8]
+04FE9  push si
+04FEA  mov bx, word ptr [si]
+04FEC  lcall [bx + 0x14]
+04FEF  add sp, 6
+04FF2  push 0
+04FF4  push 0x5453494c
+04FFA  push si
+04FFB  lcall 0x4497, 0x2b1  ; -> 44C21
+05000  add sp, 8
+05003  or ax, ax
+05005  je 0x507a
+05007  push 0
+05009  push 0x455a4953
+0500F  push si
+05010  lcall 0x4497, 0x242  ; -> 44BB2
+05015  add sp, 8
+05018  or ax, ax
+0501A  je 0x502b
+0501C  push si
+0501D  lcall 0x4497, 0x553  ; -> 44EC3
+05022  add sp, 2
+05025  mov word ptr [si + 0xb5], ax
+05029  jmp 0x5036
+0502B  push 0x1601  ; "ex"
+0502E  lcall 0x4d8, 0x1a5  ; -> 04F25
+05033  add sp, 2
+05036  push 0
+05038  push 0x5453494c
+0503E  push si
+0503F  lcall 0x4497, 0x242  ; -> 44BB2
+05044  add sp, 8
+05047  or ax, ax
+05049  je 0x507a
+0504B  mov byte ptr [si + 0xb2], 1
+05050  movzx eax, word ptr [si + 0xb5]
+05056  push eax
+05058  push ds
+05059  mov ax, si
+0505B  add ax, 0xb8
+0505E  push ax
+0505F  push si
+05060  lcall 0x4497, 0x518  ; -> 44E88
+05065  add sp, 0xa
+05068  push ds
+05069  mov ax, si
+0506B  add ax, 0xb8
+0506E  push ax
+0506F  lcall 0xce0, 5  ; -> 0CE05
+05074  add sp, 4
+05077  mov byte ptr [bp - 1], al
+0507A  mov al, byte ptr [si + 0xb2]
+0507E  mov ah, 0
+05080  or ax, ax
+05082  je 0x508b
+05084  cmp word ptr [si + 0xb5], 0x50
+05089  jbe 0x5096
+0508B  push 0x1601  ; "ex"
+0508E  lcall 0x4d8, 0x1a5  ; -> 04F25
+05093  add sp, 2
+05096  mov al, byte ptr [bp - 1]
+05099  pop si
+0509A  leave 
+0509B  retf 
+0509C  pop si
+0509D  leave 
+0509E  retf 
+0509F  push bp
+050A0  mov bp, sp
+050A2  push si
+050A3  push di
+050A4  mov di, word ptr [bp + 6]
+050A7  mov al, byte ptr [di + 0xb2]
+050AB  mov ah, 0
+050AD  or ax, ax
+050AF  jne 0x50bc
+050B1  push 0x1602
+050B4  lcall 0x4d8, 0x1a5  ; -> 04F25
+050B9  add sp, 2
+050BC  nop 
+050BD  push cs
+050BE  call 0x532a
+050C1  mov al, 0
+050C3  mov byte ptr [di + 0xb3], al
+050C7  mov byte ptr [di + 0xb4], al
+050CB  jmp 0x5119
+050CD  test word ptr [di + 0x72], 1
+050D2  je 0x50e8
+050D4  mov eax, dword ptr [di + 0x76]
+050D8  dec eax
+050DA  cmp dword ptr [di + 0x65], eax
+050DE  jne 0x50e6
+050E0  inc dword ptr [di + 0x65]
+050E4  jmp 0x50e6
+050E6  jmp 0x50e8
+050E8  mov eax, dword ptr [di + 0x65]
+050EC  cmp eax, dword ptr [di + 0x76]
+050F0  jl 0x50f7
+050F2  mov ax, 1
+050F5  jmp 0x50f9
+050F7  xor ax, ax
+050F9  or ax, ax
+050FB  je 0x5101
+050FD  pop di
+050FE  pop si
+050FF  pop bp
+05100  retf 
+05101  movzx eax, word ptr [di + 0xb5]
+05107  push eax
+05109  push ds
+0510A  mov ax, di
+0510C  add ax, 0xb8
+0510F  push ax
+05110  push di
+05111  lcall 0x4497, 0x518  ; -> 44E88
+05116  add sp, 0xa
+05119  push word ptr [bp + 8]
+0511C  mov ax, di
+0511E  add ax, 0xb8
+05121  push ax
+05122  lcall 0, 0x2ec9  ; -> 02EC9
+05127  add sp, 4
+0512A  or ax, ax
+0512C  jne 0x50cd
+0512E  jmp 0x517f
+05130  test word ptr [di + 0x72], 1
+05135  je 0x514b
+05137  mov eax, dword ptr [di + 0x76]
+0513B  dec eax
+0513D  cmp dword ptr [di + 0x65], eax
+05141  jne 0x5149
+05143  inc dword ptr [di + 0x65]
+05147  jmp 0x5149
+05149  jmp 0x514b
+0514B  mov eax, dword ptr [di + 0x65]
+0514F  cmp eax, dword ptr [di + 0x76]
+05153  jl 0x515a
+05155  mov ax, 1
+05158  jmp 0x515c
+0515A  xor ax, ax
+0515C  or ax, ax
+0515E  je 0x5164
+05160  pop di
+05161  pop si
+05162  pop bp
+05163  retf 
+05164  movzx eax, word ptr [di + 0xb5]
+0516A  push eax
+0516C  push ds
+0516D  mov ax, di
+0516F  add ax, 0xb8
+05172  push ax
+05173  push di
+05174  lcall 0x4497, 0x518  ; -> 44E88
+05179  add sp, 0xa
+0517C  dec word ptr [bp + 0xa]
+0517F  cmp word ptr [bp + 0xa], 0
+05183  ja 0x5130
+05185  cmp byte ptr [0x39e], 0
+0518A  je 0x51a4
+0518C  push 1
+0518E  mov ax, di
+05190  add ax, 0xb8
+05193  push ax
+05194  push 0x62be
+05197  lcall 0x431f, 0x44a  ; -> 4363A
+0519C  add sp, 6
+0519F  mov byte ptr [di + 0xb4], 1
+051A4  pop di
+051A5  pop si
+051A6  pop bp
+051A7  retf 
+051A8  push bp
+051A9  mov bp, sp
+051AB  push si
+051AC  mov si, word ptr [bp + 6]
+051AF  mov al, byte ptr [si + 0xb2]
+051B3  mov ah, 0
+051B5  or ax, ax
+051B7  jne 0x51c4
+051B9  push 0x1602
+051BC  lcall 0x4d8, 0x1a5  ; -> 04F25
+051C1  add sp, 2
+051C4  cmp byte ptr [si + 0xb4], 0
+051C9  je 0x51ee
+051CB  nop 
+051CC  push cs
+051CD  call 0x532a
+051D0  mov byte ptr [si + 0xb3], 0
+051D5  mov al, byte ptr [bp + 8]
+051D8  mov byte ptr [si + 0xb7], al
+051DC  mov word ptr [0x39c], si
+051E0  push 0x4fc
+051E3  push 0x231
+051E6  lcall 0x558, 5  ; -> 05585
+051EB  add sp, 4
+051EE  pop si
+051EF  pop bp
+051F0  retf 
+051F1  push bp
+051F2  mov bp, sp
+051F4  sub sp, 0xe
+051F7  push 0x62be
+051FA  lcall 0x431f, 0x7ba  ; -> 439AA
+051FF  shl eax, 0x10
+05203  shrd eax, edx, 0x10
+05208  add sp, 2
+0520B  mov dword ptr [bp - 4], eax
+0520F  mov bx, word ptr [0x39c]
+05213  cmp byte ptr [bx + 0xad], 0
+05218  je 0x5245
+0521A  mov bx, word ptr [0x39c]
+0521E  cmp dword ptr [bx + 0xa8], 0
+05224  je 0x5245
+05226  push 0
+05228  mov bx, word ptr [0x39c]
+0522C  mov al, byte ptr [bx + 0xac]
+05230  push ax
+05231  mov ax, word ptr [0x39c]
+05234  add ax, 0xa8
+05237  push ax
+05238  push 0x6a62
+0523B  lcall 0x34ca, 0x17d  ; -> 34E1D
+05240  add sp, 8
+05243  jmp 0x5245
+05245  mov bx, word ptr [0x39c]
+05249  mov dword ptr [bx + 0xa8], 0
+05252  mov bx, word ptr [0x39c]
+05256  mov byte ptr [bx + 0xad], 0
+0525B  mov bx, word ptr [0x39c]
+0525F  mov dword ptr [bx + 0xae], 0
+05268  mov eax, dword ptr [bp - 4]
+0526C  mov dword ptr [bp - 8], eax
+05270  mov bx, word ptr [0x39c]
+05274  mov al, byte ptr [bx + 0xb7]
+05278  mov byte ptr [bp - 9], al
+0527B  push 1
+0527D  push 0
+0527F  mov al, byte ptr [bp - 9]
+05282  push ax
+05283  push dword ptr [bp - 8]
+05287  push 0x6a62
+0528A  lcall 0x34ca, 0xba  ; -> 34D5A
+0528F  add sp, 0xc
+05292  mov word ptr [bp - 0xc], dx
+05295  mov word ptr [bp - 0xe], ax
+05298  mov bx, word ptr [0x39c]
+0529C  mov eax, dword ptr [bp - 0xe]
+052A0  mov dword ptr [bx + 0xa8], eax
+052A5  mov bx, word ptr [0x39c]
+052A9  mov al, byte ptr [bp - 9]
+052AC  mov byte ptr [bx + 0xac], al
+052B0  mov bx, word ptr [0x39c]
+052B4  mov byte ptr [bx + 0xad], 1
+052B9  mov bx, word ptr [0x39c]
+052BD  mov dword ptr [bx + 0xae], 0
+052C6  mov bx, word ptr [0x39c]
+052CA  mov eax, dword ptr [bp - 8]
+052CE  mov dword ptr [bx + 0xae], eax
+052D3  push -1
+052D6  push dword ptr [bp - 4]
+052DA  push 0
+052DC  mov bx, word ptr [0x39c]
+052E0  mov al, byte ptr [bx + 0xac]
+052E4  push ax
+052E5  mov bx, word ptr [0x39c]
+052E9  push word ptr [bx + 0xaa]
+052ED  push word ptr [bx + 0xa8]
+052F1  push 0x6a62
+052F4  lcall 0x34ca, 0x1fa  ; -> 34E9A
+052F9  add sp, 0xa
+052FC  push dx
+052FD  push ax
+052FE  push 0x62be
+05301  lcall 0x431f, 0x6f9  ; -> 438E9
+05306  add sp, 0xe
+05309  push 0x62be
+0530C  lcall 0x431f, 0x4aa  ; -> 4369A
+05311  add sp, 2
+05314  mov bx, word ptr [0x39c]
+05318  mov byte ptr [bx + 0xb3], 1
+0531D  mov eax, dword ptr [bp - 4]
+05321  shld edx, eax, 0x10
+05326  leave 
+05327  retf 
+05328  leave 
+05329  retf 
+0532A  push bp
+0532B  mov bp, sp
+0532D  lcall 0x558, 0x1a6  ; -> 05726
+05332  pop bp
+05333  retf 
+05334  push bp
+05335  mov bp, sp
+05337  push si
+05338  mov si, word ptr [bp + 6]
+0533B  mov ax, si
+0533D  add ax, 0xb8
+05340  push ax
+05341  push word ptr [bp + 8]
+05344  lcall 0, 0x2ec9  ; -> 02EC9
+05349  add sp, 4
+0534C  or ax, ax
+0534E  jne 0x536b
+05350  cmp byte ptr [si + 0xb3], 0
+05355  je 0x536b
+05357  cmp dword ptr [si + 0xa8], 0
+0535D  je 0x536b
+0535F  cmp byte ptr [si + 0xad], 0
+05364  je 0x536b
+05366  mov al, 1
+05368  pop si
+05369  pop bp
+0536A  retf 
+0536B  mov al, 0
+0536D  pop si
+0536E  pop bp
+0536F  retf 
+05370  pop si
+05371  pop bp
+05372  retf 
+05373  push bp
+05374  mov bp, sp
+05376  push 0x62be
+05379  lcall 0x431f, 0x140  ; -> 43330
+0537E  add sp, 2
+05381  pop bp
+05382  retf 
+05383  push bp
+05384  mov bp, sp
+05386  push 2
+05388  push 0x62be
+0538B  lcall 0x431f, 0x316  ; -> 43506
+05390  add sp, 4
+05393  pop bp
+05394  retf 
+05395  add byte ptr [bx + si], al
+05397  add byte ptr [bx + si], al
+05399  add byte ptr [bx + si], al
+0539B  add byte ptr [bx + si], al
+0539D  add byte ptr [bx + si], al
+0539F  add byte ptr [bx + si], al
+053A1  add byte ptr [bx + si], al
+053A3  add byte ptr [bx + si], al
+053A5  add byte ptr [bx + si], al
+053A7  add byte ptr [bx + si], al
+053A9  add byte ptr [bx + si], al
+053AB  add byte ptr [bx + si], al
+053AD  add byte ptr [bx + si], al
+053AF  add byte ptr [bx + si], al
+053B1  add byte ptr [bx + si], al
+053B3  add byte ptr [bx + si], al
+053B5  add byte ptr [bx + si], al
+053B7  add byte ptr [bx + si], al
+053B9  add byte ptr [bx + si], al
+053BB  add byte ptr [bx + si], al
+053BD  add byte ptr [bx + si], al
+053BF  add byte ptr [bx + si], al
+053C1  add byte ptr [bx + si], al
+053C3  add byte ptr [bx + si], al
+053C5  add byte ptr [bx + si], al
+053C7  add byte ptr [bx + si], al
+053C9  add byte ptr [bx + si], al
+053CB  add byte ptr [bx + si], al
+053CD  add byte ptr [bx + si], al
+053CF  add byte ptr [bx + si], al
+053D1  add byte ptr [bx + si], al
+053D3  add byte ptr [bx + si], al
+053D5  add byte ptr [bx + si], al
+053D7  add byte ptr [bx + si], al
+053D9  add byte ptr [bx + si], al
+053DB  add byte ptr [bx + si], al
+053DD  add byte ptr [bx + si], al
+053DF  add byte ptr [bx + si], al
+053E1  add byte ptr [bx + si], al
+053E3  add byte ptr [bx + si], al
+053E5  add byte ptr [bx + si], al
+053E7  add byte ptr [bx + si], al
+053E9  add byte ptr [bx + si], al
+053EB  add byte ptr [bx + si], al
+053ED  add byte ptr [bx + si], al
+053EF  add byte ptr [bx + si], al
+053F1  add byte ptr [bx + si], al
+053F3  add byte ptr [bx + si], al
+053F5  add byte ptr [bx + si], al
+053F7  add byte ptr [bx + si], al
+053F9  add byte ptr [bx + si], al
+053FB  add byte ptr [bx + si], al
+053FD  add byte ptr [bx + si], al
+053FF  .byte 0x00

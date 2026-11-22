@@ -7,11 +7,14 @@ ovr270		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 352 lignes, NON DÉTAILLÉE — combine
-; ResourceRecord_SeekAndReadB_647B2/Memory_TypedFreeWrapper_5C6F3 répétés — variante de
-; MissionText_LoadSubtitleRecord_87A60 (seg251).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). FABRIQUE D'APPARENCE 3D (ex-
+; MissionText_LoadSubtitleRecordB). Essaie dans l'ordre FORM POLY (objet 9Eh o, table de
+; méthodes 15C4h, lecteur Poly_LoadFromIFF_96321), FLAT (17h o, 15B8h), DIST (17h o, 15ACh),
+; ANIM (22h o, 15A0h), TRCR (4 o, 1594h), AFTB, NONE (2 o) ; erreur 6002h si rien. Tags : push
+; large 594C4F50h 'POLY', 54414C46h 'FLAT', 54534944h 'DIST', 4D494E41h 'ANIM', 52435254h
+; 'TRCR', 42544641h 'AFTB', 454E4F4Eh 'NONE'.
 ; ==============================================================================================
-MissionText_LoadSubtitleRecordB_94710	proc far		; CODE XREF: VROOMM_StubThunk_6B8B5J MissionText_LoadSubtitleWithString_94A86+C5p	...
+Appearance_CreateFromIFF_94710	proc far		; CODE XREF: VROOMM_StubThunk_6B8B5J Model_LoadAppearance_94A86+C5p	...
 
 var_26		= dword	ptr -26h
 var_22		= dword	ptr -22h
@@ -43,7 +46,7 @@ arg_0		= word ptr  6
 		jmp	loc_947F9
 ; ���������������������������������������������������������������������������
 
-loc_9473A:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+25j
+loc_9473A:				; CODE XREF: Appearance_CreateFromIFF_94710+25j
 		mov	[bp+var_6], si
 		push	1
 		push	0
@@ -59,7 +62,7 @@ loc_9473A:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+25j
 		jmp	loc_947F0
 ; ���������������������������������������������������������������������������
 
-loc_94761:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+4Cj
+loc_94761:				; CODE XREF: Appearance_CreateFromIFF_94710+4Cj
 		les	bx, [bp+var_A]
 		mov	word ptr es:[bx], 1588h
 		mov	word ptr es:[bx], 15C4h
@@ -95,13 +98,13 @@ loc_947E4:
 		jmp	loc_94A5F
 ; ���������������������������������������������������������������������������
 
-loc_947F0:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+4Ej
+loc_947F0:				; CODE XREF: Appearance_CreateFromIFF_94710+4Ej
 		mov	dx, word ptr [bp+var_A+2]
 		mov	ax, word ptr [bp+var_A]
 		jmp	loc_94A5F
 ; ���������������������������������������������������������������������������
 
-loc_947F9:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+27j
+loc_947F9:				; CODE XREF: Appearance_CreateFromIFF_94710+27j
 		push	0
 		push	large 54414C46h
 		push	si
@@ -136,17 +139,17 @@ loc_947F9:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+27j
 		mov	dx, word ptr [bp+var_10+2]
 		mov	ax, word ptr [bp+var_10]
 
-loc_9486B:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+346j
+loc_9486B:				; CODE XREF: Appearance_CreateFromIFF_94710+346j
 		jmp	loc_94A5F
 ; ���������������������������������������������������������������������������
 
-loc_9486E:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+11Dj
+loc_9486E:				; CODE XREF: Appearance_CreateFromIFF_94710+11Dj
 		mov	dx, word ptr [bp+var_10+2]
 		mov	ax, word ptr [bp+var_10]
 		jmp	loc_94A5F
 ; ���������������������������������������������������������������������������
 
-loc_94877:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+FCj
+loc_94877:				; CODE XREF: Appearance_CreateFromIFF_94710+FCj
 		push	0
 		push	large 54534944h
 		push	si
@@ -185,13 +188,13 @@ loc_94877:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+FCj
 		jmp	loc_94A5F
 ; ���������������������������������������������������������������������������
 
-loc_948F4:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+19Bj
+loc_948F4:				; CODE XREF: Appearance_CreateFromIFF_94710+19Bj
 		mov	dx, word ptr [bp+var_16+2]
 		mov	ax, word ptr [bp+var_16]
 		jmp	loc_94A5F
 ; ���������������������������������������������������������������������������
 
-loc_948FD:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+17Aj
+loc_948FD:				; CODE XREF: Appearance_CreateFromIFF_94710+17Aj
 		push	0
 		push	large 4D494E41h
 		push	si
@@ -246,13 +249,13 @@ loc_94974:
 		jmp	loc_94A5F
 ; ���������������������������������������������������������������������������
 
-loc_94986:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+221j
+loc_94986:				; CODE XREF: Appearance_CreateFromIFF_94710+221j
 		mov	dx, word ptr [bp+var_1C+2]
 		mov	ax, word ptr [bp+var_1C]
 		jmp	loc_94A5F
 ; ���������������������������������������������������������������������������
 
-loc_9498F:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+200j
+loc_9498F:				; CODE XREF: Appearance_CreateFromIFF_94710+200j
 		push	0
 		push	large 52435254h
 		push	si
@@ -285,13 +288,13 @@ loc_9498F:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+200j
 		jmp	short loc_94A5F
 ; ���������������������������������������������������������������������������
 
-loc_949E7:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+2B3j
+loc_949E7:				; CODE XREF: Appearance_CreateFromIFF_94710+2B3j
 		mov	dx, word ptr [bp+var_22+2]
 		mov	ax, word ptr [bp+var_22]
 		jmp	short loc_94A5F
 ; ���������������������������������������������������������������������������
 
-loc_949EF:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+292j
+loc_949EF:				; CODE XREF: Appearance_CreateFromIFF_94710+292j
 		push	0
 		push	large 42544641h
 		push	si
@@ -308,7 +311,7 @@ loc_949EF:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+292j
 		jmp	short loc_94A65
 ; ���������������������������������������������������������������������������
 
-loc_94A18:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+2F2j
+loc_94A18:				; CODE XREF: Appearance_CreateFromIFF_94710+2F2j
 		push	0
 		push	large 454E4F4Eh
 		push	si
@@ -333,17 +336,17 @@ loc_94A18:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+2F2j
 		jmp	loc_9486B
 ; ���������������������������������������������������������������������������
 
-loc_94A59:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+339j
+loc_94A59:				; CODE XREF: Appearance_CreateFromIFF_94710+339j
 		mov	dx, word ptr [bp+var_26+2]
 		mov	ax, word ptr [bp+var_26]
 
-loc_94A5F:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+DDj
-					; MissionText_LoadSubtitleRecordB_94710+E6j ...
+loc_94A5F:				; CODE XREF: Appearance_CreateFromIFF_94710+DDj
+					; Appearance_CreateFromIFF_94710+E6j ...
 		mov	word ptr [bp+var_4+2], dx
 		mov	word ptr [bp+var_4], ax
 
-loc_94A65:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+306j
-					; MissionText_LoadSubtitleRecordB_94710+31Bj
+loc_94A65:				; CODE XREF: Appearance_CreateFromIFF_94710+306j
+					; Appearance_CreateFromIFF_94710+31Bj
 		cmp	[bp+var_4], 0
 		jnz	short loc_94A76
 		push	6002h
@@ -351,18 +354,18 @@ loc_94A65:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+306j
 		jmp	short loc_94A7C
 ; ���������������������������������������������������������������������������
 
-loc_94A76:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+35Aj
+loc_94A76:				; CODE XREF: Appearance_CreateFromIFF_94710+35Aj
 		push	si
 		call	ResourceRecord_ReleaseAndClear_64D25
 
-loc_94A7C:				; CODE XREF: MissionText_LoadSubtitleRecordB_94710+364j
+loc_94A7C:				; CODE XREF: Appearance_CreateFromIFF_94710+364j
 		pop	cx
 		mov	dx, word ptr [bp+var_4+2]
 		mov	ax, word ptr [bp+var_4]
 		pop	si
 		leave
 		retf
-MissionText_LoadSubtitleRecordB_94710	endp
+Appearance_CreateFromIFF_94710	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -370,9 +373,13 @@ MissionText_LoadSubtitleRecordB_94710	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine String_ConstructFromPtrLen, ResourceRecord_AllocateAndDecode_64C21 (seg193).
+; far, LECTEUR DE L'APPARENCE 3D (ex-MissionText_LoadSubtitleWithString, aucun rapport avec du
+; texte) : FORM APPR, avec soit un chunk FILE (apparence dans un autre fichier), soit FORM
+; POLY (INFO, AINF, VERT, FORM TRIS/VTRI, FORM LINS/VLIN, FORM SPRS/VSPR, FORM TXMS…) via
+; MissionText_LoadSubtitleRecordB_94710. Appelé par IFF_LoadModelMain au niveau REAL (après
+; OBJT) et pour le FORM DAPR de la classe DURD.
 ; ==============================================================================================
-MissionText_LoadSubtitleWithString_94A86	proc far		; CODE XREF: VROOMM_StubThunk_6B8BAJ
+Model_LoadAppearance_94A86	proc far		; CODE XREF: VROOMM_StubThunk_6B8BAJ
 
 var_B8		= word ptr -0B8h
 var_5B		= dword	ptr -5Bh
@@ -401,7 +408,7 @@ arg_0		= word ptr  6
 		jmp	loc_94B95
 ; ���������������������������������������������������������������������������
 
-loc_94AB1:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+26j
+loc_94AB1:				; CODE XREF: Model_LoadAppearance_94A86+26j
 		push	0
 		push	large 454C4946h
 		push	si
@@ -412,7 +419,7 @@ loc_94AB1:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+26j
 		jmp	loc_94B82
 ; ���������������������������������������������������������������������������
 
-loc_94AC9:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+3Ej
+loc_94AC9:				; CODE XREF: Model_LoadAppearance_94A86+3Ej
 		mov	[bp+var_10], si
 		push	[bp+var_10]
 		lea	ax, [bp+var_E]
@@ -446,10 +453,10 @@ loc_94AC9:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+3Ej
 		jmp	short loc_94B3A
 ; ���������������������������������������������������������������������������
 
-loc_94B38:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+ABj
+loc_94B38:				; CODE XREF: Model_LoadAppearance_94A86+ABj
 		xor	ax, ax
 
-loc_94B3A:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+B0j
+loc_94B3A:				; CODE XREF: Model_LoadAppearance_94A86+B0j
 		or	ax, ax
 		jz	short loc_94B57
 		push	si
@@ -458,19 +465,19 @@ loc_94B3A:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+B0j
 		lea	ax, [bp+var_B8]
 		push	ax
 		push	cs
-		call	near ptr MissionText_LoadSubtitleRecordB_94710
+		call	near ptr Appearance_CreateFromIFF_94710
 		pop	cx
 		mov	word ptr [bp+var_4+2], dx
 		mov	word ptr [bp+var_4], ax
 		jmp	short loc_94B60
 ; ���������������������������������������������������������������������������
 
-loc_94B57:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+B6j
+loc_94B57:				; CODE XREF: Model_LoadAppearance_94A86+B6j
 		push	6003h
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_94B60:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+CFj
+loc_94B60:				; CODE XREF: Model_LoadAppearance_94A86+CFj
 		mov	[bp+var_B8], 2E0h
 		lea	ax, [bp+var_B8]
 		push	ax
@@ -486,26 +493,26 @@ loc_94B73:
 		jmp	short loc_94B8E
 ; ���������������������������������������������������������������������������
 
-loc_94B82:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+40j
+loc_94B82:				; CODE XREF: Model_LoadAppearance_94A86+40j
 		push	si
 		push	cs
-		call	near ptr MissionText_LoadSubtitleRecordB_94710
+		call	near ptr Appearance_CreateFromIFF_94710
 		pop	cx
 		mov	word ptr [bp+var_4+2], dx
 		mov	word ptr [bp+var_4], ax
 
-loc_94B8E:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+FAj
+loc_94B8E:				; CODE XREF: Model_LoadAppearance_94A86+FAj
 		push	si
 		call	ResourceRecord_ReleaseAndClear_64D25
 		pop	cx
 
-loc_94B95:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+28j
+loc_94B95:				; CODE XREF: Model_LoadAppearance_94A86+28j
 		mov	dx, word ptr [bp+var_4+2]
 		mov	ax, word ptr [bp+var_4]
 		pop	si
 		leave
 		retf
-MissionText_LoadSubtitleWithString_94A86	endp
+Model_LoadAppearance_94A86	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

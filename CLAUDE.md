@@ -36,10 +36,94 @@ tes résultats sont directement lisibles par Rémi.
   basculer par commodité.
 - Si un segment annoté manque ou semble incomplet : régénérer avec
   `tools/annotate_segments.py`, ne pas contourner.
+- Même règle pour OPTEST.EXE : lire `analysis/optest/annotated_segments/`, pas
+  `source/optest.asm` (outils avec `--exe optest`, voir « OPTEST.EXE » plus bas).
 
 *(Rappel d'incident : une session a mené toute une investigation dans
 `strike.asm` et rendu des résultats en `sub_XXXXX`, obligeant Rémi à
 rechercher chaque nom dans `known_functions.json`. À ne pas reproduire.)*
+
+**3. Style du code C++ écrit pour Rémi** (`tools/sc_player`, code destiné à libRealSpace) :
+- `if`, `for`, `while`, `do` **toujours avec des accolades**, accolade ouvrante sur la ligne de
+  l'instruction (`if (valeur == 1) {` … `}`) ;
+- **une seule instruction par ligne**, y compris les déclarations (`int a;` puis `int b;`, jamais `int a, b;`) ;
+- une liste d'initialisation de plus d'une valeur (tableau, enum…) : **une valeur par ligne**.
+- **pas de lambda** : une action (bouton, zone, rappel) est une **méthode de l'objet**, passée avec
+  `std::bind(&Classe::methode, this, …)` comme dans le reste de libRealSpace.
+
+Après chaque modification : `clang-format --style=file:tools/sc_player/.clang-format -i <fichiers>`
+puis `python3 tools/sc_player/tools/style_check.py <fichiers>` (doit ne rien signaler ;
+`--fix` découpe les déclarations multiples et les listes).
+
+**4. Parler à Rémi dans SON repère et SES unités : Y-up, en mètres.**
+Pour Rémi, **X et Z = plan horizontal (Z = profondeur), Y = altitude** (repère libRealSpace).
+L'assembleur est en Z-up (3ᵉ composante = altitude) : c'est à toi de traduire, jamais à lui.
+- Tout ce que tu écris pour Rémi (axes, champs de fichier, formules, tests) se nomme en Y-up :
+  « altitude = Y », « distance dans le plan X/Z », « le 2ᵉ i32 du fichier est Z, le 3ᵉ est Y ».
+- Pour un champ de fichier, indique la conversion à la lecture (`libRS.x = c0`, `libRS.y = c2`,
+  `libRS.z = −c1`, voir « Pourquoi Z est inversé » plus bas) ; les composantes Z-up ne restent que
+  dans les citations d'assembleur.
+- Les distances du monde sont en **mètres** (après ÷ 256), **jamais en pieds**, même si un
+  ancien document d'`analysis/` dit « ft » ou « pieds ».
+
+**5. N'écrire que ce qui a été constaté.**
+Dans les documents (`DATA_MODEL.html`, `.md`, résumés de `known_functions.json`) comme dans les
+réponses, ne pas affirmer une absence (« jamais lu », « jamais utilisé », « aucun lecteur ») ni
+une interprétation qui n'a pas été vue dans le code ou dans nos échanges. Un champ dont on n'a vu
+que le chargement s'écrit « rangé en mémoire par le chargeur ; rôle non établi ». Une recherche
+de motifs qui ne trouve rien ne prouve pas une absence.
+
+**6. Séparer le format des fichiers du code C++.**
+`DATA_MODEL.html` décrit la représentation physique des données : un fichier objet contient UN
+seul FORM de classe (`JETP`, `GUID`, `ARMG`…), décrit par ses propres chunks. Ne jamais y
+transposer la hiérarchie des classes C++ (« le lecteur de JETP appelle celui de GUID ») ni les
+conditions que le programme impose au chargement (erreurs, priorités de recherche, refus) : cela
+induit en erreur quand on ouvre les fichiers. Le comportement du code va dans
+`known_functions.json` et les documents de comportement.
+
+**7. Pas de possessifs pour parler du portage.**
+Dire « libRealSpace », « le portage », « `SCRenderer` », « le code de libRealSpace » — **jamais**
+« ton code », « ton portage », « ton renderer », « ta fonction », « tes passes », ni dans les
+réponses ni dans les documents.
+
+**8. Les nombres en décimal.**
+Dans les documents et les réponses, tout nombre destiné à Rémi s'écrit en **base 10** : numéros de
+commande et d'opcode (comme `SCenums.h` et le dump `gameflow_parsed.txt` de libRealSpace),
+arguments, champs (`[partie+250]`, `+82`), tailles, valeurs lues dans les fichiers. Pas de `25h`
+ni de `0x25`. Seules exceptions : le suffixe d'adresse des noms de fonctions
+(`Gameflow_MainLoop_3D2E`) et une citation exacte d'instruction d'assembleur.
+
+**9. Les instructions par leur nom, pas par leur valeur.**
+Une commande ou une instruction de script (déroulement, conversation, script de mission) se
+désigne par son **nom** dans tout le texte : `SET_NEXT_MISSION`, `CLOSEUP`, `OP_ADD_1_TO_FLAG`.
+Sa valeur n'apparaît que dans la table de référence qui définit les noms. **Une instruction = une
+ligne** : une suite de script s'écrit dans un bloc de code, une instruction par ligne avec son
+argument (jamais « (0, 221) (2, 16) », ni plusieurs instructions sur une ligne de texte) ; dans un
+tableau d'instructions, une instruction par ligne de tableau (pas de « 6 / 7 », « 40 / 41 » ni de
+plage « 128–152 »). Pas de `<br>` dans les fichiers `.md` : si une cellule de tableau devrait
+contenir un script, le script va dans un bloc sous le tableau. Noms : ceux de libRealSpace (`SCenums.h`, `SCConvPlayer.cpp`) quand ils
+existent, sinon les noms proposés des tables de référence (`GAMEFLOW_SYSTEM.md` § 5.2,
+`CONV_SYSTEM.md` § 2, `MISSION_SCRIPT_OPCODES.md`, conditions `REQU` au § 4.2 de GAMEFLOW).
+
+**9 bis. Tableaux : une ligne par entité.** Un objet, un point, une variable, une scène = une ligne
+avec son propre numéro. Jamais de lignes regroupées (« 40 à 47 », « 11, 12 », « 33 à 35 ») ni de liste
+d'objets dans une cellule : si une scène cite plusieurs objets, un second tableau donne une ligne par
+couple (scène, objet). *(Demande de Rémi du 2026-11-13 sur PACIFIC_MISSION_PRLH-M1.html.)*
+
+**10. Corriger libRealSpace dans ses propres classes, réflexe n° 1.**
+Une proposition pour libRealSpace se fait **d'abord sous forme de modifications des classes et fonctions
+qui existent déjà** (`RSMission::parseMISN_AREA`, `SCMission::getAreaID`, `SCSmokeSet`…), en gardant
+leurs noms et leurs champs, et en n'ajoutant que ce qui manque. Lire le code de libRealSpace concerné
+**avant** d'écrire quoi que ce soit. Ne pas créer de classes parallèles (« tracker », « emitter »,
+structures de remplacement) pour la commodité d'un essai : un essai isolé peut exister, mais il appelle
+le code modifié de libRealSpace, il ne le remplace pas. Livrable : **les fichiers de libRealSpace complets,
+déjà modifiés**, rangés sous leur chemin d'origine (ex. `tools/mission_ref/librealspace/src/realspace/RSMission.cpp`),
+compilés quand c'est possible, et un document qui donne **le code entier de chaque fonction changée** avec
+l'explication. **Jamais de patch (`git diff`) comme livrable** : Rémi ne le lit pas.
+*(Incident 2026-10-30 : zones et scènes de mission proposées dans des classes neuves `readAreas`,
+`SCSceneTracker` au lieu de corriger `RSMission`, `SCMission` et `SCMissionScene` — Rémi :
+« pourquoi recréer des classes quand elles existent déjà ? » ; puis livrées en patch — « je ne peux pas le
+lire ».)*
 
 ## Contexte du projet
 
@@ -69,6 +153,16 @@ Conséquences directes :
   champ. Pas de correction proposée sans cette citation.
 
 **Faits établis (ne pas remettre en question sans preuve nouvelle) :**
+- **`STRIKE.EXE` ne contient que la SIMULATION** : aucun écran de briefing ni menu de mission dans
+  ce binaire. Briefings et menus vivent dans un binaire **séparé, `OPTEST.EXE`** (fait donné par
+  Rémi), désassemblé depuis le 2026-10-17 dans `source/optest.asm` (voir « OPTEST.EXE » plus bas).
+  Une fonction de `STRIKE.EXE` qui ressemble à de l'UI de menu ou de
+  briefing est à réinterpréter comme une séquence jouée dans le simulateur (vue d'établissement,
+  décollage, mise en formation…).
+- **Le son passe par la bibliothèque AIL 2.0 de Miles Design** : seg161 = `AIL.ASM` compilé
+  (fonctions renommées d'après les noms officiels, ex. `AIL_start_sequence_603CC`), sources
+  publiques dans `analysis/ail_sources/`. La musique est du XMIDI joué **par le pilote**
+  (`ADLIB.ADV` contient l'interpréteur `XMIDI.ASM`). Voir `analysis/MUSIC_SYSTEM.md` §1.
 - Le jeu est écrit en **Borland C++**, compilé pour DOS 16 bits (segments
   `far`/`near`, conventions d'appel Borland classiques).
 - Il utilise le gestionnaire d'overlay propriétaire de Borland,
@@ -92,8 +186,17 @@ Conséquences directes :
   une vraie seconde source reste à retrouver si nécessaire.
   **Convention de nommage :** côté ASM/jeu on est en **Z-up** — composantes
   `(X, Y, Z)` avec **Z = altitude**. libRealSpace est en **Y-up** — `(X, Y, Z)`
-  avec **Y = altitude** : le portage **échange les composantes 1 et 2**
-  (`libRS.x = asm.c0`, `libRS.y = asm.c2`, `libRS.z = asm.c1`).
+  avec **Y = altitude** : le portage **échange les composantes 1 et 2 et inverse Z**
+  (`libRS.x = asm.c0`, `libRS.y = asm.c2`, `libRS.z = −asm.c1`).
+  **Pourquoi Z est inversé (essayé et annulé le 2026-10-16) :** le jeu est en repère direct
+  (c0 = est, c1 = nord, c2 = haut). Échanger seulement c1 et c2 donne un repère **indirect** ;
+  or la caméra de libRealSpace (`Camera::CalcViewMatrix`, OpenGL standard), les rotations de
+  l'avion (`rotateM`, nez en −Z) et les modèles sont en repère direct → **image en miroir**
+  (est/ouest inversés), qu'aucune correction de cap ne rattrape. Le `−` sur c1 est donc la
+  conversion de repère, pas une rustine : il se fait **une seule fois, à la lecture** (terrain,
+  pistes `.TRI`, objets posés, positions de mission), et le nord est vers −Z. Le seul autre
+  endroit où il se voit est le cap lu dans un fichier : `yaw = 360 − cap` (miroir de l'angle).
+  Toute autre compensation de signe sur Z dans le code est un bug de lecture, pas la convention.
   Ne jamais assumer roulis/tangage/lacet sur un axe sans vérification explicite
   dans le code — erreur déjà commise une fois.
 
@@ -122,6 +225,49 @@ par ligne. C'est précisément le travail que ce genre de session ciblée
 doit accomplir. Voir `analysis/PRIORITY_TARGETS.md` pour la liste triée
 par taille.
 
+## OPTEST.EXE (hors-vol)
+
+Second exécutable du jeu, ajouté le 2026-10-17 : `source/optest.asm` (358 861 lignes,
+CP437 comme `strike.asm`) et `source/optest.map` (noms IDA seulement, aucun vrai symbole).
+Nom interne `OPTTEST.EXE`, lancé par `SC.EXE`. Même compilateur (Borland C++ 1991) et même
+gestionnaire d'overlays VROOMM que `STRIKE.EXE` : 171 segments `seg`, 63 `ovr`, 63 `stub`,
+1 882 fonctions `proc`.
+
+Contenu repéré par les chaînes et les chunks IFF (fonctions pas encore lues) :
+campagne (`gameflow.iff` : `WNGS`, `WING`, `PILT`, `ORDR`), conversations (`convdata.iff`,
+`faces.iff`), cinématiques `midgames` (les 11 plus grosses fonctions, une par cinématique,
+ovr196 à ovr208), comptabilité (`CASH`), briefings, sauvegarde, options et configuration,
+visionneuse d'objets 3D (`objview.pak`), générique et score final.
+
+- **`optest.asm` vient d'un exécutable modifié par Rémi** (octets édités à la main) : les noms de
+  visage de mid1 (dseg 7900 et 7988) y valent « pri », **« air » à l'origine** (valeur utilisée par
+  `MID_1.IFF` de libRealSpace). Toujours documenter la valeur d'origine ; une valeur lue dans
+  `optest.asm` qui contredit les données du jeu peut venir d'une telle modification.
+- **Les adresses `sub_XXXXX` sont propres à chaque exécutable** : `sub_5AA4E` d'OPTEST n'a rien à
+  voir avec une adresse voisine de STRIKE. Toujours dire de quel exécutable on parle.
+- Analyse dans **`analysis/optest/`** : `known_functions.json`, `function_index.json`,
+  `segment_boundaries.json`, `annotated_segments/`, `strike_matches.json`.
+- Tous les outils de consultation et de génération prennent **`--exe optest`** (défaut `strike`),
+  chemins dans `tools/exe_paths.py`. Troisième exécutable : **`--exe topt`** = `TOPTTST1.EXE` de
+  Tactical Operations, sans base IDA (listing reconstruit, `analysis/topt/README.md`). Quatrième : **`--exe pacific`** = `PACIFIC.EXE` de Pacific Strike
+  (vol et hors-vol dans un seul exécutable ; `analysis/pacific/README.md`). Cinquième : **`--exe wings`** =
+  `WINGS_OF.EXE` de Wings of Glory (hors-vol ; le vol est `GLORY.EXE`, 32 bits Phar Lap ; archives XTRE : `tools/xtre_extract.py` ; terrain et mission en 3D : `tools/wog_terrain_render.py`, `tools/wog_mission_render.py` ; `analysis/wings/README.md`).
+- **Noms repris de STRIKE.EXE** par `tools/match_functions.py --write` : 567 fonctions dont le
+  code est identique (412) ou de même suite d'instructions avec des adresses de données
+  différentes (155, « à vérifier »), appels sortants contrôlés. Leur résumé commence par
+  « Reprise de STRIKE.EXE » : il décrit la fonction de STRIKE ; appelants et contexte sont à
+  revérifier dans OPTEST. Les candidats non tranchés (plusieurs fonctions identiques, ex. familles
+  de destructeurs) et les rejets relus à la main sont dans `strike_matches.json`.
+- **Couverture : 635 fonctions `proc` sur 1 882** (566 reprises + 69 lues), plus 20 labels de
+  tables de méthodes ; `build_function_index.py --exe optest` signale les autres. Les labels de
+  méthodes sans référence externe sur leur propre ligne sont listés dans
+  `FORCE_INCLUDE_LABELS_OPTEST` (`annotate_segments.py`).
+- **Lu (2026-10-17) : moteur des cinématiques** (scène, calques, cadence à 60 Hz, palettes et
+  fondus, touches, canaux son), les 12 types de calques (dont la tête parlante synchronisée sur
+  les lèvres, `TalkingHead_*`) et la cinématique mid1 (`Midgame1_PlayPart1_5FCF0`,
+  `Midgame1_PlayPart2_671C0`). Une entrée écrite à la main n'est jamais
+  écrasée par `match_functions.py` (seules les entrées « Reprise de » sont régénérées).
+
 ## Structure de l'archive
 
 ```
@@ -129,8 +275,34 @@ strike_commander_re/
 ├── CLAUDE.md                        ce fichier
 ├── source/
 │   ├── strike.asm                   désassemblage IDA complet (371 062 lignes)
-│   └── strike.map                   fichier map du linker
+│   ├── strike.map                   fichier map du linker
+│   ├── optest.asm                   désassemblage IDA d'OPTEST.EXE (358 861 lignes)
+│   ├── optest.map                   fichier map d'OPTEST.EXE
+│   ├── topttst1.asm                 TOPTTST1.EXE (Tactical Operations), listing reconstruit au format IDA
+│   │                                  par tools/vroomm_listing.py — analysis/topt/README.md
+│   ├── pacific.asm                  PACIFIC.EXE (Pacific Strike, vol et hors-vol), listing reconstruit
+│   │                                  (--exe pacific) — analysis/pacific/README.md
+│   └── wings.asm                    WINGS_OF.EXE (Wings of Glory, vol et hors-vol), listing reconstruit
+│                                      (--exe wings) — analysis/wings/README.md
 ├── analysis/
+│   ├── pacific/                     analyse de PACIFIC.EXE (Pacific Strike, --exe pacific) : README.md = déroulement
+│   │                                  (GAMEFLOW.IFF, 42 commandes, variables et drapeaux, date) et conversations
+│   │                                  (CONV.PAK compressé, commandes, voix) comparés à Strike Commander ;
+│   │                                  PACIFIC_GAMEFLOW_CONV.html = version illustrée (images/, tools/ps_doc_images.py)
+│   │                                  ; PACIFIC_TERRAIN.html (terrain, pistes, sol, eau) et PACIFIC_PHYSIQUE.html (objets 3D,
+│   │                                  FORM DYNM, modèle de vol, PSEntity / PSPlane prévus ; tools/ps_physics_figures.py)
+│   │                                  ; PACIFIC_MISSION_PRLH-M1.html : 1re mission (carte, objets, scènes, scripts, victoire,
+│   │                                  écarts de libRealSpace) — tools/ps_mission_dump.py, tools/ps_mission_map.py
+│   │                                  ; DEBUG_A_TRAITER.md : points à traiter pour déboguer Pacific Strike dans libRealSpace
+│   │                                  ; OUTILS_MISSION.md : outils du rapport de mission (ps_mission_dump.py, ps_mission_map.py)
+│   ├── wings/                       analyse de WINGS_OF.EXE (Wings of Glory, --exe wings) : README.md, noms repris de
+│   │                                  PACIFIC, STRIKE et OPTEST (match_functions.py), annotated_segments/ ;
+│   │                                  WINGS_OF_GLORY.html = version illustrée (archives, déroulement, GLORY.EXE, terrain, missions)
+│   ├── topt/                        analyse de TOPTTST1.EXE (Tactical Operations, --exe topt) : README.md,
+│   │                                  known_functions, cinématiques (midgames/, iff/), midgame_engine.json porté
+│   ├── optest/                      analyse d'OPTEST.EXE : mêmes fichiers que ci-dessous
+│   │                                  (known_functions, index, annotated_segments)
+│   │                                  + strike_matches.json — voir « OPTEST.EXE »
 │   ├── known_functions.json         ⭐ la base de connaissance : 3683 entrées
 │   │                                  {adresse: {new_name, segment, summary}}
 │   ├── function_index.json          ⭐ index enrichi et interrogeable :
@@ -157,7 +329,63 @@ strike_commander_re/
 │   │                                  point de départ pour choisir une cible
 │   ├── DATA_MODEL.md                modèle de données décodé (assets, missions,
 │   │                                  physique §6.2, caméras §6.6b) — cité en détail
+│   ├── DATA_MODEL.html              version lisible (HTML) du modèle de données :
+│   │                                  fichiers, IFF, objets, profils, mission, monde
 │   ├── PHYSICS.md                   modèle de vol / dynamique de l'avion
+│   ├── IMPL_SCJETPPLANE_CORRECTIONS.md  corrections à porter dans libRealSpace : physique
+│   ├── IMPL_SCAIBRAIN_CORRECTIONS.md    corrections à porter dans libRealSpace : IA
+│   ├── IMPL_TERRAIN_SKIRTS.md       à porter : jupes du terrain hors carte (cellule du bord répétée)
+│   ├── OBJECT_RENDER.md             rendu des objets 3D (FORM POLY) : niveaux de détail, rejet, tri,
+│   │                                  éclairage par type de face, textures — lu 2026-10-16
+│   ├── SMOKE_SYSTEM.md              fumées : jeu de fumées (WRLD/SMOK → OBJECTS\SMOKESET.IFF), émetteurs SMKG et
+│   │                                  traînées (SMOK, chute JINF), vie des particules, projection, tri commun des
+│   │                                  primitives (tri par base), dessin, tables FADE de PALFADE.IFF — lu 2026-10-28
+│   ├── SMOKE_SYSTEM.html            version illustrée (HTML, images intégrées) ; images dans smoke_images/
+│   ├── IMPL_SMOKE.md                à porter : fumées (RSSmokeSet = données + textures teintées FADE, SCSmokeSet =
+│   │                                  acteur porté par l'objet : émission, mise à jour, drawBillboard) — tools/smoke_ref/
+│   ├── IMPL_MISSION_AREAS.md        à porter : zones AREA (formes, test d'appartenance) et scènes SCNE (scène globale,
+│   │                                  scène courante, ordre des 3 scripts) — fichiers RSMission / SCMission / SCMissionScene modifiés
+│   ├── pacific/IMPL_PORTE_AVIONS.md proposition : départ et posé sur le pont du porte-avions (chunk CARD, contact avec le navire,
+│   │                                  PSEntity / SCPlane::groundLevelAt / PSPlane / PSMission) — retenue par Rémi, code non écrit
+│   ├── IMPL_MISSION_PART.md         à porter : objets de mission PART (champs nommés, lecture exacte, vitesse initiale et départ
+│   │                                  au sol, camp, allié par défaut = chef, poste en formation, repère du joueur ; chunks LOAD, CACH et SPOT) — RSMission, SCMission, SCProg…
+│   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
+│   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
+│   ├── OPTIONS_SCREEN.md            panneau CONFIGURATION du vol (ALT+O) : § 5 = tous les menus (images, boutons, jauges, paires dynamiques) ; options_layout.json (tools/options_layout.py) : touches ALT (Input_AltKeyCommands_26F7E), MAINOPT.SHP,
+│   │                                  13 boutons, sous-écrans Options_*Screen_*, OPTIONS.CFG / OPTDFLT.CFG ; image dans options_images/
+│   ├── menu_cd/                     MENU.EXE du CD-ROM : intro THEFLIC.FLX puis menu Strike Commander / Tactical Operations (code de sortie 10 / 11)
+│   │                                  ; FLX_FORMAT.md : format de THEFLIC.FLX (palettes, images LZW, blocs 4 × 4, images par lignes)
+│   ├── IMPL_FLIC_INTRO.md           à porter : intro du CD (RSFlic + SCFlicPlayer, RSMusic::GetMidgamesPak, main.cpp) — tools/flic_ref/
+│   ├── optest_cd/                   OPTTEST.EXE du CD-ROM (sans IDA, exe_disasm.py) : listings des
+│   │                                  conversations avec voix — CONV_SYSTEM.md § 8
+│   ├── CONV_SYSTEM.md               conversations d'OPTEST : format de CONV.PAK (commandes 00h–10h),
+│   │                                  CONVDATA.IFF, codes $ des textes ; voix de la version CD-ROM
+│   │                                  (§ 8) ; consignes et détection voix/texte pour libRealSpace (§ 7, § 9)
+│   ├── CONV_SYSTEM.html             version illustrée (HTML) des conversations : format, scènes, gros plan,
+│   │                                  images d'un visage, lèvres, voix, corrections ; images dans conv_images/
+│   │                                  (tools/conv_doc_images.py)
+│   ├── GAMEFLOW_SYSTEM.md           déroulement de la campagne (OPTEST) : GAMEFLOW.IFF, boucle principale,
+│   │                                  scènes et REQU, les 39 commandes des scripts EFCT (43 sur CD), compte rendu
+│   │                                  de vol misn2op.iff, écarts avec SCGameFlow de libRealSpace
+│   ├── TRAINING_MISSION.md          TRAINING MISSION d'OPTEST (choix 3 du menu, ovr190) : 7 écrans (TM.SHP, OBJVIEW.PAK),
+│   │                                  réglages, table des 16 avions, construction d'instant.iff depuis TEMPLATE.IFF,
+│   │                                  op2misn.iff ; rendus dans training_images/
+│   ├── IMPL_TRAINING_MISSION.md     à porter : l'entraînement sans fichier (RSMission::addTraining dans SCMission::loadMission,
+│   │                                  réglages dans SCState, 7 écrans de SCTrainingMenu) — tools/training_ref/
+│   ├── OPTIONS_TRAINING.html        version illustrée (HTML, images intégrées) d'OPTIONS_SCREEN.md et de TRAINING_MISSION.md
+│   │                                  (tools/options_training_html.py)
+│   ├── MIDGAME_SYSTEM.md            cinématiques d'OPTEST (moteur de scène, calques, déplacements,
+│   │                                  suites d'images, bouches, fondus) ; mid1 en exemple ; rapport
+│   │                                  avec SCAnimationArchive de libRealSpace
+│   ├── MID1_PLANS.md                MID_1.IFF produit par l'outil : plans, règles de conversion,
+│   │                                  hypothèses et limites
+│   ├── MUSIC_SYSTEM.md              ⭐ système musical (AIL/XMIDI, combat.dat/.adl,
+│   │                                  transitions, déclencheurs, effets sonores, voix)
+│   ├── ADLIB_DRIVER.md              pilote AdLib OPL2 (ADLIB.ADV) — registres, tables
+│   ├── ail_sources/                 sources publiques AIL 2.0 (AIL.ASM, AIL.INC, XMIDI.ASM)
+│   ├── adlib_driver_source/         ADLIB.ADV + son désassemblage
+│   ├── sample_dat_files/            COMBAT.DAT réel + décodage JSON
+│   ├── sample_prof_files/           fichiers PROF d'exemple (Billy, Stern, Gwen, Hammer, C-130…)
 │   ├── CAMERA_SYSTEM.md             ⭐ référence caméra : format COMP, parsing
 │   │                                  WRLD/CAMR, caméra de suivi (F2) — pour
 │   │                                  l'implémentation du système de caméra
@@ -171,6 +399,49 @@ strike_commander_re/
 │                                      raisonnement exact d'une décision de
 │                                      nommage passée, sinon secondaire
 └── tools/
+    ├── exe_paths.py                 chemins par exécutable ; tous les outils ci-dessous
+    │                                  prennent --exe optest (défaut strike)
+    ├── ps_mission_dump.py           mission de Pacific Strike → texte et JSON (zones, points, objets, scènes, programmes) ;
+    │                                  ps_mission_map.py : cartes PNG (terrain, zones, objets, trajets) — analysis/pacific/OUTILS_MISSION.md
+    │                                  ; ps_mission_viewer.py : visionneuse Tkinter autonome des 51 missions (carte, scripts cliquables,
+    │                                  scènes, programmes, variables) ; ps_mission_data.py : sa lecture, et le pseudo-code des
+    │                                  programmes (if / else / goto, blocs indentés)
+    ├── ps_conv_dump.py              conversations de Pacific Strike (CONV.PAK compressé) → texte ; pkware_dcl.py :
+    │                                  décompression PKWARE DCL (entrées de marque 3 des PAK de PACIFIC.DAT, via sc_data)
+    ├── conv_dump.py                 lecteur des scripts de conversation (CONV.PAK) → texte ;
+    │                                  conv_scene.py : rendu d'une scène de groupe → PNG
+    ├── conv_faces.py                visages des conversations : planche des 62 images, composition du gros plan
+    │                                  pour chaque valeur « image », tableau des images présentes (--table)
+    ├── conv_ref/                    conversations, code de référence : parseur C++ (boucle de premier niveau,
+    │                                  sous-parseurs, erreurs), test de format, lèvres et clignement, rejeu de la
+    │                                  détection de libRealSpace, export des deux formats — README.md, CONV_SYSTEM § 9
+    ├── gameflow_ref/                déroulement, code de référence : visibilité des sprites (REQU, § 4), changements
+    │                                  CHNG et fin de partie (apply_change.cpp, § 7) — GAMEFLOW_SYSTEM.md
+    ├── midgame_extract.py           cinématiques d'OPTEST : pseudo-code (.md) et arbre (.json)
+    ├── midgame_iff.py               rejoue le .json d'une cinématique et écrit le MID_*.IFF
+    │                                  (format ANIM version 2 de libRealSpace) — MID1_PLANS.md
+    ├── midgame_render.py            rendu de référence d'une cinématique avec les données du jeu
+    │                                  (GIF ; --donnees <DATA>) ; sc_data.py : PAK, LZW, palettes, images
+    ├── tre_extract.py               extrait BIGTRE.TRE (données du jeu, jamais dans le dépôt)
+    ├── midgame_check.py             lecteur de contrôle d'un MID_*.IFF, comparé au rendu de référence
+    │                                  (règles = spécification de SCAnimationPlayer, MID1_PLANS.md)
+    ├── vroomm_listing.py            listing au format IDA d'un EXE Borland à overlays VROOMM (capstone) :
+    │                                  source/topttst1.asm ; midgame_engine_port.py : porte le catalogue du
+    │                                  moteur des cinématiques d'un exécutable à l'autre (analysis/topt/README.md)
+    ├── exe_disasm.py                désassemble un EXE DOS sans IDA (capstone) : OPTTEST.EXE du CD-ROM,
+    │                                  chaînes du DGROUP et appels annotés — CONV_SYSTEM.md § 8
+    ├── flx_render.py                intro du CD THEFLIC.FLX : rendu de référence (GIF, planche, --empreintes) — menu_cd/FLX_FORMAT.md ;
+    │                                  flic_ref/ : RSFlic et SCFlicPlayer pour libRealSpace, build.sh, flic_test (943 images identiques)
+    ├── mission_ref/                 missions : fichiers libRealSpace modifiés (librealspace/src), build.sh (compile le jeu, lie l'essai),
+    │                                  mission_areas_test.cpp, mission_part_test.cpp, mission_load_test.cpp, mission_spot_test.cpp, mission_relative_test.cpp (RSMission modifié sur les missions) — IMPL_MISSION_AREAS.md, IMPL_MISSION_PART.md
+    ├── training_ref/                entraînement : fichiers libRealSpace modifiés (librealspace/src), build.sh (compile le jeu, lance
+    │                                  training_mission_test : mission en mémoire comparée à INSTANT.IFF ; écran d'armement) — IMPL_TRAINING_MISSION.md
+    ├── mission_prog.py              scripts PROG des fichiers de mission : désassemblage, objets et scènes
+    │                                  qui les déclenchent, origine des valeurs STAT (--stat) — GAMEFLOW_SYSTEM.md § 6.1
+    ├── instant_mission.py           mission d'entraînement : reproduit instant.iff (DOGFIGHT / SEARCH AND DESTROY)
+    │                                  depuis MISSIONS\TEMPLATE.IFF, --lire un fichier produit — TRAINING_MISSION.md
+    ├── match_functions.py           retrouve dans OPTEST les fonctions identiques à
+    │                                  celles de STRIKE et reprend leurs noms (--write)
     ├── extract_segment.py           liste les fonctions d'un segment donné
     ├── dump_func.py                 affiche une plage de lignes de strike.asm
     ├── lookup.py                    ⭐ consultation rapide : cherche une
@@ -180,6 +451,24 @@ strike_commander_re/
     ├── build_function_index.py      reconstruit function_index.json à
     │                                  partir de strike.asm +
     │                                  known_functions.json
+    ├── sc_player/                   ⭐ lecteur de la musique du jeu (C++ + SDL2/ImGui) :
+    │                                  séquenceur du jeu, XMIDI et pilote AdLib portés
+    │                                  depuis le code ; voir tools/sc_player/README.md
+    ├── tri_map.py                   lecteur .TRI (d'après DATA_MODEL.html seul) → vue SVG
+    ├── terrain_map.py               lecteur <théâtre>.PAK (PAK, LZW, altitudes) → relief PNG
+    ├── terrain_viewer.py (+ .html)  visionneuse interactive du terrain (zoom, pistes, objets) ;
+    │                                  terrain_3d.py : vue 3D Pygame + PyOpenGL, rendu du jeu, jupes hors carte (--skirt) ;
+    │                                  vue 3D WebGL <nom>_3d.html générée avec la visionneuse ;
+    │                                  données d'essai dans data/ (ALASKA.PAK, ALASKA.TRI…)
+    ├── object_render.py             rendu logiciel d'un objet .IFF comme le jeu (OBJECT_RENDER.md) → PNG
+    ├── object_viewer.py (+ .html)   même rendu en WebGL : page autonome <objet>_viewer.html (orbite, LOD, options) ;
+    │                                  avec --donnees <DATA> : traînée de fumée en vol (SMOK, JINF), textures précalculées
+    │                                  + alpha ou tables FADE exactes ; compteur d'images/s
+    ├── smoke_render.py              fumées : planches des formes, des modèles, des tables FADE ; colonne SMOKEGEN (GIF)
+    ├── smoke_trail.py               fumées : traînée d'un avion en vol, --chute = modèle du JINF (GIF) — SMOKE_SYSTEM.md
+    ├── smoke_fade_fit.py            fumées : couleur + alpha qui approchent chaque table FADE (précalcul pour OpenGL) ;
+    │                                  smoke_ref/ : code C++ de référence des fumées, compilé contre libRealSpace
+    │                                  (build.sh, essais sur les données, rendu OSMesa) — IMPL_SMOKE.md
     └── annotate_segments.py         ⭐ régénère analysis/annotated_segments/
                                        à partir de strike.asm +
                                        known_functions.json — à relancer
@@ -218,6 +507,12 @@ python3 tools/dump_func.py 161842 163718
 # (utile si le segment est trop récent pour être dans l'index, ou pour
 # une vérification croisée)
 python3 tools/extract_segment.py ovr239
+
+# Même chose pour OPTEST.EXE : ajouter --exe optest
+less analysis/optest/annotated_segments/ovr191_annotated.asm
+python3 tools/lookup.py --exe optest --segment ovr191
+python3 tools/build_function_index.py --exe optest
+python3 tools/annotate_segments.py --exe optest
 ```
 
 `lookup.py` résout aussi les adresses appelées par une fonction vers leur
@@ -329,7 +624,7 @@ Règles :
 `Categorie_RoleCourtEtDescriptif_ADRESSE` — l'adresse (ex. `_51106`) est
 **toujours conservée en suffixe** pour la traçabilité, même après
 renommage. Exemples : `AI_ThrottleController_6250`,
-`Expr_VM_Interpreter_51106`, `MissionRecord_LoadEntityDatabase_7B035`.
+`Expr_VM_Interpreter_51106`, `Player_ShotDownSequence_7B035`.
 
 ## Pièges méthodologiques déjà rencontrés (à ne pas répéter)
 
@@ -355,6 +650,27 @@ renommage. Exemples : `AI_ThrottleController_6250`,
   `loc_XXXXX`) référencés depuis un autre segment (méthodes de vtable,
   points d'entrée de stubs VROOMM) qui sont de vraies fonctions sans bloc
   `proc` formel. `extract_segment.py` détecte les deux cas.
+- **Sinus et cosinus : les noms historiques étaient INVERSÉS** (prouvé 2026-09-24 par la
+  table `seg213` : l'octet i est cos(i/4°) en 24.8, 1,0 = 256). L'ex-`Math_Sin_5483F` est un **cosinus**
+  (`Math_CosDeg_5483F`), l'ex-`Math_Cos_54876` est un **sinus** (`Math_SinDeg_54876`) ; même
+  chose pour les versions brutes (`Math_CosRaw_580A7`, `Math_SinRaw_58063`). Tout résumé ou
+  document écrit avant cette date qui déduit un « sin » ou un « cos » de ces noms est à relire
+  (les résumés concernés portent un ⚠️). **Les arcs sont inversés aussi** : l'ex-`Math_ArcSin*`
+  est un arc cosinus (`Math_AcosDeg_5493E`, `Math_AcosRaw_581E3`, `Math_AcosOfRatio_54A0E`),
+  l'ex-`Math_ArcCos*` un arc sinus (`Math_AsinDeg_549A6`, `Math_AsinRaw_581A0`,
+  `Math_AsinOfRatio_54A76`) ; l'arc tangente (`Math_ArcTan_Raw_58223`, table tan) est juste.
+  L'ex-`Math_AngleBetweenVectors_552E1` ne prend qu'UN vecteur : c'est son angle d'élévation
+  (`Math_ElevationAngle_552E1`). Relu : la loi de charge (`Aero_ComputeAoACommand_48862`)
+  utilise bien cos(tangage) — l'ancien résultat était juste par deux erreurs qui s'annulaient.
+- **libRealSpace calcule en FLOTTANTS, pas en 24.8.** Le 24.8 n'est que le format interne de
+  l'original. Ce qu'on écrit pour Rémi (formules, constantes, champs de fichier) se donne en
+  **valeurs réelles** (degrés, distances, secondes, 1,0 et pas 0x100), avec pour chaque champ de
+  fichier la conversion à la lecture : un dword utilisé tel quel dans un calcul en virgule fixe
+  → **÷ 256** ; un word/octet converti par `<< 8` dans le code → **entier tel quel**. Côté
+  assembleur, ne pas confondre les échelles : `shl 8` / `sar 8` / `imul`+`shrd 8` / `0x100` =
+  virgule fixe ; `/ 0x8000` après `CRT_Rand` = échelle de `rand()`
+  (`Math_RandomScale_54DF4(n)` = entier 0..n−1). Ne jamais écrire « valeur·256 » dans une
+  formule destinée au portage.
 - **Quand Rémi localise un bug ou exclut une piste**, c'est une contrainte
   dure, pas une hypothèse à confirmer parmi d'autres. « c'est dans le code
   que tu viens d'écrire », « ce n'est pas le dt », « c'est un signe dans
@@ -375,17 +691,18 @@ renommage. Exemples : `AI_ThrottleController_6250`,
 | Sous-système | Segments clés | Points d'entrée notables |
 |---|---|---|
 | VROOMM (overlay manager Borland) | seg000, seg212, table de stubs seg216-429 | `VROOMM_MainEntry_68B2F` |
-| VM à bytecode (Expr_VM) | seg114 | `Expr_VM_Interpreter_51106` (209 opcodes, **jamais lu en détail**) |
+| VM à bytecode (Expr_VM) | seg114 | `Expr_VM_Interpreter_51106` (209 opcodes ; 00h–56h lus, MISSION_SCRIPT_OPCODES.md) |
 | Mémoire paginée / EMS | seg127-138 | `MemoryManager` (nom confirmé par chaînes de debug) |
 | Format de ressources IFF + LZW | seg193-197 | `ResourceRecord_*`, `LZW_Decompress_66068` |
-| Registre de modules à créneaux temporisés | seg161 | `ModuleRegistry_TimerISR_5FBBE` |
+| Bibliothèque son AIL 2.0 (minuteries, pilotes, API) | seg161 | `AIL_API_timer_ISR_5FBBE`, `AIL_call_driver_5FBA6` |
+| Musique (XMIDI, transitions, déclencheurs) | seg121-125, seg458 | `Music_RequestTune_5A984`, `Music_TuneTransitionResolve_595C2` |
 | Système clavier (bas niveau → file d'événements) | seg202-203, seg211 | `Keyboard_BIOSInterceptHandler_681BC` |
 | Système souris | seg210 | `Mouse_EventCallback_68109` |
 | Segment de données global (vtables + 378 chaînes debug) | seg339 | — (pas de fonctions, uniquement données) |
 | Chargeur de mission | seg455 | `MissionLoader_LoadEntitiesMain_A767F` |
 | Cluster AudioQueue (file audio/messages indexée) | seg458-461 | `AudioQueue_ProcessMain_AA84E` |
 | IA de manœuvre/ciblage | ovr230-232 | `AI_ManeuverSolutionMain_781D0` (**jamais lu en détail**) |
-| Base de données d'entités de mission | ovr239-240 | `MissionRecord_LoadEntityDatabase_7B035` (**la plus grosse fonction du fichier, jamais lue en détail**) |
+| Séquences avion abattu / éjection (ex-« base d'entités de mission ») | ovr239-240 | `Player_ShotDownSequence_7B035` (**la plus grosse fonction du fichier**, rôle tracé, corps jamais lu en détail), `Player_EjectSequence_7D31A` |
 
 Pour le récit complet de chaque découverte (avec justification), voir les
 sections « ⭐ Découverte majeure » de `analysis/README.md`, numérotées de 1
@@ -393,13 +710,14 @@ sections « ⭐ Découverte majeure » de `analysis/README.md`, numérotées de 
 
 ## Questions ouvertes (candidates pour prochaines sessions)
 
-1. `Expr_VM_Interpreter_51106` — jamais lu en détail malgré son rôle
-   transversal central (HUD, IA, UI, mission passent tous par cette VM).
-2. `MissionRecord_LoadEntityDatabase_7B035` (3103 lignes, ovr239) — la
-   plus grosse fonction du fichier.
+1. `Expr_VM_Interpreter_51106` — instructions 00h–56h lues (2026-10-22,
+   `MISSION_SCRIPT_OPCODES.md`) ; restent 80h–98h, D0h et le détail des ordres natifs.
+2. `Player_ShotDownSequence_7B035` (3103 lignes, ovr239) — la
+   plus grosse fonction du fichier : séquence jouée quand l'avion du joueur est
+   détruit (charge `EJECT.PAK`, piste 0x0B ; voir `MUSIC_SYSTEM.md` §5.4). Corps à lire.
 3. `AI_ManeuverSolutionMain_781D0` (2373 lignes, ovr232) — cœur probable
    du calcul de manœuvre de combat aérien.
-4. Contenu exact du cluster AudioQueue (seg458-461) : audio ou texte ?
+4. ~~Contenu du cluster AudioQueue~~ : catalogue musical **et** son numérisé VOC ; système son entièrement décrit dans `MUSIC_SYSTEM.md` (questions restantes : §8).
 5. **Tick physique de l'avion : tranché** — c'est **`PhysicsTicks`**
    (seg103, ~0x4A85B ; slot Update des vtables de la classe `JDYN`, appelé par
    4 thunks seg082). `FlightPhysics_TickCandidate_4F4EE` (seg109) est le tick
@@ -414,14 +732,16 @@ sections « ⭐ Découverte majeure » de `analysis/README.md`, numérotées de 
    `jdyn[0x4C]` (+ volets `jdyn[0x4D]`), borné `jdyn[0x4B]` = décrochage ;
    `q = ½·v²·coeff(vitesse-air)` via table 1-D lerp `Aero_ResolveAeroCoeffTable`
    (`sub_46DA3`) ; traînée `Aero_ComputeDragWithFeedback` (`sub_48400`) ;
-   moments = asservissement `±2·√(q'·err)` rate-limité, nul si err ≥ 56°
+   moments = asservissement `±2·√(q'·err)` rate-limité, zone morte |err| < 0,21875° ; gains de dégâts et mode pilote automatique : `PHYSICS.md` §5.9 et §9 ; corrections du portage : `analysis/IMPL_SCJETPPLANE_CORRECTIONS.md`
    (`Aero_ComputeForcesMain`). **Pas de trim pilote** (accès direct axes).
    `jdyn[0x4C]/0x4D` = constantes de cellule (calage/volets), pas des trims.
    `FlightControl_ComputeMomentA/B/C` renommés `Aero_FlowAngle_AoA/Sideslip` /
    `Aero_DynamicPressure` ; `Vector_TransformHelperB_559BB` = **normalisation**,
-   pas une rotation. **Reste** : ligne exacte des overrides vtable `+0x3C`
-   (masse ≈ chunk `DYNM`) et `+0x34` (position) dans la vtable JDYN primaire ;
-   3 u8 du chunk `THRS` (`+0x0E/0F/10`) ; `JDYN +0x80..0x8B`.
+   pas une rotation. **Tranché (2026-09-26)** : vtable JDYN (`0x228A`, base `seg339`
+   corrigée `0x6D0B0` → `0x6F33A`) : `+0x34` = `JDYN_UpdateDamageGains_494DD`,
+   `+0x3C` = `JDYN_TotalMass_47FF8` = **masse à vide `DYNM` + carburant + emport**
+   (diviseur des forces et `X` de la loi de charge) ; 3 u8 du chunk `THRS` = fractions
+   MIL / lapse / coupure ; `JDYN +0x80..0x8B` = paramètres IA, `+0x8A` jamais lu.
 6. ~~Rôle de la souris~~ **tranché** : contrôle de la vue 3D du cockpit
    (pas le pilotage), mutuellement exclusif avec les axes de vol via
    `word_71200`. Voir `DATA_MODEL.md §6.2`.

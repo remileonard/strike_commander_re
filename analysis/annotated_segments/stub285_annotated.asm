@@ -44,8 +44,8 @@ VROOMM_StubThunk_6BB85	endp
 ; far, thunk fixe VROOMM (jmp sub_971A0) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=25100h, codesize=1C5h, nentries=3.
 ; ==============================================================================================
-VROOMM_StubThunk_6BB8A	proc far		; CODE XREF: MissionText_LoadSubtitleRecordB_94710+14DP
-					; MissionText_LoadSubtitleRecordB_94710+1CBP ...
+VROOMM_StubThunk_6BB8A	proc far		; CODE XREF: Appearance_CreateFromIFF_94710+14DP
+					; Appearance_CreateFromIFF_94710+1CBP ...
 		jmp	AircraftComponent_Helper2_971A0
 VROOMM_StubThunk_6BB8A	endp
 

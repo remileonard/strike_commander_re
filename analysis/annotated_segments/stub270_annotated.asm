@@ -32,7 +32,7 @@ VROOMM_StubThunk_6B8B0	endp
 ; d'overlay actuellement charge en memoire. fileoff=224B0h, codesize=4D3h, nentries=3.
 ; ==============================================================================================
 VROOMM_StubThunk_6B8B5	proc far
-		jmp	MissionText_LoadSubtitleRecordB_94710
+		jmp	Appearance_CreateFromIFF_94710
 VROOMM_StubThunk_6B8B5	endp
 
 
@@ -46,7 +46,7 @@ VROOMM_StubThunk_6B8B5	endp
 ; ==============================================================================================
 VROOMM_StubThunk_6B8BA	proc far		; CODE XREF: IFF_LoadModelMain+F5AP
 					; PlayerComponentVariantB_ConstructAndInit_9FBDE+42P
-		jmp	MissionText_LoadSubtitleWithString_94A86
+		jmp	Model_LoadAppearance_94A86
 VROOMM_StubThunk_6B8BA	endp
 
 stub270		ends

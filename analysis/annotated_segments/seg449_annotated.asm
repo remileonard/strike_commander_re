@@ -730,8 +730,9 @@ PlayerComponentVariantAK_ConstructAndInit_A5A17	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 102 lignes, NON DÉTAILLÉE — aucun appel externe visible (manipulation de champs
-; internes).
+; far, 102L. Copie champ a champ d'une structure JDYN (di) vers une autre (si), dont
+; +0x80..+0x8B. Seul lecteur de JDYN+0x8A dans tout le binaire (avec l'init par defaut a 3 en
+; seg449 et la lecture du chunk) : JDYN+0x8A n'est jamais consomme.
 ; ==============================================================================================
 PlayerComponent_Helper_A5B8F	proc far		; CODE XREF: VROOMM_StubThunk_6CBBAJ PlayerComponent_LoadFieldsWithRetryL_A5C76+6Ap
 

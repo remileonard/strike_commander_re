@@ -19,7 +19,7 @@ stru_6CCD0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0B5Eo
 ; d'overlay actuellement charge en memoire. fileoff=356B0h, codesize=3BEh, nentries=5.
 ; ==============================================================================================
 VROOMM_StubThunk_6CCF0	proc far		; CODE XREF: IFF_LoadModelMain+ECFP
-		jmp	PlayerComponent_LoadDataChunk_A6CA0
+		jmp	EjectSeat_LoadFromIFF_A6CA0
 VROOMM_StubThunk_6CCF0	endp
 
 
@@ -32,7 +32,7 @@ VROOMM_StubThunk_6CCF0	endp
 ; d'overlay actuellement charge en memoire. fileoff=356B0h, codesize=3BEh, nentries=5.
 ; ==============================================================================================
 VROOMM_StubThunk_6CCF5	proc far		; DATA XREF: seg339:off_6F458o
-		jmp	TriggerObject_Construct_A6D18
+		jmp	EjectSeat_SpawnInstance_A6D18
 VROOMM_StubThunk_6CCF5	endp
 
 
@@ -45,7 +45,7 @@ VROOMM_StubThunk_6CCF5	endp
 ; d'overlay actuellement charge en memoire. fileoff=356B0h, codesize=3BEh, nentries=5.
 ; ==============================================================================================
 VROOMM_StubThunk_6CCFA	proc far
-		jmp	TriggerObject_InitDerived_A6DA2
+		jmp	EjectSeat_InitInstance_A6DA2
 VROOMM_StubThunk_6CCFA	endp
 
 
@@ -57,8 +57,8 @@ VROOMM_StubThunk_6CCFA	endp
 ; far, thunk fixe VROOMM (jmp sub_A6DF2) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=356B0h, codesize=3BEh, nentries=5.
 ; ==============================================================================================
-VROOMM_StubThunk_6CCFF	proc far		; CODE XREF: AI_MissileThreatTrigger_A+110P
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+66DP ...
+VROOMM_StubThunk_6CCFF	proc far		; CODE XREF: AI_EjectDecision_50FF+110P
+					; Player_EjectSequence_7D31A+66DP ...
 		jmp	TriggerObject_SpawnAndBindFull_A6DF2
 VROOMM_StubThunk_6CCFF	endp
 
@@ -72,7 +72,7 @@ VROOMM_StubThunk_6CCFF	endp
 ; d'overlay actuellement charge en memoire. fileoff=356B0h, codesize=3BEh, nentries=5.
 ; ==============================================================================================
 VROOMM_StubThunk_6CD04	proc far		; CODE XREF: JDYN_LoadChunkAndConstruct_3A49C+505P
-		jmp	TriggerObject_ConstructSubobjects_A700F
+		jmp	DynPara_Construct_A700F
 VROOMM_StubThunk_6CD04	endp
 
 seg330		ends

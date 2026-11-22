@@ -139,7 +139,7 @@ VROOMM_StubThunk_6AEF8	endp
 ; d'overlay actuellement charge en memoire. fileoff=0C8D0h, codesize=9DCh, nentries=11.
 ; ==============================================================================================
 VROOMM_StubThunk_6AEFD	proc far		; CODE XREF: UI_RenderFormattedText+32P
-					; ResourceFile_LoadTypeC_9277C+537P ...
+					; Options_ExitGameScreen_9277C+537P ...
 		jmp	GlyphObject_MeasureWrapperB_7FC55
 VROOMM_StubThunk_6AEFD	endp
 

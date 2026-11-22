@@ -149,7 +149,7 @@ arg_4		= word ptr  0Ah
 		push	ss
 		lea	ax, [bp+var_4]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	eax, [bp+var_4]
 		neg	eax
@@ -166,7 +166,7 @@ loc_2CA33:
 		push	ss
 		lea	ax, [bp+var_14]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		lea	ax, [bp+var_14]
 		push	ax
@@ -203,7 +203,7 @@ loc_2CA8A:
 		push	ax
 		lea	ax, [bp+var_74]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		lea	ax, [bp+var_68]
 		push	ax
@@ -212,7 +212,7 @@ loc_2CA8A:
 		push	ss
 		lea	ax, [bp+var_38]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		lea	ax, [bp+var_50]
 		push	ax
@@ -221,7 +221,7 @@ loc_2CA8A:
 		push	ss
 		lea	ax, [bp+var_3C]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp+var_38]
 		mov	[bp+var_34], eax
@@ -236,7 +236,7 @@ loc_2CA8A:
 		push	ss
 		lea	ax, [bp+var_40]
 		push	ax
-		call	Math_ArcSin_5493E
+		call	Math_AcosDeg_5493E
 		add	sp, 6
 		mov	cx, [bp+var_40+1]
 		mov	[bp+var_44], 0
@@ -359,7 +359,7 @@ loc_2CC22:
 		push	5166h
 		lea	ax, [bp-15Ah]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	eax, [bp-156h]
 		cmp	eax, dword_6E9A6
@@ -1024,7 +1024,7 @@ loc_2D29F:				; CODE XREF: seg061:0957j
 ; far,14L — initialise une petite structure avec des valeurs par défaut 1:1 (+4/+6) :
 ; constructeur avec échelle par défaut 1:1.
 ; ==============================================================================================
-Descriptor_ConstructDefaultScale	proc far		; CODE XREF: MissionText_LoadSubtitleRecordB_94710:loc_9495EP
+Descriptor_ConstructDefaultScale	proc far		; CODE XREF: Appearance_CreateFromIFF_94710:loc_9495EP
 
 arg_0		= dword	ptr  6
 
@@ -1419,7 +1419,7 @@ loc_2D556:
 		push	ax
 
 loc_2D570:
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 
 loc_2D578:

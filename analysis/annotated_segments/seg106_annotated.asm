@@ -12,7 +12,16 @@ loc_4C055:				; DATA XREF: seg216:0416o
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_4C057:				; DATA XREF: seg339:off_701AEo
+; ==============================================================================================
+; far, méthode de mise à jour (seg339:off_701AE) du générateur de fumée (vtable 30EEh). Si
+; actif (+0x5A) : Timer_Tick_4F9E6(+0x51) ; à expiration, si modèle +0x45 ≠ 0 renvoie 0 (objet
+; supprimé), sinon +0x5A = 0 (arrêt). Si le sous-objet visuel est présent et word_70483 ≠ 0 :
+; compte à rebours +0x56 −= dt (dword_70458) ; à 0, +0x56 = intervalle (modèle +0x3F) et
+; Particle_SpawnWithColor(word_70483, type de fumée = modèle +0x36, position +0x12, vitesse
+; construite par Utility_Helper_55E65 avec la composante d'altitude = modèle +0x3B, les deux
+; autres à 0). Puis WorldObject_IsAlive_3CBB7.
+; ==============================================================================================
+SmokeGen_Tick_4C057:				; DATA XREF: seg339:off_701AEo
 		push	bp
 		mov	bp, sp
 		sub	sp, 20h
@@ -156,11 +165,12 @@ loc_4C15E:				; DATA XREF: seg339:off_701D2o
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,49L — copie des offsets depuis une structure de chunk (+0xD/+5/+0x15) vers des champs de
-; rendu (+0x20/+0x24/+0x28), réinitialise l'état d'animation (+0x1A/1C/1E, +0x2C/2D/2E) :
-; initialisation d'un émetteur/pool de particules depuis une définition de chunk.
+; far, INITIALISE UNE PARTICULE DEPUIS SON MODÈLE DE FUMÉE (ex-ParticleEmitter_InitFromChunk)
+; : particule +0x06 = modèle, +0x20 = taille de début (modèle +0x0D), +0x24 = durée de vie
+; (modèle +0x05), +0x28 = teinte de début (modèle +0x15 << 8), vitesse +0x1A/+0x1C/+0x1E = 0,
+; image +0x2E = 0, +0x2D = 2. Appelée par ParticlePool_AllocElement.
 ; ==============================================================================================
-ParticleEmitter_InitFromChunk	proc far		; CODE XREF: ParticlePool_AllocElement+37p
+Particle_InitFromSmokeModel_4C168	proc far		; CODE XREF: ParticlePool_AllocElement+37p
 
 var_E		= dword	ptr -0Eh
 var_A		= word ptr -0Ah
@@ -208,7 +218,7 @@ loc_4C1A2:
 		pop	si
 		leave
 		retf
-ParticleEmitter_InitFromChunk	endp
+Particle_InitFromSmokeModel_4C168	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -216,12 +226,17 @@ ParticleEmitter_InitFromChunk	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,241L — compare la position d'un émetteur à la position caméra (dword_7220A/E/212, mêmes
-; globals que le pipeline de rendu principal), déclenche un son (0x5166, sub_58768) si en
-; portée : test de proximité caméra→émetteur avec déclenchement audio, gestion de flag d'état
-; (bit1 du champ +0x2C).
+; far, LUE 2026-10-28 (ex-ParticleEmitter_ProximityTest : aucun son, aucun test de proximité).
+; PROJECTION D'UNE PARTICULE : +0x2C bit 1 effacé ; position +0x0A/+0x0E/+0x12 − caméra
+; (dword_7220A/E/212), puis Matrix_WorldToLocal_58768(matrice 5166h) → (c0 latéral, c1
+; profondeur, c2 haut). Visible si profondeur > dword_721F6 (plan proche), profondeur ≤
+; dword_72540 << 8 (lointain) et taille +0x20 × focale dword_72202 ÷ profondeur > 153/256
+; pixel (mov [bp+var_22], 99h). Alors x écran +0x16 = word_721FE + c0 × focale ÷ profondeur et
+; y écran +0x18 = word_72200 − c2 × dword_72206 ÷ profondeur, chacun borné à ±32000.
+; Profondeur rangée en +0x02 dans tous les cas (clé de tri de la liste de primitives). Renvoie
+; 1 si visible.
 ; ==============================================================================================
-ParticleEmitter_ProximityTest	proc far		; CODE XREF: seg106:0DBEp
+Particle_ProjectToScreen_4C1EE	proc far		; CODE XREF: seg106:0DBEp
 
 var_6A		= dword	ptr -6Ah
 var_66		= dword	ptr -66h
@@ -285,7 +300,7 @@ loc_4C20D:
 		push	5166h
 		lea	ax, [bp+var_6A]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	eax, [bp+var_66]
 		cmp	eax, dword_721F6
@@ -294,16 +309,16 @@ loc_4C20D:
 		jmp	short loc_4C266
 ; ���������������������������������������������������������������������������
 
-loc_4C264:				; CODE XREF: ParticleEmitter_ProximityTest+6Fj
+loc_4C264:				; CODE XREF: Particle_ProjectToScreen_4C1EE+6Fj
 		xor	ax, ax
 
-loc_4C266:				; CODE XREF: ParticleEmitter_ProximityTest+74j
+loc_4C266:				; CODE XREF: Particle_ProjectToScreen_4C1EE+74j
 		or	al, al
 		jnz	short loc_4C26D
 		jmp	loc_4C3F9
 ; ���������������������������������������������������������������������������
 
-loc_4C26D:				; CODE XREF: ParticleEmitter_ProximityTest+7Aj
+loc_4C26D:				; CODE XREF: Particle_ProjectToScreen_4C1EE+7Aj
 		mov	eax, dword_72540
 		mov	[bp+var_A], eax
 		shl	eax, 8
@@ -313,16 +328,16 @@ loc_4C26D:				; CODE XREF: ParticleEmitter_ProximityTest+7Aj
 		jmp	short loc_4C286
 ; ���������������������������������������������������������������������������
 
-loc_4C284:				; CODE XREF: ParticleEmitter_ProximityTest+8Fj
+loc_4C284:				; CODE XREF: Particle_ProjectToScreen_4C1EE+8Fj
 		xor	ax, ax
 
-loc_4C286:				; CODE XREF: ParticleEmitter_ProximityTest+94j
+loc_4C286:				; CODE XREF: Particle_ProjectToScreen_4C1EE+94j
 		or	al, al
 		jnz	short loc_4C28D
 		jmp	loc_4C3F9
 ; ���������������������������������������������������������������������������
 
-loc_4C28D:				; CODE XREF: ParticleEmitter_ProximityTest+9Aj
+loc_4C28D:				; CODE XREF: Particle_ProjectToScreen_4C1EE+9Aj
 		mov	ax, word ptr [bp+arg_0+2]
 		mov	dx, word ptr [bp+arg_0]
 		add	dx, 20h	; ' '
@@ -350,16 +365,16 @@ loc_4C2A3:
 		jmp	short loc_4C2DB
 ; ���������������������������������������������������������������������������
 
-loc_4C2D9:				; CODE XREF: ParticleEmitter_ProximityTest+E4j
+loc_4C2D9:				; CODE XREF: Particle_ProjectToScreen_4C1EE+E4j
 		xor	ax, ax
 
-loc_4C2DB:				; CODE XREF: ParticleEmitter_ProximityTest+E9j
+loc_4C2DB:				; CODE XREF: Particle_ProjectToScreen_4C1EE+E9j
 		or	al, al
 		jnz	short loc_4C2E2
 		jmp	loc_4C3F9
 ; ���������������������������������������������������������������������������
 
-loc_4C2E2:				; CODE XREF: ParticleEmitter_ProximityTest+EFj
+loc_4C2E2:				; CODE XREF: Particle_ProjectToScreen_4C1EE+EFj
 		mov	eax, [bp+var_6A]
 		mov	[bp+var_26], eax
 		mov	eax, [bp+var_66]
@@ -395,14 +410,14 @@ loc_4C30C:
 		jmp	short loc_4C365
 ; ���������������������������������������������������������������������������
 
-loc_4C351:				; CODE XREF: ParticleEmitter_ProximityTest+157j
+loc_4C351:				; CODE XREF: Particle_ProjectToScreen_4C1EE+157j
 		cmp	[bp+var_40], 0FFFF8300h
 		jge	short loc_4C365
 		mov	[bp+var_40], 0FFFF8300h
 		jmp	short $+2
 
-loc_4C365:				; CODE XREF: ParticleEmitter_ProximityTest+161j
-					; ParticleEmitter_ProximityTest+16Bj
+loc_4C365:				; CODE XREF: Particle_ProjectToScreen_4C1EE+161j
+					; Particle_ProjectToScreen_4C1EE+16Bj
 		mov	ax, word ptr [bp+var_40]
 		les	bx, [bp+arg_0]
 		mov	es:[bx+16h], ax
@@ -435,21 +450,21 @@ loc_4C365:				; CODE XREF: ParticleEmitter_ProximityTest+161j
 		jmp	short loc_4C3EB
 ; ���������������������������������������������������������������������������
 
-loc_4C3D7:				; CODE XREF: ParticleEmitter_ProximityTest+1DDj
+loc_4C3D7:				; CODE XREF: Particle_ProjectToScreen_4C1EE+1DDj
 		cmp	[bp+var_5E], 0FFFF8300h
 		jge	short loc_4C3EB
 		mov	[bp+var_5E], 0FFFF8300h
 		jmp	short $+2
 
-loc_4C3EB:				; CODE XREF: ParticleEmitter_ProximityTest+1E7j
-					; ParticleEmitter_ProximityTest+1F1j
+loc_4C3EB:				; CODE XREF: Particle_ProjectToScreen_4C1EE+1E7j
+					; Particle_ProjectToScreen_4C1EE+1F1j
 		mov	ax, word ptr [bp+var_5E]
 		les	bx, [bp+arg_0]
 		mov	es:[bx+18h], ax
 		mov	[bp+var_1], 1
 
-loc_4C3F9:				; CODE XREF: ParticleEmitter_ProximityTest+7Cj
-					; ParticleEmitter_ProximityTest+9Cj ...
+loc_4C3F9:				; CODE XREF: Particle_ProjectToScreen_4C1EE+7Cj
+					; Particle_ProjectToScreen_4C1EE+9Cj ...
 		mov	eax, [bp+var_66]
 		mov	[bp+var_E], eax
 		mov	eax, [bp+var_E]
@@ -461,7 +476,7 @@ loc_4C408:
 		pop	si
 		leave
 		retf
-ParticleEmitter_ProximityTest	endp
+Particle_ProjectToScreen_4C1EE	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -469,11 +484,24 @@ ParticleEmitter_ProximityTest	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,351L — décrémente un timer (delta-temps physique dword_70458), teste le flag +0x2C bit1
-; pour dispatcher un comportement : mise à jour périodique d'un émetteur de particules avec
-; minuteur et branchement selon l'état.
+; far, MISE À JOUR D'UNE PARTICULE À CHAQUE IMAGE (ex-ParticleEmitter_PeriodicUpdate). Durée
+; de vie +0x24 −= dt (dword_70458) ; ≤ 0 → renvoie 0 (particule supprimée). Si mode de rendu 1
+; ou 2 et pas d'animation ≠ 0 : compteur +0x2F += images/s (modèle +0x21) × dt ; à chaque
+; passage de 256, image +0x2E += pas (modèle +0x23), bornée au nombre d'images (SCRI, sinon
+; nombre d'images de la forme) selon le mode +0x1F : 'R' aller-retour (inverse le pas DU
+; MODÈLE, partagé par toutes ses particules), 'S' arrêt (pas = 0), 'T' particule supprimée,
+; 'W' boucle. Puis taille +0x20 += modèle +0x09 × dt et teinte +0x28 += modèle +0x11 × dt
+; (interpolation linéaire début → fin sur la durée de vie). Le rendu (seg106) projette la
+; taille (× dword_72202 ÷ profondeur) et utilise la teinte (>> 8) comme index d'une table de
+; remappage de palette de 256 o (dword_72528). | PRÉCISÉ 2026-10-28 : avant tout, bit 1 de
+; +0x2C (posé par Particle_Draw_4C7ED quand la particule a été dessinée) → compteur +0x2D = 2
+; ; sinon compteur −1, et à 0 la particule est supprimée : une particule qui n'est pas
+; dessinée pendant 2 mises à jour disparaît. Avance de l'image : accumulateur +0x2F (1/256
+; d'image) += images/s × dt ; une seule image de plus par mise à jour, quand la somme dépasse
+; 256 (cmp eax, 100h / jle). Dernière image = nombre de SCRI − 1, sinon
+; Shape_GetImageCount_625CC − 1.
 ; ==============================================================================================
-ParticleEmitter_PeriodicUpdate	proc far		; CODE XREF: seg106:0D71p
+Particle_UpdateLifeSizeShadeFrame_4C413	proc far		; CODE XREF: seg106:0D71p
 
 var_5C		= word ptr -5Ch
 var_5A		= dword	ptr -5Ah
@@ -520,16 +548,16 @@ arg_0		= dword	ptr  6
 		jmp	short loc_4C449
 ; ���������������������������������������������������������������������������
 
-loc_4C447:				; CODE XREF: ParticleEmitter_PeriodicUpdate+2Dj
+loc_4C447:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+2Dj
 		xor	ax, ax
 
-loc_4C449:				; CODE XREF: ParticleEmitter_PeriodicUpdate+32j
+loc_4C449:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+32j
 		or	al, al
 		jnz	short loc_4C450
 		jmp	loc_4C70A
 ; ���������������������������������������������������������������������������
 
-loc_4C450:				; CODE XREF: ParticleEmitter_PeriodicUpdate+38j
+loc_4C450:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+38j
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+2Ch]
 		shr	ax, 1
@@ -540,7 +568,7 @@ loc_4C450:				; CODE XREF: ParticleEmitter_PeriodicUpdate+38j
 		jmp	short loc_4C47D
 ; ���������������������������������������������������������������������������
 
-loc_4C467:				; CODE XREF: ParticleEmitter_PeriodicUpdate+4Bj
+loc_4C467:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+4Bj
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+2Dh]
 		add	al, 0FFh
@@ -551,8 +579,8 @@ loc_4C467:				; CODE XREF: ParticleEmitter_PeriodicUpdate+4Bj
 		jmp	locret_4C70C
 ; ���������������������������������������������������������������������������
 
-loc_4C47D:				; CODE XREF: ParticleEmitter_PeriodicUpdate+52j
-					; ParticleEmitter_PeriodicUpdate+63j
+loc_4C47D:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+52j
+					; Particle_UpdateLifeSizeShadeFrame_4C413+63j
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+6]
 		mov	al, [bx]
@@ -564,8 +592,8 @@ loc_4C47D:				; CODE XREF: ParticleEmitter_PeriodicUpdate+52j
 		jmp	loc_4C636	; default
 ; ���������������������������������������������������������������������������
 
-loc_4C495:				; CODE XREF: ParticleEmitter_PeriodicUpdate+78j
-					; ParticleEmitter_PeriodicUpdate+7Dj
+loc_4C495:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+78j
+					; Particle_UpdateLifeSizeShadeFrame_4C413+7Dj
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+6]
 		cmp	word ptr [bx+23h], 0
@@ -573,7 +601,7 @@ loc_4C495:				; CODE XREF: ParticleEmitter_PeriodicUpdate+78j
 		jmp	loc_4C636	; default
 ; ���������������������������������������������������������������������������
 
-loc_4C4A5:				; CODE XREF: ParticleEmitter_PeriodicUpdate+8Dj
+loc_4C4A5:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+8Dj
 		mov	bx, word ptr [bp+arg_0]
 		movzx	eax, byte ptr es:[bx+2Fh]
 		mov	[bp+var_48], eax
@@ -607,10 +635,10 @@ loc_4C508:
 		jmp	short loc_4C50F
 ; ���������������������������������������������������������������������������
 
-loc_4C50D:				; CODE XREF: ParticleEmitter_PeriodicUpdate+F3j
+loc_4C50D:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+F3j
 		xor	ax, ax
 
-loc_4C50F:				; CODE XREF: ParticleEmitter_PeriodicUpdate+F8j
+loc_4C50F:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+F8j
 		or	al, al
 
 loc_4C511:
@@ -618,7 +646,7 @@ loc_4C511:
 		jmp	loc_4C636	; default
 ; ���������������������������������������������������������������������������
 
-loc_4C516:				; CODE XREF: ParticleEmitter_PeriodicUpdate:loc_4C511j
+loc_4C516:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413:loc_4C511j
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+6]
 		cmp	word ptr [bx+25h], 0
@@ -632,7 +660,7 @@ loc_4C516:				; CODE XREF: ParticleEmitter_PeriodicUpdate:loc_4C511j
 		jmp	short loc_4C560
 ; ���������������������������������������������������������������������������
 
-loc_4C534:				; CODE XREF: ParticleEmitter_PeriodicUpdate+10Ej
+loc_4C534:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+10Ej
 		push	0
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+8]
@@ -646,11 +674,11 @@ loc_4C534:				; CODE XREF: ParticleEmitter_PeriodicUpdate+10Ej
 		add	sp, 0Ah
 		push	dx
 		push	ax
-		call	Struct_GetElementCountMinusOne_625CC
+		call	Shape_GetImageCount_625CC
 		dec	ax
 		mov	cx, ax
 
-loc_4C560:				; CODE XREF: ParticleEmitter_PeriodicUpdate+11Fj
+loc_4C560:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+11Fj
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+2Eh]
 		mov	ah, 0
@@ -668,7 +696,7 @@ loc_4C560:				; CODE XREF: ParticleEmitter_PeriodicUpdate+11Fj
 		jmp	loc_4C636	; default
 ; ���������������������������������������������������������������������������
 
-loc_4C58B:				; CODE XREF: ParticleEmitter_PeriodicUpdate+173j
+loc_4C58B:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+173j
 		shl	bx, 1
 		jmp	cs:off_4C70E[bx] ; switch jump
 
@@ -678,19 +706,19 @@ loc_4C592:				; DATA XREF: seg106:off_4C70Eo
 		cmp	[bp+var_5C], 0
 		jge	short loc_4C5A2
 
-loc_4C59D:				; CODE XREF: ParticleEmitter_PeriodicUpdate+182j
+loc_4C59D:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+182j
 		mov	al, 0
 		jmp	locret_4C70C
 ; ���������������������������������������������������������������������������
 
-loc_4C5A2:				; CODE XREF: ParticleEmitter_PeriodicUpdate+188j
+loc_4C5A2:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+188j
 		les	bx, [bp+arg_0]
 		mov	al, byte ptr [bp+var_5C]
 		mov	es:[bx+2Eh], al
 		jmp	loc_4C636	; default
 ; ���������������������������������������������������������������������������
 
-loc_4C5AF:				; CODE XREF: ParticleEmitter_PeriodicUpdate+17Aj
+loc_4C5AF:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+17Aj
 					; DATA XREF: seg106:off_4C70Eo
 		les	bx, [bp+arg_0]	; case 0x5
 		mov	al, byte ptr [bp+var_5C]
@@ -701,7 +729,7 @@ loc_4C5AF:				; CODE XREF: ParticleEmitter_PeriodicUpdate+17Aj
 		jle	short loc_4C5C8
 		mov	byte ptr es:[bx+2Eh], 0
 
-loc_4C5C8:				; CODE XREF: ParticleEmitter_PeriodicUpdate+1AEj
+loc_4C5C8:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+1AEj
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+2Eh], 0FFh
 		jnz	short loc_4C636	; default
@@ -709,7 +737,7 @@ loc_4C5C8:				; CODE XREF: ParticleEmitter_PeriodicUpdate+1AEj
 		jmp	short loc_4C636	; default
 ; ���������������������������������������������������������������������������
 
-loc_4C5D8:				; CODE XREF: ParticleEmitter_PeriodicUpdate+17Aj
+loc_4C5D8:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+17Aj
 					; DATA XREF: seg106:off_4C70Eo
 		les	bx, [bp+arg_0]	; case 0x0
 		mov	al, byte ptr [bp+var_5C]
@@ -723,7 +751,7 @@ loc_4C5D8:				; CODE XREF: ParticleEmitter_PeriodicUpdate+17Aj
 		mov	bx, word ptr [bp+arg_0]
 		mov	es:[bx+2Eh], cl
 
-loc_4C5FC:				; CODE XREF: ParticleEmitter_PeriodicUpdate+1D7j
+loc_4C5FC:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+1D7j
 		les	bx, [bp+arg_0]
 
 loc_4C5FF:
@@ -738,7 +766,7 @@ loc_4C606:
 		jmp	short loc_4C636	; default
 ; ���������������������������������������������������������������������������
 
-loc_4C619:				; CODE XREF: ParticleEmitter_PeriodicUpdate+17Aj
+loc_4C619:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+17Aj
 					; DATA XREF: seg106:off_4C70Eo
 		cmp	[bp+var_5C], cx	; case 0x1
 		jle	short loc_4C62C
@@ -748,13 +776,13 @@ loc_4C619:				; CODE XREF: ParticleEmitter_PeriodicUpdate+17Aj
 		jmp	short loc_4C636	; default
 ; ���������������������������������������������������������������������������
 
-loc_4C62C:				; CODE XREF: ParticleEmitter_PeriodicUpdate+209j
+loc_4C62C:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+209j
 		les	bx, [bp+arg_0]
 		mov	al, byte ptr [bp+var_5C]
 		mov	es:[bx+2Eh], al
 
-loc_4C636:				; CODE XREF: ParticleEmitter_PeriodicUpdate+7Fj
-					; ParticleEmitter_PeriodicUpdate+8Fj ...
+loc_4C636:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+7Fj
+					; Particle_UpdateLifeSizeShadeFrame_4C413+8Fj ...
 		mov	eax, [bp+var_4]	; default
 		mov	[bp+var_C], eax
 		mov	eax, [bp+var_C]
@@ -816,17 +844,17 @@ loc_4C701:
 		jmp	short locret_4C70C
 ; ���������������������������������������������������������������������������
 
-loc_4C70A:				; CODE XREF: ParticleEmitter_PeriodicUpdate+3Aj
+loc_4C70A:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+3Aj
 		mov	al, 0
 
-locret_4C70C:				; CODE XREF: ParticleEmitter_PeriodicUpdate+67j
-					; ParticleEmitter_PeriodicUpdate+18Cj ...
+locret_4C70C:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+67j
+					; Particle_UpdateLifeSizeShadeFrame_4C413+18Cj ...
 		leave
 		retf
-ParticleEmitter_PeriodicUpdate	endp
+Particle_UpdateLifeSizeShadeFrame_4C413	endp
 
 ; ���������������������������������������������������������������������������
-off_4C70E	dw offset loc_4C5D8	; DATA XREF: ParticleEmitter_PeriodicUpdate+17Ar
+off_4C70E	dw offset loc_4C5D8	; DATA XREF: Particle_UpdateLifeSizeShadeFrame_4C413+17Ar
 		dw offset loc_4C619	; jump table for switch	statement
 		dw offset loc_4C592
 		dw offset loc_4C636
@@ -838,8 +866,10 @@ off_4C70E	dw offset loc_4C5D8	; DATA XREF: ParticleEmitter_PeriodicUpdate+17Ar
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,75L — si un vecteur de vitesse (+0x1A/1C/1E) est non nul, l'intègre (delta-temps
-; dword_7045E) dans la position : intégration de la vitesse d'une particule/débris émis.
+; far, LUE 2026-10-28. Si la vitesse (+0x1A/+0x1C/+0x1E, trois int16 en 1/256 m/s, movsx eax,
+; word ptr) n'est pas nulle : position (+0x0A/+0x0E/+0x12) += vitesse × dt (dword_7045E).
+; Vitesse posée par Particle_SpawnWithColor (mots bas du vecteur passé) ; nulle pour les
+; particules d'une traînée.
 ; ==============================================================================================
 Particle_IntegrateVelocity	proc far		; CODE XREF: seg106:0E2Cp
 
@@ -919,7 +949,25 @@ Particle_IntegrateVelocity	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_4C7ED:				; DATA XREF: seg339:off_70166o
+; ==============================================================================================
+; far, LUE 2026-10-28. DESSIN D'UNE PARTICULE DE FUMÉE : méthode 0 de la table des particules
+; (seg339:off_70166, table 30B6h), appelée par RenderList_DrawAll_2AD65 dans l'ordre de la
+; liste de primitives triée. Selon le mode de rendu du modèle (octet +0 du modèle, mov al,
+; [bx]) : 0 = DISQUE : r = taille +0x20 × focale dword_72202 ÷ profondeur +0x02 (imul edx /
+; shrd eax, edx, 8 / idiv ecx), partie entière en pixels ; rejet si le carré (x ± r, y ± r)
+; sort de la fenêtre (word_7223E, word_72242, word_72240, word_72244) ; sinon +0x2C |= 2
+; (dessinée), table = dword_72528 + teinte (+0x28 >> 8) × 256 (shl bx, 8), aucune table si
+; teinte < 0, puis Render_FillEllipseRemapped_258A8(surface word_70E60, x +0x16, y +0x18, r, r
+; × dword_6E9AA (213/256 = 0,832) >> 8, table). 1 = SPRITE OPAQUE : échelle = taille × focale
+; ÷ (profondeur × demi-taille de la forme +0x0A) (Math_FixedMulDiv_5804C), bornée à 4..8192
+; (1/256 : 0,016 à 32) ; rayon projeté = échelle × demi-taille >> 8 pour le rejet ; image =
+; SCRI[image +0x2E] si le modèle a une table +0x25, sinon image +0x2E ;
+; Render_DrawRotatedScaledSprite_62800(surface, x, y, forme, image, échelle, échelle). 2 =
+; SPRITE TRANSLUCIDE : même calcul, puis Render_DrawScaledSprite_621A2(surface, x, y, forme,
+; image, échelle, échelle, table de la teinte, A = modèle +0x19, B = modèle +0x1A). Autre mode
+; : rien. Voir SMOKE_SYSTEM.md § 5.
+; ==============================================================================================
+Particle_Draw_4C7ED:				; DATA XREF: seg339:off_70166o
 		push	bp
 		mov	bp, sp
 		sub	sp, 80h
@@ -1062,7 +1110,7 @@ loc_4C90B:
 		push	word ptr es:[bx+18h]
 		push	word ptr es:[bx+16h]
 		push	word_70E60
-		call	Render_PlotPixelClippedColorMap
+		call	Render_FillEllipseRemapped_258A8
 		add	sp, 0Eh
 		jmp	loc_4CC88
 ; ���������������������������������������������������������������������������
@@ -1461,7 +1509,7 @@ loc_4CCED:				; CODE XREF: seg106:0C53j
 ; dans le pool circulaire d'émetteur (avec flag de type spécial).
 ; ==============================================================================================
 ParticlePool_InsertElement	proc far		; CODE XREF: Particle_SpawnWithColor+171p
-					; Elements_SpawnAlongSegment_4D1C9:loc_4D512p
+					; Particles_SpawnAlongSegment_4D1C9:loc_4D512p
 
 arg_0		= word ptr  6
 arg_2		= dword	ptr  8
@@ -1578,7 +1626,12 @@ loc_4CD9C:				; CODE XREF: seg106:0D3Ej
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_4CD9F:				; DATA XREF: seg339:off_7017Ao
+; ==============================================================================================
+; far, LUE 2026-10-28. Méthode +16 du jeu de fumées (table 30BAh, seg339:off_7017A). Si le jeu
+; est prêt (+0x0A) : Particle_UpdateLifeSizeShadeFrame_4C413 sur chaque particule active ;
+; résultat 0 → ParticlePool_RemoveElement (le dernier pointeur du tableau prend sa place).
+; ==============================================================================================
+SmokeSet_UpdateParticles_4CD9F:				; DATA XREF: seg339:off_7017Ao
 		push	bp
 		mov	bp, sp
 		sub	sp, 4
@@ -1595,7 +1648,7 @@ loc_4CDB9:				; CODE XREF: seg106:0D95j
 		les	bx, [bp-4]
 		push	large dword ptr	es:[bx]
 		push	cs
-		call	near ptr ParticleEmitter_PeriodicUpdate
+		call	near ptr Particle_UpdateLifeSizeShadeFrame_4C413
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -1623,7 +1676,17 @@ loc_4CDE7:				; CODE XREF: seg106:0D5Dj
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_4CDEC:				; DATA XREF: seg339:off_7016Eo
+; ==============================================================================================
+; far, LUE 2026-10-28. Méthode +4 du jeu de fumées (table 30BAh, seg339:off_7016E), appelée
+; chaque image par WorldObjects_CallSlot4OnAllThenRecompute_2214F(0x59C3) depuis
+; TrackedObject_FrameStep_2DF0D (le jeu de fumées est ajouté à la liste 0x59C3 par
+; World_LoadSmokeSet_A7CA1). Si le jeu est prêt (+0x0A) : pour chaque particule active
+; (tableau de pointeurs +0x29 .. +0x2D), Particle_ProjectToScreen_4C1EE ; si visible et s'il
+; reste de la place (word_724AC < word_724AA), ajoute le pointeur à la liste de primitives
+; dword_724AE (celle des faces des objets et du terrain), triée ensuite par
+; RenderList_SortByDepth_2AE7C et dessinée par RenderList_DrawAll_2AD65.
+; ==============================================================================================
+SmokeSet_CollectVisibleParticles_4CDEC:				; DATA XREF: seg339:off_7016Eo
 		push	bp
 		mov	bp, sp
 		sub	sp, 8
@@ -1642,7 +1705,7 @@ loc_4CE06:				; CODE XREF: seg106:0E05j
 loc_4CE09:
 		push	large dword ptr	es:[bx]
 		push	cs
-		call	near ptr ParticleEmitter_ProximityTest
+		call	near ptr Particle_ProjectToScreen_4C1EE
 
 loc_4CE11:
 		add	sp, 4
@@ -1679,7 +1742,11 @@ loc_4CE57:				; CODE XREF: seg106:0DAAj
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_4CE5A:				; DATA XREF: seg339:off_7017Eo
+; ==============================================================================================
+; far, LUE 2026-10-28. Méthode +20 du jeu de fumées (table 30BAh, seg339:off_7017E) :
+; Particle_IntegrateVelocity sur chaque particule active.
+; ==============================================================================================
+SmokeSet_IntegrateParticles_4CE5A:				; DATA XREF: seg339:off_7017Eo
 		push	bp
 		mov	bp, sp
 		sub	sp, 4
@@ -1711,7 +1778,13 @@ loc_4CE8E:				; CODE XREF: seg106:0E18j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_4CE91:				; DATA XREF: seg339:off_70182o
+; ==============================================================================================
+; far, LUE 2026-10-28. Méthode +24 du jeu de fumées (table 30BAh, seg339:off_70182) :
+; destructeur ; libère le tableau des modèles (+0x0D), les formes (+0x11, 12 octets chacune),
+; le tableau de pointeurs (+0x29) et la réserve de particules (+0x15), puis Handle_Destructor
+; ; libère l'objet si bit 0 de l'argument.
+; ==============================================================================================
+SmokeSet_Destruct_4CE91:				; DATA XREF: seg339:off_70182o
 		push	bp
 		mov	bp, sp
 		sub	sp, 4
@@ -1848,7 +1921,7 @@ loc_4CF94:				; CODE XREF: seg106:0F35j
 ; de l'émetteur de particules (wraparound).
 ; ==============================================================================================
 ParticlePool_AllocElement	proc far		; CODE XREF: Particle_SpawnWithColor+1Ap
-					; Elements_SpawnAlongSegment_4D1C9+239p
+					; Particles_SpawnAlongSegment_4D1C9+239p
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -1877,7 +1950,7 @@ loc_4CFBE:				; CODE XREF: ParticlePool_AllocElement+19j
 		push	dx
 		push	large [bp+var_4]
 		push	cs
-		call	near ptr ParticleEmitter_InitFromChunk
+		call	near ptr Particle_InitFromSmokeModel_4C168
 		add	sp, 6
 		add	word ptr [di+21h], 30h ; '0'
 		mov	ax, [di+21h]
@@ -1944,7 +2017,9 @@ ParticlePool_AllocElement	endp
 ; ==============================================================================================
 ; far,164L — alloue un élément (sub_4CFA0), résout une couleur (sub_54E1C ×3, RGB), configure
 ; les paramètres de rendu (sub_5525B) : création d'une nouvelle particule dans l'émetteur avec
-; couleur résolue.
+; couleur résolue. | 2026-10-12 : arg_2 n'est pas une couleur mais l'INDEX du modèle de fumée
+; dans le jeu de fumées word_70483 (imul ax, 2Ah : modèles de 42 o, chunk WRLD/SMOK) ; appelée
+; par SmokeGen_Tick_4C057 avec le 1er octet du chunk INFO de SMKG.
 ; ==============================================================================================
 Particle_SpawnWithColor	proc far		; CODE XREF: seg106:00FEp
 
@@ -2117,16 +2192,17 @@ Particle_SpawnWithColor	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 450 L. NOM PRÉCÉDENT (ChaseCamera_RenderEffect) FAUX. Relu 2026-09-06 : étant donnés 2
-; points monde (arg_4=A, arg_6=B), alloue N éléments de ring buffer (via sub_4CFA0) répartis
-; de A vers B, N = (|B-A|<<8) / template[idx*0x2A +1]. Chaque élément (0x30 o) :
-; [+0x0A/+0x0E/+0x12]=position (interpolée A->B, jitter sub_54E1C ×3), [+0x24]=durée de vie
-; (de arg_8), [+0x08]=index type/couleur (template[+0x27/0x28/0x29] +
-; Math_RandomChance_54E4F), [+0x20/+0x28/+0x2E]=params. TYPE D'ÉLÉMENT NON CONFIRMÉ
-; (particules ? décalques ? marqueurs ?). Appelée par sub_3D57E et le chargeur IFF seg104. Pas
-; de rendu caméra.
+; far, 450 L. NOMS PRÉCÉDENTS (ChaseCamera_RenderEffect, Elements_SpawnAlongSegment) FAUX OU
+; VAGUES. Relu 2026-09-06 : étant donnés 2 points monde (arg_4=A, arg_6=B), alloue N éléments
+; de ring buffer (via sub_4CFA0) répartis de A vers B, N = (|B-A|<<8) / template[idx*0x2A +1].
+; Chaque élément (0x30 o) : [+0x0A/+0x0E/+0x12]=position (interpolée A->B, jitter sub_54E1C
+; ×3), [+0x24]=durée de vie (de arg_8), [+0x08]=index type/couleur (template[+0x27/0x28/0x29]
+; + Math_RandomChance_54E4F), [+0x20/+0x28/+0x2E]=params. CONFIRMÉ 2026-10-12 : particules de
+; fumée (appelée par SmokeTrail_Tick_3D57E) ; arg_2 = index du modèle de fumée dans le jeu de
+; fumées word_70483 (chunk WRLD/SMOK, modèles de 0x2A = 42 o). Appelée par sub_3D57E et le
+; chargeur IFF seg104. Pas de rendu caméra.
 ; ==============================================================================================
-Elements_SpawnAlongSegment_4D1C9	proc far		; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+42AP
+Particles_SpawnAlongSegment_4D1C9	proc far		; CODE XREF: SmokeTrail_Tick_3D57E+42AP
 					; seg104:039AP
 
 var_E4		= dword	ptr -0E4h
@@ -2206,7 +2282,7 @@ arg_8		= dword	ptr  0Eh
 		jmp	loc_4D628
 ; ���������������������������������������������������������������������������
 
-loc_4D1DE:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+10j
+loc_4D1DE:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9+10j
 		mov	di, [bp+arg_6]
 		mov	ax, [bp+arg_4]
 		mov	[bp+var_2], ax
@@ -2270,22 +2346,22 @@ loc_4D214:
 		jmp	short loc_4D28E
 ; ���������������������������������������������������������������������������
 
-loc_4D28C:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+BCj
+loc_4D28C:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9+BCj
 		xor	ax, ax
 
-loc_4D28E:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+C1j
+loc_4D28E:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9+C1j
 		or	al, al
 		jz	short loc_4D295
 		inc	[bp+var_8]
 
-loc_4D295:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+B5j
-					; Elements_SpawnAlongSegment_4D1C9+C7j
+loc_4D295:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9+B5j
+					; Particles_SpawnAlongSegment_4D1C9+C7j
 		cmp	[bp+var_8], 0
 		jg	short loc_4D29E
 		jmp	loc_4D628
 ; ���������������������������������������������������������������������������
 
-loc_4D29E:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+D0j
+loc_4D29E:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9+D0j
 		mov	ax, [bp+arg_4]
 		mov	[bp+var_18], ax
 		mov	bx, [bp+var_18]
@@ -2379,7 +2455,7 @@ loc_4D300:
 		jmp	loc_4D61D
 ; ���������������������������������������������������������������������������
 
-loc_4D3FD:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+45Cj
+loc_4D3FD:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9+45Cj
 		push	[bp+arg_2]
 		push	si
 
@@ -2396,7 +2472,7 @@ loc_4D413:
 		jmp	loc_4D628
 ; ���������������������������������������������������������������������������
 
-loc_4D418:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9:loc_4D413j
+loc_4D418:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9:loc_4D413j
 		les	bx, [bp+var_16]
 		mov	eax, [bp+var_C0]
 		mov	es:[bx+0Ah], eax
@@ -2426,7 +2502,7 @@ loc_4D418:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9:loc_4D413j
 		jmp	loc_4D628
 ; ���������������������������������������������������������������������������
 
-loc_4D483:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+2B5j
+loc_4D483:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9+2B5j
 		mov	eax, [bp+var_20]
 		mov	[bp+var_8C], eax
 		mov	eax, [bp+var_8C]
@@ -2451,7 +2527,7 @@ loc_4D483:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+2B5j
 		jmp	short loc_4D50C
 ; ���������������������������������������������������������������������������
 
-loc_4D4D4:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+2F6j
+loc_4D4D4:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9+2F6j
 		mov	al, [di+28h]
 		mov	ah, 0
 		call	Math_RandomChance_54E4F
@@ -2467,7 +2543,7 @@ loc_4D4D4:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+2F6j
 		jmp	short loc_4D50C
 ; ���������������������������������������������������������������������������
 
-loc_4D4F8:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+317j
+loc_4D4F8:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9+317j
 		mov	al, [di+29h]
 		mov	ah, 0
 		imul	ax, 0Ch
@@ -2482,8 +2558,8 @@ loc_4D505:
 loc_4D508:
 		mov	es:[bx+8], dx
 
-loc_4D50C:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+2F0j
-					; Elements_SpawnAlongSegment_4D1C9+309j ...
+loc_4D50C:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9+2F0j
+					; Particles_SpawnAlongSegment_4D1C9+309j ...
 		push	large [bp+var_16]
 		push	si
 		push	cs
@@ -2526,7 +2602,7 @@ loc_4D512:
 		cmp	ax, [bp+var_74]
 		jnz	short loc_4D5B1
 
-loc_4D591:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+3BEj
+loc_4D591:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9+3BEj
 		mov	eax, [bp+var_9C]
 		add	[bp+var_C0], eax
 		mov	eax, [bp+var_98]
@@ -2536,7 +2612,7 @@ loc_4D591:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+3BEj
 		jmp	short loc_4D61A
 ; ���������������������������������������������������������������������������
 
-loc_4D5B1:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+3C6j
+loc_4D5B1:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9+3C6j
 		mov	eax, [bp+var_9C]
 		add	eax, [bp+var_B4]
 		mov	[bp+var_D8], eax
@@ -2559,23 +2635,23 @@ loc_4D5B1:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+3C6j
 		mov	eax, [bp+var_DC]
 		add	[bp+var_B8], eax
 
-loc_4D61A:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+3E6j
+loc_4D61A:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9+3E6j
 		inc	[bp+var_72]
 
-loc_4D61D:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+231j
+loc_4D61D:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9+231j
 		mov	ax, [bp+var_72]
 		cmp	ax, [bp+var_8]
 		jge	short loc_4D628
 		jmp	loc_4D3FD
 ; ���������������������������������������������������������������������������
 
-loc_4D628:				; CODE XREF: Elements_SpawnAlongSegment_4D1C9+12j
-					; Elements_SpawnAlongSegment_4D1C9+D2j ...
+loc_4D628:				; CODE XREF: Particles_SpawnAlongSegment_4D1C9+12j
+					; Particles_SpawnAlongSegment_4D1C9+D2j ...
 		pop	di
 		pop	si
 		leave
 		retf
-Elements_SpawnAlongSegment_4D1C9	endp
+Particles_SpawnAlongSegment_4D1C9	endp
 
 ; ���������������������������������������������������������������������������
 

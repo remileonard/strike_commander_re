@@ -32,7 +32,7 @@ VROOMM_StubThunk_6BE70	endp
 ; d'overlay actuellement charge en memoire. fileoff=28AA0h, codesize=31Fh, nentries=3.
 ; ==============================================================================================
 VROOMM_StubThunk_6BE75	proc far		; CODE XREF: Picking_ComputeMain+2F9P
-		jmp	TerrainSector_LoadIndexedRecord_9A95A
+		jmp	TerrainCell_LoadPlacedObjects_9A95A
 VROOMM_StubThunk_6BE75	endp
 
 

@@ -19,7 +19,7 @@ seg112		segment	byte public 'CODE' use16
 ; sont eux-memes probablement faux, a revoir.
 ; ==============================================================================================
 CombatTarget_WeaponActionSubsystem	proc far		; CODE XREF: MAIN_GAME_TICK+180P
-					; UIScript_ParseAndEvaluate_7A054:loc_7A4C0P	...
+					; Autopilot_JumpSequence_7A054:loc_7A4C0P	...
 
 var_38		= dword	ptr -38h
 var_34		= word ptr -34h
@@ -41,7 +41,7 @@ loc_4FBF4:				; DATA XREF: seg216:0446o
 		sub	sp, 34h
 		mov	[bp+var_1], 0
 		push	51E2h
-		call	Config_ReadCalibration
+		call	Input_AltKeyCommands_26F7E
 		pop	cx
 		or	al, al
 		jnz	short loc_4FC0B
@@ -369,7 +369,7 @@ loc_4FE44:
 		push	51E2h
 
 loc_4FE47:
-		call	Config_ReadCalibration
+		call	Input_AltKeyCommands_26F7E
 		pop	cx
 		mov	al, byte_722D1
 		mov	ah, 0
@@ -384,7 +384,7 @@ loc_4FE59:				; CODE XREF: CombatTarget_WeaponActionSubsystem:loc_4FE16j
 		or	ax, ax
 		jz	short loc_4FE18
 		push	51E2h
-		call	Config_ReadCalibration
+		call	Input_AltKeyCommands_26F7E
 		pop	cx
 		cmp	byte_721F0, 2
 		jnz	short loc_4FEAE
@@ -631,7 +631,7 @@ loc_5004B:				; CODE XREF: CombatTarget_WeaponActionSubsystem+453j
 		pop	eax
 		mov	dword_72B9E, eax
 		push	59C3h
-		call	Container_Op_22320
+		call	WorldObjects_IntegrateAllMotion_22320
 		pop	cx
 		call	PIT_ReadHighPrecision
 		push	dx
@@ -718,10 +718,17 @@ UIScreen_ReadNumericFields_500A6	endp
 ; TrackedObjects_CallSlot18OnActive_22F10 (liste 0x59CD), puis calcule le delta de temps de la
 ; frame (dword_70458), le plafonne (0x1900) et met à jour la variable de vitesse de jeu
 ; (dword_70468/70454/7045E). Anciennement UIScreen_ApplyFormFields (aucun formulaire dans ce
-; corps).
+; corps). | PRECISE (2026-09-25) : fps = 1500 / ecart PIT (PIT_ReadHighPrecision) ; ATTENTE
+; ACTIVE tant que fps > 25 (limiteur a 25 images/s). Sauf mode particulier (dword_70468 == 1,0
+; et byte_7046C nul et word_7046E == 1, ou byte_70497) ou dword_70454 = max(fps, 4),
+; dword_70454 = fps / dword_70468 (facteur d'echelle du temps) borne a [2, 25]. En sortie
+; (loc_50399) : dword_70458 = 1 / dword_70454 (dt, donc entre 0,04 et 0,5 s), dword_70462 =
+; dword_70454, dword_7045E = dword_70458. Les ecritures intermediaires de dword_70458 (1 / fps
+; reel, decomptes dword_72A69 / dword_72A65) sont ecrasees avant le retour ; seul
+; Timer_Tick_4F9E6(0x59B0), appele entre-temps, les voit.
 ; ==============================================================================================
 Frame_UpdateTimingAndNotifyTrackedObjects_500F6	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP:loc_538BAP
-					; UIScript_ParseAndEvaluate_7A054+467P ...
+					; Autopilot_JumpSequence_7A054+467P ...
 
 var_74		= dword	ptr -74h
 var_70		= dword	ptr -70h
@@ -1206,7 +1213,7 @@ loc_50499:
 		push	5166h
 		lea	ax, [bp+var_62]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	eax, [bp+var_5E]
 		cmp	eax, dword_721F6
@@ -1395,7 +1402,7 @@ UIScreen_ComputeDerivedFields_503EB	endp
 ; far, enveloppe fine transmettant 2 arguments + id widget 59CDh à sub_23241 (probable setter
 ; générique de valeur de widget).
 ; ==============================================================================================
-UIScreen_SetWidgetValue_50654	proc far		; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+2DEP
+UIScreen_SetWidgetValue_50654	proc far		; CODE XREF: World_OnObjectDestroyed_53A94+2DEP
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1571,7 +1578,7 @@ loc_508A3:
 		mov	word_72B4C, ax
 		mov	word_72B4A, 178Ah
 		push	5A9Ah
-		call	ProgressBar_InitFull
+		call	LightSet_Init_2B191
 		pop	cx
 		mov	word_72B63, 11E8h
 		mov	word_72B63, 1892h

@@ -243,7 +243,7 @@ VROOMM_StubThunk_6CEE0	endp
 ; d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46.
 ; ==============================================================================================
 VROOMM_StubThunk_6CEE5	proc far		; CODE XREF: MissionScenario_LoadMainRecord_A8331:loc_A8635P
-		jmp	ExprSlot_LoadFieldGroupWithErrorCheck_AA6C9
+		jmp	Mission_LoadSpotList_AA6C9
 VROOMM_StubThunk_6CEE5	endp
 
 
@@ -415,7 +415,7 @@ VROOMM_StubThunk_6CF21	endp
 ; far, thunk fixe VROOMM (jmp sub_AA04B) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46.
 ; ==============================================================================================
-VROOMM_StubThunk_6CF26	proc far		; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+20BP
+VROOMM_StubThunk_6CF26	proc far		; CODE XREF: Mission_WriteResultReport_A8F22+20BP
 		jmp	MissionScenario_DispatchDecodeB_AA04B
 VROOMM_StubThunk_6CF26	endp
 
@@ -507,8 +507,8 @@ VROOMM_StubThunk_6CF44	endp
 ; far, thunk fixe VROOMM (jmp sub_AA4BD) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46.
 ; ==============================================================================================
-VROOMM_StubThunk_6CF49	proc far		; CODE XREF: UIScript_ParseAndEvaluate_7A054+554P
-					; UIScript_ParseAndEvaluate_7A054+573P
+VROOMM_StubThunk_6CF49	proc far		; CODE XREF: Autopilot_JumpSequence_7A054+554P
+					; Autopilot_JumpSequence_7A054+573P
 		jmp	MissionScenario_ResolveMultipleFields_AA4BD
 VROOMM_StubThunk_6CF49	endp
 
@@ -613,7 +613,7 @@ VROOMM_StubThunk_6CF6C	endp
 ; far, thunk fixe VROOMM (jmp sub_A9D66) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46.
 ; ==============================================================================================
-VROOMM_StubThunk_6CF71	proc far		; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+224P
+VROOMM_StubThunk_6CF71	proc far		; CODE XREF: Mission_WriteResultReport_A8F22+224P
 		jmp	ExprSlot_WriteFieldGroup_A9D66
 VROOMM_StubThunk_6CF71	endp
 

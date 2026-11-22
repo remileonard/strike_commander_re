@@ -18,7 +18,7 @@ stru_6BAA0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:off_6A766o
 ; far, thunk fixe VROOMM (jmp sub_96590) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=244A0h, codesize=4Ah, nentries=1.
 ; ==============================================================================================
-VROOMM_StubThunk_6BAC0	proc far		; CODE XREF: AircraftComponent_LoadSubrecord_95FD0+10BP
+VROOMM_StubThunk_6BAC0	proc far		; CODE XREF: Poly_LoadTRIS_95FD0+10BP
 		jmp	AircraftComponent_LoadFieldGroupA_96590
 VROOMM_StubThunk_6BAC0	endp
 

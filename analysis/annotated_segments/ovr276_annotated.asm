@@ -7,9 +7,14 @@ ovr276		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 227 lignes, NON DÉTAILLÉE — combine ReadFieldGroupB_64A54 ×2, gestion d'erreur.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). FORM TXMS (ex-
+; AircraftComponent_LoadFieldGroupPair). INFO : uint16 nombre de TXMP, puis (si taille > 2)
+; uint16 nombre de TXMA → tables +86h/+8Ah (6 o par texture) et +88h/+8Ch (12 o par texture
+; animée). TXMP : en-tête 12 o (8 o nom, uint16 largeur, uint16 hauteur), puis largeur ×
+; hauteur octets ; erreur 6007h si trop de TXMP. TXMA : en-tête 14 o puis
+; VROOMM_StubThunk_6CD53 (format non lu). Fin du FORM par ResourceRecord_ReadPayload_64DB3.
 ; ==============================================================================================
-AircraftComponent_LoadFieldGroupPair_95E20	proc far		; CODE XREF: VROOMM_StubThunk_6B9D0J
+Poly_LoadTXMS_95E20	proc far		; CODE XREF: VROOMM_StubThunk_6B9D0J
 
 var_1A		= word ptr -1Ah
 var_18		= word ptr -18h
@@ -49,19 +54,19 @@ arg_4		= word ptr  0Ah
 		pop	cx
 		mov	[bp+var_2], ax
 
-loc_95E61:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+35j
+loc_95E61:				; CODE XREF: Poly_LoadTXMS_95E20+35j
 		mov	eax, [si+76h]
 		mov	[si+65h], eax
 		mov	byte ptr [si+6Dh], 0
 		jmp	short loc_95E78
 ; ���������������������������������������������������������������������������
 
-loc_95E6F:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+25j
+loc_95E6F:				; CODE XREF: Poly_LoadTXMS_95E20+25j
 		push	6006h
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_95E78:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+4Dj
+loc_95E78:				; CODE XREF: Poly_LoadTXMS_95E20+4Dj
 		push	[bp+var_2]
 		push	di
 		mov	ax, word ptr [bp+arg_0]
@@ -79,7 +84,7 @@ loc_95E78:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+4Dj
 		jmp	loc_95FA0
 ; ���������������������������������������������������������������������������
 
-loc_95EAB:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+1A7j
+loc_95EAB:				; CODE XREF: Poly_LoadTXMS_95E20+1A7j
 		push	si
 		call	ResourceRecord_ComputeAlignedBounds_64BC1
 		pop	cx
@@ -93,10 +98,10 @@ loc_95EBC:
 		jmp	short loc_95EC3
 ; ���������������������������������������������������������������������������
 
-loc_95EC1:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+9Aj
+loc_95EC1:				; CODE XREF: Poly_LoadTXMS_95E20+9Aj
 		xor	ax, ax
 
-loc_95EC3:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+9Fj
+loc_95EC3:				; CODE XREF: Poly_LoadTXMS_95E20+9Fj
 		or	ax, ax
 		jz	short loc_95F3A
 		push	large 0Ch
@@ -114,7 +119,7 @@ loc_95EC3:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+9Fj
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_95EEE:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+C3j
+loc_95EEE:				; CODE XREF: Poly_LoadTXMS_95E20+C3j
 		mov	ax, word ptr [bp+var_10]
 		imul	word ptr [bp+var_10+2]
 		movzx	eax, ax
@@ -144,17 +149,17 @@ loc_95EEE:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+C3j
 		jmp	short loc_95F94
 ; ���������������������������������������������������������������������������
 
-loc_95F3A:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+A5j
+loc_95F3A:				; CODE XREF: Poly_LoadTXMS_95E20+A5j
 		cmp	dword ptr [si+6Dh], 414D5854h
 		jnz	short loc_95F49
 		mov	ax, 1
 		jmp	short loc_95F4B
 ; ���������������������������������������������������������������������������
 
-loc_95F49:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+122j
+loc_95F49:				; CODE XREF: Poly_LoadTXMS_95E20+122j
 		xor	ax, ax
 
-loc_95F4B:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+127j
+loc_95F4B:				; CODE XREF: Poly_LoadTXMS_95E20+127j
 		or	ax, ax
 		jz	short loc_95F94
 		push	large 0Eh
@@ -182,7 +187,7 @@ loc_95F70:
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_95F76:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+14Bj
+loc_95F76:				; CODE XREF: Poly_LoadTXMS_95E20+14Bj
 		push	large [bp+var_10]
 		push	[bp+var_12]
 		lea	ax, [bp+var_1A]
@@ -194,13 +199,13 @@ loc_95F76:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+14Bj
 		add	[bp+var_6], 0Ch
 		inc	[bp+var_8]
 
-loc_95F94:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+118j
-					; AircraftComponent_LoadFieldGroupPair_95E20+12Dj
+loc_95F94:				; CODE XREF: Poly_LoadTXMS_95E20+118j
+					; Poly_LoadTXMS_95E20+12Dj
 		mov	eax, [si+76h]
 		mov	[si+65h], eax
 		mov	byte ptr [si+6Dh], 0
 
-loc_95FA0:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+88j
+loc_95FA0:				; CODE XREF: Poly_LoadTXMS_95E20+88j
 		cmp	word ptr [si+7Ch], 0
 		jnz	short loc_95FAF
 		push	si
@@ -209,7 +214,7 @@ loc_95FA0:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+88j
 		jmp	short loc_95FC3
 ; ���������������������������������������������������������������������������
 
-loc_95FAF:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+184j
+loc_95FAF:				; CODE XREF: Poly_LoadTXMS_95E20+184j
 		mov	eax, [si+65h]
 		mov	bx, [si+7Ch]
 		cmp	eax, [bx+0Fh]
@@ -220,21 +225,21 @@ loc_95FBA:
 		jmp	short loc_95FC3
 ; ���������������������������������������������������������������������������
 
-loc_95FC1:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20:loc_95FBAj
+loc_95FC1:				; CODE XREF: Poly_LoadTXMS_95E20:loc_95FBAj
 		xor	ax, ax
 
-loc_95FC3:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+18Dj
-					; AircraftComponent_LoadFieldGroupPair_95E20+19Fj
+loc_95FC3:				; CODE XREF: Poly_LoadTXMS_95E20+18Dj
+					; Poly_LoadTXMS_95E20+19Fj
 		or	ax, ax
 		jnz	short loc_95FCA
 		jmp	loc_95EAB
 ; ���������������������������������������������������������������������������
 
-loc_95FCA:				; CODE XREF: AircraftComponent_LoadFieldGroupPair_95E20+1A5j
+loc_95FCA:				; CODE XREF: Poly_LoadTXMS_95E20+1A5j
 		pop	di
 		pop	si
 		leave
 		retf
-AircraftComponent_LoadFieldGroupPair_95E20	endp
+Poly_LoadTXMS_95E20	endp
 
 ovr276		ends

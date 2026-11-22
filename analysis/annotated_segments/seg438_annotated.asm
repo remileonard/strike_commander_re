@@ -7,10 +7,16 @@ seg438		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine sub_6C1CA (application de flags, motif seg435) et sub_3A49C (probable
-; libération de référence).
+; far, LUE 2026-10-12. Ex-'PlayerComponent_ApplyFlagsAndReleaseRef'. LECTEUR DE LA CLASSE GRND
+; (objet au sol, vtable 0x2408, catégorie 20) : MobileObject_LoadDynamicsAndSmoke_9D189
+; (communs + ALGN + FORM DYNM → +0x36 + SMOK) puis un SECOND JDYN_LoadChunkAndConstruct_3A49C
+; sur +0x36. Les recherches repartant du début du FORM (ResourceRecord_SeekAndReadB_647B2, arg
+; 0), ce second appel relit LE MÊME FORM DYNM et remplace le premier objet (fuite mémoire de
+; l'original) : les deux recherches trouvent le premier FORM DYNM du FORM GRND. L'instance
+; GRND ne « tick » jamais sa dynamique (GroundObj_IntegrateMotion_458C8) : seule la vitesse de
+; base compte.
 ; ==============================================================================================
-PlayerComponent_ApplyFlagsAndReleaseRef_A0D80	proc far		; CODE XREF: VROOMM_StubThunk_6C670J
+GroundObj_LoadFromIFF_A0D80	proc far		; CODE XREF: VROOMM_StubThunk_6C670J
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -41,7 +47,7 @@ loc_A0D8A:
 		pop	si
 		pop	bp
 		retf
-PlayerComponent_ApplyFlagsAndReleaseRef_A0D80	endp
+GroundObj_LoadFromIFF_A0D80	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -121,7 +127,7 @@ loc_A0E2D:
 		mov	[bp+var_6], ax
 		mov	[si+51h], ax
 		push	si
-		call	Camera_EnableFollowIfActive
+		call	SmokeTrail_EnableIfModelHasSmok_3D566
 		pop	cx
 		mov	ax, si
 		pop	si
@@ -137,9 +143,9 @@ PlayerComponentVariantR_ConstructAndInit_A0DBA	endp
 ; ==============================================================================================
 ; ⚠️ far, 188 lignes, NON DÉTAILLÉE — combine TextFormat_ApplyStyleAttribute_5E2D0 (seg143),
 ; Widget_ComputeBoundsExtent_60AEB, Widget_RenderComplexLayoutWrapper_60DD1 (seg163), longueur
-; vectorielle (sub_5828E), et surtout AI_ComputeApproachAngles_553CF (seg116, ×2) — probable
-; widget HUD affichant un angle d'approche/aspect calculé, avec formatage de texte via
-; sub_2945. Candidat pour session dédiée.
+; vectorielle (sub_5828E), et surtout Math_HeadingAngle_553CF (seg116, ×2) — probable widget
+; HUD affichant un angle d'approche/aspect calculé, avec formatage de texte via sub_2945.
+; Candidat pour session dédiée.
 ; ==============================================================================================
 HUD_RenderApproachAngleWidget_A0E3F	proc far		; CODE XREF: VROOMM_StubThunk_6C67AJ
 
@@ -218,7 +224,7 @@ loc_A0E95:
 		push	ss
 		lea	ax, [bp+var_10]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	ax, [bp+var_10+1]
 		mov	[bp+var_C], ax
@@ -261,7 +267,7 @@ loc_A0F04:
 		push	ss
 		lea	ax, [bp+var_16]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	ax, [bp+var_16+1]
 		mov	[bp+var_12], ax

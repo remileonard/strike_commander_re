@@ -13,7 +13,7 @@ seg133		segment	byte public 'CODE' use16
 ; (TextRenderer_ReleaseCachedGlyph_5CA9E), puis peuple/configure chaque emplacement
 ; (Memory_AllocatorSlot_Helper_5CB30, appelée 12 fois), termine par la construction de deux
 ; sous-objets (sub_5E9A9/sub_5EA03). Référencée par sub_5F700 (seg125, via
-; TextObject_AllocateVariantA_5A984).
+; Music_RequestTune_5A984).
 ; ==============================================================================================
 Memory_AllocatorTable_PopulateSlots_5CB99	proc far		; CODE XREF: Runtime_FatalErrorHandler_5F700+37P
 					; Runtime_FatalErrorHandler_5F700+46P

@@ -32,7 +32,7 @@ VROOMM_StubThunk_6ADA0	endp
 ; d'overlay actuellement charge en memoire. fileoff=7A50h, codesize=2422h, nentries=8.
 ; ==============================================================================================
 VROOMM_StubThunk_6ADA5	proc far		; DATA XREF: TextObjectCluster_DestructAll_5ABD1+3Co
-					; MissionRecord_LoadEntityDatabase_7B035+901o ...
+					; Player_ShotDownSequence_7B035+901o ...
 		jmp	MissionRecord_ReleaseEntry_7D27E
 VROOMM_StubThunk_6ADA5	endp
 
@@ -46,7 +46,7 @@ VROOMM_StubThunk_6ADA5	endp
 ; d'overlay actuellement charge en memoire. fileoff=7A50h, codesize=2422h, nentries=8.
 ; ==============================================================================================
 VROOMM_StubThunk_6ADAA	proc far		; DATA XREF: TextRenderer_Main+8A9o
-					; MissionRecord_LoadEntityDatabase_7B035+5EAo ...
+					; Player_ShotDownSequence_7B035+5EAo ...
 		jmp	MissionRecord_Helper_7D249
 VROOMM_StubThunk_6ADAA	endp
 
@@ -59,7 +59,7 @@ VROOMM_StubThunk_6ADAA	endp
 ; far, thunk fixe VROOMM (jmp sub_7AEE0) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=7A50h, codesize=2422h, nentries=8.
 ; ==============================================================================================
-VROOMM_StubThunk_6ADAF	proc far		; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+CBP
+VROOMM_StubThunk_6ADAF	proc far		; CODE XREF: Player_EjectSequence_7D31A+CBP
 		jmp	AIManeuver_LoadFormationDataC_7AEE0
 VROOMM_StubThunk_6ADAF	endp
 
@@ -98,7 +98,7 @@ VROOMM_StubThunk_6ADB9	endp
 ; far, thunk fixe VROOMM (jmp sub_7AFA8) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=7A50h, codesize=2422h, nentries=8.
 ; ==============================================================================================
-VROOMM_StubThunk_6ADBE	proc far		; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+115P
+VROOMM_StubThunk_6ADBE	proc far		; CODE XREF: Player_EjectSequence_7D31A+115P
 		jmp	EntityTracker_RegisterAndSelect
 VROOMM_StubThunk_6ADBE	endp
 
@@ -112,7 +112,7 @@ VROOMM_StubThunk_6ADBE	endp
 ; d'overlay actuellement charge en memoire. fileoff=7A50h, codesize=2422h, nentries=8.
 ; ==============================================================================================
 VROOMM_StubThunk_6ADC3	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP+3CP
-		jmp	MissionRecord_LoadEntityDatabase_7B035
+		jmp	Player_ShotDownSequence_7B035
 VROOMM_StubThunk_6ADC3	endp
 
 stub239		ends

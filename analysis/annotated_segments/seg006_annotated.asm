@@ -8,15 +8,26 @@ seg006		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,439L — machine de sélection/transition de GOAL : compare la cible (+0x145) à la
-; référence joueur (word_722E6), teste le type de GOAL (0xAA), réinitialise les pointeurs
-; d'escorte/formation (+0x285/+0x287), puis appelle sub_DAA9. Orchestrateur de sélection de
-; GOAL (niveau au-dessus de sub_A6D3/sub_A8AC). NOTE STRUCTURELLE (verifiee) : possede DEUX
-; points d'entree, comme Goal_SetObjective_A307 - l'entree standard (proc, CODE XREF depuis
-; sub_A8AC) ET un alias 'loc_B956' juste apres le prologue (push bp/mov bp,sp), reference
-; depuis la MEME table de dispatch de messages partagee (seg216:00EE) que
-; Goal_SetObjective_A307 - confirme que ces deux fonctions appartiennent au meme systeme de
-; messages GOAL de haut niveau.
+; far, 439L, RELUE INTEGRALEMENT 2026-09-25. EXECUTION DE L'ORDRE 'SUIVRE' (0xAA), appelee par
+; Goal_ExecuteAction_A8AC (GOAL 2). Renvoie 1 par defaut. (1) Sans leader joueur et hors 0xAA
+; : renvoie 1. (2) Si byte_6E33B (drapeau global non trace) et +0x149 != 3 : +0x149 = 3,
+; cibles +0x285 et +0x287 = le joueur (word_722E6). (3) Goal_FollowAllyExec (vol en formation)
+; ; s'il ne fait rien : sans leader renvoie 0 ; si l'avion du leader a le bit 5 de flags_75,
+; le leader est oublie (+0x145 = 0) et renvoie 0. (4) Selon l'ETAT DE L'AILIER +0x149 : 0 = en
+; formation : ordre deverrouille (bit 5 de +0x28B efface) ; si word_722EE est non nul
+; (deduction : l'ennemi dans les six heures du joueur), que le leader est le joueur et que
+; l'ailier est discipline (AI_MoraleDisciplineCheck_CA93) : abandon du comportement en cours,
+; +0x149 = 3, +0x285 = +0x287 = word_722EE, ordre verrouille, radio 0x10 ('You've got one on
+; your tail, Commander!' chez Billy), +0x15B = 0x12 ; sinon, hors mode formation (bit 3 de
+; +0x28B nul) : comportement en cours, ou combat si missile (+0x27F == 2), ou
+; Goal_FollowWaypoints. 1 = combat libre autour du leader : objectif temporairement 0xAC,
+; reference de navigation +0x10F et cible de mission +0x137 = leader, Goal_ExecuteAction_A8AC
+; (combat avec cible sol autorisee), puis objectif remis a 0xAA. 2 = a quitte le combat :
+; ordre verrouille, comportement en cours sinon navigation (noeud ID 21) vers le point pose
+; par Goal_MoraleReaction_878F. 3 = engage une cible precise +0x285 : ordre verrouille ; cible
+; au sol (target_type 2) : +0x283 = elle, noeud d'attaque au sol (ID 19) ; sinon
+; Escort_LeaderSuccession (non relue). Finit par Radio_PlayerSpottedCallout dans les etats 0
+; et 3.
 ; ==============================================================================================
 Goal_SelectTransition	proc far		; CODE XREF: Goal_ExecuteAction_A8AC+FDP
 
@@ -202,7 +213,7 @@ loc_BAB7:				; CODE XREF: Goal_SelectTransition+15Fj
 		push	bx
 		nop
 		push	cs
-		call	near ptr Voice_ExpressionTimer
+		call	near ptr AI_MoraleDisciplineCheck_CA93
 		add	sp, 4
 		or	al, al
 		jnz	short loc_BACA
@@ -583,7 +594,7 @@ loc_BE36:				; CODE XREF: Radio_PlayerSpottedCallout+ACj Radio_PlayerSpottedCal
 		cmp	byte ptr es:[bx+15Bh], 0FFh
 		jz	short loc_BE73
 		push	1
-		call	Widget_Helper_5AB2C
+		call	Speech_QueryStatus_5AB2C
 		pop	cx
 		mov	ah, 0
 		or	ax, ax
@@ -1239,7 +1250,7 @@ loc_C388:
 		mov	[bp+var_24], 0
 		lea	ax, [bp+var_2C]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp+var_28]
 		mov	[bp+var_44], eax
@@ -1385,8 +1396,12 @@ off_C4F5	dw offset loc_C324	; DATA XREF: Escort_LeaderSuccession+6Er
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,88L — transfert de GOAL entre deux entités (copie +0x11D, +0x137 cible, +0x10F waypoint
-; depuis un objet référencé) : transmission d'ordre/mission du leader vers un ailier.
+; far, 88L, LUE 2026-09-25. +0x149 = 1, bit 5 de +0x28B (ordre verrouille). Si le leader
+; +0x145 existe et n'est pas le joueur, et que son entite IA (+0x55) a l'octet +6 == 1 :
+; recopie son objectif +0x11D, sa cible de mission +0x137 et sa reference de navigation
+; +0x10F. Si le leader est le joueur : byte_6E4D4 = 0, reference de navigation +0x10F et cible
+; de mission +0x137 = le joueur (l'objectif, en general 0xAA suivre, est garde). Appelee par
+; Goal_MoraleReaction_878F et AI_MessageDispatcher.
 ; ==============================================================================================
 Goal_TransferToWingman	proc far		; CODE XREF: seg004:0ACCP
 					; AI_MessageDispatcher+168p ...
@@ -1485,7 +1500,14 @@ Goal_TransferToWingman	endp
 ; ==============================================================================================
 ; far,578L — appelé par sub_814C : gère une file de messages (+0x1A/+0x26 via sub_1EC46) et un
 ; verrou de cible (+0x9C) : dispatcher de traitement des messages/événements IA de haut
-; niveau, en amont de la sélection de GOAL — à approfondir.
+; niveau, en amont de la sélection de GOAL — à approfondir. TRAITS ATRB CORRIGES 2026-09-25 :
+; le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY,
+; FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D,
+; +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h',
+; vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 =
+; TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR,
+; +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou
+; FL pour +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 AI_MessageDispatcher	proc far		; CODE XREF: AI_TopLevelThink+34P
 
@@ -1599,7 +1621,7 @@ loc_C682:				; CODE XREF: AI_MessageDispatcher+B0j
 		push	cs
 
 loc_C688:
-		call	near ptr Voice_ExpressionTimer
+		call	near ptr AI_MoraleDisciplineCheck_CA93
 		add	sp, 4
 		mov	dl, al
 
@@ -1632,7 +1654,7 @@ loc_C6B6:				; DATA XREF: seg006:off_CA7Fo
 		push	large [bp+arg_0] ; case	0x0
 		nop
 		push	cs
-		call	near ptr Radio_SelectContextMessage
+		call	near ptr AI_ComputeMorale_CD4A
 		add	sp, 4
 		mov	[bp+var_6], al
 		jmp	loc_CA19
@@ -1910,14 +1932,14 @@ loc_C8E3:				; CODE XREF: AI_MessageDispatcher+309j
 		push	bx
 		nop
 		push	cs
-		call	near ptr Radio_SelectContextMessage
+		call	near ptr AI_ComputeMorale_CD4A
 		add	sp, 4
 		cmp	al, 5
 		jz	short loc_C911
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr Radio_SelectContextMessage
+		call	near ptr AI_ComputeMorale_CD4A
 		add	sp, 4
 		cmp	al, 4
 		jz	short loc_C911
@@ -2083,11 +2105,21 @@ off_CA7F	dw offset loc_C6B6	; DATA XREF: AI_MessageDispatcher+E4r
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,90L — timer d'expression faciale/voix (+0x175/+0x15C), déclenche sub_CD4A (sélection de
-; ligne) puis ajuste un index de voix (+0xB4) via un switch à 4 cas : sélecteur
-; d'expression/réplique du pilote selon le contexte.
+; Ex-'Voice_ExpressionTimer' (ni voix ni expression). far, 90L, LUE 2026-09-25. Toutes les 3 s
+; au plus (horloge +0x175 contre +0x15C), v = LY (Loyalty, +0xB4) + ajustement selon le moral
+; (AI_ComputeMorale_CD4A : 2 -> +7, 3 -> +4, 4 -> -3, 5 -> -5) ; bit 6 de +0x28B = (v > 7).
+; Renvoie ce bit (valeur memorisee entre deux evaluations). Utilisee par
+; Goal_MoraleReaction_878F : un pilote qui passe ce test tient son role (ne fuit pas, ne prend
+; pas d'initiative). TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47
+; range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97,
+; +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A
+; (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 =
+; PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3
+; = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute
+; mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire
+; selon cette table.
 ; ==============================================================================================
-Voice_ExpressionTimer	proc far		; CODE XREF: seg004:06DBP seg004:0A83P ...
+AI_MoraleDisciplineCheck_CA93	proc far		; CODE XREF: seg004:06DBP seg004:0A83P ...
 
 var_5		= byte ptr -5
 var_4		= dword	ptr -4
@@ -2112,7 +2144,7 @@ arg_0		= dword	ptr  6
 		push	bx
 		nop
 		push	cs
-		call	near ptr Radio_SelectContextMessage
+		call	near ptr AI_ComputeMorale_CD4A
 		add	sp, 4
 		cbw
 		sub	ax, 2
@@ -2126,60 +2158,60 @@ loc_CAED:				; DATA XREF: seg006:off_CB3Do
 		mov	al, [bp+var_5]	; case 0x3
 		add	al, 0FBh ; '�'
 
-loc_CAF2:				; CODE XREF: Voice_ExpressionTimer+69j Voice_ExpressionTimer+70j ...
+loc_CAF2:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+69j AI_MoraleDisciplineCheck_CA93+70j ...
 		mov	[bp+var_5], al
 		jmp	short loc_CB0C	; default
 ; ���������������������������������������������������������������������������
 
-loc_CAF7:				; CODE XREF: Voice_ExpressionTimer+55j
+loc_CAF7:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+55j
 					; DATA XREF: seg006:off_CB3Do
 		mov	al, [bp+var_5]	; case 0x2
 		add	al, 0FDh ; '�'
 		jmp	short loc_CAF2
 ; ���������������������������������������������������������������������������
 
-loc_CAFE:				; CODE XREF: Voice_ExpressionTimer+55j
+loc_CAFE:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+55j
 					; DATA XREF: seg006:off_CB3Do
 		mov	al, [bp+var_5]	; case 0x1
 		add	al, 4
 		jmp	short loc_CAF2
 ; ���������������������������������������������������������������������������
 
-loc_CB05:				; CODE XREF: Voice_ExpressionTimer+55j
+loc_CB05:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+55j
 					; DATA XREF: seg006:off_CB3Do
 		mov	al, [bp+var_5]	; case 0x0
 		add	al, 7
 		jmp	short loc_CAF2
 ; ���������������������������������������������������������������������������
 
-loc_CB0C:				; CODE XREF: Voice_ExpressionTimer+51j Voice_ExpressionTimer+62j
+loc_CB0C:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+51j AI_MoraleDisciplineCheck_CA93+62j
 		cmp	[bp+var_5], 7	; default
 		jle	short loc_CB17
 		mov	ax, 1
 		jmp	short loc_CB19
 ; ���������������������������������������������������������������������������
 
-loc_CB17:				; CODE XREF: Voice_ExpressionTimer+7Dj
+loc_CB17:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+7Dj
 		xor	ax, ax
 
-loc_CB19:				; CODE XREF: Voice_ExpressionTimer+82j
+loc_CB19:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+82j
 		and	ax, 1
 		les	bx, [bp+arg_0]
 		and	byte ptr es:[bx+28Bh], 0BFh
 		shl	al, 6
 		or	es:[bx+28Bh], al
 
-loc_CB2D:				; CODE XREF: Voice_ExpressionTimer+22j
+loc_CB2D:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+22j
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+28Bh]
 		shr	ax, 6
 		and	ax, 1
 		leave
 		retf
-Voice_ExpressionTimer	endp
+AI_MoraleDisciplineCheck_CA93	endp
 
 ; ���������������������������������������������������������������������������
-off_CB3D	dw offset loc_CB05	; DATA XREF: Voice_ExpressionTimer+55r
+off_CB3D	dw offset loc_CB05	; DATA XREF: AI_MoraleDisciplineCheck_CA93+55r
 		dw offset loc_CAFE	; jump table for switch	statement
 		dw offset loc_CAF7
 		dw offset loc_CAED
@@ -2194,8 +2226,8 @@ off_CB3D	dw offset loc_CB05	; DATA XREF: Voice_ExpressionTimer+55r
 ; correspondance de 8 lignes alternatives pour les codes 9/0xA. Appelée dans tout le cluster
 ; IA avec des dizaines de codes différents (9,0xA,0xB,0xC,0xE,0x10,0x11...).
 ; ==============================================================================================
-Radio_PlayMessage	proc far		; CODE XREF: AI_MissileThreatTrigger_A+12AP
-					; AI_MissileThreatTrigger_A+163P ...
+Radio_PlayMessage	proc far		; CODE XREF: AI_EjectDecision_50FF+12AP
+					; AI_EjectDecision_50FF+163P ...
 
 var_6		= byte ptr -6
 var_4		= word ptr -4
@@ -2383,7 +2415,14 @@ off_CC6A	dw offset loc_CBB9	; DATA XREF: Radio_PlayMessage+6Fr
 ; tombe a 0, OU si entite+0x149==2 (etat special). SINON : verifie le temps ecoule contre un
 ; seuil PAR PALIER (80/60/40/20 unites) determine par la valeur effective (proche de l'echelle
 ; 0-16 de bavardage) - plus bavard = seuil de temps plus bas = peut reparler plus souvent.
-; Retourne 1 (bloque, ne peut pas jouer) ou 0 (autorise).
+; Retourne 1 (bloque, ne peut pas jouer) ou 0 (autorise). TRAITS ATRB CORRIGES 2026-09-25 : le
+; chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL,
+; AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E,
+; +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable
+; 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH,
+; +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 =
+; 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
+; +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 Radio_CanPlayMessage	proc far		; CODE XREF: seg004:2035P seg004:204DP ...
 
@@ -2505,11 +2544,30 @@ word_CD32	dw	6,     7,     8,   10h ; DATA XREF: Radio_CanPlayMessage+30o
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,337L — capteur caché bit5 de +0x28C : calcule la vitesse (sub_43CDC), vérifie les
-; munitions (+0x69 via +0xB), sélectionne un code de message par défaut (2) selon le contexte
-; : sélecteur de message radio contextuel (état de combat/armement).
+; Ex-'Radio_SelectContextMessage' (ne choisit aucun message). far, 337L, LUE 2026-09-25.
+; CALCUL DU MORAL, une fois par tick (bit 5 de +0x28C), resultat range dans +0xF5 et renvoye :
+; 2 (bon, score >= 80), 3 (correct, >= 50), 4 (ebranle, >= 25), 5 (panique, < 25). Score : 100
+; ; pas de recalcul si DamageSys_SumMaxPoints_43CDC du roster de l'objet est nul ou si la
+; capacite carburant [avion+0x69] est nulle ; -100 si DamageSys_SumDamage_43D0F non nul (sens
+; de l'attribut non etabli) ; + carburant restant/capacite * 51 - 50 ([+0x6D]*0x33/[+0x69] -
+; 0x32) ; -50 si l'ordre ne peut pas etre tenu (0xA7 detruire : cible sol sans arme air-sol
+; 0xFC ou cible air sans arme air-air 0xF03 ; 0xA8 defendre : pas de cible ou pas d'arme air-
+; air ; 0xAA suivre : condition sur l'objet global word_706A0 non tracee) ; equilibre des
+; camps (compteurs word_706A3/A7 = apparus du camp 1/0xFF, word_706A5/A9 = detruits, tenus par
+; PartEntry_ResolveSpawnPositionAndActivate_51EDC et Combat_TeamOpposedCheckAndDispatch_53A94)
+; : si des adversaires restent en vie et que l'objet n'est pas neutre, -8 par adversaire
+; vivant et -32 par perte de son camp ; -50 si une reaction est active (+0x27F != 0) ; + bonus
+; de loyaute LY (+0xB3) : 0 si < 3, 15 si < 6, 30 si < 12, 50 si < 15, 75 sinon ; plafond 79
+; tant que des adversaires vivent ; plancher 25 si LY > 9 ; 0 si LY <= 0. TRAITS ATRB CORRIGES
+; 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH,
+; CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B,
+; +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr
+; es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 =
+; FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 =
+; SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1,
+; LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table.
 ; ==============================================================================================
-Radio_SelectContextMessage	proc far		; CODE XREF: seg004:068AP AI_MessageDispatcher+EFp ...
+AI_ComputeMorale_CD4A	proc far		; CODE XREF: seg004:068AP AI_MessageDispatcher+EFp ...
 
 var_C		= word ptr -0Ch
 var_A		= dword	ptr -0Ah
@@ -2533,7 +2591,7 @@ arg_0		= dword	ptr  6
 		jmp	loc_CFD3
 ; ���������������������������������������������������������������������������
 
-loc_CD6D:				; CODE XREF: Radio_SelectContextMessage+1Ej
+loc_CD6D:				; CODE XREF: AI_ComputeMorale_CD4A+1Ej
 		or	byte ptr es:[bx+28Ch], 20h
 		mov	si, 64h	; 'd'
 		mov	bx, es:[bx+102h]
@@ -2547,14 +2605,14 @@ loc_CD84:
 		mov	word ptr [bp+var_6], dx
 		push	ax
 		push	dx
-		call	Roster_SumAttributeA
+		call	DamageSys_SumMaxPoints_43CDC
 		add	sp, 4
 		or	ax, ax
 		jnz	short loc_CD98
 		jmp	loc_CFD3
 ; ���������������������������������������������������������������������������
 
-loc_CD98:				; CODE XREF: Radio_SelectContextMessage+49j
+loc_CD98:				; CODE XREF: AI_ComputeMorale_CD4A+49j
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+0Bh]
 		cmp	dword ptr [bx+69h], 0
@@ -2563,24 +2621,24 @@ loc_CD98:				; CODE XREF: Radio_SelectContextMessage+49j
 		jmp	short loc_CDAD
 ; ���������������������������������������������������������������������������
 
-loc_CDAB:				; CODE XREF: Radio_SelectContextMessage+5Aj
+loc_CDAB:				; CODE XREF: AI_ComputeMorale_CD4A+5Aj
 		xor	ax, ax
 
-loc_CDAD:				; CODE XREF: Radio_SelectContextMessage+5Fj
+loc_CDAD:				; CODE XREF: AI_ComputeMorale_CD4A+5Fj
 		or	al, al
 		jnz	short loc_CDB4
 		jmp	loc_CFD3
 ; ���������������������������������������������������������������������������
 
-loc_CDB4:				; CODE XREF: Radio_SelectContextMessage+65j
+loc_CDB4:				; CODE XREF: AI_ComputeMorale_CD4A+65j
 		push	large [bp+var_6]
-		call	Roster_SumAttributeB
+		call	DamageSys_SumDamage_43D0F
 		add	sp, 4
 		or	ax, ax
 		jz	short loc_CDC7
 		sub	si, 64h	; 'd'
 
-loc_CDC7:				; CODE XREF: Radio_SelectContextMessage+78j
+loc_CDC7:				; CODE XREF: AI_ComputeMorale_CD4A+78j
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+0Bh]
 		mov	eax, [bx+6Dh]
@@ -2605,7 +2663,7 @@ loc_CDC7:				; CODE XREF: Radio_SelectContextMessage+78j
 		jmp	loc_CEC4
 ; ���������������������������������������������������������������������������
 
-loc_CE10:				; CODE XREF: Radio_SelectContextMessage+C1j
+loc_CE10:				; CODE XREF: AI_ComputeMorale_CD4A+C1j
 		push	word ptr es:[bx+137h]
 		mov	bx, es:[bx+137h]
 		mov	bx, [bx]
@@ -2627,7 +2685,7 @@ loc_CE10:				; CODE XREF: Radio_SelectContextMessage+C1j
 		jmp	short loc_CEC1
 ; ���������������������������������������������������������������������������
 
-loc_CE4B:				; CODE XREF: Radio_SelectContextMessage+E3j
+loc_CE4B:				; CODE XREF: AI_ComputeMorale_CD4A+E3j
 		push	0F03h
 		les	bx, [bp+arg_0]
 		push	large dword ptr	es:[bx+104h]
@@ -2639,7 +2697,7 @@ loc_CE4B:				; CODE XREF: Radio_SelectContextMessage+E3j
 		jmp	short loc_CEC1
 ; ���������������������������������������������������������������������������
 
-loc_CE67:				; CODE XREF: Radio_SelectContextMessage+B9j
+loc_CE67:				; CODE XREF: AI_ComputeMorale_CD4A+B9j
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+11Dh], 0A8h ; '�'
 		jnz	short loc_CE96
@@ -2661,7 +2719,7 @@ loc_CE92:
 		jmp	short loc_CEC1
 ; ���������������������������������������������������������������������������
 
-loc_CE96:				; CODE XREF: Radio_SelectContextMessage+127j
+loc_CE96:				; CODE XREF: AI_ComputeMorale_CD4A+127j
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+11Dh], 0AAh ; '�'
 		jnz	short loc_CEC4
@@ -2678,31 +2736,31 @@ loc_CE96:				; CODE XREF: Radio_SelectContextMessage+127j
 		or	ax, ax
 		jnz	short loc_CEC4
 
-loc_CEC1:				; CODE XREF: Radio_SelectContextMessage+FFj
-					; Radio_SelectContextMessage+11Bj ...
+loc_CEC1:				; CODE XREF: AI_ComputeMorale_CD4A+FFj
+					; AI_ComputeMorale_CD4A+11Bj ...
 		sub	si, 32h	; '2'
 
-loc_CEC4:				; CODE XREF: Radio_SelectContextMessage+C3j Radio_SelectContextMessage+FDj ...
+loc_CEC4:				; CODE XREF: AI_ComputeMorale_CD4A+C3j AI_ComputeMorale_CD4A+FDj ...
 		cmp	word_706A3, 0
 		jnz	short loc_CECE
 		jmp	loc_CFD3
 ; ���������������������������������������������������������������������������
 
-loc_CECE:				; CODE XREF: Radio_SelectContextMessage+17Fj
+loc_CECE:				; CODE XREF: AI_ComputeMorale_CD4A+17Fj
 		mov	ax, word_706A3
 		cmp	ax, word_706A5
 		jge	short loc_CEDA
 		jmp	loc_CFD3
 ; ���������������������������������������������������������������������������
 
-loc_CEDA:				; CODE XREF: Radio_SelectContextMessage+18Bj
+loc_CEDA:				; CODE XREF: AI_ComputeMorale_CD4A+18Bj
 		mov	ax, word_706A7
 		cmp	ax, word_706A9
 		jge	short loc_CEE6
 		jmp	loc_CFD3
 ; ���������������������������������������������������������������������������
 
-loc_CEE6:				; CODE XREF: Radio_SelectContextMessage+197j
+loc_CEE6:				; CODE XREF: AI_ComputeMorale_CD4A+197j
 		xor	dx, dx
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+102h]
@@ -2714,7 +2772,7 @@ loc_CEE6:				; CODE XREF: Radio_SelectContextMessage+197j
 		jmp	short loc_CF1C
 ; ���������������������������������������������������������������������������
 
-loc_CF03:				; CODE XREF: Radio_SelectContextMessage+1AAj
+loc_CF03:				; CODE XREF: AI_ComputeMorale_CD4A+1AAj
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+102h]
 		cmp	byte ptr [bx+50h], 1
@@ -2723,10 +2781,10 @@ loc_CF03:				; CODE XREF: Radio_SelectContextMessage+1AAj
 		sub	di, word_706A9
 		mov	ax, word_706A5
 
-loc_CF1C:				; CODE XREF: Radio_SelectContextMessage+1B7j
+loc_CF1C:				; CODE XREF: AI_ComputeMorale_CD4A+1B7j
 		mov	[bp+var_C], ax
 
-loc_CF1F:				; CODE XREF: Radio_SelectContextMessage+1C5j
+loc_CF1F:				; CODE XREF: AI_ComputeMorale_CD4A+1C5j
 		or	di, di
 		jle	short loc_CF40
 		les	bx, [bp+arg_0]
@@ -2740,15 +2798,15 @@ loc_CF1F:				; CODE XREF: Radio_SelectContextMessage+1C5j
 		shl	ax, 5
 		sub	dx, ax
 
-loc_CF40:				; CODE XREF: Radio_SelectContextMessage+1D7j
-					; Radio_SelectContextMessage+1E5j
+loc_CF40:				; CODE XREF: AI_ComputeMorale_CD4A+1D7j
+					; AI_ComputeMorale_CD4A+1E5j
 		add	si, dx
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+27Fh], 0
 		jz	short loc_CF50
 		sub	si, 32h	; '2'
 
-loc_CF50:				; CODE XREF: Radio_SelectContextMessage+201j
+loc_CF50:				; CODE XREF: AI_ComputeMorale_CD4A+201j
 		les	bx, [bp+arg_0]
 		mov	dl, es:[bx+0B3h]
 		cmp	dl, 3
@@ -2757,32 +2815,32 @@ loc_CF50:				; CODE XREF: Radio_SelectContextMessage+201j
 		jmp	short loc_CF82
 ; ���������������������������������������������������������������������������
 
-loc_CF61:				; CODE XREF: Radio_SelectContextMessage+211j
+loc_CF61:				; CODE XREF: AI_ComputeMorale_CD4A+211j
 		cmp	dl, 6
 		jge	short loc_CF6B
 		mov	bx, 0Fh
 		jmp	short loc_CF82
 ; ���������������������������������������������������������������������������
 
-loc_CF6B:				; CODE XREF: Radio_SelectContextMessage+21Aj
+loc_CF6B:				; CODE XREF: AI_ComputeMorale_CD4A+21Aj
 		cmp	dl, 0Ch
 		jge	short loc_CF75
 		mov	bx, 1Eh
 		jmp	short loc_CF82
 ; ���������������������������������������������������������������������������
 
-loc_CF75:				; CODE XREF: Radio_SelectContextMessage+224j
+loc_CF75:				; CODE XREF: AI_ComputeMorale_CD4A+224j
 		cmp	dl, 0Fh
 		jge	short loc_CF7F
 		mov	bx, 32h	; '2'
 		jmp	short loc_CF82
 ; ���������������������������������������������������������������������������
 
-loc_CF7F:				; CODE XREF: Radio_SelectContextMessage+22Ej
+loc_CF7F:				; CODE XREF: AI_ComputeMorale_CD4A+22Ej
 		mov	bx, 4Bh	; 'K'
 
-loc_CF82:				; CODE XREF: Radio_SelectContextMessage+215j
-					; Radio_SelectContextMessage+21Fj ...
+loc_CF82:				; CODE XREF: AI_ComputeMorale_CD4A+215j
+					; AI_ComputeMorale_CD4A+21Fj ...
 		add	si, bx
 		or	di, di
 		jle	short loc_CF90
@@ -2794,58 +2852,58 @@ loc_CF8B:
 		jl	short loc_CF90
 		mov	si, 4Fh	; 'O'
 
-loc_CF90:				; CODE XREF: Radio_SelectContextMessage+23Cj
-					; Radio_SelectContextMessage:loc_CF8Bj
+loc_CF90:				; CODE XREF: AI_ComputeMorale_CD4A+23Cj
+					; AI_ComputeMorale_CD4A:loc_CF8Bj
 		cmp	dl, 9
 		jle	short loc_CF9D
 		cmp	si, 19h
 		jge	short loc_CF9D
 		mov	si, 19h
 
-loc_CF9D:				; CODE XREF: Radio_SelectContextMessage+249j
-					; Radio_SelectContextMessage+24Ej
+loc_CF9D:				; CODE XREF: AI_ComputeMorale_CD4A+249j
+					; AI_ComputeMorale_CD4A+24Ej
 		or	dl, dl
 		jg	short loc_CFA3
 		xor	si, si
 
-loc_CFA3:				; CODE XREF: Radio_SelectContextMessage+255j
+loc_CFA3:				; CODE XREF: AI_ComputeMorale_CD4A+255j
 		cmp	si, 19h
 		jge	short loc_CFAE
 		mov	[bp+var_2], 5
 		jmp	short loc_CFC8
 ; ���������������������������������������������������������������������������
 
-loc_CFAE:				; CODE XREF: Radio_SelectContextMessage+25Cj
+loc_CFAE:				; CODE XREF: AI_ComputeMorale_CD4A+25Cj
 		cmp	si, 32h	; '2'
 		jge	short loc_CFB9
 		mov	[bp+var_2], 4
 		jmp	short loc_CFC8
 ; ���������������������������������������������������������������������������
 
-loc_CFB9:				; CODE XREF: Radio_SelectContextMessage+267j
+loc_CFB9:				; CODE XREF: AI_ComputeMorale_CD4A+267j
 		cmp	si, 50h	; 'P'
 		jge	short loc_CFC4
 		mov	[bp+var_2], 3
 		jmp	short loc_CFC8
 ; ���������������������������������������������������������������������������
 
-loc_CFC4:				; CODE XREF: Radio_SelectContextMessage+272j
+loc_CFC4:				; CODE XREF: AI_ComputeMorale_CD4A+272j
 		mov	[bp+var_2], 2
 
-loc_CFC8:				; CODE XREF: Radio_SelectContextMessage+262j
-					; Radio_SelectContextMessage+26Dj ...
+loc_CFC8:				; CODE XREF: AI_ComputeMorale_CD4A+262j
+					; AI_ComputeMorale_CD4A+26Dj ...
 		les	bx, [bp+arg_0]
 		mov	al, [bp+var_2]
 		mov	es:[bx+0F5h], al
 
-loc_CFD3:				; CODE XREF: Radio_SelectContextMessage+20j Radio_SelectContextMessage+4Bj ...
+loc_CFD3:				; CODE XREF: AI_ComputeMorale_CD4A+20j AI_ComputeMorale_CD4A+4Bj ...
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+0F5h]
 		pop	di
 		pop	si
 		leave
 		retf
-Radio_SelectContextMessage	endp
+AI_ComputeMorale_CD4A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2853,9 +2911,10 @@ Radio_SelectContextMessage	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,86L — selon l'état d'escorte (+0x27F ==1 ou 2), soit propage la cible du leader (+0x287)
-; soit interroge le leader (+0x281, vtable[0x38]/[0]/[0x34]) pour valider sa disponibilité :
-; requête de validité du leader pour la logique d'ailier/formation.
+; far, 86L, LUE 2026-09-27. D'apres la reaction du LEADER (+0x27F) : 1 et cible +0x287 -> 3
+; (engager cette cible) ; 2 et objet menacant +0x281 dont le lanceur (vtable+0x38) est un
+; avion (categorie 6) -> 3 (engager le lanceur) ; sinon 0. Pose le bit 1 de +0x28B du leader =
+; (resultat == 0). N'emet jamais 1.
 ; ==============================================================================================
 Escort_QueryLeaderValid	proc far		; CODE XREF: Goal_FollowAllyExec+10Bp
 
@@ -2950,10 +3009,20 @@ Escort_QueryLeaderValid	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,944L — la plus grosse fonction documentée jusqu'ici. Vérifie flag combat (+0x28B bit3),
-; récupère vitesse de la cible/leader (+0x145, vtable+0x3C+0xC) et vitesse propre : candidat
-; très fort pour la solution de guidage de formation/rejointe (followAlly), appelée par
-; sub_DAA9 — à disséquer en détail dans une session dédiée.
+; far, 944L, LUE 2026-09-27. TENUE DE FORMATION CINEMATIQUE. N = nez du leader, n = nez
+; propre, pas s = |vitesse leader| * dt. Poste = Goal_FollowAllyFormation ; d = |leader +
+; poste - moi|. Hors formation si d > 4 |poste| ; entree si |ecart de cap nez leader / nez
+; propre| < 15 deg. 'Derriere' = |ecart de cap nez propre / direction du poste| > 160 deg. A
+; l'entree : historique +0x16A (32 nez + 32 envergures) rempli avec l'orientation propre,
+; index +0x172 = 0, horloge +0x16E = 0. Si s < d : s += min(d - s, (d > 3000 et derriere ? 50
+; : 20) m/s * dt), sinon s = d. Recopie le cran de gaz du leader (ctrl+0x1E). c = s *
+; (derriere ? 76/256 : 25/256), s -= c. Tant que horloge >= 0,125 s : nez[i] = N ;
+; envergure[i] = |manche leader| > 2/16 ? (envergure[i] + envergure leader)/2 : envergure a
+; plat du nez propre (Vec_NegateSwapPair) ; i = (i+1)&31 ; horloge -= 0,125. horloge += dt.
+; Moyennes des 32 nez et envergures. Orientation = nez du leader actuel + envergure moyenne
+; (Matrix_OrthonormalizeKeepRow1_57660, vtable +0x40). Deplacement = nez_moyen*s +
+; unitaire(vers le poste - nez_moyen*s)*c ; vitesse = deplacement * dword_70454 (vtable
+; +0x50). Renvoie 1 en formation.
 ; ==============================================================================================
 Formation_GuidanceSolution	proc far		; CODE XREF: Goal_FollowAllyExec+1B2p
 
@@ -3641,7 +3710,7 @@ loc_D6FB:				; CODE XREF: Formation_GuidanceSolution+55Dj
 		mov	[bp+var_BC], 0
 		lea	ax, [bp+var_C4]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+16Ah]
@@ -3802,7 +3871,7 @@ loc_D8C3:				; CODE XREF: Formation_GuidanceSolution+83Dj
 		mov	[bp+var_A4], eax
 		lea	ax, [bp+var_B8]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		mov	eax, [bp+var_94]
 		mov	edx, [bp+var_8]
@@ -3829,7 +3898,7 @@ loc_D985:
 		sub	[bp+var_74], eax
 		lea	ax, [bp+var_7C]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp+var_7C]
 		mov	edx, [bp+var_40]
@@ -3906,9 +3975,19 @@ Formation_GuidanceSolution	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,260L — orchestrateur GOAL followAlly : valide le leader (vtable/+0x59 statut), met à
-; jour l'escorte (+0x145 via sub_3A44E), vérifie l'état GOAL 0xAA, appelle sub_CFDF (validité
-; leader) et sub_D081 (guidage) : exécuteur complet du GOAL 'suivre/former avec un allié'.
+; far, 260L, LUE 2026-09-27. EXECUTEUR DU VOL EN FORMATION (appele par Goal_SelectTransition a
+; chaque tick de l'ordre 0xAA). var_2 = bit3 de +0x28B (deja en formation) OU objet monde
+; (+0x102)+0x59 == 0 (physique non suspendue par ailleurs). Leader +0x145 : si son avion a
+; flags_75.bit5 (pilote ejecte, pose par AI_EjectDecision_50FF) -> leader oublie. Conditions :
+; ordre 0xAA, var_2, etat d'ailier +0x149 == 0, ailier non ejecte, leader pas au sol, +0x27F
+; == 0. Si le leader est une entite IA (octet +6 == 1, pose par AIEntity_Construct_74B43) :
+; +0x149 = Escort_QueryLeaderValid ; 1 -> Goal_TransferToWingman ; 3 -> cibles
+; +0x137/+0x285/+0x287 = celle renvoyee, +0x160 = 0, +0x162 = horloge +0x175 (secondes) ;
+; sinon Formation_GuidanceSolution. Leader non IA (joueur) : Formation_GuidanceSolution si
+; +0x149 == 0. Si formation tenue et aucun comportement en cours : Goal_FollowWaypoints (sans
+; effet visible, physique suspendue). Hors formation : libere l'historique +0x16A. bit3 de
+; +0x28B = resultat ; si var_2 : objet+0x59 = resultat (physique suspendue pendant la
+; formation).
 ; ==============================================================================================
 Goal_FollowAllyExec	proc far		; CODE XREF: seg003:0E67P seg004:2132P ...
 
