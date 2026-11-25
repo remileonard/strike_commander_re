@@ -352,10 +352,10 @@ loc_15134:				; CODE XREF: seg015:023Dj
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,14L — deux appels à sub_5A95E(0,6) et sub_5A95E(0,7) : initialisation de deux
-; ressources/canaux (son ou UI) par index.
+; Ex-'Resource_InitTwoChannels'. far, 14L, LUE 2026-11-25. Arrête les effets 6 et 7 (tonalités
+; du missile) : SoundFX_Stop_5A95E(6, 0) et (7, 0).
 ; ==============================================================================================
-Resource_InitTwoChannels	proc far		; CODE XREF: Video_InitShakeEffect_85D95+7P
+SoundFX_StopSeekerTones_15138	proc far		; CODE XREF: Video_InitShakeEffect_85D95+7P
 		push	bp
 		mov	bp, sp
 		push	0
@@ -368,7 +368,7 @@ Resource_InitTwoChannels	proc far		; CODE XREF: Video_InitShakeEffect_85D95+7P
 		add	sp, 4
 		pop	bp
 		retf
-Resource_InitTwoChannels	endp
+SoundFX_StopSeekerTones_15138	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -383,8 +383,8 @@ Resource_InitTwoChannels	endp
 ; Cockpit_CaptionTextRenderStep_14EFA (legende texte de vue), lien errone fait par une session
 ; precedente.
 ; ==============================================================================================
-Cockpit_LoadBettyPack	proc far		; CODE XREF: Cockpit_DetectPlayerMissile+6Ep
-					; Cockpit_DetectPlayerMissile+C1p ...
+Cockpit_LoadBettyPack	proc far		; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+6Ep
+					; Cockpit_WarningsAndSeekerTone_15FD3+C1p ...
 
 var_50		= word ptr -50h
 arg_0		= byte ptr  6
@@ -1348,7 +1348,7 @@ loc_15AAF:				; CODE XREF: seg015:0BB8j
 		push	si
 		nop
 		push	cs
-		call	near ptr Cockpit_DetectPlayerMissile
+		call	near ptr Cockpit_WarningsAndSeekerTone_15FD3
 		pop	cx
 		pop	di
 		pop	si
@@ -2031,11 +2031,16 @@ Cockpit_ViewPanTransitionMain_15B67	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,242L — parcourt tous les objets du monde (sub_224DA, type 0x59C3) cherchant un objet de
-; type 8 (missile) dont le propriétaire (+0x55) est le joueur (word_722E6) : détection
-; 'missile actif du joueur' pour affichage d'alerte cockpit.
+; Ex-'Cockpit_DetectPlayerMissile'. far, 242L, LUE 2026-11-25. ALARMES DU COCKPIT ET TONALITÉ
+; DU MISSILE. (1) Un missile (type 8) dont le champ +85 (cible) est le joueur :
+; Cockpit_LoadBettyPack(1), une fois (byte_6D8AD). (2) Sinon, résultat de
+; Physics_ApplyGroundHeightConstraint > 4 (400h) après 2 images : Betty 2, une fois
+; (byte_6D8AE ; condition non élucidée). (3) Bit 6 de JDYN +117 : Betty 0 (byte_6D8AF) ; sinon
+; carburant +109 < capacité +105 / 8 : Betty 0 (byte_6D8B0). (4) Arme choisie de mode 1 avec
+; munitions : cible accrochée (+92 et octet +150) → effet 7 (arrêt du 6), sinon effet 6 (arrêt
+; du 7) ; autre arme : arrêt des deux.
 ; ==============================================================================================
-Cockpit_DetectPlayerMissile	proc far		; CODE XREF: seg015:0BC2p
+Cockpit_WarningsAndSeekerTone_15FD3	proc far		; CODE XREF: seg015:0BC2p
 
 var_12		= dword	ptr -12h
 var_E		= dword	ptr -0Eh
@@ -2056,7 +2061,7 @@ arg_0		= word ptr  6
 		jmp	short loc_16014
 ; ���������������������������������������������������������������������������
 
-loc_15FE9:				; CODE XREF: Cockpit_DetectPlayerMissile+52j
+loc_15FE9:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+52j
 		mov	di, [bp+var_4]
 		or	di, di
 		jz	short loc_16014
@@ -2079,8 +2084,8 @@ loc_15FE9:				; CODE XREF: Cockpit_DetectPlayerMissile+52j
 		jmp	short loc_16027
 ; ���������������������������������������������������������������������������
 
-loc_16014:				; CODE XREF: Cockpit_DetectPlayerMissile+14j
-					; Cockpit_DetectPlayerMissile+1Bj ...
+loc_16014:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+14j
+					; Cockpit_WarningsAndSeekerTone_15FD3+1Bj ...
 		lea	ax, [bp+var_4]
 		push	ax
 		push	59C3h
@@ -2089,7 +2094,7 @@ loc_16014:				; CODE XREF: Cockpit_DetectPlayerMissile+14j
 		or	ax, ax
 		jnz	short loc_15FE9
 
-loc_16027:				; CODE XREF: Cockpit_DetectPlayerMissile+3Fj
+loc_16027:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+3Fj
 		cmp	[bp+var_1], 0
 		jz	short loc_16048
 		mov	al, byte_6D8AD
@@ -2099,7 +2104,7 @@ loc_16027:				; CODE XREF: Cockpit_DetectPlayerMissile+3Fj
 		jmp	loc_16112
 ; ���������������������������������������������������������������������������
 
-loc_16039:				; CODE XREF: Cockpit_DetectPlayerMissile+61j
+loc_16039:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+61j
 		mov	byte_6D8AD, 1
 		push	1
 		push	cs
@@ -2108,7 +2113,7 @@ loc_16039:				; CODE XREF: Cockpit_DetectPlayerMissile+61j
 		jmp	loc_16112
 ; ���������������������������������������������������������������������������
 
-loc_16048:				; CODE XREF: Cockpit_DetectPlayerMissile+58j
+loc_16048:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+58j
 		mov	byte_6D8AD, 0
 		mov	bx, [si+20h]
 		mov	bx, [bx+2]
@@ -2125,10 +2130,10 @@ loc_16048:				; CODE XREF: Cockpit_DetectPlayerMissile+58j
 		jmp	short loc_16075
 ; ���������������������������������������������������������������������������
 
-loc_16073:				; CODE XREF: Cockpit_DetectPlayerMissile+99j
+loc_16073:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+99j
 		xor	ax, ax
 
-loc_16075:				; CODE XREF: Cockpit_DetectPlayerMissile+9Ej
+loc_16075:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+9Ej
 		or	al, al
 		jz	short loc_1609A
 		cmp	word_70466, 2
@@ -2140,7 +2145,7 @@ loc_16075:				; CODE XREF: Cockpit_DetectPlayerMissile+9Ej
 		jmp	loc_16112
 ; ���������������������������������������������������������������������������
 
-loc_1608C:				; CODE XREF: Cockpit_DetectPlayerMissile+B4j
+loc_1608C:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+B4j
 		mov	byte_6D8AE, 1
 		push	2
 		push	cs
@@ -2149,8 +2154,8 @@ loc_1608C:				; CODE XREF: Cockpit_DetectPlayerMissile+B4j
 		jmp	short loc_16112
 ; ���������������������������������������������������������������������������
 
-loc_1609A:				; CODE XREF: Cockpit_DetectPlayerMissile+A4j
-					; Cockpit_DetectPlayerMissile+ABj
+loc_1609A:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+A4j
+					; Cockpit_WarningsAndSeekerTone_15FD3+ABj
 		mov	byte_6D8AE, 0
 		push	di
 		mov	bx, [di]
@@ -2174,7 +2179,7 @@ loc_1609A:				; CODE XREF: Cockpit_DetectPlayerMissile+A4j
 		jmp	short loc_16112
 ; ���������������������������������������������������������������������������
 
-loc_160CC:				; CODE XREF: Cockpit_DetectPlayerMissile+E0j
+loc_160CC:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+E0j
 		mov	byte_6D8AF, 0
 		mov	eax, [di+69h]
 		sar	eax, 3
@@ -2187,10 +2192,10 @@ loc_160CC:				; CODE XREF: Cockpit_DetectPlayerMissile+E0j
 		jmp	short loc_160F2
 ; ���������������������������������������������������������������������������
 
-loc_160F0:				; CODE XREF: Cockpit_DetectPlayerMissile+116j
+loc_160F0:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+116j
 		xor	ax, ax
 
-loc_160F2:				; CODE XREF: Cockpit_DetectPlayerMissile+11Bj
+loc_160F2:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+11Bj
 		or	al, al
 		jz	short loc_1610D
 		mov	al, byte_6D8B0
@@ -2205,11 +2210,11 @@ loc_160F2:				; CODE XREF: Cockpit_DetectPlayerMissile+11Bj
 		jmp	short loc_16112
 ; ���������������������������������������������������������������������������
 
-loc_1610D:				; CODE XREF: Cockpit_DetectPlayerMissile+121j
+loc_1610D:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+121j
 		mov	byte_6D8B0, 0
 
-loc_16112:				; CODE XREF: Cockpit_DetectPlayerMissile+63j
-					; Cockpit_DetectPlayerMissile+72j ...
+loc_16112:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+63j
+					; Cockpit_WarningsAndSeekerTone_15FD3+72j ...
 		mov	bx, [si+20h]
 		mov	al, [bx+95h]
 		mov	[bp+var_6], al
@@ -2238,12 +2243,12 @@ loc_16135:
 		jmp	short loc_1614E
 ; ���������������������������������������������������������������������������
 
-loc_16146:				; CODE XREF: Cockpit_DetectPlayerMissile+160j
-					; Cockpit_DetectPlayerMissile+167j
+loc_16146:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+160j
+					; Cockpit_WarningsAndSeekerTone_15FD3+167j
 		mov	byte ptr [bp+var_A], 6
 		mov	byte ptr [bp+var_E+2], 7
 
-loc_1614E:				; CODE XREF: Cockpit_DetectPlayerMissile+171j
+loc_1614E:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+171j
 		push	0
 		mov	al, byte ptr [bp+var_E+2]
 		push	ax
@@ -2258,8 +2263,8 @@ loc_1614E:				; CODE XREF: Cockpit_DetectPlayerMissile+171j
 		jmp	short loc_16187
 ; ���������������������������������������������������������������������������
 
-loc_1616F:				; CODE XREF: Cockpit_DetectPlayerMissile+14Dj
-					; Cockpit_DetectPlayerMissile:loc_16127j
+loc_1616F:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+14Dj
+					; Cockpit_WarningsAndSeekerTone_15FD3:loc_16127j
 		push	0
 		push	6
 		call	SoundFX_Stop_5A95E
@@ -2271,11 +2276,11 @@ loc_1617F:
 		call	SoundFX_Stop_5A95E
 		add	sp, 4
 
-loc_16187:				; CODE XREF: Cockpit_DetectPlayerMissile+19Aj
+loc_16187:				; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+19Aj
 		pop	di
 		pop	si
 		leave
 		retf
-Cockpit_DetectPlayerMissile	endp
+Cockpit_WarningsAndSeekerTone_15FD3	endp
 
 seg015		ends

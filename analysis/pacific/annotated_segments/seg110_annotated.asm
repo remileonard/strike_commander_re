@@ -195,7 +195,7 @@ loc_44ABB:
 		add	ax, 12h
 		push	ax
 		push	word_79788
-		call	sub_3677E
+		call	Ground_IsWaterUnderPoint_3677E
 		add	sp, 8
 		mov	ah, 0
 		or	ax, ax
@@ -220,7 +220,7 @@ loc_44B0E:
 		add	ax, 12h
 		push	ax
 		push	word_79788
-		call	sub_3677E
+		call	Ground_IsWaterUnderPoint_3677E
 		add	sp, 8
 		or	al, al
 		jnz	short loc_44B5D
@@ -258,7 +258,7 @@ loc_44B6A:
 		push	0
 		push	eax
 		push	10h
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 		sub	sp, 4
 		mov	[bp+var_54], 0
@@ -465,7 +465,7 @@ loc_44CFB:
 		add	ax, 12h
 		push	ax
 		push	word_79788
-		call	sub_3677E
+		call	Ground_IsWaterUnderPoint_3677E
 		add	sp, 8
 		mov	ah, 0
 		or	ax, ax

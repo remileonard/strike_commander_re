@@ -415,7 +415,7 @@ loc_3E419:
 		push	ax
 		nop
 		push	cs
-		call	near ptr sub_3F391
+		call	near ptr WeaponSystem_ReleaseBomb_3F391
 		add	sp, 16h
 
 loc_3E438:
@@ -586,7 +586,7 @@ loc_3E595:
 		push	ax
 		nop
 		push	cs
-		call	near ptr sub_3F657
+		call	near ptr WeaponSystem_LaunchRocket_3F657
 		add	sp, 12h
 		jmp	loc_3E438
 
@@ -1200,7 +1200,7 @@ loc_3EA9C:
 		push	word ptr es:[bx+9]
 		push	eax
 		push	1
-		call	sub_5EBFB
+		call	SoundFX_PlayOrUpdate_5EBFB
 		add	sp, 8
 
 loc_3EB20:
@@ -1313,7 +1313,7 @@ loc_3EBBD:
 		push	word ptr es:[bx+9]
 		push	eax
 		push	1
-		call	sub_5EBFB
+		call	SoundFX_PlayOrUpdate_5EBFB
 		add	sp, 8
 
 loc_3EC41:
@@ -1340,7 +1340,7 @@ loc_3EC75:
 		les	bx, word ptr [bp+arg_0]
 		push	word ptr es:[bx+9]
 		push	1
-		call	sub_5ECE8
+		call	SoundFX_Stop_5ECE8
 		add	sp, 4
 
 loc_3EC86:
@@ -2286,7 +2286,11 @@ sub_3F2EC		endp
 
 ; Attributes: bp-based frame
 
-sub_3F391		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-25. Lâcher d'une bombe (WeaponSystem_LaunchFromStation_3E2EC,
+; catégories 9 et 26) : effet 7 à la distance de la caméra.
+; ==============================================================================================
+WeaponSystem_ReleaseBomb_3F391		proc far
 
 var_6A		= dword ptr -6Ah
 var_66		= dword ptr -66h
@@ -2574,7 +2578,7 @@ loc_3F583:
 		push	si
 		push	eax
 		push	7
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 		cmp	word_7CADA, di
 		jnz	short loc_3F623
@@ -2614,13 +2618,17 @@ loc_3F64D:
 		pop	si
 		leave
 		retf
-sub_3F391		endp
+WeaponSystem_ReleaseBomb_3F391		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_3F657		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-25. Départ d'une roquette (catégorie 8) : effet 26, non
+; positionné.
+; ==============================================================================================
+WeaponSystem_LaunchRocket_3F657		proc far
 
 var_42		= word ptr -42h
 var_36		= word ptr -36h
@@ -2874,7 +2882,7 @@ loc_3F868:
 		push	0
 		push	large 0
 		push	1Ah
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 
 loc_3F87D:
@@ -2909,7 +2917,7 @@ loc_3F8A9:
 		pop	si
 		leave
 		retf
-sub_3F657		endp
+WeaponSystem_LaunchRocket_3F657		endp
 
 ; ----------------------------------------------------------------------
 
@@ -3003,6 +3011,6 @@ loc_3F940:
 		les	bx, word ptr [bp+arg_0]
 		push	word ptr es:[bx+9]
 		push	14h
-		call	sub_5ECE8
+		call	SoundFX_Stop_5ECE8
 sub_3F8AD		endp
 seg099		ends

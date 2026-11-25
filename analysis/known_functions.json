@@ -4367,7 +4367,7 @@
   "sub_85D95": {
     "new_name": "Video_InitShakeEffect_85D95",
     "segment": "ovr246",
-    "summary": "far, combine `Resource_InitTwoChannels` et `Video_SetHorizontalShake` — initialisation d'un effet de tremblement d'écran (impact/explosion)."
+    "summary": "far, combine `SoundFX_StopSeekerTones_15138` (ex-Resource_InitTwoChannels : arrêt des tonalités du missile) et `Video_SetHorizontalShake` — initialisation d'un effet de tremblement d'écran (impact/explosion)."
   },
   "sub_9B1FC": {
     "new_name": "Terrain_FormatAndReleaseReader_9B1FC",
@@ -8220,9 +8220,9 @@
     "summary": "far — wrapper 1 argument vers sub_5D30E (probable free() near)."
   },
   "sub_15138": {
-    "new_name": "Resource_InitTwoChannels",
+    "new_name": "SoundFX_StopSeekerTones_15138",
     "segment": "seg015",
-    "summary": "far,14L — deux appels à sub_5A95E(0,6) et sub_5A95E(0,7) : **initialisation de deux ressources/canaux (son ou UI) par index.**"
+    "summary": "Ex-'Resource_InitTwoChannels'. far, 14L, LUE 2026-11-25. Arrête les effets 6 et 7 (tonalités du missile) : SoundFX_Stop_5A95E(6, 0) et (7, 0)."
   },
   "sub_676F1": {
     "new_name": "Stopwatch_StartOrStop_676F1",
@@ -10240,9 +10240,9 @@
     "summary": "far, variante de TextRenderer_EncodeCharA_5E27B (lit un octet depuis l'objet source avant conversion via sub_1811), suivi d'un appel à sub_5E7D6. Référencée par `TextRenderer_Main` et seg144."
   },
   "sub_15FD3": {
-    "new_name": "Cockpit_DetectPlayerMissile",
+    "new_name": "Cockpit_WarningsAndSeekerTone_15FD3",
     "segment": "seg015",
-    "summary": "far,242L — parcourt tous les objets du monde (sub_224DA, type 0x59C3) cherchant un objet de type 8 (missile) dont le propriétaire (+0x55) est le joueur (word_722E6) : **détection 'missile actif du joueur' pour affichage d'alerte cockpit.**"
+    "summary": "Ex-'Cockpit_DetectPlayerMissile'. far, 242L, LUE 2026-11-25. ALARMES DU COCKPIT ET TONALITÉ DU MISSILE. (1) Un missile (type 8) dont le champ +85 (cible) est le joueur : Cockpit_LoadBettyPack(1), une fois (byte_6D8AD). (2) Sinon, résultat de Physics_ApplyGroundHeightConstraint > 4 (400h) après 2 images : Betty 2, une fois (byte_6D8AE ; condition non élucidée). (3) Bit 6 de JDYN +117 : Betty 0 (byte_6D8AF) ; sinon carburant +109 < capacité +105 / 8 : Betty 0 (byte_6D8B0). (4) Arme choisie de mode 1 avec munitions : cible accrochée (+92 et octet +150) → effet 7 (arrêt du 6), sinon effet 6 (arrêt du 7) ; autre arme : arrêt des deux."
   },
   "sub_6BBEA": {
     "new_name": "VROOMM_StubThunk_6BBEA",

@@ -381,6 +381,9 @@ strike_commander_re/
 │   │                                  hypothèses et limites
 │   ├── MUSIC_SYSTEM.md              ⭐ système musical (AIL/XMIDI, combat.dat/.adl,
 │   │                                  transitions, déclencheurs, effets sonores, voix)
+│   ├── SOUND_EFFECTS.md             effets sonores de STRIKE et de PACIFIC : les 14 et 27 effets synthétisés (soundfx), la table
+│   │                                  des 50 sons numériques de Pacific (DSOUNDFX.PAK), numérique d'abord puis synthèse, voix Betty,
+│   │                                  déclencheur de chaque effet, correspondance entre les deux jeux
 │   ├── ADLIB_DRIVER.md              pilote AdLib OPL2 (ADLIB.ADV) — registres, tables
 │   ├── ail_sources/                 sources publiques AIL 2.0 (AIL.ASM, AIL.INC, XMIDI.ASM)
 │   ├── adlib_driver_source/         ADLIB.ADV + son désassemblage

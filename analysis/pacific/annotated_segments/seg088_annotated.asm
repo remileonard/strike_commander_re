@@ -623,7 +623,7 @@ loc_3746F:
 		push	0
 		push	eax
 		push	2
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 		push	di
 		push	67ADh
@@ -689,7 +689,7 @@ loc_37556:
 		lea	ax, word ptr [bp+var_40]
 		push	ax
 		push	word_79788
-		call	sub_3677E
+		call	Ground_IsWaterUnderPoint_3677E
 		add	sp, 8
 		or	al, al
 		jnz	short loc_375A3
@@ -727,7 +727,7 @@ loc_375B0:
 		push	0
 		push	eax
 		push	10h
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 		sub	sp, 4
 		mov	[bp+var_6C], 0

@@ -882,7 +882,11 @@ sub_4E3A3		endp
 
 ; Attributes: bp-based frame
 
-sub_4E3C0		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. Équivalent de loc_4DECF de STRIKE : objet touché = joueur en vue
+; cockpit (byte_7CEF8 = 4) → effet 8 ; sinon effet 9 à la distance de la caméra.
+; ==============================================================================================
+Weapon_OnImpact_4E3C0		proc far
 
 var_24		= dword ptr -24h
 var_20		= dword ptr -20h
@@ -957,7 +961,7 @@ loc_4E3EE:
 		push	9
 
 loc_4E461:
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 
 loc_4E469:
@@ -966,7 +970,7 @@ loc_4E469:
 		pop	si
 		leave
 		retf
-sub_4E3C0		endp
+Weapon_OnImpact_4E3C0		endp
 
 ; ----------------------------------------------------------------------
 

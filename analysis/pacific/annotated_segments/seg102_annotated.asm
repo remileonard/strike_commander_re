@@ -941,7 +941,7 @@ loc_40BD2:
 
 loc_40BD4:
 		push	ax
-		call	sub_5EBFB
+		call	SoundFX_PlayOrUpdate_5EBFB
 		add	sp, 8
 
 loc_40BDD:
@@ -1908,7 +1908,7 @@ loc_41402:
 		push	word_7CADA
 		push	large 100h
 		push	0
-		call	sub_5EBFB
+		call	SoundFX_PlayOrUpdate_5EBFB
 		add	sp, 8
 		sub	sp, 4
 		mov	[bp+var_6A], 0
@@ -1924,7 +1924,7 @@ loc_41402:
 loc_4143B:
 		push	word_7CADA
 		push	0
-		call	sub_5ECE8
+		call	SoundFX_Stop_5ECE8
 		add	sp, 4
 
 loc_41449:

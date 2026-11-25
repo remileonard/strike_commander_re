@@ -1304,8 +1304,9 @@ HUDSymbol_ConstructWithContainerOpC_85D22	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine Resource_InitTwoChannels et Video_SetHorizontalShake — initialisation d'un
-; effet de tremblement d'écran (impact/explosion).
+; far, combine SoundFX_StopSeekerTones_15138 (ex-Resource_InitTwoChannels : arrêt des
+; tonalités du missile) et Video_SetHorizontalShake — initialisation d'un effet de tremblement
+; d'écran (impact/explosion).
 ; ==============================================================================================
 Video_InitShakeEffect_85D95	proc far		; CODE XREF: VROOMM_StubThunk_6B134J
 
@@ -1315,7 +1316,7 @@ arg_0		= word ptr  6
 		mov	bp, sp
 		push	si
 		mov	si, [bp+arg_0]
-		call	Resource_InitTwoChannels
+		call	SoundFX_StopSeekerTones_15138
 		push	si
 		call	VROOMM_StubThunk_6BC2B
 		pop	cx

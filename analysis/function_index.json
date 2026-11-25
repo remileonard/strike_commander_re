@@ -2993,8 +2993,8 @@
 "sub_5A95E",
 "sub_5A95E"
 ],
-"new_name": "Resource_InitTwoChannels",
-"summary": "far,14L — deux appels à sub_5A95E(0,6) et sub_5A95E(0,7) : **initialisation de deux ressources/canaux (son ou UI) par index.**"
+"new_name": "SoundFX_StopSeekerTones_15138",
+"summary": "Ex-'Resource_InitTwoChannels'. far, 14L, LUE 2026-11-25. Arrête les effets 6 et 7 (tonalités du missile) : SoundFX_Stop_5A95E(6, 0) et (7, 0)."
 },
 "sub_15155": {
 "segment": "seg015",
@@ -3084,8 +3084,8 @@
 "sub_5A95E",
 "sub_5A95E"
 ],
-"new_name": "Cockpit_DetectPlayerMissile",
-"summary": "far,242L — parcourt tous les objets du monde (sub_224DA, type 0x59C3) cherchant un objet de type 8 (missile) dont le propriétaire (+0x55) est le joueur (word_722E6) : **détection 'missile actif du joueur' pour affichage d'alerte cockpit.**"
+"new_name": "Cockpit_WarningsAndSeekerTone_15FD3",
+"summary": "Ex-'Cockpit_DetectPlayerMissile'. far, 242L, LUE 2026-11-25. ALARMES DU COCKPIT ET TONALITÉ DU MISSILE. (1) Un missile (type 8) dont le champ +85 (cible) est le joueur : Cockpit_LoadBettyPack(1), une fois (byte_6D8AD). (2) Sinon, résultat de Physics_ApplyGroundHeightConstraint > 4 (400h) après 2 images : Betty 2, une fois (byte_6D8AE ; condition non élucidée). (3) Bit 6 de JDYN +117 : Betty 0 (byte_6D8AF) ; sinon carburant +109 < capacité +105 / 8 : Betty 0 (byte_6D8B0). (4) Arme choisie de mode 1 avec munitions : cible accrochée (+92 et octet +150) → effet 7 (arrêt du 6), sinon effet 6 (arrêt du 7) ; autre arme : arrêt des deux."
 },
 "sub_16898": {
 "segment": "seg017",

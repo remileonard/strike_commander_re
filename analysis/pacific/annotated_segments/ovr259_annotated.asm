@@ -1729,7 +1729,7 @@ loc_9A8D0:
 		cmp	byte_7CB1C, 0
 		jz	short loc_9A8F8
 		push	0
-		call	sub_5AE86
+		call	DigitalSFX_Construct_5AE86
 		pop	cx
 		mov	word_79E73, ax
 		mov	ax, seg seg230

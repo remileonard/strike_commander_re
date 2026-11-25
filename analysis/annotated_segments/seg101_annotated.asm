@@ -927,7 +927,7 @@ Physics_AllocGroundConstraintVector	endp
 ; moteur physique JDYN au système de terrain.
 ; ==============================================================================================
 Physics_ApplyGroundHeightConstraint	proc far		; CODE XREF: seg002:0EB1P
-					; Cockpit_DetectPlayerMissile+89P ...
+					; Cockpit_WarningsAndSeekerTone_15FD3+89P ...
 
 var_20		= dword	ptr -20h
 var_1C		= dword	ptr -1Ch

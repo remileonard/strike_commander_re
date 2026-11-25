@@ -279,7 +279,7 @@ loc_B04EA:
 		add	ax, 12h
 		push	ax
 		push	word_79788
-		call	sub_3677E
+		call	Ground_IsWaterUnderPoint_3677E
 		add	sp, 8
 		or	al, al
 		jnz	short loc_B0539
@@ -317,7 +317,7 @@ loc_B0546:
 		push	0
 		push	eax
 		push	0Fh
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 		sub	sp, 4
 		mov	[bp+var_62], 0

@@ -10,7 +10,11 @@ loc_5EB26:
 
 ; Attributes: bp-based frame
 
-sub_5EB2A		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. Arrête la musique (word_79E6F), les effets synthétisés (word_79E6D) et
+; la voix (word_79E71) s'ils existent.
+; ==============================================================================================
+Sound_StopAll_5EB2A		proc far
 		push	bp
 		mov	bp, sp
 		cmp	word_79E6F, 0
@@ -36,13 +40,20 @@ loc_5EB4F:
 loc_5EB60:
 		pop	bp
 		retf
-sub_5EB2A		endp
+Sound_StopAll_5EB2A		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_5EB62		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. Façade « jouer l'effet n » (effet, distance, émetteur). Numérique
+; d'abord : si les sons numériques sont actifs (byte_7CB1C, objet word_79E73) et que l'effet
+; synthétisé n ne joue pas déjà, DigitalSFX_PlayEffect_5B04F. S'il n'a rien joué : si les
+; effets synthétisés sont actifs (byte_7CB1A, objet word_79E6D), SoundFX_Play3D_5C68A puis
+; DigitalSFX_StopEffect_5B328(n).
+; ==============================================================================================
+SoundFX_Play_5EB62		proc far
 
 var_1		= byte ptr -1
 arg_0		= byte ptr  6
@@ -77,7 +88,7 @@ loc_5EB9C:
 		mov	al, [bp+arg_0]
 		push	ax
 		push	word_79E73
-		call	sub_5B04F
+		call	DigitalSFX_PlayEffect_5B04F
 		add	sp, 0Ah
 		mov	[bp+var_1], al
 
@@ -103,20 +114,26 @@ loc_5EBB4:
 		mov	al, [bp+arg_0]
 		push	ax
 		push	word_79E73
-		call	sub_5B328
+		call	DigitalSFX_StopEffect_5B328
 		add	sp, 6
 
 loc_5EBF8:
 		pop	si
 		leave
 		retf
-sub_5EB62		endp
+SoundFX_Play_5EB62		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_5EBFB		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. Façade pour un son tenu (canon…) : numérique d'abord (sauf si la
+; version synthétisée joue déjà) ; s'il joue, arrêt de la version synthétisée ; sinon synthèse
+; : SoundFX_Play3D_5C68A si l'effet ne joue pas, SoundFX_UpdateVolume3D_5C75B sinon, et arrêt
+; du numérique.
+; ==============================================================================================
+SoundFX_PlayOrUpdate_5EBFB		proc far
 
 var_1		= byte ptr -1
 arg_0		= byte ptr  6
@@ -154,7 +171,7 @@ loc_5EC40:
 		mov	al, [bp+arg_0]
 		push	ax
 		push	word_79E73
-		call	sub_5B04F
+		call	DigitalSFX_PlayEffect_5B04F
 		add	sp, 0Ah
 		mov	[bp+var_1], al
 		cmp	[bp+var_1], 0
@@ -210,20 +227,24 @@ loc_5ECCA:
 		mov	al, [bp+arg_0]
 		push	ax
 		push	word_79E73
-		call	sub_5B328
+		call	DigitalSFX_StopEffect_5B328
 		add	sp, 6
 
 loc_5ECE5:
 		pop	si
 		leave
 		retf
-sub_5EBFB		endp
+SoundFX_PlayOrUpdate_5EBFB		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_5ECE8		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. Façade : arrête l'effet n de l'émetteur dans les deux parties
+; (DigitalSFX_StopEffect_5B328 et SoundFX_StopEffect_5C812).
+; ==============================================================================================
+SoundFX_Stop_5ECE8		proc far
 
 arg_0		= byte ptr  6
 arg_2		= word ptr  8
@@ -240,7 +261,7 @@ arg_2		= word ptr  8
 		mov	al, [bp+arg_0]
 		push	ax
 		push	word_79E73
-		call	sub_5B328
+		call	DigitalSFX_StopEffect_5B328
 		add	sp, 6
 
 loc_5ED0E:
@@ -259,7 +280,7 @@ loc_5ED2D:
 		pop	si
 		pop	bp
 		retf
-sub_5ECE8		endp
+SoundFX_Stop_5ECE8		endp
 
 ; ----------------------------------------------------------------------
 
@@ -707,7 +728,11 @@ sub_5EF3D		endp
 
 ; Attributes: bp-based frame
 
-sub_5EF6D		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. Si byte_7CB1C et la voix (word_79E71) existent : sub_5E355(voix, nom,
+; banque, rang, 1, boucle) — lecture d'une entrée d'un fichier PAK chargé par son nom.
+; ==============================================================================================
+DigitalSFX_PlaySampleFromPak_5EF6D		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -738,7 +763,7 @@ loc_5EF9F:
 		mov	al, dl
 		pop	bp
 		retf
-sub_5EF6D		endp
+DigitalSFX_PlaySampleFromPak_5EF6D		endp
 
 ; ----------------------------------------------------------------------
 
@@ -817,7 +842,12 @@ sub_5EFE1		endp
 
 ; Attributes: bp-based frame
 
-sub_5F005		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. Passage d'avion près du point de vue (word_7CEF9) : avion (type 6)
+; autre que celui suivi, à moins de 200 m, angle de croisement > 30° : rend 2 (30 à 80°) ou 1
+; (> 80°) ; sinon 0.
+; ==============================================================================================
+SoundFX_CheckFlyBy_5F005		proc far
 
 var_60		= dword ptr -60h
 var_5C		= dword ptr -5Ch
@@ -1044,7 +1074,7 @@ loc_5F1FE:
 		pop	si
 		leave
 		retf
-sub_5F005		endp
+SoundFX_CheckFlyBy_5F005		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1072,7 +1102,7 @@ arg_8		= word ptr  0Eh
 		cbw
 		push	ax
 		push	word_79E73
-		call	sub_5B12B
+		call	DigitalSFX_RequestSample_5B12B
 		add	sp, 6
 		mov	dl, al
 
@@ -1111,7 +1141,7 @@ loc_5F25E:
 		mov	al, [bp+var_2]
 		push	ax
 		push	word_79E73
-		call	sub_5B328
+		call	DigitalSFX_StopEffect_5B328
 		add	sp, 6
 
 loc_5F28B:
@@ -1124,7 +1154,16 @@ sub_5F202		endp
 
 ; Attributes: bp-based frame
 
-sub_5F28E		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. Équivalent de Sound_FrameUpdate_5AB79 de STRIKE. Passage d'avion
+; (SoundFX_CheckFlyBy_5F005) → DigitalSFX_PlayEffect_5B04F(10, 750 × résultat) : 1 → 750
+; (variante proche), 2 → 1500 (lointaine) ; pas de version synthétisée. Moteur : si
+; byte_7CB1D, DigitalSFX_EngineTick_5B434 (s'il joue : arrêt de l'effet synthétisé 13), sinon
+; effet synthétisé (sub_5C90D) seulement musique coupée (byte_7CB19 = 0) ; byte_7CB1D à 0 :
+; effet 13 arrêté des deux côtés. Puis SoundFX_Tick_5C898, voix (sub_5E9F9), musique une image
+; sur 16, DigitalSFX_Tick_5B206.
+; ==============================================================================================
+Sound_FrameUpdate_5F28E		proc far
 
 var_1		= byte ptr -1
 arg_0		= word ptr  6
@@ -1134,7 +1173,7 @@ arg_0		= word ptr  6
 		sub	sp, 2
 		mov	ax, [bp+arg_0]
 		push	cs
-		call	near ptr sub_5F005
+		call	near ptr SoundFX_CheckFlyBy_5F005
 		mov	dl, al
 		or	dl, dl
 		jz	short loc_5F2CA
@@ -1149,7 +1188,7 @@ arg_0		= word ptr  6
 		push	eax
 		push	0Ah
 		push	word_79E73
-		call	sub_5B04F
+		call	DigitalSFX_PlayEffect_5B04F
 		add	sp, 0Ah
 
 loc_5F2CA:
@@ -1161,7 +1200,7 @@ loc_5F2CA:
 		cmp	word_79E73, 0
 		jz	short loc_5F30D
 		push	word_79E73
-		call	sub_5B434
+		call	DigitalSFX_EngineTick_5B434
 		pop	cx
 		mov	[bp+var_1], al
 		cmp	[bp+var_1], 0
@@ -1198,7 +1237,7 @@ loc_5F339:
 		push	0
 		push	0Dh
 		push	word_79E73
-		call	sub_5B328
+		call	DigitalSFX_StopEffect_5B328
 		add	sp, 6
 
 loc_5F350:
@@ -1216,7 +1255,7 @@ loc_5F367:
 		cmp	word_79E6D, 0
 		jz	short loc_5F37F
 		push	word_79E6D
-		call	sub_5C898
+		call	SoundFX_Tick_5C898
 		pop	cx
 
 loc_5F37F:
@@ -1243,13 +1282,13 @@ loc_5F3B0:
 		cmp	word_79E73, 0
 		jz	short loc_5F3C8
 		push	word_79E73
-		call	sub_5B206
+		call	DigitalSFX_Tick_5B206
 		pop	cx
 
 loc_5F3C8:
 		leave
 		retf
-sub_5F28E		endp
+Sound_FrameUpdate_5F28E		endp
 
 ; ----------------------------------------------------------------------
 

@@ -369,7 +369,7 @@ loc_229E7:
 		or	ax, ax
 		jnz	short loc_229F9
 		push	6988h
-		call	sub_5F28E
+		call	Sound_FrameUpdate_5F28E
 		pop	cx
 
 loc_229F9:

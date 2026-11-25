@@ -405,7 +405,7 @@ sur 16. `Sound_StopAll_5A88F` : arrête musique (avec fondu), effets et voix.
   §5.3).
 - Facteur `dword_7044C` du test « dans les six heures ».
 - Séquence jouée à la fin de `Sound_LoadDriverAndTimbreCache_5A0F3`.
-- Autres numéros d'effets sonores (seuls 0x0B et 0x0D sont identifiés).
+- ~~Autres numéros d'effets sonores~~ : inventaire complet (déclencheurs, Betty, Pacific Strike) dans `SOUND_EFFECTS.md` (2026-11-25).
 - Lecteur `tools/sc_player` : à valider sur les vrais `COMBAT.ADL` et `STRIKE.AD` (testé ici sur
   des données synthétiques uniquement).
 - Renommer `CRT_Doprnt_Dispatch` après lecture.

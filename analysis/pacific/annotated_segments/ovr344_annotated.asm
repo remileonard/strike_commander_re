@@ -275,7 +275,7 @@ arg_0		= word ptr  6
 		call	near ptr sub_BD45E
 		pop	cx
 		call	sub_6CB4D
-		call	sub_5EB2A
+		call	Sound_StopAll_5EB2A
 		cmp	byte_79BF4, 0
 		jz	short loc_BD576
 		push	si

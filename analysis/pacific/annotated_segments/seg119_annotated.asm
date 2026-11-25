@@ -19,7 +19,12 @@ sub_4F134		endp
 
 ; Attributes: bp-based frame
 
-sub_4F13B		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-25. Impact d'une traçante : sur l'eau
+; (Ground_IsWaterUnderPoint_3677E) effet 15 ; sinon objet d'impact créé et effet 21, à la
+; distance de la caméra.
+; ==============================================================================================
+Tracer_OnImpact_4F13B		proc far
 
 var_A4		= dword ptr -0A4h
 var_9C		= dword ptr -9Ch
@@ -217,7 +222,7 @@ loc_4F29D:
 		lea	ax, word ptr [bp+var_60]
 		push	ax
 		push	word_79788
-		call	sub_3677E
+		call	Ground_IsWaterUnderPoint_3677E
 		add	sp, 8
 		or	al, al
 		jnz	short loc_4F316
@@ -254,7 +259,7 @@ loc_4F316:
 		push	0
 		push	eax
 		push	0Fh
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 		sub	sp, 4
 		mov	[bp+var_A4], 0
@@ -380,7 +385,7 @@ loc_4F467:
 		push	0
 		push	eax
 		push	15h
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 		push	di
 		push	67ADh
@@ -426,7 +431,7 @@ loc_4F563:
 		pop	si
 		leave
 		retf
-sub_4F13B		endp
+Tracer_OnImpact_4F13B		endp
 
 ; ----------------------------------------------------------------------
 

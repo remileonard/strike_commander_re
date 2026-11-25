@@ -15822,8 +15822,8 @@
 "calls": [
 "sub_3664D"
 ],
-"new_name": "sub_3677E",
-"summary": ""
+"new_name": "Ground_IsWaterUnderPoint_3677E",
+"summary": "far. LUE 2026-11-25. 1 si Ground_HeightUnderPoint_3664D rend au plus 2 m (512 en 24.8) : sol au niveau de la mer."
 },
 "sub_367B1": {
 "segment": "seg086",
@@ -19480,8 +19480,8 @@
 "sub_4DC07",
 "sub_4E882"
 ],
-"new_name": "sub_3D019",
-"summary": ""
+"new_name": "Aircraft_ApplyHitDamage_3D019",
+"summary": "far. LUE EN PARTIE 2026-11-25. Dégâts reçus par un avion (dégâts divisés par 2 pour le joueur avec Flight Model Veteran ou Rookie) : effet 8 si c'est le joueur, sinon 9 (non positionné) ; puis sub_3F8AD."
 },
 "sub_3D217": {
 "segment": "seg097",
@@ -19610,8 +19610,8 @@
 "sub_5EB62",
 "sub_3D5FB"
 ],
-"new_name": "sub_3D7AE",
-"summary": ""
+"new_name": "Aircraft_Update_3D7AE",
+"summary": "far. LUE EN PARTIE 2026-11-25. Équivalent d'Aircraft_Update_3DEFB de STRIKE pour le train : effet 5 quand le train rentre, 6 quand il sort, pour le joueur quand la caméra suit le joueur (objet suivi = joueur, ou son +36 = joueur), après 5 images."
 },
 "sub_3D9FA": {
 "segment": "seg098",
@@ -20035,8 +20035,8 @@
 "sub_5EB62",
 "sub_76A"
 ],
-"new_name": "sub_3F391",
-"summary": ""
+"new_name": "WeaponSystem_ReleaseBomb_3F391",
+"summary": "far. LUE EN PARTIE 2026-11-25. Lâcher d'une bombe (WeaponSystem_LaunchFromStation_3E2EC, catégories 9 et 26) : effet 7 à la distance de la caméra."
 },
 "sub_3F657": {
 "segment": "seg099",
@@ -20057,8 +20057,8 @@
 "sub_5EB62",
 "sub_76A"
 ],
-"new_name": "sub_3F657",
-"summary": ""
+"new_name": "WeaponSystem_LaunchRocket_3F657",
+"summary": "far. LUE EN PARTIE 2026-11-25. Départ d'une roquette (catégorie 8) : effet 26, non positionné."
 },
 "sub_3F8AD": {
 "segment": "seg099",
@@ -23478,8 +23478,8 @@
 "sub_5A065",
 "sub_5EB62"
 ],
-"new_name": "sub_4E3C0",
-"summary": ""
+"new_name": "Weapon_OnImpact_4E3C0",
+"summary": "far. LUE 2026-11-25. Équivalent de loc_4DECF de STRIKE : objet touché = joueur en vue cockpit (byte_7CEF8 = 4) → effet 8 ; sinon effet 9 à la distance de la caméra."
 },
 "sub_4E46F": {
 "segment": "seg118",
@@ -23773,8 +23773,8 @@
 "sub_1E24C",
 "sub_4F567"
 ],
-"new_name": "sub_4F13B",
-"summary": ""
+"new_name": "Tracer_OnImpact_4F13B",
+"summary": "far. LUE EN PARTIE 2026-11-25. Impact d'une traçante : sur l'eau (Ground_IsWaterUnderPoint_3677E) effet 15 ; sinon objet d'impact créé et effet 21, à la distance de la caméra."
 },
 "sub_4F567": {
 "segment": "seg119",
@@ -26883,8 +26883,8 @@
 "sub_76A",
 "sub_172F"
 ],
-"new_name": "sub_5AE86",
-"summary": ""
+"new_name": "DigitalSFX_Construct_5AE86",
+"summary": "far. LUE 2026-11-25. Objet des sons numériques (203 octets) : table de 50 entrées de 4 octets (octet 0 = numéro d'effet servi, 255 = libre ; octets 1-2 = émetteur ; octet 3 : bit 0 boucle, bit 1 à relancer, bit 2 variante lointaine, distance > 1000), écrite en dur ici (voir analysis/SOUND_EFFECTS.md § 3.2) ; [+200] = échantillon en cours (−1)."
 },
 "sub_5B025": {
 "segment": "seg132",
@@ -26920,8 +26920,8 @@
 "sub_81F",
 "sub_5B12B"
 ],
-"new_name": "sub_5B04F",
-"summary": ""
+"new_name": "DigitalSFX_PlayEffect_5B04F",
+"summary": "far. LUE 2026-11-25. (objet, effet, distance, émetteur) : cherche la première entrée de cet effet dont la variante (bit 2 de l'octet 3) correspond à distance > 1000 ; parmi les entrées suivantes identiques, en tire une au hasard (CRT_Rand) ; DigitalSFX_RequestSample_5B12B. Rend 0 si l'effet n'a pas d'échantillon (la façade passe alors à la synthèse)."
 },
 "sub_5B12B": {
 "segment": "seg132",
@@ -26932,8 +26932,8 @@
 "calls": [
 "sub_5EFBF"
 ],
-"new_name": "sub_5B12B",
-"summary": ""
+"new_name": "DigitalSFX_RequestSample_5B12B",
+"summary": "far. LUE 2026-11-25. Un seul canal numérique. Refus si word_7974E (moins de 3 000 000 octets libres) et rang ≥ 4, ou si une voix joue (sub_5EFBF(2)). Accepté si rien ne joue, si l'échantillon en cours est du même effet, ou si le rang demandé est plus petit (priorité au plus petit rang) : rang noté en [+200], bit 1 posé, émetteur rangé."
 },
 "sub_5B206": {
 "segment": "seg132",
@@ -26948,8 +26948,8 @@
 "sub_5EFBF",
 "sub_5EF6D"
 ],
-"new_name": "sub_5B206",
-"summary": ""
+"new_name": "DigitalSFX_Tick_5B206",
+"summary": "far. LUE 2026-11-25. Lance l'échantillon demandé : DigitalSFX_PlaySampleFromPak_5EF6D(DSOUNDFX.PAK, banque 0 et rang si rang < 4, sinon banque 1 et rang − 4, boucle = bit 0). Canal libre : relance la première entrée qui a le bit 1 (sons en boucle)."
 },
 "sub_5B328": {
 "segment": "seg132",
@@ -26960,8 +26960,8 @@
 "calls": [
 "sub_5B364"
 ],
-"new_name": "sub_5B328",
-"summary": ""
+"new_name": "DigitalSFX_StopEffect_5B328",
+"summary": "far. LUE 2026-11-25. Arrête toutes les entrées de l'effet n (sub_5B364)."
 },
 "sub_5B364": {
 "segment": "seg132",
@@ -27001,8 +27001,8 @@
 "sub_5B12B",
 "sub_5B364"
 ],
-"new_name": "sub_5B434",
-"summary": ""
+"new_name": "DigitalSFX_EngineTick_5B434",
+"summary": "far. LUE 2026-11-25. Moteur numérique de l'avion suivi par la caméra (le joueur si byte_7769B) : cran de manette c (≥ 1) → échantillon 27 + c en vue cockpit (méthode +20 de la caméra = 4), sinon 38 + c. Avec byte_76D44 (plus de 4 500 000 octets libres), le cran entendu suit le vrai cran d'un pas à la fois. Rend 1 s'il joue."
 },
 "sub_5B682": {
 "segment": "seg132",
@@ -27013,8 +27013,8 @@
 "calls": [
 "sub_76A"
 ],
-"new_name": "sub_5B682",
-"summary": ""
+"new_name": "DigitalSFX_InitEntry_5B682",
+"summary": "far. LUE 2026-11-25. Entrée de la table : effet 255, émetteur 0, bits à 0."
 },
 "sub_5B6C3": {
 "segment": "seg133",
@@ -27312,8 +27312,8 @@
 "sub_1DC07",
 "sub_5C915"
 ],
-"new_name": "sub_5C898",
-"summary": ""
+"new_name": "SoundFX_Tick_5C898",
+"summary": "far. LUE 2026-11-25. Libère le canal d'effet synthétisé (un seul, marque libre 28) dont la séquence est finie."
 },
 "sub_5C90D": {
 "segment": "seg134",
@@ -27935,8 +27935,8 @@
 "sub_7546A",
 "sub_754B4"
 ],
-"new_name": "sub_5EB2A",
-"summary": ""
+"new_name": "Sound_StopAll_5EB2A",
+"summary": "far. LUE 2026-11-25. Arrête la musique (word_79E6F), les effets synthétisés (word_79E6D) et la voix (word_79E71) s'ils existent."
 },
 "sub_5EB62": {
 "segment": "seg139",
@@ -27950,8 +27950,8 @@
 "sub_5C68A",
 "sub_5B328"
 ],
-"new_name": "sub_5EB62",
-"summary": ""
+"new_name": "SoundFX_Play_5EB62",
+"summary": "far. LUE 2026-11-25. Façade « jouer l'effet n » (effet, distance, émetteur). Numérique d'abord : si les sons numériques sont actifs (byte_7CB1C, objet word_79E73) et que l'effet synthétisé n ne joue pas déjà, DigitalSFX_PlayEffect_5B04F. S'il n'a rien joué : si les effets synthétisés sont actifs (byte_7CB1A, objet word_79E6D), SoundFX_Play3D_5C68A puis DigitalSFX_StopEffect_5B328(n)."
 },
 "sub_5EBFB": {
 "segment": "seg139",
@@ -27968,8 +27968,8 @@
 "sub_5C75B",
 "sub_5B328"
 ],
-"new_name": "sub_5EBFB",
-"summary": ""
+"new_name": "SoundFX_PlayOrUpdate_5EBFB",
+"summary": "far. LUE 2026-11-25. Façade pour un son tenu (canon…) : numérique d'abord (sauf si la version synthétisée joue déjà) ; s'il joue, arrêt de la version synthétisée ; sinon synthèse : SoundFX_Play3D_5C68A si l'effet ne joue pas, SoundFX_UpdateVolume3D_5C75B sinon, et arrêt du numérique."
 },
 "sub_5ECE8": {
 "segment": "seg139",
@@ -27981,8 +27981,8 @@
 "sub_5B328",
 "sub_5C812"
 ],
-"new_name": "sub_5ECE8",
-"summary": ""
+"new_name": "SoundFX_Stop_5ECE8",
+"summary": "far. LUE 2026-11-25. Façade : arrête l'effet n de l'émetteur dans les deux parties (DigitalSFX_StopEffect_5B328 et SoundFX_StopEffect_5C812)."
 },
 "sub_5ED30": {
 "segment": "seg139",
@@ -28174,8 +28174,8 @@
 "calls": [
 "sub_5E355"
 ],
-"new_name": "sub_5EF6D",
-"summary": ""
+"new_name": "DigitalSFX_PlaySampleFromPak_5EF6D",
+"summary": "far. LUE 2026-11-25. Si byte_7CB1C et la voix (word_79E71) existent : sub_5E355(voix, nom, banque, rang, 1, boucle) — lecture d'une entrée d'un fichier PAK chargé par son nom."
 },
 "sub_5EFA3": {
 "segment": "seg139",
@@ -28222,8 +28222,8 @@
 "sub_578DF",
 "sub_1E7CF"
 ],
-"new_name": "sub_5F005",
-"summary": ""
+"new_name": "SoundFX_CheckFlyBy_5F005",
+"summary": "far. LUE 2026-11-25. Passage d'avion près du point de vue (word_7CEF9) : avion (type 6) autre que celui suivi, à moins de 200 m, angle de croisement > 30° : rend 2 (30 à 80°) ou 1 (> 80°) ; sinon 0."
 },
 "sub_5F202": {
 "segment": "seg139",
@@ -28259,8 +28259,8 @@
 "sub_5BBF8",
 "sub_5B206"
 ],
-"new_name": "sub_5F28E",
-"summary": ""
+"new_name": "Sound_FrameUpdate_5F28E",
+"summary": "far. LUE 2026-11-25. Équivalent de Sound_FrameUpdate_5AB79 de STRIKE. Passage d'avion (SoundFX_CheckFlyBy_5F005) → DigitalSFX_PlayEffect_5B04F(10, 750 × résultat) : 1 → 750 (variante proche), 2 → 1500 (lointaine) ; pas de version synthétisée. Moteur : si byte_7CB1D, DigitalSFX_EngineTick_5B434 (s'il joue : arrêt de l'effet synthétisé 13), sinon effet synthétisé (sub_5C90D) seulement musique coupée (byte_7CB19 = 0) ; byte_7CB1D à 0 : effet 13 arrêté des deux côtés. Puis SoundFX_Tick_5C898, voix (sub_5E9F9), musique une image sur 16, DigitalSFX_Tick_5B206."
 },
 "sub_5F3CA": {
 "segment": "seg139",

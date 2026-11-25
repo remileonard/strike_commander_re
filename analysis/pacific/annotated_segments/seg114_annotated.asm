@@ -2157,7 +2157,7 @@ loc_490AD:
 		add	ax, 12h
 		push	ax
 		push	word_79788
-		call	sub_3677E
+		call	Ground_IsWaterUnderPoint_3677E
 		add	sp, 8
 		or	al, al
 		jz	short loc_49124
@@ -2203,7 +2203,7 @@ loc_49136:
 		add	ax, 12h
 		push	ax
 		push	word_79788
-		call	sub_3677E
+		call	Ground_IsWaterUnderPoint_3677E
 		add	sp, 8
 		or	al, al
 		jz	short loc_491A4
@@ -5142,7 +5142,7 @@ loc_4ADD3:
 		push	0
 		push	large 0
 		push	12h
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 
 loc_4ADE2:

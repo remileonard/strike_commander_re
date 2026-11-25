@@ -644,7 +644,12 @@ sub_3D77C		endp
 
 ; Attributes: bp-based frame
 
-sub_3D7AE		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-25. Équivalent d'Aircraft_Update_3DEFB de STRIKE pour le train :
+; effet 5 quand le train rentre, 6 quand il sort, pour le joueur quand la caméra suit le
+; joueur (objet suivi = joueur, ou son +36 = joueur), après 5 images.
+; ==============================================================================================
+Aircraft_Update_3D7AE		proc far
 
 var_6		= dword ptr -6
 var_2		= byte ptr -2
@@ -736,7 +741,7 @@ loc_3D86D:
 		push	0
 		push	large 0
 		push	5
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 
 loc_3D87C:
@@ -797,7 +802,7 @@ loc_3D901:
 		push	0
 		push	large 0
 		push	6
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 
 loc_3D910:
@@ -909,7 +914,7 @@ loc_3D9F7:
 		pop	si
 		leave
 		retf
-sub_3D7AE		endp
+Aircraft_Update_3D7AE		endp
 
 ; ----------------------------------------------------------------------
 

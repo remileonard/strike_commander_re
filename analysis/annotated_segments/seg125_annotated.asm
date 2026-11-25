@@ -92,7 +92,7 @@ SoundFX_Play_5A8DC	endp
 ; Ex-'Weapon_HUDBox_TimerCaseI_5A906'. far. LUE 2026-10-06. Facade : demarre l'effet s'il ne
 ; joue pas, sinon met a jour son volume selon la distance.
 ; ==============================================================================================
-SoundFX_PlayOrUpdate_5A906	proc far		; CODE XREF: Cockpit_DetectPlayerMissile+192P
+SoundFX_PlayOrUpdate_5A906	proc far		; CODE XREF: Cockpit_WarningsAndSeekerTone_15FD3+192P
 					; WeaponSystem_FrameUpdate_3F8C0:loc_400C2P
 
 arg_0		= byte ptr  6
@@ -152,8 +152,8 @@ SoundFX_PlayOrUpdate_5A906	endp
 ; Ex-'Weapon_HUDBox_TimerCaseJ_5A95E'. far. LUE 2026-10-06. Facade :
 ; SoundFX_StopEffect_59A8A(effet, emetteur).
 ; ==============================================================================================
-SoundFX_Stop_5A95E	proc far		; CODE XREF: Resource_InitTwoChannels+7P
-					; Resource_InitTwoChannels+13P ...
+SoundFX_Stop_5A95E	proc far		; CODE XREF: SoundFX_StopSeekerTones_15138+7P
+					; SoundFX_StopSeekerTones_15138+13P ...
 
 arg_0		= byte ptr  6
 arg_2		= word ptr  8

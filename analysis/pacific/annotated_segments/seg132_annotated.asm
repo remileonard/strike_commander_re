@@ -10,7 +10,13 @@ loc_5AE81:
 
 ; Attributes: bp-based frame
 
-sub_5AE86		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. Objet des sons numériques (203 octets) : table de 50 entrées de 4
+; octets (octet 0 = numéro d'effet servi, 255 = libre ; octets 1-2 = émetteur ; octet 3 : bit
+; 0 boucle, bit 1 à relancer, bit 2 variante lointaine, distance > 1000), écrite en dur ici
+; (voir analysis/SOUND_EFFECTS.md § 3.2) ; [+200] = échantillon en cours (−1).
+; ==============================================================================================
+DigitalSFX_Construct_5AE86		proc far
 
 arg_0		= word ptr  6
 
@@ -30,7 +36,7 @@ arg_0		= word ptr  6
 
 loc_5AEA3:
 		push	seg seg132
-		push	offset sub_5B682
+		push	offset DigitalSFX_InitEntry_5B682
 		push	large 10032h
 		push	4
 		push	si
@@ -122,7 +128,7 @@ loc_5B020:
 		pop	si
 		pop	bp
 		retf
-sub_5AE86		endp
+DigitalSFX_Construct_5AE86		endp
 
 ; ----------------------------------------------------------------------
 
@@ -184,7 +190,13 @@ StreamReader_ReportError_5B03A		endp
 
 ; Attributes: bp-based frame
 
-sub_5B04F		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. (objet, effet, distance, émetteur) : cherche la première entrée de cet
+; effet dont la variante (bit 2 de l'octet 3) correspond à distance > 1000 ; parmi les entrées
+; suivantes identiques, en tire une au hasard (CRT_Rand) ; DigitalSFX_RequestSample_5B12B.
+; Rend 0 si l'effet n'a pas d'échantillon (la façade passe alors à la synthèse).
+; ==============================================================================================
+DigitalSFX_PlayEffect_5B04F		proc far
 
 var_4		= word ptr -4
 var_2		= byte ptr -2
@@ -290,7 +302,7 @@ loc_5B106:
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_5B12B
+		call	near ptr DigitalSFX_RequestSample_5B12B
 		add	sp, 6
 		mov	[bp+var_1], al
 		jmp	short loc_5B124
@@ -309,13 +321,19 @@ loc_5B124:
 		pop	si
 		leave
 		retf
-sub_5B04F		endp
+DigitalSFX_PlayEffect_5B04F		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_5B12B		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. Un seul canal numérique. Refus si word_7974E (moins de 3 000 000 octets
+; libres) et rang ≥ 4, ou si une voix joue (sub_5EFBF(2)). Accepté si rien ne joue, si
+; l'échantillon en cours est du même effet, ou si le rang demandé est plus petit (priorité au
+; plus petit rang) : rang noté en [+200], bit 1 posé, émetteur rangé.
+; ==============================================================================================
+DigitalSFX_RequestSample_5B12B		proc far
 
 var_1		= byte ptr -1
 arg_0		= word ptr  6
@@ -430,13 +448,19 @@ loc_5B202:
 		pop	si
 		leave
 		retf
-sub_5B12B		endp
+DigitalSFX_RequestSample_5B12B		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_5B206		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. Lance l'échantillon demandé :
+; DigitalSFX_PlaySampleFromPak_5EF6D(DSOUNDFX.PAK, banque 0 et rang si rang < 4, sinon banque
+; 1 et rang − 4, boucle = bit 0). Canal libre : relance la première entrée qui a le bit 1
+; (sons en boucle).
+; ==============================================================================================
+DigitalSFX_Tick_5B206		proc far
 
 arg_0		= word ptr  6
 
@@ -482,7 +506,7 @@ loc_5B252:
 
 loc_5B26C:
 		push	360Eh
-		call	sub_5EF6D
+		call	DigitalSFX_PlaySampleFromPak_5EF6D
 		add	sp, 0Ah
 
 loc_5B277:
@@ -544,7 +568,7 @@ loc_5B2C4:
 
 loc_5B2F6:
 		push	360Eh
-		call	sub_5EF6D
+		call	DigitalSFX_PlaySampleFromPak_5EF6D
 		add	sp, 0Ah
 		jmp	short loc_5B325
 
@@ -572,13 +596,16 @@ loc_5B325:
 		pop	si
 		pop	bp
 		retf
-sub_5B206		endp
+DigitalSFX_Tick_5B206		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_5B328		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. Arrête toutes les entrées de l'effet n (sub_5B364).
+; ==============================================================================================
+DigitalSFX_StopEffect_5B328		proc far
 
 var_1		= byte ptr -1
 arg_0		= word ptr  6
@@ -621,7 +648,7 @@ loc_5B358:
 		pop	si
 		leave
 		retf
-sub_5B328		endp
+DigitalSFX_StopEffect_5B328		endp
 
 ; ----------------------------------------------------------------------
 
@@ -763,7 +790,13 @@ sub_5B3F3		endp
 
 ; Attributes: bp-based frame
 
-sub_5B434		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. Moteur numérique de l'avion suivi par la caméra (le joueur si
+; byte_7769B) : cran de manette c (≥ 1) → échantillon 27 + c en vue cockpit (méthode +20 de la
+; caméra = 4), sinon 38 + c. Avec byte_76D44 (plus de 4 500 000 octets libres), le cran
+; entendu suit le vrai cran d'un pas à la fois. Rend 1 s'il joue.
+; ==============================================================================================
+DigitalSFX_EngineTick_5B434		proc far
 
 var_16		= word ptr -16h
 var_14		= word ptr -14h
@@ -961,7 +994,7 @@ loc_5B5AA:
 		push	di
 		push	si
 		push	cs
-		call	near ptr sub_5B12B
+		call	near ptr DigitalSFX_RequestSample_5B12B
 		add	sp, 6
 		jmp	loc_5B67E
 
@@ -1070,13 +1103,16 @@ loc_5B67E:
 		pop	si
 		leave
 		retf
-sub_5B434		endp
+DigitalSFX_EngineTick_5B434		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_5B682		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. Entrée de la table : effet 255, émetteur 0, bits à 0.
+; ==============================================================================================
+DigitalSFX_InitEntry_5B682		proc far
 
 arg_0		= word ptr  6
 
@@ -1108,5 +1144,5 @@ loc_5B69B:
 
 loc_5B6BE:
 		mov	ax, si
-sub_5B682		endp
+DigitalSFX_InitEntry_5B682		endp
 seg132		ends

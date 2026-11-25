@@ -826,7 +826,7 @@ arg_0		= word ptr  6
 		add	ax, 12h
 		push	ax
 		push	word_79788
-		call	sub_3677E
+		call	Ground_IsWaterUnderPoint_3677E
 		add	sp, 8
 		mov	ah, 0
 		or	ax, ax

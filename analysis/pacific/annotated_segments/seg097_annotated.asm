@@ -412,7 +412,7 @@ loc_3CDBB:
 		push	0
 		push	large 0
 		push	0Bh
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 
 loc_3CDF3:
@@ -635,7 +635,12 @@ Aircraft_ContactWithObject_3CA69		endp
 
 ; Attributes: bp-based frame
 
-sub_3D019		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-25. Dégâts reçus par un avion (dégâts divisés par 2 pour le
+; joueur avec Flight Model Veteran ou Rookie) : effet 8 si c'est le joueur, sinon 9 (non
+; positionné) ; puis sub_3F8AD.
+; ==============================================================================================
+Aircraft_ApplyHitDamage_3D019		proc far
 
 var_DE		= word ptr -0DEh
 var_A8		= dword ptr -0A8h
@@ -791,7 +796,7 @@ loc_3D174:
 		push	0
 		push	large 0
 		push	8
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 		jmp	short loc_3D1BA
 
@@ -799,7 +804,7 @@ loc_3D1AB:
 		push	0
 		push	large 0
 		push	9
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 
 loc_3D1BA:
@@ -845,7 +850,7 @@ loc_3D213:
 		pop	si
 		leave
 		retf
-sub_3D019		endp
+Aircraft_ApplyHitDamage_3D019		endp
 
 ; ----------------------------------------------------------------------
 

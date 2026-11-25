@@ -589,7 +589,11 @@ Ground_HeightUnderPoint_3664D		endp
 
 ; Attributes: bp-based frame
 
-sub_3677E		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. 1 si Ground_HeightUnderPoint_3664D rend au plus 2 m (512 en 24.8) : sol
+; au niveau de la mer.
+; ==============================================================================================
+Ground_IsWaterUnderPoint_3677E		proc far
 
 var_4		= dword ptr -4
 arg_0		= word ptr  6
@@ -623,7 +627,7 @@ loc_367AD:
 loc_367AF:
 		leave
 		retf
-sub_3677E		endp
+Ground_IsWaterUnderPoint_3677E		endp
 
 ; ----------------------------------------------------------------------
 

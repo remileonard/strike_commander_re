@@ -424,7 +424,11 @@ SoundFX_IsPlaying_5C85F		endp
 
 ; Attributes: bp-based frame
 
-sub_5C898		proc far
+; ==============================================================================================
+; far. LUE 2026-11-25. Libère le canal d'effet synthétisé (un seul, marque libre 28) dont la
+; séquence est finie.
+; ==============================================================================================
+SoundFX_Tick_5C898		proc far
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -490,7 +494,7 @@ loc_5C903:
 		pop	si
 		leave
 		retf
-sub_5C898		endp
+SoundFX_Tick_5C898		endp
 
 ; ----------------------------------------------------------------------
 

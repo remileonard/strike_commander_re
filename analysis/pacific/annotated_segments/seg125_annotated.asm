@@ -3697,7 +3697,7 @@ loc_538DA:
 		push	0
 		push	eax
 		push	2
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 		push	si
 		push	67ADh

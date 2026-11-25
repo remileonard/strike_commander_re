@@ -590,7 +590,7 @@ loc_1230B:
 		push	0
 		push	large 3E8h
 		push	13h
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 		cmp	byte_7CAC2, 1
 		jnz	short loc_12334
@@ -1800,7 +1800,7 @@ loc_12EC5:
 		push	0
 		push	large 3E8h
 		push	13h
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 		les	bx, word ptr [bp+arg_0]
 		les	bx, es:[bx+7]
@@ -2204,7 +2204,7 @@ loc_13340:
 		push	0
 		push	large 3E8h
 		push	13h
-		call	sub_5EB62
+		call	SoundFX_Play_5EB62
 		add	sp, 8
 		les	bx, word ptr [bp+arg_0]
 		les	bx, es:[bx+7]
