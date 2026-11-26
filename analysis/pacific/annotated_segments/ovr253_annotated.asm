@@ -305,7 +305,7 @@ loc_9547C:
 		push	word ptr [bp+var_14]
 		lea	ax, [bp+var_108]
 		push	ax
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 		inc	word ptr [bp+var_14]
 		add	word ptr [bp+var_14+2], 0Ah
@@ -868,7 +868,7 @@ loc_95A63:
 		push	ax
 		push	di
 		push	word ptr [si+102h]
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 
 loc_95ACB:

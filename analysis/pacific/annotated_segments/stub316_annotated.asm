@@ -15,7 +15,7 @@ stru_746F0	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_74710	proc far
-		jmp	sub_B0710
+		jmp	Swpn_LoadModel_B0710
 sub_74710	endp
 
 ; ----------------------------------------------------------------------
@@ -47,7 +47,7 @@ sub_7471F	endp
 ; Attributes: thunk
 
 sub_74724	proc far
-		jmp	sub_B0A21
+		jmp	Swpn_InitInstance_B0A21
 sub_74724	endp
 		db 0, 0, 0, 0, 0, 0, 0
 stub316		ends

@@ -2157,7 +2157,7 @@ loc_490AD:
 		add	ax, 12h
 		push	ax
 		push	word_79788
-		call	Ground_IsWaterUnderPoint_3677E
+		call	Ground_IsSeaLevel_3677E
 		add	sp, 8
 		or	al, al
 		jz	short loc_49124
@@ -2203,7 +2203,7 @@ loc_49136:
 		add	ax, 12h
 		push	ax
 		push	word_79788
-		call	Ground_IsWaterUnderPoint_3677E
+		call	Ground_IsSeaLevel_3677E
 		add	sp, 8
 		or	al, al
 		jz	short loc_491A4

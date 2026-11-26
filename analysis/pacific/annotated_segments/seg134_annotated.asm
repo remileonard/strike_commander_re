@@ -8,13 +8,10 @@ seg134		segment	para public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; Reprise de STRIKE.EXE : même suite d'instructions, 7 opérande(s) différent(s) (adresses de
-; données ou constantes) — à vérifier à SoundFX_FindFreeChannel_598A6 (sub_598A6 de
-; STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. —
-; Ex-'Weapon_HUDBox_TimerCaseC_598A6'. far. LUE 2026-10-06. Systeme d'effets sonores : 5
-; canaux de sequence XMIDI a +0x92 (pas 0x11 : struct canal, +0xE = numero d'effet, 0x0F =
-; libre, +0xF = emetteur). Renvoie le premier canal dont la sequence ne joue pas
-; (AIL_sequence_status_603DE != 1), ou -1.
+; far (lue 2026-11-15). Comme SoundFX_FindFreeChannel_598A6 de STRIKE.EXE, mais un seul canal
+; d'effet : la boucle s'arrête à di < 1 (cmp di, 1 / jl) au lieu de 5. Pacific Strike ne joue
+; donc qu'un effet XMIDI à la fois. Renvoie 0 si le canal est libre (pas de séquence en
+; [+114h], ou sub_1DC07 ≠ 1), sinon -1.
 ; ==============================================================================================
 SoundFX_FindFreeChannel_5C62E		proc far
 

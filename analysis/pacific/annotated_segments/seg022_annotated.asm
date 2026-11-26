@@ -328,7 +328,7 @@ loc_B3BC:
 
 loc_B3F4:
 		push	large [bp+arg_0]
-		call	sub_FE3D
+		call	AI_ScanCollisionThreats_FE3D
 		add	sp, 4
 		mov	[bp+var_1], al
 
@@ -341,7 +341,7 @@ loc_B403:
 		or	al, al
 		jz	short loc_B41E
 		push	large [bp+arg_0]
-		call	sub_A58C
+		call	AI_Eject_A58C
 		jmp	short loc_B48F
 
 loc_B41E:
@@ -1095,7 +1095,7 @@ loc_B9FA:
 		push	[bp+var_1E]
 		les	bx, word ptr [bp+arg_0]
 		push	large es:[bx+0C0h]
-		call	sub_9D0A
+		call	MVRS_ComputeTargetContext_9D0A
 		add	sp, 6
 		xor	si, si
 		mov	ax, word ptr [bp+arg_0+2]
@@ -1517,7 +1517,12 @@ sub_BD14		endp
 
 ; Attributes: bp-based frame
 
-sub_BD4C		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Direction d'évitement = (ma position − A) × (B − A) (produit
+; vectoriel), sans composante descendante sous 600 m d'altitude ; abandonne le comportement en
+; cours et lance le nœud 20 avec cette direction et 2 s.
+; ==============================================================================================
+AI_CollisionAvoid_BD4C		proc far
 
 var_30		= dword ptr -30h
 var_2C		= dword ptr -2Ch
@@ -1655,7 +1660,7 @@ loc_BE98:
 		pop	si
 		leave
 		retf
-sub_BD4C		endp
+AI_CollisionAvoid_BD4C		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1807,7 +1812,7 @@ loc_BF93:
 		push	si
 		les	bx, [bp+arg_0]
 		push	large es:[bx+0C0h]
-		call	sub_9D0A
+		call	MVRS_ComputeTargetContext_9D0A
 		add	sp, 6
 		cmp	[bp+var_3], 0
 		jnz	short loc_BFB0

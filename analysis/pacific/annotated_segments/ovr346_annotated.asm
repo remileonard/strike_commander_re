@@ -689,7 +689,7 @@ loc_C0414:
 		push	ax
 		push	[bp+var_6]
 		push	si
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 		push	0
 		push	large [bp+var_4]
@@ -845,7 +845,7 @@ loc_C0586:
 		push	ax
 		push	[bp+var_6]
 		push	si
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 		push	0
 		push	large [bp+var_4]
@@ -1032,7 +1032,7 @@ loc_C073C:
 		push	si
 		lea	ax, [bp+var_90]
 		push	ax
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 		push	0
 		push	large [bp+var_C]

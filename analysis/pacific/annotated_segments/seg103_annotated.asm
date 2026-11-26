@@ -282,7 +282,11 @@ DamageSys_IsSeriouslyDamaged_41612		endp
 
 ; Attributes: bp-based frame
 
-sub_41658		proc far
+; ==============================================================================================
+; far (lue 2026-11-15). Comme DamageSys_IsSeriouslyDamaged_41612 avec un seuil de 90 % : 1 si
+; DamageSys_PercentOfSystem_41595 du système 0, 4 ou 3 dépasse 90 (cmp al, 5Ah).
+; ==============================================================================================
+DamageSys_IsCriticallyDamaged_41658		proc far
 
 var_1		= byte ptr -1
 arg_0		= dword ptr  6
@@ -309,9 +313,9 @@ arg_0		= dword ptr  6
 		push	large [bp+arg_0]
 		push	cs
 		call	near ptr DamageSys_PercentOfSystem_41595
-sub_41658		endp
+DamageSys_IsCriticallyDamaged_41658		endp
 
-; START OF FUNCTION CHUNK FOR sub_41658
+; START OF FUNCTION CHUNK FOR DamageSys_IsCriticallyDamaged_41658
 		db 83h, 0C4h
-; END OF FUNCTION CHUNK FOR sub_41658
+; END OF FUNCTION CHUNK FOR DamageSys_IsCriticallyDamaged_41658
 seg103		ends

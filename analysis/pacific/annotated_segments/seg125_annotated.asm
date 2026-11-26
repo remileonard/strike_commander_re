@@ -7370,7 +7370,16 @@ sub_55100		endp
 
 ; Attributes: bp-based frame
 
-sub_553B6		proc far
+; ==============================================================================================
+; far (lue 2026-11-15, partie musique). Équivalent de World_OnObjectDestroyed_53A94. Joueur
+; détruit : SetReference16(63ACh). Rien si byte_77698. Musique pour les catégories 1, 6, 19,
+; 20, 21, 23, 24 (table word_55747), sauf avion dont le pilote s'est éjecté. Objet du camp 255
+; : Music_OnObjectDestroyed_5EE68 ; s'il ne change rien et que le joueur est l'auteur :
+; ponctuation 16 (avion), 12 (catégorie 1, 19, 20), 15 (autres), remplacée par 15 dans 11 %
+; des cas (CRT_Rand × 100 / 32768 < 11). Objet du camp 1 : piste 19 ou 4, au hasard
+; (Math_RandomScale_56C2F(2)).
+; ==============================================================================================
+World_OnObjectDestroyed_553B6		proc far
 
 var_1A		= word ptr -1Ah
 var_18		= word ptr -18h
@@ -7839,9 +7848,9 @@ loc_55733:
 		pop	si
 		leave
 		retf
-sub_553B6		endp
+World_OnObjectDestroyed_553B6		endp
 
-; START OF FUNCTION CHUNK FOR sub_553B6
+; START OF FUNCTION CHUNK FOR World_OnObjectDestroyed_553B6
 word_55737	dw 1
 		dw 6
 		dw 13h
@@ -7864,7 +7873,7 @@ off_55755	dw offset loc_55606
 		dw offset loc_55606
 		dw offset loc_55606
 		dw offset loc_55606
-; END OF FUNCTION CHUNK FOR sub_553B6
+; END OF FUNCTION CHUNK FOR World_OnObjectDestroyed_553B6
 
 ; ----------------------------------------------------------------------
 

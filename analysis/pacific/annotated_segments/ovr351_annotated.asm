@@ -436,7 +436,7 @@ loc_C22E0:
 		push	word ptr [si+6Bh]
 		lea	ax, [bp+var_D6]
 		push	ax
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 		mov	eax, [bp+var_8]
 		mov	[bp+var_C], eax

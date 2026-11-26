@@ -373,7 +373,7 @@ loc_C15EF:
 		push	[bp+arg_4]
 		lea	ax, [bp+var_B0]
 		push	ax
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 		mov	ax, di
 		add	ax, 4
@@ -431,7 +431,7 @@ loc_C1696:
 		push	[bp+arg_4]
 		lea	ax, [bp+var_B0]
 		push	ax
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 		mov	ax, di
 		add	ax, 4
@@ -501,7 +501,7 @@ loc_C173E:
 		push	[bp+arg_4]
 		lea	ax, [bp+var_B0]
 		push	ax
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 		mov	ax, di
 		add	ax, 4

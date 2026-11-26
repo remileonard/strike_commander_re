@@ -388,7 +388,7 @@ arg_A		= dword ptr  10h
 		push	large [bp+arg_6]
 		nop
 		push	cs
-		call	near ptr sub_1C574
+		call	near ptr SpeechCodec_DecompressEntry_1C574
 		add	sp, 0Eh
 		pop	bp
 		retf
@@ -398,7 +398,13 @@ sub_1C558		endp
 
 ; Attributes: bp-based frame
 
-sub_1C574		proc far
+; ==============================================================================================
+; far (lue 2026-11-15). Entrée de type 5 : u32 taille décompressée, puis blocs (u16 longueur
+; en-tête compris, u16 nombre d'échantillons, octet 6 = table, octet 7 = ordre du filtre).
+; Chaque bloc est décodé par SpeechCodec_DecodeBlock_7CF8 dans un tampon remis à 0 sur 6 000
+; octets (sub_380B), puis recopié à partir de l'octet 7 (sub_37C3).
+; ==============================================================================================
+SpeechCodec_DecompressEntry_1C574		proc far
 
 var_1C		= dword ptr -1Ch
 var_17		= byte ptr -17h
@@ -509,7 +515,7 @@ loc_1C675:
 		add	sp, 8
 		push	large [bp+var_1C]
 		push	large [bp+var_8]
-		call	sub_7CF8
+		call	SpeechCodec_DecodeBlock_7CF8
 		movsx	eax, ax
 		mov	[bp+var_C], eax
 		cmp	[bp+var_C], 0
@@ -569,7 +575,7 @@ loc_1C73C:
 		add	sp, 8
 		push	large [bp+var_1C]
 		push	large [bp+var_8]
-		call	sub_7CF8
+		call	SpeechCodec_DecodeBlock_7CF8
 		movsx	eax, ax
 		mov	[bp+var_C], eax
 		push	di
@@ -610,7 +616,7 @@ loc_1C797:
 		pop	si
 		leave
 		retf
-sub_1C574		endp
+SpeechCodec_DecompressEntry_1C574		endp
 
 ; ----------------------------------------------------------------------
 

@@ -240,7 +240,12 @@ sub_A572		endp
 
 ; Attributes: bp-based frame
 
-sub_A58C		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Si le modèle a un siège éjectable ([+6Dh]) : crée l'objet d'éjection
+; (nom en +6Fh, sub_750CF), réplique 9 forcée, bit 5 de [modèle+92h] posé (pilote éjecté) ;
+; sinon réplique 10 forcée.
+; ==============================================================================================
+AI_Eject_A58C		proc far
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -282,7 +287,7 @@ arg_0		= dword ptr  6
 		mov	bx, es:[bx+0D4h]
 		push	word ptr [bx+73h]
 		push	bx
-		call	sub_553B6
+		call	World_OnObjectDestroyed_553B6
 		add	sp, 4
 		les	bx, word ptr [bp+arg_0]
 		mov	bx, es:[bx+0Bh]
@@ -300,7 +305,7 @@ loc_A612:
 loc_A626:
 		leave
 		retf
-sub_A58C		endp
+AI_Eject_A58C		endp
 
 ; ----------------------------------------------------------------------
 
@@ -320,7 +325,7 @@ arg_0		= dword ptr  6
 		mov	bp, sp
 		sub	sp, 14h
 		push	large [bp+arg_0]
-		call	sub_9578
+		call	MVRS_SetupOwnState_9578
 		add	sp, 4
 		mov	ax, word ptr [bp+arg_0+2]
 		mov	dx, word ptr [bp+arg_0]
@@ -434,7 +439,7 @@ loc_A76D:
 		or	ax, ax
 		jnz	short loc_A77F
 		push	large [bp+arg_0]
-		call	sub_9890
+		call	MVRS_ApplyPilotCommands_9890
 		add	sp, 4
 
 loc_A77F:

@@ -6,7 +6,14 @@ ovr316		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_B0710		proc far
+; ==============================================================================================
+; far (lue 2026-11-15, partiellement), lecture du FORM SWPN d'un modèle : champs du chunk DATA
+; rangés au modèle (+51h portée, +55h vitesse de rotation, +57h, +5Bh, +5Ch nom d'arme, +60h),
+; puis chunk GARC (push large 43524147h) : 4 mots rangés à +64h, +66h, +68h, +6Ah = élévation
+; max, élévation min, gisement max, gisement min en degrés ; puis un chunk 'XBRL' (push large
+; 4C524258h, rôle non établi) ; enfin recherche du modèle de l'arme par Debris_FindModelByID.
+; ==============================================================================================
+Swpn_LoadModel_B0710		proc far
 
 var_E		= word ptr -0Eh
 var_C		= word ptr -0Ch
@@ -209,7 +216,7 @@ loc_B091F:
 		pop	si
 		leave
 		retf
-sub_B0710		endp
+Swpn_LoadModel_B0710		endp
 
 ; ----------------------------------------------------------------------
 
@@ -352,7 +359,12 @@ sub_B09C1		endp
 
 ; Attributes: bp-based frame
 
-sub_B0A21		proc far
+; ==============================================================================================
+; far (lue 2026-11-15, partiellement), initialisation d'une tourelle SWPN : recopie le secteur
+; GARC du modèle ([+0Eh]) dans l'instance (+64h → +5Ch, +66h → +5Eh, +68h → +60h, +6Ah → +62h)
+; et remet à zéro ses angles courants +64h, +68h, +6Ch.
+; ==============================================================================================
+Swpn_InitInstance_B0A21		proc far
 
 var_54		= word ptr -54h
 var_30		= dword ptr -30h
@@ -513,5 +525,5 @@ loc_B0AE2:
 		pop	si
 		leave
 		retf
-sub_B0A21		endp
+Swpn_InitInstance_B0A21		endp
 ovr316		ends

@@ -373,7 +373,12 @@ sub_7553		endp
 
 ; Attributes: bp-based frame
 
-sub_75C8		proc far
+; ==============================================================================================
+; far (lue 2026-11-15). Lit l'entrée n d'un PAK (sub_7844 place le flux et range le type en
+; [+6Dh]) ; selon les bits 0C0h du type : 00h → sub_7553, 40h (type 3) → sub_1C401 (PKWARE
+; DCL), 80h (type 5) → SpeechCodec_DecompressEntry_1C574, 0C0h → lecture brute.
+; ==============================================================================================
+PakReader_ReadEntry_75C8		proc far
 
 var_A		= word ptr -0Ah
 var_8		= dword ptr -8
@@ -503,7 +508,7 @@ loc_76CC:
 		push	eax
 		push	si
 		push	large [bp+arg_4]
-		call	sub_1C574
+		call	SpeechCodec_DecompressEntry_1C574
 		push	dx
 		push	ax
 		pop	eax
@@ -528,9 +533,9 @@ loc_770F:
 		pop	si
 		leave
 		retf
-sub_75C8		endp
+PakReader_ReadEntry_75C8		endp
 
-; START OF FUNCTION CHUNK FOR sub_75C8
+; START OF FUNCTION CHUNK FOR PakReader_ReadEntry_75C8
 word_7713	dw 0
 		dw 40h
 		dw 80h
@@ -539,7 +544,7 @@ off_771B	dw offset loc_763A
 		dw offset loc_7653
 		dw offset loc_76AB
 		dw offset loc_7622
-; END OF FUNCTION CHUNK FOR sub_75C8
+; END OF FUNCTION CHUNK FOR PakReader_ReadEntry_75C8
 
 ; ----------------------------------------------------------------------
 

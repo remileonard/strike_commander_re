@@ -36,7 +36,7 @@ arg_4		= word ptr  0Ah
 		mov	si, [bp+arg_4]
 		push	si
 		push	large [bp+arg_0]
-		call	sub_10409
+		call	MVRS_ApplyCommon_10409
 		add	sp, 6
 		cmp	word ptr [si+2], 0
 		jz	short loc_85511
@@ -2393,7 +2393,7 @@ arg_4		= word ptr  0Ah
 		push	si
 		push	[bp+arg_4]
 		push	large [bp+arg_0]
-		call	sub_10409
+		call	MVRS_ApplyCommon_10409
 		add	sp, 6
 		les	bx, word ptr [bp+arg_0]
 		push	word ptr es:[bx+0Ah]

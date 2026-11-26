@@ -234,7 +234,7 @@ loc_C0D01:
 		push	di
 		lea	ax, [bp+var_D6]
 		push	ax
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 		push	0
 		mov	ax, di

@@ -489,7 +489,15 @@ sub_AAB8C		endp
 
 ; Attributes: bp-based frame
 
-sub_AAC15		proc far
+; ==============================================================================================
+; far (lue 2026-11-15, partiellement), lecture des chunks communs d'un modèle d'objet : DAMG,
+; un chunk de nom, TRGT, SIGN, puis CHLD (push large 444C4843h) : enregistrements de 32 octets
+; (nom 8 octets, décalage 3 × i32 en 24.8, 3 angles i32 en 24.8), rangés en enregistrements de
+; 57 octets (nom +0, décalage +9/+0Dh/+11h, matrice d'orientation +15h construite par
+; Matrix_BuildFullOrientation_5937B dans l'ordre angle 1 (axe X), angle 2 (axe Y), angle 3
+; (axe vertical)) ; puis SHAD.
+; ==============================================================================================
+Object_LoadModelChunks_AAC15		proc far
 
 var_5E		= dword ptr -5Eh
 var_5A		= dword ptr -5Ah
@@ -1025,7 +1033,7 @@ loc_AB1DC:
 		pop	si
 		leave
 		retf
-sub_AAC15		endp
+Object_LoadModelChunks_AAC15		endp
 
 ; ----------------------------------------------------------------------
 

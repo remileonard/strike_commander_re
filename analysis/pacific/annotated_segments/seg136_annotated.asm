@@ -153,7 +153,7 @@ loc_5CC44:
 		push	0
 		lea	ax, [bp+var_B6]
 		push	ax
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 		push	large [bp+var_10]
 		call	AIL_register_driver_1D983
@@ -401,7 +401,7 @@ loc_5CE7A:
 		push	1
 		lea	ax, [bp+var_B6]
 		push	ax
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 		mov	[bp+var_16E], 0D7Ch
 		mov	ax, word_7AFA2

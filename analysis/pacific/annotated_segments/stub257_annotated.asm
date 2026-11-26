@@ -15,7 +15,7 @@ stru_73700	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_73720	proc far
-		jmp	sub_97C10
+		jmp	Radio_PlayerMenu_97C10
 sub_73720	endp
 
 ; ----------------------------------------------------------------------

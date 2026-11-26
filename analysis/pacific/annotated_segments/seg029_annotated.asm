@@ -319,7 +319,7 @@ loc_1399F:
 		mov	word ptr [bp+var_4], dx
 		push	si
 		push	large [bp+arg_0]
-		call	sub_10409
+		call	MVRS_ApplyCommon_10409
 		add	sp, 6
 		les	bx, word ptr [bp+arg_0]
 		les	bx, es:[bx+0Dh]
@@ -788,7 +788,7 @@ loc_13E70:
 		push	word ptr es:[bx+33h]
 		push	word ptr [bp+arg_0+2]
 		push	bx
-		call	sub_9D0A
+		call	MVRS_ComputeTargetContext_9D0A
 		add	sp, 6
 		les	bx, word ptr [bp+arg_0]
 		mov	al, es:[bx+32h]
@@ -806,56 +806,56 @@ loc_13E9D:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_13F3F
+		call	near ptr GroundAttack_Phase0_Strafe_13F3F
 		jmp	loc_13E10
 
 loc_13EA9:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_14135
+		call	near ptr GroundAttack_Phase1_Rockets_14135
 		jmp	loc_13E10
 
 loc_13EB5:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_143BE
+		call	near ptr GroundAttack_Phase2_LevelBomb_143BE
 		jmp	loc_13E10
 
 loc_13EC1:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_14A59
+		call	near ptr GroundAttack_Phase3_DiveApproach_14A59
 		jmp	loc_13E10
 
 loc_13ECD:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_14EDF
+		call	near ptr GroundAttack_Phase4_Dive_14EDF
 		jmp	loc_13E10
 
 loc_13ED9:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_14325
+		call	near ptr GroundAttack_Phase10_PullUp_14325
 		jmp	loc_13E10
 
 loc_13EE5:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_14353
+		call	near ptr GroundAttack_Phase11_Egress_14353
 		jmp	loc_13E10
 
 loc_13EF1:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_154B0
+		call	near ptr GroundAttack_Phase5_Torpedo_154B0
 		jmp	loc_13E10
 
 loc_13EFD:
@@ -876,7 +876,7 @@ loc_13F15:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_157BA
+		call	near ptr GroundAttack_Phase8_NextPass_157BA
 		jmp	loc_13E10
 
 loc_13F21:
@@ -907,7 +907,13 @@ off_13F27	dw offset loc_13E9D
 
 ; Attributes: bp-based frame
 
-sub_13F3F		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Phase 0 (canon) : sans cible, phase 10 (3 s). Direction voulue = la
+; cible ; nez à moins de 5° : à moins de 2500 m, nez recalé sur la cible et tir (bit 1 de
+; [commandes+1Bh]), minuteur 2 s ; à moins de 600 m, phase 10 (10 s). Nez à plus de 35° et
+; cible à moins de 2000 m : s'éloigne (direction opposée, altitude cible + 500 m).
+; ==============================================================================================
+GroundAttack_Phase0_Strafe_13F3F		proc far
 
 var_68		= dword ptr -68h
 var_64		= dword ptr -64h
@@ -1100,13 +1106,17 @@ loc_14132:
 		pop	si
 		leave
 		retf
-sub_13F3F		endp
+GroundAttack_Phase0_Strafe_13F3F		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_14135		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Phase 1 (roquettes) : comme la phase 0 avec les seuils 2500 m (tir et
+; éloignement) et 1000 m (phase 10, 10 s).
+; ==============================================================================================
+GroundAttack_Phase1_Rockets_14135		proc far
 
 var_68		= dword ptr -68h
 var_64		= dword ptr -64h
@@ -1297,13 +1307,17 @@ loc_14322:
 		pop	si
 		leave
 		retf
-sub_14135		endp
+GroundAttack_Phase1_Rockets_14135		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_14325		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Phase 10 (ressource) : assiette voulue +8°, roulis 0, vitesse = champ
+; 23 du JDYN.
+; ==============================================================================================
+GroundAttack_Phase10_PullUp_14325		proc far
 
 arg_0		= word ptr  6
 
@@ -1320,13 +1334,17 @@ arg_0		= word ptr  6
 		mov	byte_7C848, 1
 		pop	bp
 		retf
-sub_14325		endp
+GroundAttack_Phase10_PullUp_14325		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_14353		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Phase 11 (dégagement) : direction opposée à la cible, vitesse = champ
+; 23 du JDYN.
+; ==============================================================================================
+GroundAttack_Phase11_Egress_14353		proc far
 
 var_18		= dword ptr -18h
 var_14		= dword ptr -14h
@@ -1367,13 +1385,18 @@ arg_0		= word ptr  6
 		mov	word_7C82B, ax
 		leave
 		retf
-sub_14353		endp
+GroundAttack_Phase11_Egress_14353		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_143BE		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-15. Phase 2 (bombardement à plat) : anticipe le point d'impact
+; (cible mobile : position + vitesse × temps), cap à moins de 70° ; largage (bit 1, sub_3F17A)
+; quand l'impact tombe sur la cible ; plus de bombe : phase 10.
+; ==============================================================================================
+GroundAttack_Phase2_LevelBomb_143BE		proc far
 
 var_152		= dword ptr -152h
 var_14E		= dword ptr -14Eh
@@ -1936,7 +1959,7 @@ loc_14A07:
 		pop	si
 		leave
 		retf
-sub_143BE		endp
+GroundAttack_Phase2_LevelBomb_143BE		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1980,7 +2003,11 @@ sub_14A2B		endp
 
 ; Attributes: bp-based frame
 
-sub_14A59		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-15. Phase 3 (approche du piqué, bombardier en piqué) : rejoint
+; l'altitude d'approche en s'alignant ; aligné à moins de 5° et en position, phase 4 (25 s).
+; ==============================================================================================
+GroundAttack_Phase3_DiveApproach_14A59		proc far
 
 var_106		= dword ptr -106h
 var_102		= dword ptr -102h
@@ -2390,13 +2417,18 @@ loc_14EDB:
 		pop	si
 		leave
 		retf
-sub_14A59		endp
+GroundAttack_Phase3_DiveApproach_14A59		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_14EDF		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Phase 4 (piqué) : sub_AF37 (guidage vers la cible) ; sous 666 m de
+; hauteur, largage (bit 1) et phase 10 (15 s) ; sous 600 m, phase 10 (8 s). La protection
+; anti-sol est coupée ([nœud+71] = 1).
+; ==============================================================================================
+GroundAttack_Phase4_Dive_14EDF		proc far
 
 var_1E		= dword ptr -1Eh
 var_1A		= dword ptr -1Ah
@@ -2472,15 +2504,16 @@ loc_14FBB:
 		pop	si
 		leave
 		retf
-sub_14EDF		endp
+GroundAttack_Phase4_Dive_14EDF		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far. LUE 2026-11-05. Phase 6 : dirige l'avion vers la cible (sub_A41D) ; aligné et assez
-; près, phase 7 ([nœud+45] = 25,0). Aucun largage d'arme.
+; far. LUE 2026-11-05. Phase kamikaze (rôle 4 du JDYN ou demande spéciale). Phase 6 : dirige
+; l'avion vers la cible (sub_A41D) ; aligné et assez près, phase 7 ([nœud+45] = 25,0). Aucun
+; largage d'arme.
 ; ==============================================================================================
 GroundAttack_Phase6_14FBE		proc far
 
@@ -2889,9 +2922,9 @@ GroundAttack_Phase6_14FBE		endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far. LUE 2026-11-05. Phase 7 : [nœud+71] = 1, [entité+361] = 1, garde la direction ; si
-; dword_7C837 < 250 : +20 par tour sur [[avion+99]+62] jusqu'à [[avion+99]+3]. Aucun largage
-; d'arme.
+; far. LUE 2026-11-05. Phase kamikaze (rôle 4 du JDYN ou demande spéciale). Phase 7 :
+; [nœud+71] = 1, [entité+361] = 1, garde la direction ; si dword_7C837 < 250 : +20 par tour
+; sur [[avion+99]+62] jusqu'à [[avion+99]+3]. Aucun largage d'arme.
 ; ==============================================================================================
 GroundAttack_Phase7_1542B		proc far
 
@@ -2943,7 +2976,11 @@ GroundAttack_Phase7_1542B		endp
 
 ; Attributes: bp-based frame
 
-sub_154B0		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-15. Phase 5 (torpille) : cap à moins de 70°, largage (bit 1)
+; entre 700 et 1525 m de la cible, puis phase 10 (2 s).
+; ==============================================================================================
+GroundAttack_Phase5_Torpedo_154B0		proc far
 
 var_9A		= dword ptr -9Ah
 var_96		= dword ptr -96h
@@ -3214,13 +3251,17 @@ loc_157B6:
 		pop	si
 		leave
 		retf
-sub_154B0		endp
+GroundAttack_Phase5_Torpedo_154B0		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_157BA		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-15. Phase 8 : rechoisit l'arme (sub_3F219, sub_3F17A) et la phase
+; d'une nouvelle passe (3, 2, 5, 0 ou 1), ou fin (9).
+; ==============================================================================================
+GroundAttack_Phase8_NextPass_157BA		proc far
 
 var_24		= word ptr -24h
 var_22		= dword ptr -22h
@@ -3420,11 +3461,11 @@ loc_159AD:
 loc_159B9:
 		leave
 		retf
-sub_157BA		endp
+GroundAttack_Phase8_NextPass_157BA		endp
 
-; START OF FUNCTION CHUNK FOR sub_157BA
+; START OF FUNCTION CHUNK FOR GroundAttack_Phase8_NextPass_157BA
 		db 8
 		add	[bx+di], cl
 		add	[di], cl
-; END OF FUNCTION CHUNK FOR sub_157BA
+; END OF FUNCTION CHUNK FOR GroundAttack_Phase8_NextPass_157BA
 seg029		ends

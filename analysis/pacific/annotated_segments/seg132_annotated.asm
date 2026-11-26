@@ -11,10 +11,13 @@ loc_5AE81:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far. LUE 2026-11-25. Objet des sons numériques (203 octets) : table de 50 entrées de 4
-; octets (octet 0 = numéro d'effet servi, 255 = libre ; octets 1-2 = émetteur ; octet 3 : bit
-; 0 boucle, bit 1 à relancer, bit 2 variante lointaine, distance > 1000), écrite en dur ici
-; (voir analysis/SOUND_EFFECTS.md § 3.2) ; [+200] = échantillon en cours (−1).
+; far (lue 2026-11-15). Construit l'objet des sons numérisés : tableau de 50 entrées de 4
+; octets (une par son de SOUND\DSOUNDFX.PAK mis à plat, sous-archive 0 puis 1), octet 0 =
+; numéro d'effet, octet 3 bit 0 = boucle, bit 2 = variante lointaine. Rang → effet : 0→9, 1→8,
+; 2→0, 3→1, 4→26, 5→5, 6→6, 7→7, 8→11, 9→18, 11→20, 12→21, 13 à 18→2, 3, 4, 2, 3, 4
+; (lointaines), 19→19, 20→15, 21→16, 23→23, 24→24, 25→25 (boucle), 26→10, 27 à 37→12 (boucle),
+; 38 à 47→13 (boucle), 49→22 (boucle) ; rangs 10, 22 et 48 sans numéro écrit (48 a le drapeau
+; de boucle) ; [+0C8h] = -1.
 ; ==============================================================================================
 DigitalSFX_Construct_5AE86		proc far
 
@@ -191,10 +194,10 @@ StreamReader_ReportError_5B03A		endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far. LUE 2026-11-25. (objet, effet, distance, émetteur) : cherche la première entrée de cet
-; effet dont la variante (bit 2 de l'octet 3) correspond à distance > 1000 ; parmi les entrées
-; suivantes identiques, en tire une au hasard (CRT_Rand) ; DigitalSFX_RequestSample_5B12B.
-; Rend 0 si l'effet n'a pas d'échantillon (la façade passe alors à la synthèse).
+; far (lue 2026-11-15). Cherche dans la table de DigitalSFX_Construct_5AE86 la première entrée
+; du numéro d'effet dont la variante lointaine (bit 2 de l'octet 3) vaut (distance > 1 000),
+; compte les entrées consécutives identiques, en tire une au hasard (CRT_Rand) et la joue
+; (sub_5B12B).
 ; ==============================================================================================
 DigitalSFX_PlayEffect_5B04F		proc far
 

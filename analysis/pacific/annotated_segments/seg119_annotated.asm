@@ -222,7 +222,7 @@ loc_4F29D:
 		lea	ax, word ptr [bp+var_60]
 		push	ax
 		push	word_79788
-		call	Ground_IsWaterUnderPoint_3677E
+		call	Ground_IsSeaLevel_3677E
 		add	sp, 8
 		or	al, al
 		jnz	short loc_4F316

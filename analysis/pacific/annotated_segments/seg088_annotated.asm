@@ -504,7 +504,7 @@ loc_37357:
 loc_37382:
 		push	[bp+arg_6]
 		push	si
-		call	sub_553B6
+		call	World_OnObjectDestroyed_553B6
 		add	sp, 4
 		cmp	word_7CADA, si
 		jnz	short loc_373A2
@@ -689,7 +689,7 @@ loc_37556:
 		lea	ax, word ptr [bp+var_40]
 		push	ax
 		push	word_79788
-		call	Ground_IsWaterUnderPoint_3677E
+		call	Ground_IsSeaLevel_3677E
 		add	sp, 8
 		or	al, al
 		jnz	short loc_375A3

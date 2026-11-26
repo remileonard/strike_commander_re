@@ -6,7 +6,23 @@ ovr257		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_97C10		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-14. Menu radio du joueur (modal). « NO RESPONSE » si
+; [joueur+63h]→+48h ≠ 0. Page 1 : titre « Select Frequency » en (90, 40), 130 × 11 ; une ligne
+; par destinataire (11 px plus bas à chaque fois, y = 51 + 11 × i), 8 au plus : objets du camp
+; du joueur dont l'enregistrement radio a des ordres ([+88h] ≠ 0) ; avion (type 6, sauf le
+; joueur) « %i: %Fs %Fs », types 21, 23, 24 « %i: %Fs » ; « S: Entire Squadron » si plus d'un
+; avion, puis « No One » (fin). Page 2 : ordres du destinataire
+; (Radio_GetOptionLetterByIndex_1B70B), texte du chunk ASKS du joueur (sub_1B728), « %i: %Fs
+; », puis « nothing ». Un ordre n'est proposé que si (table off_98940, lettre − 100) : d
+; toujours ; e joueur au sol ; f et n joueur en vol et destinataire à moins de 5000 m ; g en
+; formation [+357] (escadrille : toujours) ; h hors formation ; i le joueur a une cible ; j
+; pas en fuite ([+309] ≠ 2) ; k word_7CAE2 ≠ 0 (rôle non établi) ; l pas en silence radio
+; [+354] ; m en silence radio. Couleurs posées dans word_79218..79222 : 192, 192, 9, 11, 14,
+; 28 (rôles non établis). L'ordre choisi part dans la file RadioQueue_AllocateSlot, lue par
+; AI_PlayerRadioCommand_E3CA.
+; ==============================================================================================
+Radio_PlayerMenu_97C10		proc far
 
 var_192		= dword ptr -192h
 var_18A		= dword ptr -18Ah
@@ -1408,9 +1424,9 @@ loc_98926:
 		pop	si
 		leave
 		retf
-sub_97C10		endp
+Radio_PlayerMenu_97C10		endp
 
-; START OF FUNCTION CHUNK FOR sub_97C10
+; START OF FUNCTION CHUNK FOR Radio_PlayerMenu_97C10
 off_9892A	dw offset loc_986E4
 		dw offset loc_986AE
 		dw offset loc_986B4
@@ -1433,7 +1449,7 @@ off_98940	dw offset loc_98468
 		dw offset loc_983F7
 		dw offset loc_98434
 		dw offset loc_98281
-; END OF FUNCTION CHUNK FOR sub_97C10
+; END OF FUNCTION CHUNK FOR Radio_PlayerMenu_97C10
 
 ; ----------------------------------------------------------------------
 

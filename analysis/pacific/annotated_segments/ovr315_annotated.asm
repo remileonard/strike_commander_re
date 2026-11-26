@@ -279,7 +279,7 @@ loc_B04EA:
 		add	ax, 12h
 		push	ax
 		push	word_79788
-		call	Ground_IsWaterUnderPoint_3677E
+		call	Ground_IsSeaLevel_3677E
 		add	sp, 8
 		or	al, al
 		jnz	short loc_B0539

@@ -1977,7 +1977,7 @@
   "sub_5C62E": {
     "new_name": "SoundFX_FindFreeChannel_5C62E",
     "segment": "seg134",
-    "summary": "Reprise de STRIKE.EXE : même suite d'instructions, 7 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `SoundFX_FindFreeChannel_598A6` (sub_598A6 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — Ex-'Weapon_HUDBox_TimerCaseC_598A6'. far. LUE 2026-10-06. Systeme d'effets sonores : 5 canaux de sequence XMIDI a +0x92 (pas 0x11 : struct canal, +0xE = numero d'effet, 0x0F = libre, +0xF = emetteur). Renvoie le premier canal dont la sequence ne joue pas (AIL_sequence_status_603DE != 1), ou -1."
+    "summary": "far (lue 2026-11-15). Comme SoundFX_FindFreeChannel_598A6 de STRIKE.EXE, mais un seul canal d'effet : la boucle s'arrête à di < 1 (`cmp di, 1` / `jl`) au lieu de 5. Pacific Strike ne joue donc qu'un effet XMIDI à la fois. Renvoie 0 si le canal est libre (pas de séquence en [+114h], ou sub_1DC07 ≠ 1), sinon -1."
   },
   "sub_5C68A": {
     "new_name": "SoundFX_Play3D_5C68A",
@@ -6012,12 +6012,12 @@
   "sub_14FBE": {
     "new_name": "GroundAttack_Phase6_14FBE",
     "segment": "seg029",
-    "summary": "far. LUE 2026-11-05. Phase 6 : dirige l'avion vers la cible (sub_A41D) ; aligné et assez près, phase 7 ([nœud+45] = 25,0). Aucun largage d'arme."
+    "summary": "far. LUE 2026-11-05. Phase kamikaze (rôle 4 du JDYN ou demande spéciale). Phase 6 : dirige l'avion vers la cible (sub_A41D) ; aligné et assez près, phase 7 ([nœud+45] = 25,0). Aucun largage d'arme."
   },
   "sub_1542B": {
     "new_name": "GroundAttack_Phase7_1542B",
     "segment": "seg029",
-    "summary": "far. LUE 2026-11-05. Phase 7 : [nœud+71] = 1, [entité+361] = 1, garde la direction ; si dword_7C837 < 250 : +20 par tour sur [[avion+99]+62] jusqu'à [[avion+99]+3]. Aucun largage d'arme."
+    "summary": "far. LUE 2026-11-05. Phase kamikaze (rôle 4 du JDYN ou demande spéciale). Phase 7 : [nœud+71] = 1, [entité+361] = 1, garde la direction ; si dword_7C837 < 250 : +20 par tour sur [[avion+99]+62] jusqu'à [[avion+99]+3]. Aucun largage d'arme."
   },
   "sub_51DD3": {
     "new_name": "Expr_VM_SeekLabel_51DD3",
@@ -6704,114 +6704,379 @@
     "segment": "ovr320",
     "summary": "far. LUE 2026-11-13. Lecteur du chunk CARD d'un objet CARR : 8 i32 en 24.8 rangés dans des variables globales dword_7CDE6, 7CDEA, 7CDEE, 7CDF2, 7CDF6, 7CDFA, 7CDFE, 7CE02 (le dernier porte-avions chargé l'emporte ; les 4 fichiers de PACIFIC.DAT ont les mêmes valeurs : 33, 5, 0, −60, 33, 0, −80, 33 m). Absent : erreur 49273. dword_7CDE6 = hauteur du pont (Aircraft_ContactWithObject_3CA69, PhysicsTicks_4A8F4) ; 7CDEE..7CDF6 = point (0, −60, 33) lu par sub_B169C (ovr321) et ovr322 ; les autres rangés, rôle non établi."
   },
+  "sub_108DD": {
+    "new_name": "MVRS_ID7_ApplyFollowLeader_108DD",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-14. Méthode +8 du nœud ID 7 de Pacific Strike (table dseg 488h, nœud [entité+204] créé dans ovr236). Lancée par Goal_FormationFlight_D2AC avec le chef, le poste [entité+310] et 2 s. Range le minuteur (node+13h) et le chef (node+11h), [modèle+85h] = 0FFh. Direction voulue = chef − moi (MVRS_ComputeTargetContext_9D0A). Vitesse voulue (word_7C82B) : écart de cap nez/chef < 30° : vitesse du chef si distance < 2000/3 m et niveau du pilote [entité+178] ≠ 0, sinon vitesse du chef + 30 m/s ; écart ≥ 30° : champ 23 du JDYN ([modèle+9Dh]). Le poste n'est pas lu ici."
+  },
+  "sub_109A4": {
+    "new_name": "MVRS_ID7_TickFollowLeader_109A4",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-14. Méthode +12 du nœud ID 7 de Pacific Strike. Minuteur − dt. Avec un chef : MVRS_ComputeTargetContext_9D0A ; si le chef est le joueur, proche (< 2000 m) et aligné (< 30°) : SetReference16(63AEh) et byte_776B2 = 1 (rôle non établi). Direction voulue = chef − moi. Vitesse voulue : écart de cap entre mon nez et celui du chef < 90° : distance < 1000 m → vitesse du chef si niveau [entité+178] ≠ 0, sinon + 30 m/s ; distance ≥ 1000 m → vitesse du chef + 25 m/s ; écart ≥ 90° : champ 23 du JDYN. Fin (sub_103CB) sans chef ou minuteur négatif."
+  },
+  "sub_9D0A": {
+    "new_name": "MVRS_ComputeTargetContext_9D0A",
+    "segment": "seg018",
+    "summary": "far. LUE 2026-11-14. Contexte de la cible d'un nœud : dword_7C7C3/C7/CB = position de la cible − la mienne, dword_7C7CF = hauteur de la cible au-dessus du sol, word_7C7D3 = écart de cap entre mon nez et la direction de la cible, word_7C7D5 = écart de cap entre mon nez et celui de la cible, dword_7C7D9 = distance (m), word_7C7DD = vitesse de la cible (m/s), word_7C7D7 = |écart de cap entre le nez de la cible et la direction vers moi|. Seuil dword_7C7DF = 2000 m posé une fois dans ovr236."
+  },
+  "sub_9890": {
+    "new_name": "MVRS_ApplyPilotCommands_9890",
+    "segment": "seg018",
+    "summary": "far. LUE EN PARTIE 2026-11-14. Applique les commandes calculées par le nœud en cours : selon les drapeaux, sub_98E7, sub_9AC0 ou sub_9BCD ; puis, si une vitesse voulue est posée (word_7C82B ≠ 0), MVRS_SpeedThrottleLaw_9C3D."
+  },
+  "sub_9C3D": {
+    "new_name": "MVRS_SpeedThrottleLaw_9C3D",
+    "segment": "seg018",
+    "summary": "far. LUE 2026-11-14. Manette des gaz d'après la vitesse voulue word_7C82B et ma vitesse word_7C829. Écart = voulue − vitesse (m/s) : > 20 → état 2 ; > 1 → 4 ; ≥ 0 → 6 ; > −2 → 5 ; > −21 → 3 ; sinon 1. État retenu = MVRS_SpeedStateHysteresis_97D3(état précédent [entité+250], état mesuré), rangé dans [entité+250]. Manette (objet +1Eh) : états 1 et 3 → 1, états 2 et 4 → 10, états 5 et 6 → 8 ; état 1 : bit 6 de l'objet +1Ch = inverse du bit 0 de [modèle+92h] (rôle non établi)."
+  },
+  "sub_97D3": {
+    "new_name": "MVRS_SpeedStateHysteresis_97D3",
+    "segment": "seg018",
+    "summary": "far. LUE 2026-11-14. (précédent, mesuré) → état retenu. Précédent 0, 5 ou 6 : le mesuré. Précédent 1 : mesuré 2, 4 ou 6 ; mesuré 5 → 3 ; sinon 1. Précédent 2 : mesuré 1, 3 ou 5 ; mesuré 6 → 4 ; sinon 2. Précédent 3 : mesuré 1, 2, 4 ou 6 ; sinon 3. Précédent 4 : mesuré 1, 2, 3 ou 5 ; sinon 4."
+  },
+  "sub_97C10": {
+    "new_name": "Radio_PlayerMenu_97C10",
+    "segment": "ovr257",
+    "summary": "far. LUE EN PARTIE 2026-11-14. Menu radio du joueur (modal). « NO RESPONSE » si [joueur+63h]→+48h ≠ 0. Page 1 : titre « Select Frequency » en (90, 40), 130 × 11 ; une ligne par destinataire (11 px plus bas à chaque fois, y = 51 + 11 × i), 8 au plus : objets du camp du joueur dont l'enregistrement radio a des ordres ([+88h] ≠ 0) ; avion (type 6, sauf le joueur) « %i: %Fs %Fs », types 21, 23, 24 « %i: %Fs » ; « S: Entire Squadron » si plus d'un avion, puis « No One » (fin). Page 2 : ordres du destinataire (Radio_GetOptionLetterByIndex_1B70B), texte du chunk ASKS du joueur (sub_1B728), « %i: %Fs », puis « nothing ». Un ordre n'est proposé que si (table off_98940, lettre − 100) : d toujours ; e joueur au sol ; f et n joueur en vol et destinataire à moins de 5000 m ; g en formation [+357] (escadrille : toujours) ; h hors formation ; i le joueur a une cible ; j pas en fuite ([+309] ≠ 2) ; k word_7CAE2 ≠ 0 (rôle non établi) ; l pas en silence radio [+354] ; m en silence radio. Couleurs posées dans word_79218..79222 : 192, 192, 9, 11, 14, 28 (rôles non établis). L'ordre choisi part dans la file RadioQueue_AllocateSlot, lue par AI_PlayerRadioCommand_E3CA."
+  },
+  "sub_84B24": {
+    "new_name": "MVRS_CreateProfileNode_84B24",
+    "segment": "ovr236",
+    "summary": "far. LUE 2026-11-14. Crée le nœud de manœuvre d'un numéro lu dans le chunk MVRS du profil : seuls 3 (table 458h), 4 (468h), 5 (448h) et 6 (478h) existent (sub ax, 3 / cmp bx, 3) ; tout autre numéro rend un pointeur nul, l'entrée n'est pas gardée. Les profils de PACIFIC.DAT listent pourtant 1 à 13 (hérités de Strike Commander). Le chargeur (ovr236) range d'abord 5 nœuds fixes de poids 0 dans la liste du tournoi ([entité+445], 5 octets par entrée, nombre à [entité+443]) : 19 (attaque au sol, 4C8h), 22 (4B8h), 14 (4A8h), 15 (498h), 7 (488h) ; puis les nœuds du profil avec leur poids signé, 10 entrées au plus. Les nœuds 20 (4D8h) et 21 (4F8h) sont créés à part, hors de la liste."
+  },
+  "sub_10C89": {
+    "new_name": "MVRS_ID22_ScoreGunAttack_10C89",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-14. Note du nœud 22 (attaque au canon, table 4B8h, nœud fixe du tournoi). Pose le minuteur à 2,0 s ([nœud+14h]), la cible ([nœud+1Eh]) et [nœud+11h] = 1, remet le compteur de rafales [nœud+12h] à 0. 0 si l'avion pique (word_7C82D < 0) plus bas que la hauteur de son niveau (word_7C804 + 2 × [entité+178] : 250, 200, 150 m ; dword_7C837 = hauteur au-dessus du sol) ; 0 si MVRS_ID22_SelectGuns_11393 ne trouve pas de canon chargé ; 0 si la cible n'est pas un avion (byte_7C7C2 ≠ 6). Sinon n = MVRS_ID22_AimQuality_1125E + 2 × [entité+187] (octet 9 d'ATRB), note = 10 si n ≥ 100, sinon n ÷ 10."
+  },
+  "sub_10D3C": {
+    "new_name": "MVRS_ID22_ApplyGunAttack_10D3C",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-14. Lancement du nœud 22 : note le nœud s'il ne l'a pas été ([nœud+11h] = 0), lancement commun sub_10409, compteur de rafales à 0, puis le tick tout de suite."
+  },
+  "sub_10D82": {
+    "new_name": "MVRS_ID22_TickGunAttack_10D82",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-14. Tick du nœud 22 : minuteur − dt ; efface le bit de tir au canon (bit 1 de [commandes+1Bh]) et le bit 6. Sans cible : fin. Visée en avance : vitesse de l'obus = dword +85h du modèle du canon choisi ; vitesse relative = vitesse de la cible − la mienne (méthode +50h) ; si l'écart de cap entre mon nez et celui de la cible < 90° (word_7C7D5) vitesse = obus + |relative|, sinon obus − |relative| ; t = distance ÷ vitesse ; point visé = position de la cible + vitesse de la cible × t, relevé de ½ g t² (t(t+1)/2 × dword_7942B, g = −9,8 m/s², posé par sub_47B4D : compense la chute de l'obus) et d'un écart aléatoire (Math_RandomJitter_56C57(10) ÷ 10 m). Direction voulue (dword_7C811) = point visé − (ma position + ma vitesse × 1 s). Vitesse voulue = champ 23 du JDYN ; si l'écart de cap des nez < 90° et distance < 1000 m : vitesse de la cible si niveau [entité+178] ≠ 0, sinon + 30 m/s. q = MVRS_ID22_AimQuality_1125E ; q > 75 : sub_A932 (recalage de visée selon [entité+185], octet 7 d'ATRB) ; q > 100 : sub_3F15E (début de rafale) ; q > 75 : bit de tir au canon posé et compteur de rafales [nœud+12h] + 1. Fin (sub_10381) au bout du minuteur ou sans cible."
+  },
+  "sub_1125E": {
+    "new_name": "MVRS_ID22_AimQuality_1125E",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-14. Qualité de la visée au canon (0 sans cible). a = angle (sub_578DF, degrés) entre la direction voulue dword_7C811 et mon nez ; b = angle entre la direction de la cible et mon nez. Distance < 2000 m : q = 100 − a² ; < 4000 m et a ≤ 1 : 15 ; sinon 0. Compteur de rafales n ≠ 0 : q += 20 − n si b > 30°, sinon 10 − n. Distance < 500 m : q += (500 − distance) ÷ 20. q += [entité+180] (octet 1 d'ATRB). Borné à 0."
+  },
+  "sub_11393": {
+    "new_name": "MVRS_ID22_SelectGuns_11393",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-14. Sans cible : 0. Sans point d'emport canon chargé (WeaponStation_FindLoadedCompatible, masque 64) : 0. Sinon choisit le canon (sub_3EF67 jusqu'à un point canon), début de rafale (sub_3F15E) si la cible est à moins de 500 m, et renvoie 64."
+  },
+  "sub_3F15E": {
+    "new_name": "WeaponSystem_StartBurst_3F15E",
+    "segment": "seg099",
+    "summary": "far. LUE 2026-11-14. [système+0Ch] = 1, point d'emport courant [+18h] = premier ([+14h]), index [+0] = 0 : la rafale repart du premier canon."
+  },
+  "sub_9578": {
+    "new_name": "MVRS_SetupOwnState_9578",
+    "segment": "seg018",
+    "summary": "far. LUE EN PARTIE 2026-11-14. Avant la réflexion de l'IA : remet le manche du bloc de commandes à 0, copie mon nez dans dword_7C81D et dans la direction voulue dword_7C811, ma vitesse dans word_7C829 et word_7C82B, mon roulis dans word_7C831/33, mon assiette dans word_7C82D/2F, ma position dans dword_7C83B, ma hauteur au-dessus du sol dans dword_7C837 ; manette à 10."
+  },
+  "sub_A1A8": {
+    "new_name": "MVRS_ID7_ScoreFollowTarget_A1A8",
+    "segment": "seg020",
+    "summary": "far. LUE 2026-11-14. Note du nœud 7 (vol vers la cible) : 5 si la cible est un avion (byte_7C7C2 = 6), sinon 0. Pendant le tournoi, la direction voulue dword_7C811 vaut le nez (MVRS_SetupOwnState_9578) : la qualité de visée du nœud 22 prend un écart nul, il note 10 à moins de 2000 m et l'emporte sur ce 5."
+  },
+  "sub_A03C": {
+    "new_name": "MVRS_ID3_ScoreJink_A03C",
+    "segment": "seg020",
+    "summary": "far. LUE 2026-11-15. Note de la manœuvre 3 (esquive) : 0 si la cible n'est pas un avion, si elle ne vise pas l'avion (word_7C7D7 > 20°), si elle n'est pas derrière (|word_7C7D3| < 150°) ou si elle est à plus de 2000 m. Niveau 2 : 0 si la dernière manœuvre finie était la 3 ou au-delà de 1000 m, sinon 4. Autres niveaux : 5 à moins de 1000 m, sinon 4."
+  },
+  "sub_A277": {
+    "new_name": "MVRS_ID4_ScoreClimbAway_A277",
+    "segment": "seg020",
+    "summary": "far. LUE 2026-11-15. Note de la manœuvre 4 (dégagement en montée) : 0 si la cible n'est pas un avion ou au-dessus de 8333 m de hauteur ; 9 si la dernière manœuvre finie était la 6 ; 0 si la cible est à moins de 90° du nez, ou si elle vise l'avion (< 90°) à moins de 2000 m. Dernière manœuvre 4 : 9 sous 1000 m, sinon + 3. Visée de la cible < 155° : + 1, sinon + 3. Sous le plancher du niveau : + 4, sinon sous 1000 m : + 2. Plafond 8."
+  },
+  "sub_A0BD": {
+    "new_name": "MVRS_ID5_ScoreImmelmann_A0BD",
+    "segment": "seg020",
+    "summary": "far. LUE 2026-11-15. Note de la manœuvre 5 (Immelmann) : 0 si la cible n'est pas un avion, au-dessus de 8333 m, si la vitesse est inférieure à champ 23 ÷ 2 + 2 × champ 24 du JDYN, si l'assiette sort de −10° à +20°, ou si les systèmes 4, 3 et 0 ont des dégâts (sub_415CD). 7 de face à moins de 200 m (cible < 20° du nez, nez opposés > 160°). Sinon : + 3 sous 1000 m ; + 3 si la cible est à plus de 150° du nez, + 1 à plus de 90°."
+  },
+  "sub_A333": {
+    "new_name": "MVRS_ID6_ScoreSplitS_A333",
+    "segment": "seg020",
+    "summary": "far. LUE 2026-11-15. Note de la manœuvre 6 (split-S) : 0 si la cible n'est pas un avion, si elle ne vise pas l'avion (> 30°), au-delà de 1800 m, si l'assiette sort de −12° à +20°, si la dernière manœuvre finie n'est pas la 7, ou sous 2 × le plancher du niveau. Sinon : + 2 si la vitesse est inférieure à 2 × champ 24 du JDYN ; + 2 si la cible est à plus de 135° du nez ; + 4 à moins de 4000 m ; + 1 si l'octet +167 du JDYN ≥ 3 ; − 1 si l'octet +168 ≥ 3. Plafond 8."
+  },
+  "sub_1047B": {
+    "new_name": "MVRS_ID3_ApplyJink_1047B",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Lancement de la manœuvre 3 : minuteur de la demande (2 s), [nœud+17h] = la cible est le joueur, variante [nœud+11h] = Math_RandomScale_56C2F(5 sous le plancher du niveau, sinon 8), puis le tick."
+  },
+  "sub_10503": {
+    "new_name": "MVRS_ID3_TickJink_10503",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Tick de la manœuvre 3 : vitesse voulue = champ 23 du JDYN ; selon la variante, assiette voulue (word_7C82F) et écart de cap (word_7C835) : 0 (+30°, −30°), 1 (+30°, 0), 2 (+30°, +30°), 3 et 4 (0, −30°), 5 (−30°, −30°), 6 (−30°, 0), 7 (−30°, +30°). Fin au bout du minuteur."
+  },
+  "sub_114E1": {
+    "new_name": "MVRS_ID4_ApplyClimbAway_114E1",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Lancement de la manœuvre 4 : minuteur de la demande (2 s), puis le tick."
+  },
+  "sub_1151D": {
+    "new_name": "MVRS_ID4_TickClimbAway_1151D",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Tick de la manœuvre 4 : assiette voulue +30°, ou 0 si la vitesse est inférieure au champ 24 du JDYN ; vitesse voulue = champ 23. Fin au bout du minuteur."
+  },
+  "sub_105C1": {
+    "new_name": "MVRS_ID5_ApplyImmelmann_105C1",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Lancement de la manœuvre 5 : minuteur 8 s, phase 0, puis le tick."
+  },
+  "sub_105FE": {
+    "new_name": "MVRS_ID5_TickImmelmann_105FE",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Tick de la manœuvre 5, vitesse voulue = champ 23 du JDYN : (0) roulis voulu 0, phase 1 quand |roulis| < 20° ; (1) roulis 0, manche (commandes +1Fh) = byte_7C7FB[niveau] (14, 15, 16), phase 2 au-dessus de +35° d'assiette ; (2) même manche, phase 3 sous +30° ; (3) assiette voulue 0, fin sous +15°. Fin aussi au bout du minuteur."
+  },
+  "sub_1157B": {
+    "new_name": "MVRS_ID6_ApplySplitS_1157B",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Lancement de la manœuvre 6 : minuteur 8 s, phase 0, puis le tick."
+  },
+  "sub_115B7": {
+    "new_name": "MVRS_ID6_TickSplitS_115B7",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Tick de la manœuvre 6 : (0) vitesse = champ 23, roulis voulu 180°, phase 1 quand |roulis| > 160° ; (1) roulis 180°, vitesse = 2 × champ 24, manche = byte_7C7FB[niveau], phase 2 sous −35° d'assiette ; (2) vitesse 2 × champ 24, même manche, phase 3 au-dessus de −35° ; (3) vitesse = champ 23, assiette voulue 0. Fin au bout du minuteur."
+  },
+  "sub_A1BA": {
+    "new_name": "MVRS_ID14_ScoreGroundAvoid_A1BA",
+    "segment": "seg020",
+    "summary": "far. LUE 2026-11-15. Note de la manœuvre 14 : 0 si la dernière manœuvre finie est l'attaque au sol (19) ou sous pilote automatique ; 10 si l'avion pique sous le plancher de son niveau (word_7C804) ; sinon 0."
+  },
+  "sub_A215": {
+    "new_name": "MVRS_ID15_ScoreStallRecovery_A215",
+    "segment": "seg020",
+    "summary": "far. LUE 2026-11-15. Note de la manœuvre 15 : 0 sous pilote automatique ; 10 si le bit 6 de [modèle+146] est posé, ou si l'avion monte plus lentement que le champ 24 du JDYN ; sinon 0. Le même test déclenche le réflexe 15 dans AI_TopLevelThink_B0C4."
+  },
+  "sub_10B1B": {
+    "new_name": "MVRS_ID14_ApplyGroundAvoid_10B1B",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Lancement de la manœuvre 14 : minuteur 4 s, puis le tick."
+  },
+  "sub_10B52": {
+    "new_name": "MVRS_ID14_TickGroundAvoid_10B52",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Tick de la manœuvre 14 : sous 200 m et sérieusement endommagé, AI_Eject_A58C ; assiette voulue +20°, roulis 0, vitesse = champ 23 du JDYN, byte_7C847 = 1 (manche à fond tant que l'assiette est loin). Fin au bout du minuteur."
+  },
+  "sub_10BD2": {
+    "new_name": "MVRS_ID15_ApplyStallRecovery_10BD2",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Lancement de la manœuvre 15 : minuteur 8 s, puis le tick."
+  },
+  "sub_10C09": {
+    "new_name": "MVRS_ID15_TickStallRecovery_10C09",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Tick de la manœuvre 15 : comme celui de la 14 avec une assiette voulue de +5°."
+  },
+  "sub_A58C": {
+    "new_name": "AI_Eject_A58C",
+    "segment": "seg021",
+    "summary": "far. LUE 2026-11-15. Si le modèle a un siège éjectable ([+6Dh]) : crée l'objet d'éjection (nom en +6Fh, sub_750CF), réplique 9 forcée, bit 5 de [modèle+92h] posé (pilote éjecté) ; sinon réplique 10 forcée."
+  },
+  "sub_FE3D": {
+    "new_name": "AI_ScanCollisionThreats_FE3D",
+    "segment": "seg025",
+    "summary": "far. LUE 2026-11-15. Pendant un évitement ([entité+0Dh] et réaction [entité+495] = 3) : tick du comportement, renvoie 1. Sinon remet la réaction 3 à 0 et teste les objets de type 6 (sauf lui-même) par AI_CollisionCourse_FBE7 ; renvoie 1 au premier qui déclenche un évitement."
+  },
+  "sub_FBE7": {
+    "new_name": "AI_CollisionCourse_FBE7",
+    "segment": "seg025",
+    "summary": "far. LUE 2026-11-15. Collision si l'autre avion est à moins de 50 m (même camp) ou 25 m (ennemi), ou si la vitesse relative le rapproche avec un passage à moins de 50 m dans les 4 s (distance × sin < 50, distance × cos ≤ 4 × vitesse relative). Alors AI_CollisionAvoid_BD4C(entité, position de l'autre, sa position dans 4 s), réaction [entité+495] = 3, formation serrée décrochée ([entité+353] = 0)."
+  },
+  "sub_BD4C": {
+    "new_name": "AI_CollisionAvoid_BD4C",
+    "segment": "seg022",
+    "summary": "far. LUE 2026-11-15. Direction d'évitement = (ma position − A) × (B − A) (produit vectoriel), sans composante descendante sous 600 m d'altitude ; abandonne le comportement en cours et lance le nœud 20 avec cette direction et 2 s."
+  },
+  "sub_106EE": {
+    "new_name": "MVRS_ID20_ApplyAvoid_106EE",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Lancement du nœud 20 : sans vecteur dans la demande, fin ; sinon minuteur de la demande, direction rangée en [nœud+11h], pilote automatique coupé ([modèle+85h] = 0FFh), puis le tick."
+  },
+  "sub_10783": {
+    "new_name": "MVRS_ID20_TickAvoid_10783",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Tick du nœud 20 : manette 10, direction voulue (dword_7C811) = la direction rangée ; fin au bout du minuteur."
+  },
+  "sub_107ED": {
+    "new_name": "MVRS_ID21_ApplyNavigation_107ED",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Lancement du nœud 21 : drapeau « point atteint » du bloc de commandes à 0, minuteur de la demande, puis le tick."
+  },
+  "sub_10839": {
+    "new_name": "MVRS_ID21_TickNavigation_10839",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Tick du nœud 21 : vitesse voulue = champ 23 du JDYN ; pilote automatique coupé : engagé si |assiette| < 15°, sinon assiette voulue 0 ; fin (pilote automatique coupé) au bout du minuteur ou quand le point est atteint."
+  },
+  "sub_10409": {
+    "new_name": "MVRS_ApplyCommon_10409",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Partie commune des lancements de nœud : le nœud devient le comportement en cours de l'entité ([entité+0Dh]) et garde l'ancien."
+  },
+  "sub_1043A": {
+    "new_name": "MVRS_ScoreZero_1043A",
+    "segment": "seg026",
+    "summary": "far. LUE 2026-11-15. Note toujours nulle (nœuds 20 et 21, hors tournoi)."
+  },
+  "sub_13F3F": {
+    "new_name": "GroundAttack_Phase0_Strafe_13F3F",
+    "segment": "seg029",
+    "summary": "far. LUE 2026-11-15. Phase 0 (canon) : sans cible, phase 10 (3 s). Direction voulue = la cible ; nez à moins de 5° : à moins de 2500 m, nez recalé sur la cible et tir (bit 1 de [commandes+1Bh]), minuteur 2 s ; à moins de 600 m, phase 10 (10 s). Nez à plus de 35° et cible à moins de 2000 m : s'éloigne (direction opposée, altitude cible + 500 m)."
+  },
+  "sub_14135": {
+    "new_name": "GroundAttack_Phase1_Rockets_14135",
+    "segment": "seg029",
+    "summary": "far. LUE 2026-11-15. Phase 1 (roquettes) : comme la phase 0 avec les seuils 2500 m (tir et éloignement) et 1000 m (phase 10, 10 s)."
+  },
+  "sub_143BE": {
+    "new_name": "GroundAttack_Phase2_LevelBomb_143BE",
+    "segment": "seg029",
+    "summary": "far. LUE EN PARTIE 2026-11-15. Phase 2 (bombardement à plat) : anticipe le point d'impact (cible mobile : position + vitesse × temps), cap à moins de 70° ; largage (bit 1, sub_3F17A) quand l'impact tombe sur la cible ; plus de bombe : phase 10."
+  },
+  "sub_14A59": {
+    "new_name": "GroundAttack_Phase3_DiveApproach_14A59",
+    "segment": "seg029",
+    "summary": "far. LUE EN PARTIE 2026-11-15. Phase 3 (approche du piqué, bombardier en piqué) : rejoint l'altitude d'approche en s'alignant ; aligné à moins de 5° et en position, phase 4 (25 s)."
+  },
+  "sub_14EDF": {
+    "new_name": "GroundAttack_Phase4_Dive_14EDF",
+    "segment": "seg029",
+    "summary": "far. LUE 2026-11-15. Phase 4 (piqué) : sub_AF37 (guidage vers la cible) ; sous 666 m de hauteur, largage (bit 1) et phase 10 (15 s) ; sous 600 m, phase 10 (8 s). La protection anti-sol est coupée ([nœud+71] = 1)."
+  },
+  "sub_154B0": {
+    "new_name": "GroundAttack_Phase5_Torpedo_154B0",
+    "segment": "seg029",
+    "summary": "far. LUE EN PARTIE 2026-11-15. Phase 5 (torpille) : cap à moins de 70°, largage (bit 1) entre 700 et 1525 m de la cible, puis phase 10 (2 s)."
+  },
+  "sub_157BA": {
+    "new_name": "GroundAttack_Phase8_NextPass_157BA",
+    "segment": "seg029",
+    "summary": "far. LUE EN PARTIE 2026-11-15. Phase 8 : rechoisit l'arme (sub_3F219, sub_3F17A) et la phase d'une nouvelle passe (3, 2, 5, 0 ou 1), ou fin (9)."
+  },
+  "sub_14325": {
+    "new_name": "GroundAttack_Phase10_PullUp_14325",
+    "segment": "seg029",
+    "summary": "far. LUE 2026-11-15. Phase 10 (ressource) : assiette voulue +8°, roulis 0, vitesse = champ 23 du JDYN."
+  },
+  "sub_14353": {
+    "new_name": "GroundAttack_Phase11_Egress_14353",
+    "segment": "seg029",
+    "summary": "far. LUE 2026-11-15. Phase 11 (dégagement) : direction opposée à la cible, vitesse = champ 23 du JDYN."
+  },
+  "sub_403A8": {
+    "new_name": "Swpn_TurretUpdate_403A8",
+    "segment": "seg102",
+    "summary": "far, mise à jour d'une tourelle SWPN (lue 2026-11-15, partiellement : la recherche de cible et le tir). Objet porteur en [si+24h] (classe 6 = pilote éjecté → rien) ; cible cherchée par sub_1EE4B(…, portée = modèle +4Dh, 180, 1, 6) puis sub_1EA93 (camp ennemi, pilote non éjecté), gardée en [si+52h] ; minuteur de tir [si+58h] décrémenté du pas de temps dword_7976E. Si la distance est sous la portée (modèle +51h, `shl eax, 8 / cmp eax, [bp+var_24]`) : direction de la cible avec avance, ramenée dans le repère du porteur puis dans celui de la tourelle (Matrix_WorldToLocal_5A569 deux fois), élévation = Math_AsinDeg_567D3 de la composante haute normalisée dans le plan avant/haut, gisement = −asin de la composante droite normalisée dans le plan droite/avant (positif vers la gauche) ; commande bornée par la vitesse de rotation (modèle +55h × 10 × pas de temps) et passée à Swpn_TurretSlewClamp_40C5B : le tir n'a lieu que si elle renvoie 1 (angle non bloqué par le secteur GARC) et si la commande ne dépassait pas la vitesse de rotation. Tir par sub_4F791."
+  },
+  "sub_40C5B": {
+    "new_name": "Swpn_TurretSlewClamp_40C5B",
+    "segment": "seg102",
+    "summary": "far (lue 2026-11-15), tourne la tourelle et applique son secteur de tir. Ajoute les 3 incréments d'angle à [+64h] (élévation), [+68h], [+6Ch] (gisement) ; borne [+64h] entre [+5Ch] (max) et [+5Eh] (min), [+6Ch] entre [+60h] (max) et [+62h] (min), bornes = chunk GARC recopié par Swpn_InitInstance_B0A21 ; un axe dont la borne max vaut 180 ou plus, ou la borne min −180 ou moins, n'est pas borné (`cmp word ptr [bx+5Ch], 0B4h` / `cmp word ptr [bx+5Eh], 0FF4Ch`). Renvoie 0 si un angle a été bloqué, 1 sinon. Reconstruit ensuite la matrice de la tourelle (méthodes +40h et +2Ch)."
+  },
+  "sub_B0710": {
+    "new_name": "Swpn_LoadModel_B0710",
+    "segment": "ovr316",
+    "summary": "far (lue 2026-11-15, partiellement), lecture du FORM SWPN d'un modèle : champs du chunk DATA rangés au modèle (+51h portée, +55h vitesse de rotation, +57h, +5Bh, +5Ch nom d'arme, +60h), puis chunk GARC (`push large 43524147h`) : 4 mots rangés à +64h, +66h, +68h, +6Ah = élévation max, élévation min, gisement max, gisement min en degrés ; puis un chunk 'XBRL' (`push large 4C524258h`, rôle non établi) ; enfin recherche du modèle de l'arme par Debris_FindModelByID."
+  },
+  "sub_B0A21": {
+    "new_name": "Swpn_InitInstance_B0A21",
+    "segment": "ovr316",
+    "summary": "far (lue 2026-11-15, partiellement), initialisation d'une tourelle SWPN : recopie le secteur GARC du modèle ([+0Eh]) dans l'instance (+64h → +5Ch, +66h → +5Eh, +68h → +60h, +6Ah → +62h) et remet à zéro ses angles courants +64h, +68h, +6Ch."
+  },
+  "sub_AAC15": {
+    "new_name": "Object_LoadModelChunks_AAC15",
+    "segment": "ovr297",
+    "summary": "far (lue 2026-11-15, partiellement), lecture des chunks communs d'un modèle d'objet : DAMG, un chunk de nom, TRGT, SIGN, puis CHLD (`push large 444C4843h`) : enregistrements de 32 octets (nom 8 octets, décalage 3 × i32 en 24.8, 3 angles i32 en 24.8), rangés en enregistrements de 57 octets (nom +0, décalage +9/+0Dh/+11h, matrice d'orientation +15h construite par Matrix_BuildFullOrientation_5937B dans l'ordre angle 1 (axe X), angle 2 (axe Y), angle 3 (axe vertical)) ; puis SHAD."
+  },
+  "sub_5BBF8": {
+    "new_name": "Music_CombatIntensitySelector_5BBF8",
+    "segment": "seg133",
+    "summary": "far (lue 2026-11-15). Équivalent de Music_CombatIntensitySelector_59302 de STRIKE.EXE, pistes de Pacific Strike. Sort sans rien choisir si byte_7769E, byte_77698, byte_7CEF8 == 12, byte_7D06A == 11 ou byte_79D76 == 3. Repérage des ennemis (Music_ScanNearbyEnemies_5B962, résultat dans byte_79D88). Pistes « verrouillées » (table off_5BD55) : si la piste en attente word_79D77 est 4, 11, 12, 15, 16 ou 19, les choix 9 et 1 et le retour à la piste de la mission sont bloqués, sauf si word_7D06D et sub_1DC07(word_7D06D+4, word_7D06F) == 2. Ennemi proche : byte_79D87 = 1, puis première règle vraie : 13 si word_7CAE2 (un ennemi attaque le joueur ; même champ que l'option k de Radio_PlayerMenu_97C10) ; 18 si Music_TargetWithinRange_5B85C (cible du joueur à moins de 1 500 m) ; 2 si DamageSys_IsCriticallyDamaged_41658 ; 10 si DamageSys_IsSeriouslyDamaged_41612 ; 9 si un avion ennemi est proche ; 1 sinon (menaces au sol seules). Aucun ennemi : Music_SelectTuneCandidate_5BB21(mode 0) ; s'il ne choisit rien et sans verrou, piste de la mission byte_79B8E. Résultat dans word_79D77."
+  },
+  "sub_5B962": {
+    "new_name": "Music_ScanNearbyEnemies_5B962",
+    "segment": "seg133",
+    "summary": "far (lue 2026-11-15). Équivalent de Music_ScanNearbyEnemies_590E0. Exécute d'abord le script de mission ([word_79B8C+5Fh], entrée +40h) ; si la variable de jeu GameVar_Get(GameVar_Get(255) + 256) est posée, les objets de catégorie 1 sont ignorés. Objets de catégorie 1, 6, 19, 20, 21, 23, 24 (table word_5BB05), du camp 255, à moins de 18 520 m du joueur (`cmp [bp+var_12], 4858h`), sauf l'objet passé en argument et les avions dont le pilote s'est éjecté (bit 5 de +92h) : bit 0 = avion (catégorie 6), bit 1 = autre. S'arrête dès que les deux bits sont posés."
+  },
+  "sub_5B85C": {
+    "new_name": "Music_TargetWithinRange_5B85C",
+    "segment": "seg133",
+    "summary": "far (lue 2026-11-15). Cible du joueur ([word_7CADA+5Fh] puis +0Eh, le champ que Radio_PlayerMenu_97C10 teste pour l'option i, « attaquer ma cible ») : vrai si c'est un avion (catégorie 6), pilote non éjecté (bit 5 de +92h), et que sa distance au joueur × dword_79762 est sous 1 500 m (`cmp eax, 5DCh`). Pas de test d'angle. Remplace le test « ennemi dans les six heures » de STRIKE.EXE."
+  },
+  "sub_5BB21": {
+    "new_name": "Music_SelectTuneCandidate_5BB21",
+    "segment": "seg133",
+    "summary": "far (lue 2026-11-15). Équivalent de Music_SelectTuneCandidate_5923A. Mode 1 (destruction, objet en argument) : nouveau repérage sans l'objet ; s'il reste des ennemis, que byte_79D88 avait le bit 0 (avion proche) et qu'il n'y a plus d'avion → piste 1 ; s'il n'en reste aucun alors qu'il y en avait → étape suivante. Mode 0 → étape suivante. Étape : script de mission ([word_79B8C+5Fh], entrée +40h) ; si GameVar_Get(GameVar_Get(255) + 256) et sub_1AC03([word_79B8C]+79h) → 17 ; sinon si byte_79D87 (un combat a eu lieu) → 3 et byte_79D87 = 0. Écrit word_79D77 et renvoie 1 si une piste est choisie."
+  },
+  "sub_41658": {
+    "new_name": "DamageSys_IsCriticallyDamaged_41658",
+    "segment": "seg103",
+    "summary": "far (lue 2026-11-15). Comme DamageSys_IsSeriouslyDamaged_41612 avec un seuil de 90 % : 1 si DamageSys_PercentOfSystem_41595 du système 0, 4 ou 3 dépasse 90 (`cmp al, 5Ah`)."
+  },
+  "sub_553B6": {
+    "new_name": "World_OnObjectDestroyed_553B6",
+    "segment": "seg125",
+    "summary": "far (lue 2026-11-15, partie musique). Équivalent de World_OnObjectDestroyed_53A94. Joueur détruit : SetReference16(63ACh). Rien si byte_77698. Musique pour les catégories 1, 6, 19, 20, 21, 23, 24 (table word_55747), sauf avion dont le pilote s'est éjecté. Objet du camp 255 : Music_OnObjectDestroyed_5EE68 ; s'il ne change rien et que le joueur est l'auteur : ponctuation 16 (avion), 12 (catégorie 1, 19, 20), 15 (autres), remplacée par 15 dans 11 % des cas (CRT_Rand × 100 / 32768 < 11). Objet du camp 1 : piste 19 ou 4, au hasard (Math_RandomScale_56C2F(2))."
+  },
   "sub_5EB62": {
     "new_name": "SoundFX_Play_5EB62",
     "segment": "seg139",
-    "summary": "far. LUE 2026-11-25. Façade « jouer l'effet n » (effet, distance, émetteur). Numérique d'abord : si les sons numériques sont actifs (byte_7CB1C, objet word_79E73) et que l'effet synthétisé n ne joue pas déjà, DigitalSFX_PlayEffect_5B04F. S'il n'a rien joué : si les effets synthétisés sont actifs (byte_7CB1A, objet word_79E6D), SoundFX_Play3D_5C68A puis DigitalSFX_StopEffect_5B328(n)."
+    "summary": "far (lue 2026-11-15). Façade d'un effet sonore (numéro d'effet, distance au point de vue en mètres, émetteur) : si les sons numérisés sont actifs (byte_7CB1C, objet word_79E73) et que l'effet XMIDI n'est pas déjà joué, DigitalSFX_PlayEffect_5B04F ; sinon séquence XMIDI de même numéro (SoundFX_Play3D_5C68A sur word_79E6D, si byte_7CB1A). 21 appels."
   },
   "sub_5EBFB": {
     "new_name": "SoundFX_PlayOrUpdate_5EBFB",
     "segment": "seg139",
-    "summary": "far. LUE 2026-11-25. Façade pour un son tenu (canon…) : numérique d'abord (sauf si la version synthétisée joue déjà) ; s'il joue, arrêt de la version synthétisée ; sinon synthèse : SoundFX_Play3D_5C68A si l'effet ne joue pas, SoundFX_UpdateVolume3D_5C75B sinon, et arrêt du numérique."
+    "summary": "far (lue 2026-11-15, en partie). Même façade pour un effet entretenu (numéro, distance, émetteur) : rejoue ou arrête selon SoundFX_IsPlaying_5C85F. Tir du canon (sub_3E640, effet 1), tir des tourelles (Swpn_TurretUpdate_403A8, effet 24 ou 0 selon le champ +73h du modèle de l'arme)."
   },
-  "sub_5ECE8": {
-    "new_name": "SoundFX_Stop_5ECE8",
+  "sub_5F202": {
+    "new_name": "SoundFX_PlayDigitalRank_5F202",
     "segment": "seg139",
-    "summary": "far. LUE 2026-11-25. Façade : arrête l'effet n de l'émetteur dans les deux parties (DigitalSFX_StopEffect_5B328 et SoundFX_StopEffect_5C812)."
-  },
-  "sub_5EB2A": {
-    "new_name": "Sound_StopAll_5EB2A",
-    "segment": "seg139",
-    "summary": "far. LUE 2026-11-25. Arrête la musique (word_79E6F), les effets synthétisés (word_79E6D) et la voix (word_79E71) s'ils existent."
-  },
-  "sub_5F28E": {
-    "new_name": "Sound_FrameUpdate_5F28E",
-    "segment": "seg139",
-    "summary": "far. LUE 2026-11-25. Équivalent de Sound_FrameUpdate_5AB79 de STRIKE. Passage d'avion (SoundFX_CheckFlyBy_5F005) → DigitalSFX_PlayEffect_5B04F(10, 750 × résultat) : 1 → 750 (variante proche), 2 → 1500 (lointaine) ; pas de version synthétisée. Moteur : si byte_7CB1D, DigitalSFX_EngineTick_5B434 (s'il joue : arrêt de l'effet synthétisé 13), sinon effet synthétisé (sub_5C90D) seulement musique coupée (byte_7CB19 = 0) ; byte_7CB1D à 0 : effet 13 arrêté des deux côtés. Puis SoundFX_Tick_5C898, voix (sub_5E9F9), musique une image sur 16, DigitalSFX_Tick_5B206."
-  },
-  "sub_5F005": {
-    "new_name": "SoundFX_CheckFlyBy_5F005",
-    "segment": "seg139",
-    "summary": "far. LUE 2026-11-25. Passage d'avion près du point de vue (word_7CEF9) : avion (type 6) autre que celui suivi, à moins de 200 m, angle de croisement > 30° : rend 2 (30 à 80°) ou 1 (> 80°) ; sinon 0."
+    "summary": "far (lue 2026-11-15). Joue directement le son numérisé de rang n (sub_5B12B) ; repli XMIDI seulement pour n = 9, sinon erreur D005h."
   },
   "sub_5AE86": {
     "new_name": "DigitalSFX_Construct_5AE86",
     "segment": "seg132",
-    "summary": "far. LUE 2026-11-25. Objet des sons numériques (203 octets) : table de 50 entrées de 4 octets (octet 0 = numéro d'effet servi, 255 = libre ; octets 1-2 = émetteur ; octet 3 : bit 0 boucle, bit 1 à relancer, bit 2 variante lointaine, distance > 1000), écrite en dur ici (voir analysis/SOUND_EFFECTS.md § 3.2) ; [+200] = échantillon en cours (−1)."
-  },
-  "sub_5B682": {
-    "new_name": "DigitalSFX_InitEntry_5B682",
-    "segment": "seg132",
-    "summary": "far. LUE 2026-11-25. Entrée de la table : effet 255, émetteur 0, bits à 0."
+    "summary": "far (lue 2026-11-15). Construit l'objet des sons numérisés : tableau de 50 entrées de 4 octets (une par son de SOUND\\DSOUNDFX.PAK mis à plat, sous-archive 0 puis 1), octet 0 = numéro d'effet, octet 3 bit 0 = boucle, bit 2 = variante lointaine. Rang → effet : 0→9, 1→8, 2→0, 3→1, 4→26, 5→5, 6→6, 7→7, 8→11, 9→18, 11→20, 12→21, 13 à 18→2, 3, 4, 2, 3, 4 (lointaines), 19→19, 20→15, 21→16, 23→23, 24→24, 25→25 (boucle), 26→10, 27 à 37→12 (boucle), 38 à 47→13 (boucle), 49→22 (boucle) ; rangs 10, 22 et 48 sans numéro écrit (48 a le drapeau de boucle) ; [+0C8h] = -1."
   },
   "sub_5B04F": {
     "new_name": "DigitalSFX_PlayEffect_5B04F",
     "segment": "seg132",
-    "summary": "far. LUE 2026-11-25. (objet, effet, distance, émetteur) : cherche la première entrée de cet effet dont la variante (bit 2 de l'octet 3) correspond à distance > 1000 ; parmi les entrées suivantes identiques, en tire une au hasard (CRT_Rand) ; DigitalSFX_RequestSample_5B12B. Rend 0 si l'effet n'a pas d'échantillon (la façade passe alors à la synthèse)."
-  },
-  "sub_5B12B": {
-    "new_name": "DigitalSFX_RequestSample_5B12B",
-    "segment": "seg132",
-    "summary": "far. LUE 2026-11-25. Un seul canal numérique. Refus si word_7974E (moins de 3 000 000 octets libres) et rang ≥ 4, ou si une voix joue (sub_5EFBF(2)). Accepté si rien ne joue, si l'échantillon en cours est du même effet, ou si le rang demandé est plus petit (priorité au plus petit rang) : rang noté en [+200], bit 1 posé, émetteur rangé."
-  },
-  "sub_5B206": {
-    "new_name": "DigitalSFX_Tick_5B206",
-    "segment": "seg132",
-    "summary": "far. LUE 2026-11-25. Lance l'échantillon demandé : DigitalSFX_PlaySampleFromPak_5EF6D(DSOUNDFX.PAK, banque 0 et rang si rang < 4, sinon banque 1 et rang − 4, boucle = bit 0). Canal libre : relance la première entrée qui a le bit 1 (sons en boucle)."
-  },
-  "sub_5B328": {
-    "new_name": "DigitalSFX_StopEffect_5B328",
-    "segment": "seg132",
-    "summary": "far. LUE 2026-11-25. Arrête toutes les entrées de l'effet n (sub_5B364)."
-  },
-  "sub_5B434": {
-    "new_name": "DigitalSFX_EngineTick_5B434",
-    "segment": "seg132",
-    "summary": "far. LUE 2026-11-25. Moteur numérique de l'avion suivi par la caméra (le joueur si byte_7769B) : cran de manette c (≥ 1) → échantillon 27 + c en vue cockpit (méthode +20 de la caméra = 4), sinon 38 + c. Avec byte_76D44 (plus de 4 500 000 octets libres), le cran entendu suit le vrai cran d'un pas à la fois. Rend 1 s'il joue."
-  },
-  "sub_5EF6D": {
-    "new_name": "DigitalSFX_PlaySampleFromPak_5EF6D",
-    "segment": "seg139",
-    "summary": "far. LUE 2026-11-25. Si byte_7CB1C et la voix (word_79E71) existent : sub_5E355(voix, nom, banque, rang, 1, boucle) — lecture d'une entrée d'un fichier PAK chargé par son nom."
-  },
-  "sub_5C898": {
-    "new_name": "SoundFX_Tick_5C898",
-    "segment": "seg134",
-    "summary": "far. LUE 2026-11-25. Libère le canal d'effet synthétisé (un seul, marque libre 28) dont la séquence est finie."
+    "summary": "far (lue 2026-11-15). Cherche dans la table de DigitalSFX_Construct_5AE86 la première entrée du numéro d'effet dont la variante lointaine (bit 2 de l'octet 3) vaut (distance > 1 000), compte les entrées consécutives identiques, en tire une au hasard (CRT_Rand) et la joue (sub_5B12B)."
   },
   "sub_3677E": {
-    "new_name": "Ground_IsWaterUnderPoint_3677E",
+    "new_name": "Ground_IsSeaLevel_3677E",
     "segment": "seg086",
-    "summary": "far. LUE 2026-11-25. 1 si Ground_HeightUnderPoint_3664D rend au plus 2 m (512 en 24.8) : sol au niveau de la mer."
+    "summary": "far (lue 2026-11-15). Vrai si le sol sous le point (Ground_HeightUnderPoint_3664D) est à 2 m ou moins (`cmp [bp+var_4], 200h`) : point au-dessus de la mer."
   },
-  "sub_3D7AE": {
-    "new_name": "Aircraft_Update_3D7AE",
-    "segment": "seg098",
-    "summary": "far. LUE EN PARTIE 2026-11-25. Équivalent d'Aircraft_Update_3DEFB de STRIKE pour le train : effet 5 quand le train rentre, 6 quand il sort, pour le joueur quand la caméra suit le joueur (objet suivi = joueur, ou son +36 = joueur), après 5 images."
+  "sub_75C8": {
+    "new_name": "PakReader_ReadEntry_75C8",
+    "segment": "seg011",
+    "summary": "far (lue 2026-11-15). Lit l'entrée n d'un PAK (sub_7844 place le flux et range le type en [+6Dh]) ; selon les bits 0C0h du type : 00h → sub_7553, 40h (type 3) → sub_1C401 (PKWARE DCL), 80h (type 5) → SpeechCodec_DecompressEntry_1C574, 0C0h → lecture brute."
   },
-  "sub_3F391": {
-    "new_name": "WeaponSystem_ReleaseBomb_3F391",
-    "segment": "seg099",
-    "summary": "far. LUE EN PARTIE 2026-11-25. Lâcher d'une bombe (WeaponSystem_LaunchFromStation_3E2EC, catégories 9 et 26) : effet 7 à la distance de la caméra."
+  "sub_1C574": {
+    "new_name": "SpeechCodec_DecompressEntry_1C574",
+    "segment": "seg044",
+    "summary": "far (lue 2026-11-15). Entrée de type 5 : u32 taille décompressée, puis blocs (u16 longueur en-tête compris, u16 nombre d'échantillons, octet 6 = table, octet 7 = ordre du filtre). Chaque bloc est décodé par SpeechCodec_DecodeBlock_7CF8 dans un tampon remis à 0 sur 6 000 octets (sub_380B), puis recopié à partir de l'octet 7 (sub_37C3)."
   },
-  "sub_3F657": {
-    "new_name": "WeaponSystem_LaunchRocket_3F657",
-    "segment": "seg099",
-    "summary": "far. LUE EN PARTIE 2026-11-25. Départ d'une roquette (catégorie 8) : effet 26, non positionné."
+  "sub_7CF8": {
+    "new_name": "SpeechCodec_DecodeBlock_7CF8",
+    "segment": "seg012",
+    "summary": "far (lue 2026-11-15). Contrôle XOR des mots du bloc = 0ACEDh ; SpeechCodec_DecodeValues_7C3F (table = octet 6, nombre = mot 2, données après 8 + 2 × octet 7) ; si l'octet 7 n'est pas nul, SpeechCodec_PredictionFilter_797C avec les mots 8.. comme coefficients. Suivie de la chaîne « Copyright 1993 … Speech Compression; all rights reserved »."
   },
-  "sub_4E3C0": {
-    "new_name": "Weapon_OnImpact_4E3C0",
-    "segment": "seg118",
-    "summary": "far. LUE 2026-11-25. Équivalent de loc_4DECF de STRIKE : objet touché = joueur en vue cockpit (byte_7CEF8 = 4) → effet 8 ; sinon effet 9 à la distance de la caméra."
+  "sub_7C3F": {
+    "new_name": "SpeechCodec_DecodeValues_7C3F",
+    "segment": "seg012",
+    "summary": "near (lue 2026-11-15). Pour chaque échantillon : rang = nombre de bits 1 en bas de l'octet courant (table cs:55h), longueur du code, nombre de bits de la valeur et masque dans la table de 27 octets cs:155h + (paramètre − 8) × 27 ; la valeur (signe étendu, masque, décalage) donne un octet non signé."
   },
-  "sub_4F13B": {
-    "new_name": "Tracer_OnImpact_4F13B",
-    "segment": "seg119",
-    "summary": "far. LUE EN PARTIE 2026-11-25. Impact d'une traçante : sur l'eau (Ground_IsWaterUnderPoint_3677E) effet 15 ; sinon objet d'impact créé et effet 21, à la distance de la caméra."
-  },
-  "sub_3D019": {
-    "new_name": "Aircraft_ApplyHitDamage_3D019",
-    "segment": "seg097",
-    "summary": "far. LUE EN PARTIE 2026-11-25. Dégâts reçus par un avion (dégâts divisés par 2 pour le joueur avec Flight Model Veteran ou Rookie) : effet 8 si c'est le joueur, sinon 9 (non positionné) ; puis sub_3F8AD."
+  "sub_797C": {
+    "new_name": "SpeechCodec_PredictionFilter_797C",
+    "segment": "seg012",
+    "summary": "near (lue 2026-11-15). Filtre de prédiction d'ordre n : à chaque échantillon, retranche la somme des n précédents (signés) × coefficients (mots), arrondie à 1/4 096."
   }
 }

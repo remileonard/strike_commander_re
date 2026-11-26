@@ -39,7 +39,7 @@ sub_741CA	endp
 ; Attributes: thunk
 
 sub_741CF	proc far
-		jmp	sub_AAC15
+		jmp	Object_LoadModelChunks_AAC15
 sub_741CF	endp
 
 ; ----------------------------------------------------------------------

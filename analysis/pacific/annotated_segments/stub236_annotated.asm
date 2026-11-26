@@ -135,7 +135,7 @@ sub_72F96	endp
 ; Attributes: thunk
 
 sub_72F9B	proc far
-		jmp	sub_84B24
+		jmp	MVRS_CreateProfileNode_84B24
 sub_72F9B	endp
 
 ; ----------------------------------------------------------------------

@@ -29,7 +29,13 @@ sub_A037		endp
 
 ; Attributes: bp-based frame
 
-sub_A03C		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Note de la manœuvre 3 (esquive) : 0 si la cible n'est pas un avion, si
+; elle ne vise pas l'avion (word_7C7D7 > 20°), si elle n'est pas derrière (|word_7C7D3| <
+; 150°) ou si elle est à plus de 2000 m. Niveau 2 : 0 si la dernière manœuvre finie était la 3
+; ou au-delà de 1000 m, sinon 4. Autres niveaux : 5 à moins de 1000 m, sinon 4.
+; ==============================================================================================
+MVRS_ID3_ScoreJink_A03C		proc far
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -88,13 +94,20 @@ loc_A0B9:
 loc_A0BB:
 		leave
 		retf
-sub_A03C		endp
+MVRS_ID3_ScoreJink_A03C		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_A0BD		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Note de la manœuvre 5 (Immelmann) : 0 si la cible n'est pas un avion,
+; au-dessus de 8333 m, si la vitesse est inférieure à champ 23 ÷ 2 + 2 × champ 24 du JDYN, si
+; l'assiette sort de −10° à +20°, ou si les systèmes 4, 3 et 0 ont des dégâts (sub_415CD). 7
+; de face à moins de 200 m (cible < 20° du nez, nez opposés > 160°). Sinon : + 3 sous 1000 m ;
+; + 3 si la cible est à plus de 150° du nez, + 1 à plus de 90°.
+; ==============================================================================================
+MVRS_ID5_ScoreImmelmann_A0BD		proc far
 
 var_A		= word ptr -0Ah
 var_8		= word ptr -8
@@ -202,13 +215,19 @@ loc_A1A3:
 loc_A1A6:
 		leave
 		retf
-sub_A0BD		endp
+MVRS_ID5_ScoreImmelmann_A0BD		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_A1A8		proc far
+; ==============================================================================================
+; far. LUE 2026-11-14. Note du nœud 7 (vol vers la cible) : 5 si la cible est un avion
+; (byte_7C7C2 = 6), sinon 0. Pendant le tournoi, la direction voulue dword_7C811 vaut le nez
+; (MVRS_SetupOwnState_9578) : la qualité de visée du nœud 22 prend un écart nul, il note 10 à
+; moins de 2000 m et l'emporte sur ce 5.
+; ==============================================================================================
+MVRS_ID7_ScoreFollowTarget_A1A8		proc far
 		push	bp
 		mov	bp, sp
 		cmp	byte_7C7C2, 6
@@ -222,13 +241,18 @@ loc_A1B6:
 loc_A1B8:
 		pop	bp
 		retf
-sub_A1A8		endp
+MVRS_ID7_ScoreFollowTarget_A1A8		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_A1BA		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Note de la manœuvre 14 : 0 si la dernière manœuvre finie est l'attaque
+; au sol (19) ou sous pilote automatique ; 10 si l'avion pique sous le plancher de son niveau
+; (word_7C804) ; sinon 0.
+; ==============================================================================================
+MVRS_ID14_ScoreGroundAvoid_A1BA		proc far
 
 arg_0		= word ptr  6
 
@@ -272,13 +296,18 @@ loc_A211:
 loc_A213:
 		pop	bp
 		retf
-sub_A1BA		endp
+MVRS_ID14_ScoreGroundAvoid_A1BA		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_A215		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Note de la manœuvre 15 : 0 sous pilote automatique ; 10 si le bit 6 de
+; [modèle+146] est posé, ou si l'avion monte plus lentement que le champ 24 du JDYN ; sinon 0.
+; Le même test déclenche le réflexe 15 dans AI_TopLevelThink_B0C4.
+; ==============================================================================================
+MVRS_ID15_ScoreStallRecovery_A215		proc far
 
 arg_0		= word ptr  6
 
@@ -329,13 +358,20 @@ loc_A273:
 loc_A275:
 		pop	bp
 		retf
-sub_A215		endp
+MVRS_ID15_ScoreStallRecovery_A215		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_A277		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Note de la manœuvre 4 (dégagement en montée) : 0 si la cible n'est pas
+; un avion ou au-dessus de 8333 m de hauteur ; 9 si la dernière manœuvre finie était la 6 ; 0
+; si la cible est à moins de 90° du nez, ou si elle vise l'avion (< 90°) à moins de 2000 m.
+; Dernière manœuvre 4 : 9 sous 1000 m, sinon + 3. Visée de la cible < 155° : + 1, sinon + 3.
+; Sous le plancher du niveau : + 4, sinon sous 1000 m : + 2. Plafond 8.
+; ==============================================================================================
+MVRS_ID4_ScoreClimbAway_A277		proc far
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -426,13 +462,21 @@ loc_A32F:
 loc_A331:
 		leave
 		retf
-sub_A277		endp
+MVRS_ID4_ScoreClimbAway_A277		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_A333		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Note de la manœuvre 6 (split-S) : 0 si la cible n'est pas un avion, si
+; elle ne vise pas l'avion (> 30°), au-delà de 1800 m, si l'assiette sort de −12° à +20°, si
+; la dernière manœuvre finie n'est pas la 7, ou sous 2 × le plancher du niveau. Sinon : + 2 si
+; la vitesse est inférieure à 2 × champ 24 du JDYN ; + 2 si la cible est à plus de 135° du nez
+; ; + 4 à moins de 4000 m ; + 1 si l'octet +167 du JDYN ≥ 3 ; − 1 si l'octet +168 ≥ 3. Plafond
+; 8.
+; ==============================================================================================
+MVRS_ID6_ScoreSplitS_A333		proc far
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -518,5 +562,5 @@ loc_A3E8:
 loc_A3FB:
 		cmp	cx, 8
 		jle	short loc_A404
-sub_A333		endp
+MVRS_ID6_ScoreSplitS_A333		endp
 seg020		ends

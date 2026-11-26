@@ -1218,7 +1218,7 @@ loc_5DDC6:
 		push	di
 		lea	ax, [bp+var_80]
 		push	ax
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 		push	2
 		lea	ax, [bp+var_80]

@@ -37,7 +37,14 @@ sub_9558		endp
 
 ; Attributes: bp-based frame
 
-sub_9578		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-14. Avant la réflexion de l'IA : remet le manche du bloc de
+; commandes à 0, copie mon nez dans dword_7C81D et dans la direction voulue dword_7C811, ma
+; vitesse dans word_7C829 et word_7C82B, mon roulis dans word_7C831/33, mon assiette dans
+; word_7C82D/2F, ma position dans dword_7C83B, ma hauteur au-dessus du sol dans dword_7C837 ;
+; manette à 10.
+; ==============================================================================================
+MVRS_SetupOwnState_9578		proc far
 
 var_3C		= dword ptr -3Ch
 var_38		= dword ptr -38h
@@ -211,7 +218,7 @@ loc_96C9:
 		pop	si
 		leave
 		retf
-sub_9578		endp
+MVRS_SetupOwnState_9578		endp
 
 ; ----------------------------------------------------------------------
 
@@ -256,7 +263,13 @@ sub_978B		endp
 
 ; Attributes: bp-based frame
 
-sub_97D3		proc far
+; ==============================================================================================
+; far. LUE 2026-11-14. (précédent, mesuré) → état retenu. Précédent 0, 5 ou 6 : le mesuré.
+; Précédent 1 : mesuré 2, 4 ou 6 ; mesuré 5 → 3 ; sinon 1. Précédent 2 : mesuré 1, 3 ou 5 ;
+; mesuré 6 → 4 ; sinon 2. Précédent 3 : mesuré 1, 2, 4 ou 6 ; sinon 3. Précédent 4 : mesuré 1,
+; 2, 3 ou 5 ; sinon 4.
+; ==============================================================================================
+MVRS_SpeedStateHysteresis_97D3		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -342,9 +355,9 @@ loc_9852:
 		mov	al, cl
 		pop	bp
 		retf
-sub_97D3		endp
+MVRS_SpeedStateHysteresis_97D3		endp
 
-; START OF FUNCTION CHUNK FOR sub_97D3
+; START OF FUNCTION CHUNK FOR MVRS_SpeedStateHysteresis_97D3
 off_9856	dw offset loc_9850
 		dw offset loc_9850
 		dw offset loc_9850
@@ -374,13 +387,18 @@ off_9882	dw offset loc_97F0
 		dw offset loc_983D
 		dw offset loc_97F0
 		dw offset loc_97F0
-; END OF FUNCTION CHUNK FOR sub_97D3
+; END OF FUNCTION CHUNK FOR MVRS_SpeedStateHysteresis_97D3
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_9890		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-14. Applique les commandes calculées par le nœud en cours : selon
+; les drapeaux, sub_98E7, sub_9AC0 ou sub_9BCD ; puis, si une vitesse voulue est posée
+; (word_7C82B ≠ 0), MVRS_SpeedThrottleLaw_9C3D.
+; ==============================================================================================
+MVRS_ApplyPilotCommands_9890		proc far
 
 arg_0		= dword ptr  6
 
@@ -424,13 +442,13 @@ loc_98D2:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_9C3D
+		call	near ptr MVRS_SpeedThrottleLaw_9C3D
 		add	sp, 4
 
 loc_98E5:
 		pop	bp
 		retf
-sub_9890		endp
+MVRS_ApplyPilotCommands_9890		endp
 
 ; ----------------------------------------------------------------------
 
@@ -483,7 +501,7 @@ loc_9932:
 		mov	al, es:[bx+0F9h]
 		push	ax
 		push	cs
-		call	near ptr sub_97D3
+		call	near ptr MVRS_SpeedStateHysteresis_97D3
 		add	sp, 4
 		les	bx, word ptr [bp+arg_0]
 		mov	es:[bx+0F9h], al
@@ -744,7 +762,7 @@ loc_9B09:
 		mov	al, es:[bx+0F8h]
 		push	ax
 		push	cs
-		call	near ptr sub_97D3
+		call	near ptr MVRS_SpeedStateHysteresis_97D3
 		add	sp, 4
 		les	bx, word ptr [bp+arg_0]
 		mov	es:[bx+0F8h], al
@@ -908,7 +926,15 @@ sub_9BCD		endp
 
 ; Attributes: bp-based frame
 
-sub_9C3D		proc far
+; ==============================================================================================
+; far. LUE 2026-11-14. Manette des gaz d'après la vitesse voulue word_7C82B et ma vitesse
+; word_7C829. Écart = voulue − vitesse (m/s) : > 20 → état 2 ; > 1 → 4 ; ≥ 0 → 6 ; > −2 → 5 ;
+; > −21 → 3 ; sinon 1. État retenu = MVRS_SpeedStateHysteresis_97D3(état précédent
+; [entité+250], état mesuré), rangé dans [entité+250]. Manette (objet +1Eh) : états 1 et 3 →
+; 1, états 2 et 4 → 10, états 5 et 6 → 8 ; état 1 : bit 6 de l'objet +1Ch = inverse du bit 0
+; de [modèle+92h] (rôle non établi).
+; ==============================================================================================
+MVRS_SpeedThrottleLaw_9C3D		proc far
 
 var_6		= byte ptr -6
 var_4		= byte ptr -4
@@ -959,7 +985,7 @@ loc_9C85:
 		mov	al, es:[bx+0FAh]
 		push	ax
 		push	cs
-		call	near ptr sub_97D3
+		call	near ptr MVRS_SpeedStateHysteresis_97D3
 		add	sp, 4
 		les	bx, [bp+arg_0]
 		mov	es:[bx+0FAh], al
@@ -1004,22 +1030,30 @@ loc_9CEB:
 		mov	es:[bx+1Eh], al
 		leave
 		retf
-sub_9C3D		endp
+MVRS_SpeedThrottleLaw_9C3D		endp
 
-; START OF FUNCTION CHUNK FOR sub_9C3D
+; START OF FUNCTION CHUNK FOR MVRS_SpeedThrottleLaw_9C3D
 off_9CFE	dw offset loc_9CBB
 		dw offset loc_9CE7
 		dw offset loc_9CE1
 		dw offset loc_9CE7
 		dw offset loc_9CB5
 		dw offset loc_9CB5
-; END OF FUNCTION CHUNK FOR sub_9C3D
+; END OF FUNCTION CHUNK FOR MVRS_SpeedThrottleLaw_9C3D
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_9D0A		proc far
+; ==============================================================================================
+; far. LUE 2026-11-14. Contexte de la cible d'un nœud : dword_7C7C3/C7/CB = position de la
+; cible − la mienne, dword_7C7CF = hauteur de la cible au-dessus du sol, word_7C7D3 = écart de
+; cap entre mon nez et la direction de la cible, word_7C7D5 = écart de cap entre mon nez et
+; celui de la cible, dword_7C7D9 = distance (m), word_7C7DD = vitesse de la cible (m/s),
+; word_7C7D7 = |écart de cap entre le nez de la cible et la direction vers moi|. Seuil
+; dword_7C7DF = 2000 m posé une fois dans ovr236.
+; ==============================================================================================
+MVRS_ComputeTargetContext_9D0A		proc far
 
 var_48		= dword ptr -48h
 var_44		= dword ptr -44h
@@ -1193,7 +1227,7 @@ loc_9EC5:
 		pop	si
 		leave
 		retf
-sub_9D0A		endp
+MVRS_ComputeTargetContext_9D0A		endp
 
 ; ----------------------------------------------------------------------
 

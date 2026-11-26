@@ -47,11 +47,10 @@ Sound_StopAll_5EB2A		endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far. LUE 2026-11-25. Façade « jouer l'effet n » (effet, distance, émetteur). Numérique
-; d'abord : si les sons numériques sont actifs (byte_7CB1C, objet word_79E73) et que l'effet
-; synthétisé n ne joue pas déjà, DigitalSFX_PlayEffect_5B04F. S'il n'a rien joué : si les
-; effets synthétisés sont actifs (byte_7CB1A, objet word_79E6D), SoundFX_Play3D_5C68A puis
-; DigitalSFX_StopEffect_5B328(n).
+; far (lue 2026-11-15). Façade d'un effet sonore (numéro d'effet, distance au point de vue en
+; mètres, émetteur) : si les sons numérisés sont actifs (byte_7CB1C, objet word_79E73) et que
+; l'effet XMIDI n'est pas déjà joué, DigitalSFX_PlayEffect_5B04F ; sinon séquence XMIDI de
+; même numéro (SoundFX_Play3D_5C68A sur word_79E6D, si byte_7CB1A). 21 appels.
 ; ==============================================================================================
 SoundFX_Play_5EB62		proc far
 
@@ -128,10 +127,10 @@ SoundFX_Play_5EB62		endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far. LUE 2026-11-25. Façade pour un son tenu (canon…) : numérique d'abord (sauf si la
-; version synthétisée joue déjà) ; s'il joue, arrêt de la version synthétisée ; sinon synthèse
-; : SoundFX_Play3D_5C68A si l'effet ne joue pas, SoundFX_UpdateVolume3D_5C75B sinon, et arrêt
-; du numérique.
+; far (lue 2026-11-15, en partie). Même façade pour un effet entretenu (numéro, distance,
+; émetteur) : rejoue ou arrête selon SoundFX_IsPlaying_5C85F. Tir du canon (sub_3E640, effet
+; 1), tir des tourelles (Swpn_TurretUpdate_403A8, effet 24 ou 0 selon le champ +73h du modèle
+; de l'arme).
 ; ==============================================================================================
 SoundFX_PlayOrUpdate_5EBFB		proc far
 
@@ -405,13 +404,13 @@ Music_SelectStartTune_5EDAB		proc far
 		cmp	word_79E6F, 0
 		jz	short loc_5EDF0
 		push	word_79E6F
-		call	sub_5BBF8
+		call	Music_CombatIntensitySelector_5BBF8
 		pop	cx
 		cmp	ax, 0FFFFh
 		jnz	short loc_5EDF0
 		push	0
 		push	word_79E6F
-		call	sub_5B962
+		call	Music_ScanNearbyEnemies_5B962
 		add	sp, 4
 		or	al, al
 		jz	short loc_5EDE5
@@ -564,7 +563,7 @@ arg_0		= word ptr  6
 		push	[bp+arg_0]
 		push	1
 		push	word_79E6F
-		call	sub_5BB21
+		call	Music_SelectTuneCandidate_5BB21
 		add	sp, 6
 		mov	dl, al
 
@@ -1080,7 +1079,11 @@ SoundFX_CheckFlyBy_5F005		endp
 
 ; Attributes: bp-based frame
 
-sub_5F202		proc far
+; ==============================================================================================
+; far (lue 2026-11-15). Joue directement le son numérisé de rang n (sub_5B12B) ; repli XMIDI
+; seulement pour n = 9, sinon erreur D005h.
+; ==============================================================================================
+SoundFX_PlayDigitalRank_5F202		proc far
 
 var_2		= byte ptr -2
 arg_0		= byte ptr  6
@@ -1148,7 +1151,7 @@ loc_5F28B:
 		pop	si
 		leave
 		retf
-sub_5F202		endp
+SoundFX_PlayDigitalRank_5F202		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1273,7 +1276,7 @@ loc_5F390:
 		test	word_7977C, 0Fh
 		jnz	short loc_5F3B0
 		push	word_79E6F
-		call	sub_5BBF8
+		call	Music_CombatIntensitySelector_5BBF8
 		pop	cx
 
 loc_5F3B0:

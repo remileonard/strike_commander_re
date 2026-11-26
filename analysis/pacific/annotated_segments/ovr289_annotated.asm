@@ -185,7 +185,7 @@ loc_A8208:
 		push	ax
 		push	[bp+arg_4]
 		push	di
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 		mov	word ptr [si+10h], 0
 		mov	word ptr [si+0Eh], 7FFFh

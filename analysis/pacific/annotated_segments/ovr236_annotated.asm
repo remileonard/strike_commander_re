@@ -518,7 +518,7 @@ loc_84890:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_84B24
+		call	near ptr MVRS_CreateProfileNode_84B24
 		add	sp, 6
 		les	bx, [bp+var_4]
 		mov	es:[bx+2], dx
@@ -800,7 +800,17 @@ off_84B16	dw offset loc_84AB9
 
 ; Attributes: bp-based frame
 
-sub_84B24		proc far
+; ==============================================================================================
+; far. LUE 2026-11-14. Crée le nœud de manœuvre d'un numéro lu dans le chunk MVRS du profil :
+; seuls 3 (table 458h), 4 (468h), 5 (448h) et 6 (478h) existent (sub ax, 3 / cmp bx, 3) ; tout
+; autre numéro rend un pointeur nul, l'entrée n'est pas gardée. Les profils de PACIFIC.DAT
+; listent pourtant 1 à 13 (hérités de Strike Commander). Le chargeur (ovr236) range d'abord 5
+; nœuds fixes de poids 0 dans la liste du tournoi ([entité+445], 5 octets par entrée, nombre à
+; [entité+443]) : 19 (attaque au sol, 4C8h), 22 (4B8h), 14 (4A8h), 15 (498h), 7 (488h) ; puis
+; les nœuds du profil avec leur poids signé, 10 entrées au plus. Les nœuds 20 (4D8h) et 21
+; (4F8h) sont créés à part, hors de la liste.
+; ==============================================================================================
+MVRS_CreateProfileNode_84B24		proc far
 
 var_20		= word ptr -20h
 var_1E		= word ptr -1Eh
@@ -977,14 +987,14 @@ loc_84CCC:
 loc_84CD0:
 		leave
 		retf
-sub_84B24		endp
+MVRS_CreateProfileNode_84B24		endp
 
-; START OF FUNCTION CHUNK FOR sub_84B24
+; START OF FUNCTION CHUNK FOR MVRS_CreateProfileNode_84B24
 off_84CD2	dw offset loc_84C06
 		dw offset loc_84BA5
 		dw offset loc_84C69
 		dw offset loc_84B43
-; END OF FUNCTION CHUNK FOR sub_84B24
+; END OF FUNCTION CHUNK FOR MVRS_CreateProfileNode_84B24
 
 ; ----------------------------------------------------------------------
 

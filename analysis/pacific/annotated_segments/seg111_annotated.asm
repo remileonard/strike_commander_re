@@ -826,7 +826,7 @@ arg_0		= word ptr  6
 		add	ax, 12h
 		push	ax
 		push	word_79788
-		call	Ground_IsWaterUnderPoint_3677E
+		call	Ground_IsSeaLevel_3677E
 		add	sp, 8
 		mov	ah, 0
 		or	ax, ax
@@ -2149,7 +2149,7 @@ loc_460C1:
 loc_46107:
 		push	word ptr [si+11Eh]
 		push	si
-		call	sub_553B6
+		call	World_OnObjectDestroyed_553B6
 		add	sp, 4
 		mov	ax, word_7CADA
 		mov	[bp+var_34], ax

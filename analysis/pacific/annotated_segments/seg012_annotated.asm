@@ -10,7 +10,11 @@ loc_7977:
 
 ; Attributes: bp-based frame
 
-sub_797C		proc near
+; ==============================================================================================
+; near (lue 2026-11-15). Filtre de prédiction d'ordre n : à chaque échantillon, retranche la
+; somme des n précédents (signés) × coefficients (mots), arrondie à 1/4 096.
+; ==============================================================================================
+SpeechCodec_PredictionFilter_797C		proc near
 
 arg_0		= word ptr  4
 arg_2		= word ptr  6
@@ -55,9 +59,9 @@ loc_7998:
 		jnz	short loc_7987
 		pop	bp
 		ret	0Ch
-sub_797C		endp
+SpeechCodec_PredictionFilter_797C		endp
 
-; START OF FUNCTION CHUNK FOR sub_797C
+; START OF FUNCTION CHUNK FOR SpeechCodec_PredictionFilter_797C
 		db 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4
 		db 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5
 		db 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4
@@ -98,13 +102,19 @@ sub_797C		endp
 		db 7, 7, 7, 7, 7, 7, 0, 0, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh, 0
 		db 2, 2, 2, 2, 2, 2, 2, 2, 1, 7, 7, 7, 7, 7, 7, 7
 		db 7, 0, 0, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh
-; END OF FUNCTION CHUNK FOR sub_797C
+; END OF FUNCTION CHUNK FOR SpeechCodec_PredictionFilter_797C
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_7C3F		proc near
+; ==============================================================================================
+; near (lue 2026-11-15). Pour chaque échantillon : rang = nombre de bits 1 en bas de l'octet
+; courant (table cs:55h), longueur du code, nombre de bits de la valeur et masque dans la
+; table de 27 octets cs:155h + (paramètre − 8) × 27 ; la valeur (signe étendu, masque,
+; décalage) donne un octet non signé.
+; ==============================================================================================
+SpeechCodec_DecodeValues_7C3F		proc near
 
 saved_0		= word ptr  0
 arg_0		= word ptr  4
@@ -181,9 +191,9 @@ loc_7CB6:
 		jnz	short loc_7C6E
 		pop	bp
 		ret	0Ch
-sub_7C3F		endp
+SpeechCodec_DecodeValues_7C3F		endp
 
-; START OF FUNCTION CHUNK FOR sub_7C3F
+; START OF FUNCTION CHUNK FOR SpeechCodec_DecodeValues_7C3F
 		inc	bx
 		outsw
 		jo	short loc_7D3F
@@ -208,11 +218,17 @@ sub_7C3F		endp
 		jnb	short loc_7D59
 		jb	short loc_7D6C
 		db 65h, 64h
-; END OF FUNCTION CHUNK FOR sub_7C3F
+; END OF FUNCTION CHUNK FOR SpeechCodec_DecodeValues_7C3F
 
 ; ----------------------------------------------------------------------
 
-sub_7CF8		proc far
+; ==============================================================================================
+; far (lue 2026-11-15). Contrôle XOR des mots du bloc = 0ACEDh ; SpeechCodec_DecodeValues_7C3F
+; (table = octet 6, nombre = mot 2, données après 8 + 2 × octet 7) ; si l'octet 7 n'est pas
+; nul, SpeechCodec_PredictionFilter_797C avec les mots 8.. comme coefficients. Suivie de la
+; chaîne « Copyright 1993 … Speech Compression; all rights reserved ».
+; ==============================================================================================
+SpeechCodec_DecodeBlock_7CF8		proc far
 		push	si
 		push	di
 		push	bp
@@ -256,7 +272,7 @@ loc_7D1B:
 		push	ax
 
 loc_7D3F:
-		call	sub_7C3F
+		call	SpeechCodec_DecodeValues_7C3F
 		cmp	word ptr [bp-4], 0
 		jz	short loc_7D5F
 		les	di, [bp+0Eh]
@@ -274,12 +290,12 @@ loc_7D53:
 
 loc_7D59:
 		push	word ptr [bp-4]
-		call	sub_797C
-sub_7CF8		endp
+		call	SpeechCodec_PredictionFilter_797C
+SpeechCodec_DecodeBlock_7CF8		endp
 
-; START OF FUNCTION CHUNK FOR sub_7CF8
+; START OF FUNCTION CHUNK FOR SpeechCodec_DecodeBlock_7CF8
 
 loc_7D5F:
 		db 33h
-; END OF FUNCTION CHUNK FOR sub_7CF8
+; END OF FUNCTION CHUNK FOR SpeechCodec_DecodeBlock_7CF8
 seg012		ends

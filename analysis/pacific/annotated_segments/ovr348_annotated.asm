@@ -194,7 +194,7 @@ loc_C0FDD:
 		push	ax
 		push	[bp+var_C]
 		push	di
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 		jmp	short loc_C1090
 

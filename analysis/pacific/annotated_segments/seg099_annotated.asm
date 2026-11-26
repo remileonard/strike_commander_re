@@ -817,7 +817,7 @@ loc_3E71E:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_3F15E
+		call	near ptr WeaponSystem_StartBurst_3F15E
 		add	sp, 4
 		jmp	loc_3E80A
 
@@ -1946,7 +1946,11 @@ off_3F152	dw offset loc_3F06E
 
 ; Attributes: bp-based frame
 
-sub_3F15E		proc far
+; ==============================================================================================
+; far. LUE 2026-11-14. [système+0Ch] = 1, point d'emport courant [+18h] = premier ([+14h]),
+; index [+0] = 0 : la rafale repart du premier canon.
+; ==============================================================================================
+WeaponSystem_StartBurst_3F15E		proc far
 
 arg_0		= word ptr  6
 
@@ -1959,7 +1963,7 @@ arg_0		= word ptr  6
 		mov	word ptr es:[bx], 0
 		pop	bp
 		retf
-sub_3F15E		endp
+WeaponSystem_StartBurst_3F15E		endp
 
 ; ----------------------------------------------------------------------
 

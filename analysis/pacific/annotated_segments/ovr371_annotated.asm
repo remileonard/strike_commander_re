@@ -132,7 +132,7 @@ loc_D0307:
 		push	ax
 		push	[bp+arg_2]
 		push	di
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 		pop	di
 		pop	si

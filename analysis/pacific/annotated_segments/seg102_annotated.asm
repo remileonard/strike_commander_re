@@ -118,7 +118,21 @@ sub_4039E		endp
 
 ; Attributes: bp-based frame
 
-sub_403A8		proc far
+; ==============================================================================================
+; far, mise à jour d'une tourelle SWPN (lue 2026-11-15, partiellement : la recherche de cible
+; et le tir). Objet porteur en [si+24h] (classe 6 = pilote éjecté → rien) ; cible cherchée par
+; sub_1EE4B(…, portée = modèle +4Dh, 180, 1, 6) puis sub_1EA93 (camp ennemi, pilote non
+; éjecté), gardée en [si+52h] ; minuteur de tir [si+58h] décrémenté du pas de temps
+; dword_7976E. Si la distance est sous la portée (modèle +51h, shl eax, 8 / cmp eax,
+; [bp+var_24]) : direction de la cible avec avance, ramenée dans le repère du porteur puis
+; dans celui de la tourelle (Matrix_WorldToLocal_5A569 deux fois), élévation =
+; Math_AsinDeg_567D3 de la composante haute normalisée dans le plan avant/haut, gisement =
+; −asin de la composante droite normalisée dans le plan droite/avant (positif vers la gauche)
+; ; commande bornée par la vitesse de rotation (modèle +55h × 10 × pas de temps) et passée à
+; Swpn_TurretSlewClamp_40C5B : le tir n'a lieu que si elle renvoie 1 (angle non bloqué par le
+; secteur GARC) et si la commande ne dépassait pas la vitesse de rotation. Tir par sub_4F791.
+; ==============================================================================================
+Swpn_TurretUpdate_403A8		proc far
 
 var_D6		= dword ptr -0D6h
 var_D2		= dword ptr -0D2h
@@ -807,7 +821,7 @@ loc_409D7:
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_40C5B
+		call	near ptr Swpn_TurretSlewClamp_40C5B
 		add	sp, 0Eh
 		jmp	short loc_40A85
 
@@ -822,7 +836,7 @@ loc_40A58:
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_40C5B
+		call	near ptr Swpn_TurretSlewClamp_40C5B
 		add	sp, 0Eh
 		mov	[bp+var_1F], al
 
@@ -1000,13 +1014,22 @@ loc_40C57:
 		pop	si
 		leave
 		retf
-sub_403A8		endp
+Swpn_TurretUpdate_403A8		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_40C5B		proc far
+; ==============================================================================================
+; far (lue 2026-11-15), tourne la tourelle et applique son secteur de tir. Ajoute les 3
+; incréments d'angle à [+64h] (élévation), [+68h], [+6Ch] (gisement) ; borne [+64h] entre
+; [+5Ch] (max) et [+5Eh] (min), [+6Ch] entre [+60h] (max) et [+62h] (min), bornes = chunk GARC
+; recopié par Swpn_InitInstance_B0A21 ; un axe dont la borne max vaut 180 ou plus, ou la borne
+; min −180 ou moins, n'est pas borné (cmp word ptr [bx+5Ch], 0B4h / cmp word ptr [bx+5Eh],
+; 0FF4Ch). Renvoie 0 si un angle a été bloqué, 1 sinon. Reconstruit ensuite la matrice de la
+; tourelle (méthodes +40h et +2Ch).
+; ==============================================================================================
+Swpn_TurretSlewClamp_40C5B		proc far
 
 var_5E		= word ptr -5Eh
 var_3A		= dword ptr -3Ah
@@ -1241,7 +1264,7 @@ loc_40DC9:
 		pop	si
 		leave
 		retf
-sub_40C5B		endp
+Swpn_TurretSlewClamp_40C5B		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1786,7 +1809,7 @@ loc_41294:
 		mov	[bp+var_6A], eax
 		push	si
 		push	cs
-		call	near ptr sub_40C5B
+		call	near ptr Swpn_TurretSlewClamp_40C5B
 		add	sp, 0Eh
 		jmp	loc_413DB
 

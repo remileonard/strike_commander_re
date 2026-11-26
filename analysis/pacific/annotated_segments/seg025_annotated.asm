@@ -7,7 +7,14 @@ seg025		segment	para public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_FBE7		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Collision si l'autre avion est à moins de 50 m (même camp) ou 25 m
+; (ennemi), ou si la vitesse relative le rapproche avec un passage à moins de 50 m dans les 4
+; s (distance × sin < 50, distance × cos ≤ 4 × vitesse relative). Alors
+; AI_CollisionAvoid_BD4C(entité, position de l'autre, sa position dans 4 s), réaction
+; [entité+495] = 3, formation serrée décrochée ([entité+353] = 0).
+; ==============================================================================================
+AI_CollisionCourse_FBE7		proc far
 
 var_7E		= dword ptr -7Eh
 var_7A		= dword ptr -7Ah
@@ -266,7 +273,7 @@ loc_FE0B:
 		lea	ax, [bp+var_42]
 		push	ax
 		push	large [bp+arg_0]
-		call	sub_BD4C
+		call	AI_CollisionAvoid_BD4C
 		add	sp, 8
 		les	bx, word ptr [bp+arg_0]
 		mov	byte ptr es:[bx+1EFh], 3
@@ -278,13 +285,19 @@ loc_FE36:
 		pop	si
 		leave
 		retf
-sub_FBE7		endp
+AI_CollisionCourse_FBE7		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_FE3D		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Pendant un évitement ([entité+0Dh] et réaction [entité+495] = 3) : tick
+; du comportement, renvoie 1. Sinon remet la réaction 3 à 0 et teste les objets de type 6
+; (sauf lui-même) par AI_CollisionCourse_FBE7 ; renvoie 1 au premier qui déclenche un
+; évitement.
+; ==============================================================================================
+AI_ScanCollisionThreats_FE3D		proc far
 
 var_E		= word ptr -0Eh
 var_C		= dword ptr -0Ch
@@ -350,7 +363,7 @@ loc_FE94:
 		push	[bp+var_E]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_FBE7
+		call	near ptr AI_CollisionCourse_FBE7
 		add	sp, 6
 		mov	[bp+var_1], al
 
@@ -372,7 +385,7 @@ loc_FEFF:
 		pop	si
 		leave
 		retf
-sub_FE3D		endp
+AI_ScanCollisionThreats_FE3D		endp
 
 ; ----------------------------------------------------------------------
 
@@ -820,7 +833,7 @@ loc_1022A:
 		push	si
 		les	bx, [bp+arg_2]
 		push	large es:[bx+0C0h]
-		call	sub_9D0A
+		call	MVRS_ComputeTargetContext_9D0A
 		add	sp, 6
 		mov	ax, [si+52h]
 		mov	[bp+var_C], ax

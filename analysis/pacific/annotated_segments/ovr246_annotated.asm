@@ -102,7 +102,7 @@ arg_0		= word ptr  6
 		mov	di, [bp+arg_0]
 		push	0
 		push	[bp+arg_0]
-		call	sub_553B6
+		call	World_OnObjectDestroyed_553B6
 		add	sp, 4
 		push	80h
 		call	CRT_Malloc16_Retry

@@ -216,7 +216,14 @@ sub_5B730		endp
 
 ; Attributes: bp-based frame
 
-sub_5B85C		proc far
+; ==============================================================================================
+; far (lue 2026-11-15). Cible du joueur ([word_7CADA+5Fh] puis +0Eh, le champ que
+; Radio_PlayerMenu_97C10 teste pour l'option i, « attaquer ma cible ») : vrai si c'est un
+; avion (catégorie 6), pilote non éjecté (bit 5 de +92h), et que sa distance au joueur ×
+; dword_79762 est sous 1 500 m (cmp eax, 5DCh). Pas de test d'angle. Remplace le test « ennemi
+; dans les six heures » de STRIKE.EXE.
+; ==============================================================================================
+Music_TargetWithinRange_5B85C		proc far
 
 var_30		= dword ptr -30h
 var_2C		= dword ptr -2Ch
@@ -340,13 +347,22 @@ loc_5B95B:
 		pop	si
 		leave
 		retf
-sub_5B85C		endp
+Music_TargetWithinRange_5B85C		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_5B962		proc far
+; ==============================================================================================
+; far (lue 2026-11-15). Équivalent de Music_ScanNearbyEnemies_590E0. Exécute d'abord le script
+; de mission ([word_79B8C+5Fh], entrée +40h) ; si la variable de jeu
+; GameVar_Get(GameVar_Get(255) + 256) est posée, les objets de catégorie 1 sont ignorés.
+; Objets de catégorie 1, 6, 19, 20, 21, 23, 24 (table word_5BB05), du camp 255, à moins de 18
+; 520 m du joueur (cmp [bp+var_12], 4858h), sauf l'objet passé en argument et les avions dont
+; le pilote s'est éjecté (bit 5 de +92h) : bit 0 = avion (catégorie 6), bit 1 = autre.
+; S'arrête dès que les deux bits sont posés.
+; ==============================================================================================
+Music_ScanNearbyEnemies_5B962		proc far
 
 var_26		= dword ptr -26h
 var_22		= dword ptr -22h
@@ -545,9 +561,9 @@ loc_5BAFE:
 		pop	si
 		leave
 		retf
-sub_5B962		endp
+Music_ScanNearbyEnemies_5B962		endp
 
-; START OF FUNCTION CHUNK FOR sub_5B962
+; START OF FUNCTION CHUNK FOR Music_ScanNearbyEnemies_5B962
 word_5BB05	dw 1
 		dw 6
 		dw 13h
@@ -562,13 +578,22 @@ off_5BB13	dw offset loc_5BA1E
 		dw offset loc_5BA1E
 		dw offset loc_5BA1E
 		dw offset loc_5BA1E
-; END OF FUNCTION CHUNK FOR sub_5B962
+; END OF FUNCTION CHUNK FOR Music_ScanNearbyEnemies_5B962
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_5BB21		proc far
+; ==============================================================================================
+; far (lue 2026-11-15). Équivalent de Music_SelectTuneCandidate_5923A. Mode 1 (destruction,
+; objet en argument) : nouveau repérage sans l'objet ; s'il reste des ennemis, que byte_79D88
+; avait le bit 0 (avion proche) et qu'il n'y a plus d'avion → piste 1 ; s'il n'en reste aucun
+; alors qu'il y en avait → étape suivante. Mode 0 → étape suivante. Étape : script de mission
+; ([word_79B8C+5Fh], entrée +40h) ; si GameVar_Get(GameVar_Get(255) + 256) et
+; sub_1AC03([word_79B8C]+79h) → 17 ; sinon si byte_79D87 (un combat a eu lieu) → 3 et
+; byte_79D87 = 0. Écrit word_79D77 et renvoie 1 si une piste est choisie.
+; ==============================================================================================
+Music_SelectTuneCandidate_5BB21		proc far
 
 var_4		= byte ptr -4
 var_3		= byte ptr -3
@@ -592,7 +617,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+arg_4]
 		push	ax
 		push	cs
-		call	near ptr sub_5B962
+		call	near ptr Music_ScanNearbyEnemies_5B962
 		add	sp, 4
 		mov	dl, al
 		or	dl, dl
@@ -673,13 +698,28 @@ loc_5BBF1:
 		pop	si
 		leave
 		retf
-sub_5BB21		endp
+Music_SelectTuneCandidate_5BB21		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_5BBF8		proc far
+; ==============================================================================================
+; far (lue 2026-11-15). Équivalent de Music_CombatIntensitySelector_59302 de STRIKE.EXE,
+; pistes de Pacific Strike. Sort sans rien choisir si byte_7769E, byte_77698, byte_7CEF8 ==
+; 12, byte_7D06A == 11 ou byte_79D76 == 3. Repérage des ennemis
+; (Music_ScanNearbyEnemies_5B962, résultat dans byte_79D88). Pistes « verrouillées » (table
+; off_5BD55) : si la piste en attente word_79D77 est 4, 11, 12, 15, 16 ou 19, les choix 9 et 1
+; et le retour à la piste de la mission sont bloqués, sauf si word_7D06D et
+; sub_1DC07(word_7D06D+4, word_7D06F) == 2. Ennemi proche : byte_79D87 = 1, puis première
+; règle vraie : 13 si word_7CAE2 (un ennemi attaque le joueur ; même champ que l'option k de
+; Radio_PlayerMenu_97C10) ; 18 si Music_TargetWithinRange_5B85C (cible du joueur à moins de 1
+; 500 m) ; 2 si DamageSys_IsCriticallyDamaged_41658 ; 10 si DamageSys_IsSeriouslyDamaged_41612
+; ; 9 si un avion ennemi est proche ; 1 sinon (menaces au sol seules). Aucun ennemi :
+; Music_SelectTuneCandidate_5BB21(mode 0) ; s'il ne choisit rien et sans verrou, piste de la
+; mission byte_79B8E. Résultat dans word_79D77.
+; ==============================================================================================
+Music_CombatIntensitySelector_5BBF8		proc far
 
 var_8		= dword ptr -8
 var_3		= byte ptr -3
@@ -724,7 +764,7 @@ loc_5BC3E:
 		push	0
 		push	si
 		push	cs
-		call	near ptr sub_5B962
+		call	near ptr Music_ScanNearbyEnemies_5B962
 		add	sp, 4
 		mov	byte_79D88, al
 		mov	bx, word_79D77
@@ -786,7 +826,7 @@ loc_5BCB3:
 loc_5BCBC:
 		push	si
 		push	cs
-		call	near ptr sub_5B85C
+		call	near ptr Music_TargetWithinRange_5B85C
 		pop	cx
 		or	al, al
 		jz	short loc_5BCCB
@@ -798,7 +838,7 @@ loc_5BCCB:
 		mov	eax, [bx+63h]
 		mov	[bp+var_8], eax
 		push	large [bp+var_8]
-		call	sub_41658
+		call	DamageSys_IsCriticallyDamaged_41658
 		add	sp, 4
 		or	al, al
 		jz	short loc_5BCEB
@@ -842,7 +882,7 @@ loc_5BD2C:
 		push	0
 		push	si
 		push	cs
-		call	near ptr sub_5BB21
+		call	near ptr Music_SelectTuneCandidate_5BB21
 		add	sp, 6
 		mov	ah, 0
 		or	ax, ax
@@ -861,9 +901,9 @@ loc_5BD4F:
 		pop	si
 		leave
 		retf
-sub_5BBF8		endp
+Music_CombatIntensitySelector_5BBF8		endp
 
-; START OF FUNCTION CHUNK FOR sub_5BBF8
+; START OF FUNCTION CHUNK FOR Music_CombatIntensitySelector_5BBF8
 off_5BD55	dw offset loc_5BC62
 		dw offset loc_5BC96
 		dw offset loc_5BC96
@@ -880,7 +920,7 @@ off_5BD55	dw offset loc_5BC62
 		dw offset loc_5BC96
 		dw offset loc_5BC96
 		dw offset loc_5BC62
-; END OF FUNCTION CHUNK FOR sub_5BBF8
+; END OF FUNCTION CHUNK FOR Music_CombatIntensitySelector_5BBF8
 
 ; ----------------------------------------------------------------------
 
@@ -1609,7 +1649,7 @@ loc_5C347:
 		push	si
 		lea	ax, [bp+var_86]
 		push	ax
-		call	sub_75C8
+		call	PakReader_ReadEntry_75C8
 		add	sp, 8
 
 loc_5C3C8:

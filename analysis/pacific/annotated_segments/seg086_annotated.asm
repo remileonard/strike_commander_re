@@ -590,10 +590,10 @@ Ground_HeightUnderPoint_3664D		endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far. LUE 2026-11-25. 1 si Ground_HeightUnderPoint_3664D rend au plus 2 m (512 en 24.8) : sol
-; au niveau de la mer.
+; far (lue 2026-11-15). Vrai si le sol sous le point (Ground_HeightUnderPoint_3664D) est à 2 m
+; ou moins (cmp [bp+var_4], 200h) : point au-dessus de la mer.
 ; ==============================================================================================
-Ground_IsWaterUnderPoint_3677E		proc far
+Ground_IsSeaLevel_3677E		proc far
 
 var_4		= dword ptr -4
 arg_0		= word ptr  6
@@ -627,7 +627,7 @@ loc_367AD:
 loc_367AF:
 		leave
 		retf
-Ground_IsWaterUnderPoint_3677E		endp
+Ground_IsSeaLevel_3677E		endp
 
 ; ----------------------------------------------------------------------
 

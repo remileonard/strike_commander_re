@@ -115,7 +115,11 @@ sub_103CB		endp
 
 ; Attributes: bp-based frame
 
-sub_10409		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Partie commune des lancements de nœud : le nœud devient le comportement
+; en cours de l'entité ([entité+0Dh]) et garde l'ancien.
+; ==============================================================================================
+MVRS_ApplyCommon_10409		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -136,19 +140,22 @@ arg_2		= word ptr  8
 		mov	es:[bx+0Dh], dx
 		pop	bp
 		retf
-sub_10409		endp
+MVRS_ApplyCommon_10409		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_1043A		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Note toujours nulle (nœuds 20 et 21, hors tournoi).
+; ==============================================================================================
+MVRS_ScoreZero_1043A		proc far
 		push	bp
 		mov	bp, sp
 		mov	al, 0
 		pop	bp
 		retf
-sub_1043A		endp
+MVRS_ScoreZero_1043A		endp
 
 ; ----------------------------------------------------------------------
 
@@ -189,7 +196,12 @@ sub_10441		endp
 
 ; Attributes: bp-based frame
 
-sub_1047B		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Lancement de la manœuvre 3 : minuteur de la demande (2 s), [nœud+17h] =
+; la cible est le joueur, variante [nœud+11h] = Math_RandomScale_56C2F(5 sous le plancher du
+; niveau, sinon 8), puis le tick.
+; ==============================================================================================
+MVRS_ID3_ApplyJink_1047B		proc far
 
 var_4		= dword ptr -4
 arg_0		= dword ptr  6
@@ -204,7 +216,7 @@ arg_4		= word ptr  0Ah
 		push	si
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_10409
+		call	near ptr MVRS_ApplyCommon_10409
 		add	sp, 6
 		mov	di, si
 		add	di, 6
@@ -252,13 +264,19 @@ loc_104E3:
 		pop	si
 		leave
 		retf
-sub_1047B		endp
+MVRS_ID3_ApplyJink_1047B		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_10503		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Tick de la manœuvre 3 : vitesse voulue = champ 23 du JDYN ; selon la
+; variante, assiette voulue (word_7C82F) et écart de cap (word_7C835) : 0 (+30°, −30°), 1
+; (+30°, 0), 2 (+30°, +30°), 3 et 4 (0, −30°), 5 (−30°, −30°), 6 (−30°, 0), 7 (−30°, +30°).
+; Fin au bout du minuteur.
+; ==============================================================================================
+MVRS_ID3_TickJink_10503		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -342,9 +360,9 @@ loc_10594:
 loc_105AF:
 		pop	bp
 		retf
-sub_10503		endp
+MVRS_ID3_TickJink_10503		endp
 
-; START OF FUNCTION CHUNK FOR sub_10503
+; START OF FUNCTION CHUNK FOR MVRS_ID3_TickJink_10503
 off_105B1	dw offset loc_10550
 		dw offset loc_1055E
 		dw offset loc_10560
@@ -353,13 +371,16 @@ off_105B1	dw offset loc_10550
 		dw offset loc_10572
 		dw offset loc_10580
 		dw offset loc_10588
-; END OF FUNCTION CHUNK FOR sub_10503
+; END OF FUNCTION CHUNK FOR MVRS_ID3_TickJink_10503
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_105C1		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Lancement de la manœuvre 5 : minuteur 8 s, phase 0, puis le tick.
+; ==============================================================================================
+MVRS_ID5_ApplyImmelmann_105C1		proc far
 
 var_4		= dword ptr -4
 arg_0		= dword ptr  6
@@ -371,7 +392,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+arg_4]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_10409
+		call	near ptr MVRS_ApplyCommon_10409
 		add	sp, 6
 		mov	[bp+var_4], 800h
 		mov	eax, [bp+var_4]
@@ -385,13 +406,19 @@ arg_4		= word ptr  0Ah
 		add	sp, 4
 		leave
 		retf
-sub_105C1		endp
+MVRS_ID5_ApplyImmelmann_105C1		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_105FE		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Tick de la manœuvre 5, vitesse voulue = champ 23 du JDYN : (0) roulis
+; voulu 0, phase 1 quand |roulis| < 20° ; (1) roulis 0, manche (commandes +1Fh) =
+; byte_7C7FB[niveau] (14, 15, 16), phase 2 au-dessus de +35° d'assiette ; (2) même manche,
+; phase 3 sous +30° ; (3) assiette voulue 0, fin sous +15°. Fin aussi au bout du minuteur.
+; ==============================================================================================
+MVRS_ID5_TickImmelmann_105FE		proc far
 
 var_6		= word ptr -6
 var_4		= word ptr -4
@@ -490,20 +517,25 @@ loc_106D9:
 loc_106E4:
 		leave
 		retf
-sub_105FE		endp
+MVRS_ID5_TickImmelmann_105FE		endp
 
-; START OF FUNCTION CHUNK FOR sub_105FE
+; START OF FUNCTION CHUNK FOR MVRS_ID5_TickImmelmann_105FE
 off_106E6	dw offset loc_10635
 		dw offset loc_10654
 		dw offset loc_1068A
 		dw offset loc_106BA
-; END OF FUNCTION CHUNK FOR sub_105FE
+; END OF FUNCTION CHUNK FOR MVRS_ID5_TickImmelmann_105FE
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_106EE		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Lancement du nœud 20 : sans vecteur dans la demande, fin ; sinon
+; minuteur de la demande, direction rangée en [nœud+11h], pilote automatique coupé
+; ([modèle+85h] = 0FFh), puis le tick.
+; ==============================================================================================
+MVRS_ID20_ApplyAvoid_106EE		proc far
 
 var_10		= dword ptr -10h
 var_C		= dword ptr -0Ch
@@ -521,7 +553,7 @@ arg_4		= word ptr  0Ah
 		push	si
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_10409
+		call	near ptr MVRS_ApplyCommon_10409
 		add	sp, 6
 		cmp	word ptr [si+4], 0
 		jz	short loc_10774
@@ -565,13 +597,17 @@ loc_1077C:
 		pop	si
 		leave
 		retf
-sub_106EE		endp
+MVRS_ID20_ApplyAvoid_106EE		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_10783		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Tick du nœud 20 : manette 10, direction voulue (dword_7C811) = la
+; direction rangée ; fin au bout du minuteur.
+; ==============================================================================================
+MVRS_ID20_TickAvoid_10783		proc far
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -615,13 +651,17 @@ loc_107EA:
 		pop	si
 		leave
 		retf
-sub_10783		endp
+MVRS_ID20_TickAvoid_10783		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_107ED		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Lancement du nœud 21 : drapeau « point atteint » du bloc de commandes à
+; 0, minuteur de la demande, puis le tick.
+; ==============================================================================================
+MVRS_ID21_ApplyNavigation_107ED		proc far
 
 var_4		= dword ptr -4
 arg_0		= dword ptr  6
@@ -635,7 +675,7 @@ arg_4		= word ptr  0Ah
 		push	si
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_10409
+		call	near ptr MVRS_ApplyCommon_10409
 		add	sp, 6
 		les	bx, word ptr [bp+arg_0]
 		les	bx, es:[bx+0Dh]
@@ -655,13 +695,18 @@ arg_4		= word ptr  0Ah
 		pop	si
 		leave
 		retf
-sub_107ED		endp
+MVRS_ID21_ApplyNavigation_107ED		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_10839		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Tick du nœud 21 : vitesse voulue = champ 23 du JDYN ; pilote
+; automatique coupé : engagé si |assiette| < 15°, sinon assiette voulue 0 ; fin (pilote
+; automatique coupé) au bout du minuteur ou quand le point est atteint.
+; ==============================================================================================
+MVRS_ID21_TickNavigation_10839		proc far
 
 var_2		= word ptr -2
 arg_0		= dword ptr  6
@@ -731,13 +776,22 @@ loc_108C0:
 loc_108DB:
 		leave
 		retf
-sub_10839		endp
+MVRS_ID21_TickNavigation_10839		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_108DD		proc far
+; ==============================================================================================
+; far. LUE 2026-11-14. Méthode +8 du nœud ID 7 de Pacific Strike (table dseg 488h, nœud
+; [entité+204] créé dans ovr236). Lancée par Goal_FormationFlight_D2AC avec le chef, le poste
+; [entité+310] et 2 s. Range le minuteur (node+13h) et le chef (node+11h), [modèle+85h] =
+; 0FFh. Direction voulue = chef − moi (MVRS_ComputeTargetContext_9D0A). Vitesse voulue
+; (word_7C82B) : écart de cap nez/chef < 30° : vitesse du chef si distance < 2000/3 m et
+; niveau du pilote [entité+178] ≠ 0, sinon vitesse du chef + 30 m/s ; écart ≥ 30° : champ 23
+; du JDYN ([modèle+9Dh]). Le poste n'est pas lu ici.
+; ==============================================================================================
+MVRS_ID7_ApplyFollowLeader_108DD		proc far
 
 var_8		= word ptr -8
 var_6		= word ptr -6
@@ -754,7 +808,7 @@ arg_4		= word ptr  0Ah
 		push	si
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_10409
+		call	near ptr MVRS_ApplyCommon_10409
 		add	sp, 6
 		mov	di, si
 		add	di, 6
@@ -819,13 +873,22 @@ loc_1099D:
 		pop	si
 		leave
 		retf
-sub_108DD		endp
+MVRS_ID7_ApplyFollowLeader_108DD		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_109A4		proc far
+; ==============================================================================================
+; far. LUE 2026-11-14. Méthode +12 du nœud ID 7 de Pacific Strike. Minuteur − dt. Avec un chef
+; : MVRS_ComputeTargetContext_9D0A ; si le chef est le joueur, proche (< 2000 m) et aligné (<
+; 30°) : SetReference16(63AEh) et byte_776B2 = 1 (rôle non établi). Direction voulue = chef −
+; moi. Vitesse voulue : écart de cap entre mon nez et celui du chef < 90° : distance < 1000 m
+; → vitesse du chef si niveau [entité+178] ≠ 0, sinon + 30 m/s ; distance ≥ 1000 m → vitesse
+; du chef + 25 m/s ; écart ≥ 90° : champ 23 du JDYN. Fin (sub_103CB) sans chef ou minuteur
+; négatif.
+; ==============================================================================================
+MVRS_ID7_TickFollowLeader_109A4		proc far
 
 var_A		= word ptr -0Ah
 var_8		= word ptr -8
@@ -848,7 +911,7 @@ loc_109C0:
 		push	word ptr es:[bx+11h]
 		push	word ptr [bp+arg_0+2]
 		push	bx
-		call	sub_9D0A
+		call	MVRS_ComputeTargetContext_9D0A
 		add	sp, 6
 		les	bx, word ptr [bp+arg_0]
 		mov	bx, es:[bx+0Ah]
@@ -978,13 +1041,16 @@ loc_10B0E:
 loc_10B19:
 		leave
 		retf
-sub_109A4		endp
+MVRS_ID7_TickFollowLeader_109A4		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_10B1B		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Lancement de la manœuvre 14 : minuteur 4 s, puis le tick.
+; ==============================================================================================
+MVRS_ID14_ApplyGroundAvoid_10B1B		proc far
 
 var_4		= dword ptr -4
 arg_0		= dword ptr  6
@@ -996,7 +1062,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+arg_4]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_10409
+		call	near ptr MVRS_ApplyCommon_10409
 		add	sp, 6
 		mov	[bp+var_4], 400h
 		mov	eax, [bp+var_4]
@@ -1009,13 +1075,18 @@ arg_4		= word ptr  0Ah
 		add	sp, 4
 		leave
 		retf
-sub_10B1B		endp
+MVRS_ID14_ApplyGroundAvoid_10B1B		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_10B52		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Tick de la manœuvre 14 : sous 200 m et sérieusement endommagé,
+; AI_Eject_A58C ; assiette voulue +20°, roulis 0, vitesse = champ 23 du JDYN, byte_7C847 = 1
+; (manche à fond tant que l'assiette est loin). Fin au bout du minuteur.
+; ==============================================================================================
+MVRS_ID14_TickGroundAvoid_10B52		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1035,7 +1106,7 @@ arg_2		= word ptr  8
 		jz	short loc_10B92
 		les	bx, [bp+arg_0]
 		push	large es:[bx+0Dh]
-		call	sub_A58C
+		call	AI_Eject_A58C
 		add	sp, 4
 
 loc_10B92:
@@ -1061,13 +1132,16 @@ loc_10B92:
 loc_10BD0:
 		pop	bp
 		retf
-sub_10B52		endp
+MVRS_ID14_TickGroundAvoid_10B52		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_10BD2		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Lancement de la manœuvre 15 : minuteur 8 s, puis le tick.
+; ==============================================================================================
+MVRS_ID15_ApplyStallRecovery_10BD2		proc far
 
 var_4		= dword ptr -4
 arg_0		= dword ptr  6
@@ -1079,7 +1153,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+arg_4]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_10409
+		call	near ptr MVRS_ApplyCommon_10409
 		add	sp, 6
 		mov	[bp+var_4], 800h
 		mov	eax, [bp+var_4]
@@ -1092,13 +1166,17 @@ arg_4		= word ptr  0Ah
 		add	sp, 4
 		leave
 		retf
-sub_10BD2		endp
+MVRS_ID15_ApplyStallRecovery_10BD2		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_10C09		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Tick de la manœuvre 15 : comme celui de la 14 avec une assiette voulue
+; de +5°.
+; ==============================================================================================
+MVRS_ID15_TickStallRecovery_10C09		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1118,7 +1196,7 @@ arg_2		= word ptr  8
 		jz	short loc_10C49
 		les	bx, [bp+arg_0]
 		push	large es:[bx+0Dh]
-		call	sub_A58C
+		call	AI_Eject_A58C
 		add	sp, 4
 
 loc_10C49:
@@ -1144,13 +1222,22 @@ loc_10C49:
 loc_10C87:
 		pop	bp
 		retf
-sub_10C09		endp
+MVRS_ID15_TickStallRecovery_10C09		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_10C89		proc far
+; ==============================================================================================
+; far. LUE 2026-11-14. Note du nœud 22 (attaque au canon, table 4B8h, nœud fixe du tournoi).
+; Pose le minuteur à 2,0 s ([nœud+14h]), la cible ([nœud+1Eh]) et [nœud+11h] = 1, remet le
+; compteur de rafales [nœud+12h] à 0. 0 si l'avion pique (word_7C82D < 0) plus bas que la
+; hauteur de son niveau (word_7C804 + 2 × [entité+178] : 250, 200, 150 m ; dword_7C837 =
+; hauteur au-dessus du sol) ; 0 si MVRS_ID22_SelectGuns_11393 ne trouve pas de canon chargé ;
+; 0 si la cible n'est pas un avion (byte_7C7C2 ≠ 6). Sinon n = MVRS_ID22_AimQuality_1125E + 2
+; × [entité+187] (octet 9 d'ATRB), note = 10 si n ≥ 100, sinon n ÷ 10.
+; ==============================================================================================
+MVRS_ID22_ScoreGunAttack_10C89		proc far
 
 var_6		= word ptr -6
 var_4		= dword ptr -4
@@ -1197,7 +1284,7 @@ loc_10CF2:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_11393
+		call	near ptr MVRS_ID22_SelectGuns_11393
 		add	sp, 4
 		or	al, al
 		jz	short loc_10CEE
@@ -1206,7 +1293,7 @@ loc_10CF2:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_1125E
+		call	near ptr MVRS_ID22_AimQuality_1125E
 		add	sp, 4
 		mov	dx, ax
 		les	bx, word ptr [bp+arg_0]
@@ -1230,13 +1317,17 @@ loc_10D39:
 		pop	si
 		leave
 		retf
-sub_10C89		endp
+MVRS_ID22_ScoreGunAttack_10C89		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_10D3C		proc far
+; ==============================================================================================
+; far. LUE 2026-11-14. Lancement du nœud 22 : note le nœud s'il ne l'a pas été ([nœud+11h] =
+; 0), lancement commun sub_10409, compteur de rafales à 0, puis le tick tout de suite.
+; ==============================================================================================
+MVRS_ID22_ApplyGunAttack_10D3C		proc far
 
 arg_0		= dword ptr  6
 arg_4		= word ptr  0Ah
@@ -1261,7 +1352,7 @@ loc_10D5E:
 		push	si
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_10409
+		call	near ptr MVRS_ApplyCommon_10409
 		add	sp, 6
 		les	bx, word ptr [bp+arg_0]
 		mov	byte ptr es:[bx+12h], 0
@@ -1273,13 +1364,28 @@ loc_10D5E:
 		pop	si
 		pop	bp
 		retf
-sub_10D3C		endp
+MVRS_ID22_ApplyGunAttack_10D3C		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_10D82		proc far
+; ==============================================================================================
+; far. LUE 2026-11-14. Tick du nœud 22 : minuteur − dt ; efface le bit de tir au canon (bit 1
+; de [commandes+1Bh]) et le bit 6. Sans cible : fin. Visée en avance : vitesse de l'obus =
+; dword +85h du modèle du canon choisi ; vitesse relative = vitesse de la cible − la mienne
+; (méthode +50h) ; si l'écart de cap entre mon nez et celui de la cible < 90° (word_7C7D5)
+; vitesse = obus + |relative|, sinon obus − |relative| ; t = distance ÷ vitesse ; point visé =
+; position de la cible + vitesse de la cible × t, relevé de ½ g t² (t(t+1)/2 × dword_7942B, g
+; = −9,8 m/s², posé par sub_47B4D : compense la chute de l'obus) et d'un écart aléatoire
+; (Math_RandomJitter_56C57(10) ÷ 10 m). Direction voulue (dword_7C811) = point visé − (ma
+; position + ma vitesse × 1 s). Vitesse voulue = champ 23 du JDYN ; si l'écart de cap des nez
+; < 90° et distance < 1000 m : vitesse de la cible si niveau [entité+178] ≠ 0, sinon + 30 m/s.
+; q = MVRS_ID22_AimQuality_1125E ; q > 75 : sub_A932 (recalage de visée selon [entité+185],
+; octet 7 d'ATRB) ; q > 100 : sub_3F15E (début de rafale) ; q > 75 : bit de tir au canon posé
+; et compteur de rafales [nœud+12h] + 1. Fin (sub_10381) au bout du minuteur ou sans cible.
+; ==============================================================================================
+MVRS_ID22_TickGunAttack_10D82		proc far
 
 var_110		= dword ptr -110h
 var_10C		= dword ptr -10Ch
@@ -1676,7 +1782,7 @@ loc_111DD:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_1125E
+		call	near ptr MVRS_ID22_AimQuality_1125E
 		add	sp, 4
 		mov	[bp+var_2], ax
 		cmp	ax, 4Bh
@@ -1691,7 +1797,7 @@ loc_111DD:
 		les	bx, word ptr [bp+arg_0]
 		les	bx, es:[bx+0Dh]
 		push	large es:[bx+0D6h]
-		call	sub_3F15E
+		call	WeaponSystem_StartBurst_3F15E
 		add	sp, 4
 
 loc_11220:
@@ -1721,13 +1827,20 @@ loc_1125B:
 		pop	si
 		leave
 		retf
-sub_10D82		endp
+MVRS_ID22_TickGunAttack_10D82		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_1125E		proc far
+; ==============================================================================================
+; far. LUE 2026-11-14. Qualité de la visée au canon (0 sans cible). a = angle (sub_578DF,
+; degrés) entre la direction voulue dword_7C811 et mon nez ; b = angle entre la direction de
+; la cible et mon nez. Distance < 2000 m : q = 100 − a² ; < 4000 m et a ≤ 1 : 15 ; sinon 0.
+; Compteur de rafales n ≠ 0 : q += 20 − n si b > 30°, sinon 10 − n. Distance < 500 m : q +=
+; (500 − distance) ÷ 20. q += [entité+180] (octet 1 d'ATRB). Borné à 0.
+; ==============================================================================================
+MVRS_ID22_AimQuality_1125E		proc far
 
 var_1A		= dword ptr -1Ah
 var_16		= dword ptr -16h
@@ -1867,13 +1980,19 @@ loc_1138E:
 		pop	si
 		leave
 		retf
-sub_1125E		endp
+MVRS_ID22_AimQuality_1125E		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_11393		proc far
+; ==============================================================================================
+; far. LUE 2026-11-14. Sans cible : 0. Sans point d'emport canon chargé
+; (WeaponStation_FindLoadedCompatible, masque 64) : 0. Sinon choisit le canon (sub_3EF67
+; jusqu'à un point canon), début de rafale (sub_3F15E) si la cible est à moins de 500 m, et
+; renvoie 64.
+; ==============================================================================================
+MVRS_ID22_SelectGuns_11393		proc far
 
 var_5		= byte ptr -5
 var_4		= dword ptr -4
@@ -1919,7 +2038,7 @@ loc_113F1:
 		cmp	dword_7C7D9, 1F4h
 		jge	short loc_1140A
 		push	large [bp+var_4]
-		call	sub_3F15E
+		call	WeaponSystem_StartBurst_3F15E
 		add	sp, 4
 		jmp	short loc_11475
 
@@ -1979,7 +2098,7 @@ loc_11479:
 loc_1147B:
 		leave
 		retf
-sub_11393		endp
+MVRS_ID22_SelectGuns_11393		endp
 
 ; ----------------------------------------------------------------------
 
@@ -2046,7 +2165,11 @@ sub_1147D		endp
 
 ; Attributes: bp-based frame
 
-sub_114E1		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Lancement de la manœuvre 4 : minuteur de la demande (2 s), puis le
+; tick.
+; ==============================================================================================
+MVRS_ID4_ApplyClimbAway_114E1		proc far
 
 var_4		= dword ptr -4
 arg_0		= dword ptr  6
@@ -2060,7 +2183,7 @@ arg_4		= word ptr  0Ah
 		push	si
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_10409
+		call	near ptr MVRS_ApplyCommon_10409
 		add	sp, 6
 		add	si, 6
 		mov	eax, [si]
@@ -2076,13 +2199,17 @@ arg_4		= word ptr  0Ah
 		pop	si
 		leave
 		retf
-sub_114E1		endp
+MVRS_ID4_ApplyClimbAway_114E1		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_1151D		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Tick de la manœuvre 4 : assiette voulue +30°, ou 0 si la vitesse est
+; inférieure au champ 24 du JDYN ; vitesse voulue = champ 23. Fin au bout du minuteur.
+; ==============================================================================================
+MVRS_ID4_TickClimbAway_1151D		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -2123,13 +2250,16 @@ loc_1154C:
 loc_11579:
 		pop	bp
 		retf
-sub_1151D		endp
+MVRS_ID4_TickClimbAway_1151D		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_1157B		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Lancement de la manœuvre 6 : minuteur 8 s, phase 0, puis le tick.
+; ==============================================================================================
+MVRS_ID6_ApplySplitS_1157B		proc far
 
 var_4		= dword ptr -4
 arg_0		= dword ptr  6
@@ -2141,7 +2271,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+arg_4]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_10409
+		call	near ptr MVRS_ApplyCommon_10409
 		add	sp, 6
 		mov	[bp+var_4], 800h
 		mov	eax, [bp+var_4]
@@ -2155,13 +2285,20 @@ arg_4		= word ptr  0Ah
 		add	sp, 4
 		leave
 		retf
-sub_1157B		endp
+MVRS_ID6_ApplySplitS_1157B		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_115B7		proc far
+; ==============================================================================================
+; far. LUE 2026-11-15. Tick de la manœuvre 6 : (0) vitesse = champ 23, roulis voulu 180°,
+; phase 1 quand |roulis| > 160° ; (1) roulis 180°, vitesse = 2 × champ 24, manche =
+; byte_7C7FB[niveau], phase 2 sous −35° d'assiette ; (2) vitesse 2 × champ 24, même manche,
+; phase 3 au-dessus de −35° ; (3) vitesse = champ 23, assiette voulue 0. Fin au bout du
+; minuteur.
+; ==============================================================================================
+MVRS_ID6_TickSplitS_115B7		proc far
 
 var_6		= word ptr -6
 var_4		= word ptr -4
@@ -2277,12 +2414,12 @@ loc_116BB:
 loc_116D6:
 		leave
 		retf
-sub_115B7		endp
+MVRS_ID6_TickSplitS_115B7		endp
 
-; START OF FUNCTION CHUNK FOR sub_115B7
+; START OF FUNCTION CHUNK FOR MVRS_ID6_TickSplitS_115B7
 off_116D8	dw offset loc_115DF
 		dw offset loc_11614
 		dw offset loc_1165E
 		dw offset loc_116A3
-; END OF FUNCTION CHUNK FOR sub_115B7
+; END OF FUNCTION CHUNK FOR MVRS_ID6_TickSplitS_115B7
 seg026		ends

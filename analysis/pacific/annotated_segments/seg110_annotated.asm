@@ -195,7 +195,7 @@ loc_44ABB:
 		add	ax, 12h
 		push	ax
 		push	word_79788
-		call	Ground_IsWaterUnderPoint_3677E
+		call	Ground_IsSeaLevel_3677E
 		add	sp, 8
 		mov	ah, 0
 		or	ax, ax
@@ -220,7 +220,7 @@ loc_44B0E:
 		add	ax, 12h
 		push	ax
 		push	word_79788
-		call	Ground_IsWaterUnderPoint_3677E
+		call	Ground_IsSeaLevel_3677E
 		add	sp, 8
 		or	al, al
 		jnz	short loc_44B5D
@@ -465,7 +465,7 @@ loc_44CFB:
 		add	ax, 12h
 		push	ax
 		push	word_79788
-		call	Ground_IsWaterUnderPoint_3677E
+		call	Ground_IsSeaLevel_3677E
 		add	sp, 8
 		mov	ah, 0
 		or	ax, ax

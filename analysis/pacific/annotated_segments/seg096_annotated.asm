@@ -334,7 +334,7 @@ loc_3CA1D:
 		jnz	short loc_3CA4F
 		push	[bp+arg_6]
 		push	di
-		call	sub_553B6
+		call	World_OnObjectDestroyed_553B6
 		add	sp, 4
 		les	bx, word ptr [bp+arg_0]
 		mov	al, es:[bx+6Bh]
